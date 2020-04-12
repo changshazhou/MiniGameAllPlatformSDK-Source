@@ -1,6 +1,7 @@
-import BaseModule from './BaseModule'
-import MathUtils from './MathUtils';
-import Common from './Common';
+import MathUtils from "./MathUtils";
+import Common from "./Common";
+import BaseModule from "./BaseModule";
+
 export const VIDEO_STATUS = {
     END: "__video_end",
     NOTEND: "__video_not_end",
@@ -11,7 +12,7 @@ export const VIDEO_MSG = {
     NOTEND: "请完整观看完视频！"
 }
 export const SHARE_MSG = {
-    FAIL: "请分享到30人以上的群",
+    FAIL: "请分享到群！",
 }
 // var videoLoading: boolean = false;
 // var videoCb = null;
@@ -19,15 +20,861 @@ export default class PlatformModule extends BaseModule {
 
     constructor() {
         super();
-        window["moosnow"] = this as any;
+        this._regisiterWXCallback();
+        this.initShare(true);
+        this.share_clickTime = null; //分享拉起时间
+        this.currentShareCallback = null; //模拟分享回调
+        this.shareFail = false;
+
+        this.updateProgram();
+        this.initRecord();
+    }
+    public share_clickTime: number;
+    public currentShareCallback: Function = null;
+    public shareFail: boolean = null;
+    public vibrateOn: boolean = false;
+    public systemInfo: any = null;
+
+    public banner: any = null;
+    public video: any = null;
+    public inter: any = null;
+
+    public platformName: string = "wx";
+    public bannerId: string = "";
+    public videoId: string = "";
+    public interId = "";
+    public appid: string = "gunking_test";
+    public bannerWidth: number = 300;
+    public bannerShowCount: number = 0;
+    public bannerShowCountLimit: number = 3;
+    public videoCb: Function = null;
+    public videoLoading: boolean = false;
+
+    public interShowCount: number = 0;
+    public interShowCountLimit: number = 3;
+    public isInterLoaded: boolean = false;
+
+    public record: any = null;
+
+    private shareInfoArr: { img: string, title: string }[] = [];
+    onEnable() {
+
+
+    }
+    private vibrateSwitch(on) {
+        this.vibrateOn = on;
     }
 
-    public getCache() {
-        return (window["moosnow"] as any).cache
+    public gameLogin(callback: Function) {
+
     }
-    public setCache(val) {
-        (window["moosnow"] as any).cache = val
+
+    // lateStart() {
+    //     this.updateProgram();
+
+    //     if (!window[this.platformName]) return;
+    //     Lite.event.sendEventImmediately('OnWXShow', this.getLaunchOption());
+    // }
+    public isIphoneXModel() {
+        if (!window[this.platformName]) return;
+        let sysInfo = this.getSystemInfoSync();
+        if (/iphone x/.test(sysInfo.model.toLowerCase())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public isIphoneX() {
+        if (!window[this.platformName]) return;
+        let sysInfo = this.getSystemInfoSync();
+        let screenHeight = sysInfo.screenHeight;
+        let screenWidth = sysInfo.screenWidth;
+        let ratioWH = screenWidth / screenHeight;
+        if (ratioWH <= 0.5 || ratioWH >= 2) {
+            return true;
+        } else {
+            return false;
+        }
+        // let lanscape = screenHeight == 375 && screenWidth == 812;
+        // let portrait = screenHeight == 812 && screenWidth == 375;
+        // if (lanscape || portrait) {
+        //     return true;
+        // }
+        // return false;
+    }
+    public getPlatform() {
+        if (window['tt'])
+            return 'tt';
+        else if (window['swan'])
+            return 'swan';
+        else if (window['qq'])
+            return 'qq';
+        else if (window['wx'])
+            return 'wx';
+        else
+            return 'pc';
+    }
+    private compareVersion(v1, v2) {
+        v1 = v1.split('.')
+        v2 = v2.split('.')
+        const len = Math.max(v1.length, v2.length)
+
+        while (v1.length < len) {
+            v1.push('0')
+        }
+        while (v2.length < len) {
+            v2.push('0')
+        }
+
+        for (let i = 0; i < len; i++) {
+            const num1 = parseInt(v1[i])
+            const num2 = parseInt(v2[i])
+
+            if (num1 > num2) {
+                return 1
+            } else if (num1 < num2) {
+                return -1
+            }
+        }
+
+        return 0
+    }
+
+    /**
+     * 检测版本是否可用
+     * @param version 需要检查的版本号
+     */
+    public checkVersion(version: string) {
+        let sdkVersion = this.getSystemInfoSync().SDKVersion
+        return (this.compareVersion(sdkVersion, version) >= 0);
+    }
+
+    public isSmallWidth() {
+        if (!window[this.platformName]) return;
+        let sysInfo = this.getSystemInfoSync();
+        let screenHeight = sysInfo.screenHeight;
+        let screenWidth = sysInfo.screenWidth;
+        if (screenHeight < 667) {
+            console.log('高度不够', screenHeight);
+            return true;
+        }
+        return false;
+    }
+
+    public login(success: Function, fail: Function) {
+        if (success)
+            success(Common.generateUUID());
+    }
+
+    public postMessage(data: { action: number, data?: any }) {
+        if (!window[this.platformName]) return;
+        // console.log("postMessage:", data);
+        if (!window[this.platformName].getOpenDataContext) return;
+        window[this.platformName].getOpenDataContext().postMessage(data);
+    }
+    private prevNavigate = Date.now();
+    public navigate2Mini(row, success?: Function, fail?: Function, complete?: Function) {
+
+
+        if (Date.now() - this.prevNavigate < 300) {
+            console.log('>>>>>>>>>>>>>>>>>>>>> ')
+            return;
+        }
+        this.prevNavigate = Date.now();
+
+        if (!window[this.platformName]) {
+            if (success)
+                success();
+            return;
+        }
+        let { appid, path, toid, extraData } = row;
+        extraData = extraData || {};
+        window[this.platformName].navigateToMiniProgram({
+            appId: appid,
+            path: path,
+            extraData: extraData,
+            success: () => {
+                if (window[this.platformName] && window[this.platformName].aldSendEvent) {
+                    window[this.platformName].aldSendEvent('跳转', {
+                        position: row.position,
+                        appid,
+                        img: row.atlas || row.img
+                    })
+                }
+                moosnow.http.exportUser();
+                if (success)
+                    success();
+            },
+            fail: (err) => {
+                console.log('navigateToMiniProgram error ', err)
+                if (fail)
+                    fail();
+            },
+            complete: () => {
+                if (complete)
+                    complete();
+            }
+        })
+    }
+
+    private updateProgram() {
+        let self = this;
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].getUpdateManager === 'function') { // 请在使用前先判断是否支持
+            const updateManager = window[this.platformName].getUpdateManager()
+            updateManager.onCheckForUpdate(function (res) {
+                // 请求完新版本信息的回调
+                // console.log('是否有新版本', res.hasUpdate);
+            })
+
+            updateManager.onUpdateReady(function (res) {
+                self.showModal('发现新版本', '新版本已经准备好，是否更新？', '取消', '更新', function (res) {
+                    if (res)
+                        updateManager.applyUpdate();
+                });
+                // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            })
+
+            updateManager.onUpdateFailed(function () {
+                // 新的版本下载失败
+            })
+        }
+    }
+
+    public vibrateShort() {
+        if (!window[this.platformName] || !this.vibrateOn) {
+            return;
+        }
+        window[this.platformName].vibrateShort();
+    }
+    public vibrateLong() {
+        if (!window[this.platformName] || !this.vibrateOn) {
+            return;
+        }
+        window[this.platformName].vibrateLong();
+    }
+    public showLoading(title: string) {
+        if (!window[this.platformName]) {
+            console.log('showLoading', title)
+            return;
+        }
+        window[this.platformName].showLoading({
+            title: title,
+            mask: false,
+            success: null,
+            fail: null,
+            complete: null
+        });
+    }
+    public hideLoading() {
+        if (!window[this.platformName]) {
+            return;
+        }
+        window[this.platformName].hideLoading();
+    }
+    public showModal(title: string, content: string, cancelTitle: string, confirmTitle: string, confirm: (res) => void) {
+        if (!window[this.platformName]) {
+            return;
+        }
+        window[this.platformName].showModal({
+            title: title,
+            content: content,
+            cancelText: cancelTitle,
+            confirmText: confirmTitle,
+            showCancel: true,
+            cancelColor: '#000000',
+            confirmColor: '#3CC51F',
+            fail: null,
+            complete: null,
+            success(res) {
+                if (res.confirm) {
+                    if (confirm) confirm(true);
+                    // console.log('用户点击确定')
+                } else if (res.cancel) {
+                    if (confirm) confirm(false);
+                    // console.log('用户点击取消')
+                }
+            }
+        })
+    }
+
+    public showModalWithoutCancel(title: string, content: string, confirmTitle: string, confirm: (res) => void) {
+        if (!window[this.platformName]) {
+            return;
+        }
+        window[this.platformName].showModal({
+            title: title,
+            content: content,
+            showCancel: false,
+            confirmText: confirmTitle,
+            cancelColor: '#000000',
+            confirmColor: '#3CC51F',
+            cancelText: '',
+            fail: null,
+            complete: null,
+            success(res) {
+                if (res.confirm) {
+                    if (confirm) confirm(true);
+                    // console.log('用户点击确定')
+                } else if (res.cancel) {
+                    if (confirm) confirm(false);
+                    // console.log('用户点击取消')
+                }
+            }
+        })
+    }
+
+    public showToast(title: string, toastType: string = 'none', mask: boolean = false) {
+        if (!window[this.platformName]) {
+            return;
+        }
+        window[this.platformName].showToast({
+            title: title,
+            icon: toastType,
+            duration: 2000,
+            mask: mask,
+            image: null,
+            success: null,
+            fail: null,
+            complete: null
+        })
+    }
+
+    // createImage(sptite, avatarUrl, callback) {
+    //     if (!window[this.platformName]) {
+    //         callback(null);
+    //         return;
+    //     }
+    //     let image = window[this.platformName].createImage();
+    //     image.onload = (res) => {
+    //         let texture = new cc.Texture2D();
+    //         texture.initWithElement(image);
+    //         texture.handleLoadedTexture();
+    //         let spriteFrame = new cc.SpriteFrame(texture);
+    //         sptite.spriteFrame = spriteFrame;
+    //         callback(image, spriteFrame);
+    //     };
+    //     image.onerror = () => {
+    //         callback(null);
+    //     };
+    //     image.src = avatarUrl;
+    // }
+
+    public authOrGetUserInfo(callback: (userInfo: any, flag: boolean) => void) {
+        if (!window[this.platformName]) {
+            return;
+        }
+        let self = this;
+
+        this.getSetting(
+            function (setting) {
+                console.log('授权信息', setting);
+                if (setting['scope.userInfo']) {
+                    //已经授权
+                    self.getUserInfo(
+                        function (userInfo) {
+                            //获取用户信息成功
+                            console.log('获取用户信息：', userInfo);
+                            callback(userInfo, false);
+                        },
+                        function (error) {
+                            //获取用户信息失败
+                            // callback(null);
+                        });
+                } else {
+                    //未授权
+                    self.showUserInfoButton(
+                        function (userInfo) {
+                            callback(userInfo, true);
+                            console.log('授权获取用户信息：', userInfo);
+                        }
+                    );
+                }
+            },
+            function (error) {
+                //获取授权设置失败
+                self.showUserInfoButton(
+                    function (userInfo) {
+                        callback(userInfo, true);
+                        console.log('授权获取用户信息：', userInfo);
+                    }
+                );
+            });
+
+
+
+    }
+
+    private showUserInfoButton(callback: (userInfo: any) => void) {
+        let obj = {
+            type: 'text',
+            text: '',
+            style: this._initLoginButton(),
+        };
+        let btn = window[this.platformName].createUserInfoButton(obj);
+        btn.onTap(function (res) {
+            if (res.userInfo && res.userInfo.nickName) {
+                //授权成功
+                callback(res.userInfo);
+                btn.hide();
+            } else {
+                //授权失败
+                callback(null);
+            }
+        });
+        btn.show();
+    }
+
+    private getSetting(success: Function, fail: Function) {
+        window[this.platformName].getSetting({
+            success: function (res) {
+                success(res.authSetting);
+                // res.authSetting = {
+                //   "scope.userInfo": true,
+                //   "scope.userLocation": true
+                // }
+            },
+            fail: function () {
+                fail();
+            },
+            complete: null,
+        })
+    }
+
+    private getUserInfo(success: (userInfo: any) => void, fail: Function) {
+        window[this.platformName].getUserInfo({
+            success: function (res) {
+                success(res.userInfo);
+            },
+            fail: function () {
+                fail();
+            },
+            withCredentials: false,
+            complete: null,
+            lang: 'en',
+        })
+    }
+
+    /**
+     * 获取游戏启动参数
+     * 返回值
+     * scene	number	场景值	
+     * query	Object	启动参数	
+     * isSticky	boolean	当前小游戏是否被显示在聊天顶部	
+     * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量 
+     */
+    public getLaunchOption() {
+        if (!window[this.platformName]) return;
+        return window[this.platformName].getLaunchOptionsSync();
+    }
+
+    /**
+     * return obj
+     * brand	string	手机品牌
+     * model	string	手机型号
+     * pixelRatio	number	设备像素比
+     * screenWidth	number	屏幕宽度
+     * screenHeight	number	屏幕高度
+     * windowWidth	number	可使用窗口宽度
+     * windowHeight	number	可使用窗口高度
+     * language	string	微信设置的语言
+     * version	string	微信版本号
+     * system	string	操作系统版本
+     * platform	string	客户端平台
+     * fontSizeSetting	number	用户字体大小设置。以“我-设置-通用-字体大小”中的设置为准，单位 px。	>= 1.5.0
+     * SDKVersion	string	客户端基础库版本	                                >= 1.1.0
+     * benchmarkLevel	number	性能等级，-2 或 0：该设备无法运行小游戏，-1：性能未知，>=1 设备性能值，该值越高，设备性能越好(目前设备最高不到50)	                                >= 1.8.0
+     * battery	number	电量，范围 1 - 100	                                   >= 1.9.0
+     * wifiSignal	number	wifi 信号强度，范围 0 - 4	                        >= 1.9.0
+     */
+    public getSystemInfoSync() {
+        if (!window[this.platformName]) return;
+        if (this.systemInfo == null) {
+            this.systemInfo = window[this.platformName].getSystemInfoSync();
+        }
+        return this.systemInfo;
+    }
+
+    //-----------------分享------------------
+    public initShare(shareInfoArr) {
+        if (!window[this.platformName]) return;
+        this.shareInfoArr = shareInfoArr;
+        window[this.platformName].showShareMenu({
+            withShareTicket: true,
+            success: null,
+            fail: null,
+            complete: null
+        });
+        if (window[this.platformName].onShareAppMessage)
+            window[this.platformName].onShareAppMessage(() => {
+                return this._buildShareInfo();
+            });
+    }
+
+    public getShareInfo(ticket: string, success: (encryptedData: string, iv: string) => void, fail: Function = null) {
+        if (!window[this.platformName]) {
+            return;
+        }
+        window[this.platformName].getShareInfo({
+            shareTicket: ticket,
+            success: function (res) {
+                success(res.encryptedData, res.iv);
+            },
+            fail: function () {
+                if (fail) fail();
+            },
+            complete: null,
+        });
+    }
+
+    public share(query: Object = {}, callback?: (shared: boolean) => void) {
+        if (!window[this.platformName]) {
+            if (callback)
+                callback(true);
+        }
+        this.currentShareCallback = callback;
+        this.share_clickTime = Date.now();
+        this.shareFail = false;
+        this._share(query);
+    }
+
+    public shareWithoutCheck(query: Object = {}, callback?: (shared: boolean) => void) {
+        if (!window[this.platformName]) {
+            if (callback)
+                callback(true);
+        }
+        this.currentShareCallback = callback;
+        this.share_clickTime = 1;
+        this.shareFail = false;
+        this._share(query);
+    }
+
+    private _share(query = null) {
+        if (!window[this.platformName]) return;
+        let self = this;
+        let shareInfo = this._buildShareInfo(query);
+        window[this.platformName].shareAppMessage(shareInfo);
+    }
+
+    //构建分享内容
+    private _buildShareInfo(query = null) {
+        let title = "", imageUrl = ""
+        if (this.shareInfoArr.length > 0) {
+            let item = this.shareInfoArr[MathUtils.randomNumBoth(0, this.shareInfoArr.length - 1)];
+            title = item.title;
+            imageUrl = item.img;
+        }
+        let shareInfo = {
+            title: title,
+            imageUrl: imageUrl,
+            query: query,
+        };
+        return shareInfo;
+    }
+
+    private _onShareback() {
+        let self = this;
+        setTimeout(() => {
+            if (this.share_clickTime && this.currentShareCallback) {
+                // console.log('分享回来:',this.shareFail);
+                if (this.shareFail) {
+                    this.currentShareCallback(false);
+                } else {
+                    if (this.share_clickTime == 1 || (Date.now() - this.share_clickTime >= 3 * 1000)) {
+                        //分享成功
+                        this.currentShareCallback(true);
+                        // console.log('分享成功',this.shareFail);
+                    } else {
+                        this.currentShareCallback(false);
+                        // console.log('分享失败',this.shareFail);
+                    }
+                }
+            }
+            this.shareFail = false;
+            this.currentShareCallback = null;
+            this.share_clickTime = null;
+        }, 100);
+    }
+
+    private _initLoginButton() {
+        if (!window[this.platformName]) return;
+        let wxsys = window[this.platformName].getSystemInfoSync();
+        let style = {
+            left: 0,
+            top: 0,
+            width: wxsys.screenWidth,
+            height: wxsys.screenHeight,
+            lineHeight: 40,
+            // backgroundColor: '#de0000',
+            color: '#ffffff',
+            type: 'text',
+            text: '获取用户信息',
+            textAlign: 'center',
+            fontSize: 28,
+            // borderRadius: 5,
+        }
+        return style;
+    }
+    //-----------------录屏 具体逻辑在子类实现------------------
+    public initRecord() { }
+    public clipRecord() { }
+    public startRecord(duration = 300, callback = null) {
+        if (!this.record) {
+            if (callback)
+                callback(false);
+            return;
+        }
+    }
+    public stopRecord(callback = null) {
+        if (!this.record) {
+            if (callback)
+                callback(false);
+            return;
+        }
+    }
+    //-----------------注册事件------------------
+
+    /**
+     * 注册微信各种回调
+     */
+    private _regisiterWXCallback() {
+        if (!window[this.platformName]) return;
+        this._regisiterOnShow();
+        this._regisiterOnHide();
+    }
+
+    private _regisiterOnShow() {
+        let self = this;
+        window[this.platformName].onShow(function (res) {
+            self._onShowCallback(res);
+        });
+    }
+
+    private _onShowCallback(res) {
+        this._onShareback();
+        //Lite.log.log('WX_show:', res);
+        // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, res);
+    }
+
+    private _regisiterOnHide() {
+        let self = this;
+        window[this.platformName].onHide(self._onHideCallback);
+    }
+
+    private _onHideCallback(res) {
+        //Lite.log.log('WX_hide');
+        // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
     }
 
 
+    //-----------------Banner广告------------------
+    public initBanner() {
+        if (!window[this.platformName]) return;
+        this._prepareBanner()
+    }
+
+    public _prepareBanner() {
+        if (!window[this.platformName].createBannerAd) return;
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        if (windowWidth < this.bannerWidth) {
+            this.bannerWidth = windowWidth;
+        }
+        if (this.banner) {
+            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offError(this._onBannerError);
+            this.banner.offLoad(this._onBannerLoad);
+        }
+        this.banner = this._createBannerAd();
+        this.banner.onResize(this._bottomCenterBanner.bind(this));
+        this.banner.onError(this._onBannerError.bind(this));
+        this.banner.onLoad(this._onBannerLoad.bind(this));
+    }
+    public _createBannerAd() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createBannerAd) return;
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let left = (windowWidth - this.bannerWidth) / 2;
+        let banner = window[this.platformName].createBannerAd({
+            adUnitId: this.bannerId,
+            style: {
+                top: 0,
+                left: left,
+                width: this.bannerWidth
+            }
+        });
+        return banner;
+    }
+    public _onBannerLoad() {
+        this.bannerShowCount = 0;
+    }
+    public _onBannerError(err) {
+        console.log('banner___error:', err.errCode, err.errMsg);
+    }
+    public _bottomCenterBanner(size) {
+        let wxsys = this.getSystemInfoSync();
+        // let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        this.banner.style.height = size.height;
+        // this.banner.style.left = (windowWidth - size.width) / 2;
+        this.banner.style.top = windowHeight - size.height;
+    }
+    public showBanner() {
+        if (!window[this.platformName]) {
+            return;
+        }
+        if (this.banner)
+            this.banner.show().catch(err => {
+                console.log('广告组件出现问题', err);
+            });
+    }
+    public hideBanner() {
+        if (!window[this.platformName]) {
+            return;
+        }
+
+        this.bannerShowCount++;
+        if (this.banner) {
+            if (this.bannerShowCount >= this.bannerShowCountLimit) {
+                console.log('banner destroy');
+                this.banner.hide();
+                this.banner.destroy();
+                this.banner = null;
+                this._prepareBanner();
+                // console.log('banner---destory');
+            } else {
+                this.banner.hide();
+            }
+        }
+    }
+
+    //------------广告video------------
+    public initVideo() {
+        this.createRewardAD(false);
+    }
+    public createRewardAD(show) {
+        if (moosnow.platform.videoLoading) {
+            return;
+        }
+        if (!window[this.platformName]) {
+            moosnow.platform.videoCb(VIDEO_STATUS.END);
+            return;
+        }
+        if (!window[this.platformName].createRewardedVideoAd) {
+            return;
+        }
+        if (this.video) {
+            this.video.offClose(this._onVideoClose);
+            this.video.offError(this._onVideoError);
+            this.video.offLoad(this._onVideoLoad);
+        } else {
+            this.video = window[this.platformName].createRewardedVideoAd({
+                adUnitId: this.videoId
+            });
+        }
+        this.video.onError(this._onVideoError);
+        this.video.onClose(this._onVideoClose);
+        this.video.onLoad(this._onVideoLoad);
+        moosnow.platform.videoLoading = true;
+        this.video.load().then(() => {
+            if (show) {
+                this.video.show().then(() => { }).catch(err => {
+                    this._onVideoError(err.errMsg, err.errCode);
+                    console.log(err.errMsg);
+                });
+            }
+        }).catch(err => {
+            this._onVideoError(err.errMsg, err.errCode);
+            console.log(err.errMsg);
+        });
+    }
+
+    public _onVideoError(msg, code) {
+        moosnow.platform.videoLoading = false;
+        if (moosnow.platform.videoCb) {
+            moosnow.platform.videoCb(VIDEO_STATUS.ERR);
+            moosnow.platform.videoCb = null;
+        }
+    }
+
+    public _onVideoClose(isEnd) {
+        moosnow.platform.videoLoading = false;
+        if (moosnow.platform.videoCb) {
+            let ret = (!!isEnd.isEnded) ? VIDEO_STATUS.END : VIDEO_STATUS.NOTEND;
+            setTimeout(() => {
+                moosnow.platform.videoCb(ret);
+            }, 50);
+        }
+    }
+
+    public _onVideoLoad() {
+        moosnow.platform.videoLoading = false;
+    }
+
+    public showVideo(completeCallback = null) {
+        moosnow.platform.videoCb = completeCallback;
+        this.createRewardAD(true);
+    }
+
+    //--------------插屏广告---------------
+    public initInter() {
+        this.prepareInter();
+    }
+    public prepareInter() {
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].createInterstitialAd != "function") return;
+        if (!this.checkVersion('2.8.0')) return;
+        this.inter = window[this.platformName].createInterstitialAd({
+            adUnitId: this.interId
+        });
+        this.inter.onLoad(this._onInterLoad.bind(this));
+        this.inter.onClose(this._onInterClose.bind(this));
+        // this.inter.load();
+    }
+    public showInter() {
+        if (!this.inter) return;
+        if (this.isInterLoaded)
+            this.inter.show();
+    }
+    public _onInterLoad() {
+        this.interShowCount = 0;
+        this.isInterLoaded = true;
+    }
+    public _onInterClose() {
+        this.interShowCount++;
+        if (this.interShowCount >= this.interShowCountLimit) {
+            this.isInterLoaded = false;
+            this.inter.load();
+        }
+    }
+    //----自定义--
+    public initRank() {
+        let data = {
+            action: 1,
+        };
+        this.postMessage(data);
+    }
+    public showRank() {
+        let data = {
+            action: 10,
+        };
+        this.postMessage(data);
+    }
+    public updateUserScore(score) {
+        let data = {
+            action: 13,
+            data: score,
+        };
+        this.postMessage(data);
+    }
+    public hideRank() {
+        let data = {
+            action: 20,
+        }
+        this.postMessage(data);
+    }
+
+    onDisable() {
+    }
 }

@@ -1,10 +1,16 @@
 import PlatformModule from "./PlatformModule";
 import WXModule from "./WXModule";
+import AdModule from "./AdModule";
+import { HttpModule } from "./HttpModule";
 
 class Main {
     constructor() {
         this.initPlatform();
-        (window["moosnow"] as any) = this;
+
+        this.mHttp = new HttpModule();
+        this.mAd = new AdModule();
+
+        (window["moosnow"]) = this;
     }
     private mPlatform: PlatformModule;
     public get platform() {
@@ -16,6 +22,15 @@ class Main {
         else
             this.mPlatform = new PlatformModule();
         // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
+    }
+    private mAd: AdModule;
+    public get ad() {
+        return this.mAd;
+    }
+
+    private mHttp: HttpModule
+    public get http() {
+        return this.mHttp;
     }
 
 }

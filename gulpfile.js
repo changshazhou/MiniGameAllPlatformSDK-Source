@@ -35,7 +35,7 @@ gulp.task('tsc', () => {
 		]
 	}).then(bundle => {
 		return bundle.write({
-			file: './dist/moosnowSdk.js',
+			file: '../../dist/platformSdk.js',
 			format: 'iife',
 			name: 'laya',
 			sourcemap: false
