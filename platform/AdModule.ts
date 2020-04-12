@@ -100,9 +100,9 @@ export default class AdModule extends BaseModule {
                     this.this.cacheImage = storageVal.data;
                     console.log('cacheKey data  ', storageVal.data)
                 },
-                fail: function (e) {
-                    this.this.cacheImage = {}
-                    console.log('cacheKey error ', e)
+                fail: () => {
+                    this.cacheImage = {}
+                    console.log('cacheKey error ')
                 },
                 complete: function () {
                     callback(this.this.cacheImage)
@@ -186,7 +186,7 @@ export default class AdModule extends BaseModule {
     }
     private saveCacheUrl = function (retValue) {
         let clearItem = [];
-        let fileSystemManager = wx.getFileSystemManager();
+        let fileSystemManager = window["wx"].getFileSystemManager() as any;
         for (let url in this.cacheImage) {
             let removeUrl = true;
             for (let pos in retValue) {
@@ -214,9 +214,12 @@ export default class AdModule extends BaseModule {
             delete this.cacheImage[clearItem[i]]
         }
         if (window["wx"])
-            wx.setStorage({
+            window["wx"].setStorage({
                 key: this.cacheKey,
-                data: this.cacheImage
+                data: this.cacheImage,
+                success: () => { },
+                fail: () => { },
+                complete: () => { }
             })
     }
 
@@ -262,27 +265,7 @@ export default class AdModule extends BaseModule {
      * @param {string} userid  小游戏中的用户Id
      */
     private collect(row, userid) {
-        return;
-        let n = Date.now();
-        if ((window.lastCollect && n < window.lastCollect - 1000)) {
-            return;
-        }
-        window.lastCollect = n;
-        let cache = getCache();
-        let openSuccess = false;
-        for (var k in cache) {
-            let adArr = cache[k];
-            for (let i = 0; i < adArr.length; i++) {
-                let item = adArr[i];
-                if (item.appid == row.appid) {
-                    openSuccess = true;
-                    openAppSuccess(conf.sdkAppId, row.appid, userid)
-                    break;
-                }
-            }
-            if (openSuccess)
-                break;
-        }
+
     }
 
     private formatNumber(n) {
