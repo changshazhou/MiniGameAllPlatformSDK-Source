@@ -92,7 +92,6 @@ var conf = {
         let userid = localStorage.getItem(userKey);
         if (!userid) {
             userid = generateUUID();
-            userid = userid.replace(/-/g, '')
             this.setUserId(userid);
         }
         return userid;

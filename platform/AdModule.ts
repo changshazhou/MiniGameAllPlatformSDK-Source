@@ -19,7 +19,7 @@ export default class AdModule extends BaseModule {
      *   gameFloat 游戏页浮动广告 
      *   endPage 结束页广告
      */
-    public getAd(callback: Function) {
+    public getAd(callback: (appList: moosnowResult) => {}) {
         let cache = this.getCache();
         if (!Common.isEmpty(cache)) {
             for (let k in cache) {

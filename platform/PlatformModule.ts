@@ -161,6 +161,7 @@ export default class PlatformModule extends BaseModule {
             let token = moosnow.data.getToken()
             if (!token) {
                 token = Common.generateUUID();
+                token = token.replace(/-/g, '')
                 moosnow.data.setToken(token);
             }
             success(token);
@@ -175,7 +176,7 @@ export default class PlatformModule extends BaseModule {
         window[this.platformName].getOpenDataContext().postMessage(data);
     }
     private prevNavigate = Date.now();
-    public navigate2Mini(row, success?: Function, fail?: Function, complete?: Function) {
+    public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
         if (Date.now() - this.prevNavigate < 300) {
@@ -189,7 +190,7 @@ export default class PlatformModule extends BaseModule {
                 success();
             return;
         }
-        let { appid, path, toid, extraData } = row;
+        let { appid, path, extraData } = row;
         extraData = extraData || {};
         window[this.platformName].navigateToMiniProgram({
             appId: appid,
@@ -255,6 +256,7 @@ export default class PlatformModule extends BaseModule {
         }
         window[this.platformName].vibrateLong();
     }
+
     public showLoading(title: string) {
         if (!window[this.platformName]) {
             console.log('showLoading', title)
@@ -341,26 +343,6 @@ export default class PlatformModule extends BaseModule {
             complete: null
         })
     }
-
-    // createImage(sptite, avatarUrl, callback) {
-    //     if (!window[this.platformName]) {
-    //         callback(null);
-    //         return;
-    //     }
-    //     let image = window[this.platformName].createImage();
-    //     image.onload = (res) => {
-    //         let texture = new cc.Texture2D();
-    //         texture.initWithElement(image);
-    //         texture.handleLoadedTexture();
-    //         let spriteFrame = new cc.SpriteFrame(texture);
-    //         sptite.spriteFrame = spriteFrame;
-    //         callback(image, spriteFrame);
-    //     };
-    //     image.onerror = () => {
-    //         callback(null);
-    //     };
-    //     image.src = avatarUrl;
-    // }
 
     public authOrGetUserInfo(callback: (userInfo: any, flag: boolean) => void) {
         if (!window[this.platformName]) {
