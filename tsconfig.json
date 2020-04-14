@@ -1,11 +1,13 @@
 {
-    "compilerOptions": {
-      "module": "es6",
-      "target": "es5",
-      "noEmitHelpers": true,
-      "sourceMap": false
-    },
-    "exclude": [
-      "node_modules"
-    ]
-  }
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "noEmitHelpers": true,
+    "sourceMap": false,
+    "declaration": true, // 是否自动创建类型声明文件
+    "declarationDir":"./"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

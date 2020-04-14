@@ -5,12 +5,10 @@ import { HttpModule } from "./HttpModule";
 
 class Main {
     constructor() {
+        (window["moosnow"]) = this;
         this.initPlatform();
-
         this.mHttp = new HttpModule();
         this.mAd = new AdModule();
-
-        (window["moosnow"]) = this;
     }
     private mPlatform: PlatformModule;
     public get platform() {

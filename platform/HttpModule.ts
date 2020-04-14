@@ -102,27 +102,27 @@ export class HttpModule extends BaseModule {
        * Loading加载完成
        */
     public finishLoading() {
-        this.remote('channel/validUser.html')
+        this.postData('channel/validUser.html')
     }
     /**
       * Loading加载完成
       */
     public clickBanner() {
-        this.remote('channel/clickBanner.html')
+        this.postData('channel/clickBanner.html')
     }
 
     /**
      * Loading加载完成
      */
     public clickVideo() {
-        this.remote('channel/clickVideo.html')
+        this.postData('channel/clickVideo.html')
     }
 
     /**
      * 
      */
     public exportUser() {
-        this.remote('channel/exportUser.html')
+        this.postData('channel/exportUser.html')
     }
 
 
@@ -132,7 +132,7 @@ export class HttpModule extends BaseModule {
      * 
      * @param url 
      */
-    private remote(url) {
+    private postData(url) {
         let userToken = moosnow.data.getToken();
         if (userToken && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
             moosnow.http.request(`${this.baseUrl}${url}`, {
@@ -158,22 +158,46 @@ export class HttpModule extends BaseModule {
     }
 
     /**
-     * 开始游戏
-     * @param lvIndex 
-     */
-    public startGame(lvIndex) {
-        let nowLevel = `${lvIndex}.${lvIndex}`;
-        moosnow.startGame(nowLevel)
+    * 统计开始游戏
+    * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
+    */
+    public startGame(level) {
+        if (window["wx"])
+            window['wx'].aldStage.onStart({
+                stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                stageName: level,//关卡名称，该字段必传
+                userId: moosnow.data.getToken() //用户ID
+            });
     }
     /**
-     * 结束游戏
-     * @param isWin 
-     * @param level 
+     * 统计结束游戏
+     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
+     * @param {boolean} isWin 是否成功
      */
-    public endGame(isWin, level) {
-        // let level = Lite.data.getCurrentLevel();
-        let nowLevel = `${level}.${level}`;
-        moosnow.endGame(nowLevel, isWin)
+    public endGame(level, isWin) {
+        if (!window["wx"]) return;
+        var event = isWin ? "complete" : "fail";
+        var desc = isWin ? "关卡完成" : "关卡失败";
+        window['wx'].aldStage.onEnd({
+            stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+            stageName: level,//关卡名称，该字段必传
+            userId: moosnow.data.getToken(), //用户ID
+            event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
+            params: {
+                desc: desc   //描述
+            }
+        });
+    }
+    /**
+     * 视频统计
+     * @param {number} type 0：视频点击 1：视频观看完成
+     * @param {string} info 信息 ex:“领取三倍金币”
+     * @param {string} level 关卡数
+     */
+    public videoPoint(type, info, level) {
+        if (!window["wx"]) return;
+        var name = type == 0 ? "点击视频" : "观看完成视频";
+        window['wx'].aldSendEvent(name, { info, level: level + "" });
     }
 }
 

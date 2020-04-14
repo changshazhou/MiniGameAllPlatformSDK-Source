@@ -1,8 +1,16 @@
 import BaseModule from "./BaseModule";
+import Common from "./Common";
 
 export default class AdModule extends BaseModule {
 
     private baseUrl: string = "https://api.liteplay.com.cn/admin/";
+
+    constructor() {
+        super();
+        this.getAllConfig(res => {
+            moosnow.platform.bannerShowCountLimit = res.bannerShowCountLimit
+        })
+    }
 
     /**
      * 获取广告数据
@@ -14,16 +22,16 @@ export default class AdModule extends BaseModule {
      *   gameFloat 游戏页浮动广告 
      *   endPage 结束页广告
      */
-    public getAd(callback) {
+    public getAd(callback: Function) {
         let cache = this.getCache();
-        if (cache) {
+        if (!Common.isEmpty(cache)) {
             for (let k in cache) {
                 cache[k].sort(item => Math.random() > 0.5 ? 1 : -1)
             }
             callback(cache)
         }
         else
-            this.getRemoteAd(function (res) {
+            this.getRemoteAd((res) => {
                 let retValue = this.initRetValue();
                 // if (window["wx"])
                 //     loadCacheImage(() => {
@@ -331,6 +339,7 @@ export default class AdModule extends BaseModule {
                 this.disableAd(res, res2, (disable) => {
                     if (disable) {
                         callback({
+                            ...res,
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             bannerShowCountLimit: 5
@@ -347,9 +356,9 @@ export default class AdModule extends BaseModule {
 
 
     /**
-        * 获取误点间隔次数，启动游戏时调用
-        * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
-        */
+    * 获取误点间隔次数，启动游戏时调用
+    * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
+    */
     private getMisTouchNum(callback) {
         this.loadCfg(res => {
             this.loadArea(res2 => {
@@ -432,6 +441,52 @@ export default class AdModule extends BaseModule {
         }
 
     }
+
+    public getForceExport(callback) {
+        this.loadCfg(res => {
+            this.loadArea(res2 => {
+                this.disabledForceExport(res, res2, (disable) => {
+                    callback(disable)
+                })
+            })
+        })
+
+    }
+
+    public disabledForceExport(res, res2, callback) {
+        let curTime = this.formatTime(new Date())
+        let inDisabledRegion = false;
+        if (res.disabledForceExport) {
+            for (let i = 0; i < res.disabledForceExport.length; i++) {
+                let region = res.disabledForceExport[i];
+                if (res2.data.city.indexOf(region) != -1
+                    || res2.data.province.indexOf(region) != -1
+                    || res2.data.area.indexOf(region) != -1) {
+                    inDisabledRegion = true;
+                    break;
+                }
+            }
+        }
+
+        if (inDisabledRegion) {
+            if (res.forceExportTime && res.forceExportTime.length == 2) {
+                if (curTime > res.forceExportTime[0] && curTime < res.forceExportTime[1]) {
+                    callback(true)
+                }
+                else {
+                    callback(false)
+                }
+            }
+
+            else {
+                callback(true)
+            }
+        }
+        else {
+            callback(false)
+        }
+    }
+
 
     private mMemory = {};
     private getCache = function () {
