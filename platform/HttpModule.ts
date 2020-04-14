@@ -1,4 +1,5 @@
 import BaseModule from "./BaseModule";
+import Common from "./Common";
 
 
 let ErrorType = {
@@ -102,27 +103,27 @@ export class HttpModule extends BaseModule {
        * Loading加载完成
        */
     public finishLoading() {
-        this.postData('channel/validUser.html')
+        this.postData('api/channel/validUser.html')
     }
     /**
       * Loading加载完成
       */
     public clickBanner() {
-        this.postData('channel/clickBanner.html')
+        this.postData('api/channel/clickBanner.html')
     }
 
     /**
      * Loading加载完成
      */
     public clickVideo() {
-        this.postData('channel/clickVideo.html')
+        this.postData('api/channel/clickVideo.html')
     }
 
     /**
      * 
      */
     public exportUser() {
-        this.postData('channel/exportUser.html')
+        this.postData('api/channel/exportUser.html')
     }
 
 
@@ -134,15 +135,25 @@ export class HttpModule extends BaseModule {
      */
     private postData(url) {
         let userToken = moosnow.data.getToken();
-        if (userToken && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
-            moosnow.http.request(`${this.baseUrl}${url}`, {
-                appid: window["moosnowAppId"],
-                user_id: userToken,
-                channel_id: moosnow.data.getChannelId(),
-                channel_appid: moosnow.data.getChannelAppId()
-            }, "POST", (respone) => {
 
-            });
+        // if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
+        //     this.request(`${this.baseUrl}${url}`, {
+        //         appid: window["moosnowAppId"],
+        //         user_id: userToken,
+        //         channel_id: moosnow.data.getChannelId(),
+        //         channel_appid: moosnow.data.getChannelAppId()
+        //     }, "POST", (respone) => {
+
+        //     });
+
+        this.request(`${this.baseUrl}${url}`, {
+            appid: window["moosnowAppId"],
+            user_id: userToken,
+            channel_id: 13,
+            channel_appid: "wx5de34d67dbbcf061"
+        }, "POST", (respone) => {
+
+        });
     }
 
 
@@ -199,5 +210,209 @@ export class HttpModule extends BaseModule {
         var name = type == 0 ? "点击视频" : "观看完成视频";
         window['wx'].aldSendEvent(name, { info, level: level + "" });
     }
+
+
+
+
+    /**
+     * 
+     * @param callback 
+     */
+    public getAllConfig(callback: Function) {
+        this.loadCfg(res => {
+            this.loadArea(res2 => {
+                this.disableAd(res, res2, (disable) => {
+                    if (disable) {
+                        callback({
+                            ...res,
+                            mistouchNum: 0,
+                            mistouchPosNum: 0,
+                            bannerShowCountLimit: 1
+                        })
+                    }
+                    else {
+                        callback(res)
+                    }
+                })
+            })
+        })
+    }
+
+
+    private cfgData = null;
+    private areaData = null;
+    public loadCfg(callback) {
+        if (this.cfgData) {
+            callback(this.cfgData);
+        }
+        else {
+            var url = window["moosnowConfig"] + "?t=" + Date.now();
+            this.request(url, {}, 'GET',
+                (res) => {
+                    this.cfgData = res;
+                    moosnow.platform.bannerId = res.bannerId;
+                    moosnow.platform.videoId = res.videoId;
+                    moosnow.platform.interId = res.interId;
+                    moosnow.platform.bannerShowCountLimit = res.bannerShowCountLimit;
+
+                    callback(this.cfgData);
+                },
+                () => {
+                    callback(null);
+                    console.log('load config json fail');
+                }
+            );
+        }
+
+    }
+
+    public loadArea(callback) {
+        if (this.areaData) {
+            callback(this.areaData)
+        }
+        else {
+            let ipUrl = 'https://api.liteplay.com.cn/admin/wx_config/getLocation';
+            this.request(ipUrl, {}, 'GET', (res2) => {
+                this.areaData = res2;
+                callback(this.areaData)
+
+            }, () => {
+                callback(null);
+            })
+        }
+
+    }
+
+    public getForceExport(callback) {
+        this.loadCfg(res => {
+            this.loadArea(res2 => {
+                this.disabledForceExport(res, res2, (disable) => {
+                    callback(disable)
+                })
+            })
+        })
+
+    }
+
+    public disabledForceExport(res, res2, callback) {
+        let curTime = Common.formatTime(new Date())
+        let inDisabledRegion = false;
+        if (res.disabledForceExport) {
+            for (let i = 0; i < res.disabledForceExport.length; i++) {
+                let region = res.disabledForceExport[i];
+                if (res2.data.city.indexOf(region) != -1
+                    || res2.data.province.indexOf(region) != -1
+                    || res2.data.area.indexOf(region) != -1) {
+                    inDisabledRegion = true;
+                    break;
+                }
+            }
+        }
+
+        if (inDisabledRegion) {
+            if (res.forceExportTime && res.forceExportTime.length == 2) {
+                if (curTime > res.forceExportTime[0] && curTime < res.forceExportTime[1]) {
+                    callback(true)
+                }
+                else {
+                    callback(false)
+                }
+            }
+
+            else {
+                callback(true)
+            }
+        }
+        else {
+            callback(false)
+        }
+    }
+
+
+
+    /**
+       * 获取误点间隔次数，启动游戏时调用
+       * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
+       */
+    private getMisTouchNum(callback) {
+        this.loadCfg(res => {
+            this.loadArea(res2 => {
+                this.disableAd(res, res2, (disable) => {
+                    if (disable) {
+                        callback(0)
+                    }
+                    else {
+                        callback(parseInt(res.mistouchNum))
+                    }
+                })
+            })
+        })
+    }
+    /**
+      * 获取位移间隔次数，启动游戏时调用
+      * @param {Funtion} callback 回调参数为mistouchPosNum:int，当misTouchNum=0时关闭误点，当mistouchPosNum=n(0除外)时，每隔n次，触发误点1次
+      */
+    private getMistouchPosNum(callback) {
+        this.loadCfg(res => {
+            this.loadArea(res2 => {
+                this.disableAd(res, res2, (disable) => {
+                    if (disable) {
+                        callback(0)
+                    }
+                    else {
+                        callback(parseInt(res.mistouchPosNum))
+                    }
+                })
+            })
+        })
+    }
+
+    private getBannerShowCountLimit(callback) {
+        this.loadCfg(res => {
+            if (isNaN(res.bannerShowCountLimit))
+                callback(5);
+            else
+                callback(parseInt(res.bannerShowCountLimit))
+        })
+    }
+
+
+
+    private disableAd(res, res2, callback) {
+        let curTime = Common.formatTime(new Date())
+        let inDisabledRegion = false;
+        if (res.disabledRegion) {
+            for (let i = 0; i < res.disabledRegion.length; i++) {
+                let region = res.disabledRegion[i];
+                if (res2.data.city.indexOf(region) != -1
+                    || res2.data.province.indexOf(region) != -1
+                    || res2.data.area.indexOf(region) != -1) {
+                    inDisabledRegion = true;
+                    break;
+                }
+            }
+        }
+
+        if (inDisabledRegion) {
+            if (res.disabledTime && res.disabledTime.length == 2) {
+                if (curTime > res.disabledTime[0] && curTime < res.disabledTime[1]) {
+                    callback(true)
+                }
+                else {
+                    callback(false)
+                }
+            }
+
+            else {
+                callback(true)
+            }
+        }
+        else {
+            callback(false)
+        }
+
+    }
+
+
 }
 

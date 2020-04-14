@@ -1,4 +1,5 @@
 import BaseModule from "./BaseModule";
+import Common from "./Common";
 
 export default class GameDataCenter extends BaseModule {
 
@@ -7,7 +8,7 @@ export default class GameDataCenter extends BaseModule {
     private mUserToken: string = "";
 
     getToken() {
-        if (this.mUserToken)
+        if (Common.isEmpty(this.mUserToken))
             this.mUserToken = moosnow.setting.getString(this.TOKEN, "");
         return this.mUserToken
     }

@@ -43,7 +43,6 @@ export default class PlatformModule extends BaseModule {
     public bannerId: string = "";
     public videoId: string = "";
     public interId = "";
-    public appid: string = "gunking_test";
     public bannerWidth: number = 300;
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
@@ -63,10 +62,6 @@ export default class PlatformModule extends BaseModule {
     }
     private vibrateSwitch(on) {
         this.vibrateOn = on;
-    }
-
-    public gameLogin(callback: Function) {
-
     }
 
     // lateStart() {
@@ -162,8 +157,15 @@ export default class PlatformModule extends BaseModule {
     }
 
     public login(success: Function, fail: Function) {
-        if (success)
-            success(Common.generateUUID());
+        if (success) {
+            let token = moosnow.data.getToken()
+            if (!token) {
+                token = Common.generateUUID();
+                moosnow.data.setToken(token);
+            }
+            success(token);
+
+        }
     }
 
     public postMessage(data: { action: number, data?: any }) {
@@ -664,6 +666,10 @@ export default class PlatformModule extends BaseModule {
     private _onHideCallback(res) {
         //Lite.log.log('WX_hide');
         // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
+
+        if ((res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50) {
+            moosnow.http.clickBanner();
+        }
     }
 
 
@@ -800,6 +806,9 @@ export default class PlatformModule extends BaseModule {
 
     public _onVideoClose(isEnd) {
         moosnow.platform.videoLoading = false;
+        if (!!isEnd.isEnded) {
+            moosnow.http.clickVideo();
+        }
         if (moosnow.platform.videoCb) {
             let ret = (!!isEnd.isEnded) ? VIDEO_STATUS.END : VIDEO_STATUS.NOTEND;
             setTimeout(() => {
