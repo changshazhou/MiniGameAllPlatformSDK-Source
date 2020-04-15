@@ -1,6 +1,7 @@
 import MathUtils from "./MathUtils";
 import Common from "./Common";
 import BaseModule from "./BaseModule";
+import moosnowAdRow from "./moosnowAdRow";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -156,7 +157,7 @@ export default class PlatformModule extends BaseModule {
         return false;
     }
 
-    public login(success: Function, fail: Function) {
+    public login(success: Function, fail?: Function) {
         if (success) {
             let token = moosnow.data.getToken()
             if (!token) {
@@ -693,6 +694,10 @@ export default class PlatformModule extends BaseModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let left = (windowWidth - this.bannerWidth) / 2;
+        if (Common.isEmpty(this.bannerId)) {
+            console.warn('banner id is null')
+            return;
+        }
         let banner = window[this.platformName].createBannerAd({
             adUnitId: this.bannerId,
             style: {
@@ -766,6 +771,10 @@ export default class PlatformModule extends BaseModule {
             this.video.offError(this._onVideoError);
             this.video.offLoad(this._onVideoLoad);
         } else {
+            if (Common.isEmpty(this.videoId)) {
+                console.warn(' video id is null')
+                return;
+            }
             this.video = window[this.platformName].createRewardedVideoAd({
                 adUnitId: this.videoId
             });

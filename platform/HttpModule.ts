@@ -12,8 +12,9 @@ let GAME_COMMAND = {
     VERIFY_USER: 1,
     CREATE_ROLE: 2,
     CAPTAIN: 3
-
 }
+
+
 export class HttpModule extends BaseModule {
 
     private appid: string = "";
@@ -140,24 +141,15 @@ export class HttpModule extends BaseModule {
     private postData(url) {
         let userToken = moosnow.data.getToken();
 
-        // if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
-        //     this.request(`${this.baseUrl}${url}`, {
-        //         appid: window["moosnowAppId"],
-        //         user_id: userToken,
-        //         channel_id: moosnow.data.getChannelId(),
-        //         channel_appid: moosnow.data.getChannelAppId()
-        //     }, "POST", (respone) => {
+        if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
+            this.request(`${this.baseUrl}${url}`, {
+                appid: window["moosnowConfig"].moosnowAppId,
+                user_id: userToken,
+                channel_id: moosnow.data.getChannelId(),
+                channel_appid: moosnow.data.getChannelAppId()
+            }, "POST", (respone) => {
 
-        //     });
-
-        this.request(`${this.baseUrl}${url}`, {
-            appid: window["moosnowAppId"],
-            user_id: userToken,
-            channel_id: 13,
-            channel_appid: "wx5de34d67dbbcf061"
-        }, "POST", (respone) => {
-
-        });
+            });
     }
 
 
@@ -178,11 +170,14 @@ export class HttpModule extends BaseModule {
     */
     public startGame(level) {
         if (window["wx"])
-            window['wx'].aldStage.onStart({
-                stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                stageName: level,//关卡名称，该字段必传
-                userId: moosnow.data.getToken() //用户ID
-            });
+            if (window['wx'].aldStage)
+                window['wx'].aldStage.onStart({
+                    stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                    stageName: level,//关卡名称，该字段必传
+                    userId: moosnow.data.getToken() //用户ID
+                });
+            else
+                console.warn('阿拉丁文件未引入')
     }
     /**
      * 统计结束游戏
@@ -193,15 +188,18 @@ export class HttpModule extends BaseModule {
         if (!window["wx"]) return;
         var event = isWin ? "complete" : "fail";
         var desc = isWin ? "关卡完成" : "关卡失败";
-        window['wx'].aldStage.onEnd({
-            stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-            stageName: level,//关卡名称，该字段必传
-            userId: moosnow.data.getToken(), //用户ID
-            event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
-            params: {
-                desc: desc   //描述
-            }
-        });
+        if (window['wx'].aldStage)
+            window['wx'].aldStage.onEnd({
+                stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                stageName: level,//关卡名称，该字段必传
+                userId: moosnow.data.getToken(), //用户ID
+                event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
+                params: {
+                    desc: desc   //描述
+                }
+            });
+        else
+            console.warn('阿拉丁文件未引入')
     }
     /**
      * 视频统计
@@ -212,7 +210,10 @@ export class HttpModule extends BaseModule {
     public videoPoint(type, info, level) {
         if (!window["wx"]) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
-        window['wx'].aldSendEvent(name, { info, level: level + "" });
+        if (window['wx'].aldSendEvent)
+            window['wx'].aldSendEvent(name, { info, level: level + "" });
+        else
+            console.warn('阿拉丁文件未引入')
     }
 
 
@@ -250,14 +251,14 @@ export class HttpModule extends BaseModule {
             callback(this.cfgData);
         }
         else {
-            var url = window["moosnowConfig"] + "?t=" + Date.now();
+            var url = window["moosnowConfig"].url + "?t=" + Date.now();
             this.request(url, {}, 'GET',
                 (res) => {
                     this.cfgData = res;
-                    moosnow.platform.bannerId = res.bannerId;
-                    moosnow.platform.videoId = res.videoId;
-                    moosnow.platform.interId = res.interId;
-                    moosnow.platform.bannerShowCountLimit = res.bannerShowCountLimit;
+                    if (moosnow.platform) {
+                        moosnow.platform.bannerShowCountLimit = res.bannerShowCountLimit;
+                    }
+
 
                     callback(this.cfgData);
                 },
@@ -335,10 +336,10 @@ export class HttpModule extends BaseModule {
 
 
     /**
-       * 获取误点间隔次数，启动游戏时调用
-       * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
-       */
-    private getMisTouchNum(callback) {
+     * 获取误点间隔次数，启动游戏时调用
+     * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
+     */
+    public getMisTouchNum(callback) {
         this.loadCfg(res => {
             this.loadArea(res2 => {
                 this.disableAd(res, res2, (disable) => {
@@ -356,7 +357,7 @@ export class HttpModule extends BaseModule {
       * 获取位移间隔次数，启动游戏时调用
       * @param {Funtion} callback 回调参数为mistouchPosNum:int，当misTouchNum=0时关闭误点，当mistouchPosNum=n(0除外)时，每隔n次，触发误点1次
       */
-    private getMistouchPosNum(callback) {
+    public getMistouchPosNum(callback) {
         this.loadCfg(res => {
             this.loadArea(res2 => {
                 this.disableAd(res, res2, (disable) => {
@@ -371,7 +372,7 @@ export class HttpModule extends BaseModule {
         })
     }
 
-    private getBannerShowCountLimit(callback) {
+    public getBannerShowCountLimit(callback) {
         this.loadCfg(res => {
             if (isNaN(res.bannerShowCountLimit))
                 callback(5);

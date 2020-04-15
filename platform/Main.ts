@@ -19,7 +19,7 @@ class Main {
     public get platform() {
         return this.mPlatform;
     }
-    private initPlatform() {
+    public initPlatform() {
         if (window['wx'])
             this.mPlatform = new WXModule();
         else if (window['qg'])

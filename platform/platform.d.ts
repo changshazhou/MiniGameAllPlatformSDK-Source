@@ -9,6 +9,7 @@ import GameDataCenter from "./GameDataCenter"
 
 declare global {
     class moosnow {
+        static initPlatform: Function
         static http: HttpModule
         static platform: PlatformModule
         static ad: AdModule

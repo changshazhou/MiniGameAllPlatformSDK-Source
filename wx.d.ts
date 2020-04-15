@@ -5639,7 +5639,5 @@ declare namespace wx {
 
 
   export function getFileSystemManager(): void;
-
-
 }
 

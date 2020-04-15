@@ -225,7 +225,7 @@
         this.push = function (t) {
             this.tasks.push(new Promise(function (n, r) {
                 var a = function () {
-                    e.activeCount++ , t().then(function (e) {
+                    e.activeCount++, t().then(function (e) {
                         n(e)
                     }).then(function () {
                         e.next()
@@ -236,7 +236,7 @@
         }, this.all = function () {
             return Promise.all(this.tasks)
         }, this.next = function () {
-            e.activeCount-- , e.queue.length > 0 && e.queue.shift()()
+            e.activeCount--, e.queue.length > 0 && e.queue.shift()()
         }
     }
 
@@ -265,11 +265,11 @@
         if (isShow === null) {
             timer = setInterval(() => {
                 if (isShow === null) return;
-                w.useOpen && t(), O++ , e.as = D, e.at = M, e.rq_c = O, e.ifo = _, e.ak = w.app_key, e.uu = x, e.v = m, e.st = Date.now(), e.ev = n, e.te = S, e.wsr = isShow ? j : { "scene": 1011, "query": {}, "referrerInfo": {} }, "" !== p(e.ufo) && (e.ufo = e.ufo), e.ec = N, w.useOpen ? "" === b ? K.push(r) : (wx.Queue.push(r), K.concat()) : wx.Queue.push(r)
+                w.useOpen && t(), O++, e.as = D, e.at = M, e.rq_c = O, e.ifo = _, e.ak = w.app_key, e.uu = x, e.v = m, e.st = Date.now(), e.ev = n, e.te = S, e.wsr = isShow ? j : { "scene": 1011, "query": {}, "referrerInfo": {} }, "" !== p(e.ufo) && (e.ufo = e.ufo), e.ec = N, w.useOpen ? "" === b ? K.push(r) : (wx.Queue.push(r), K.concat()) : wx.Queue.push(r)
                 clearInterval(timer);
             }, 500)
         } else {
-            w.useOpen && t(), O++ , e.as = D, e.at = M, e.rq_c = O, e.ifo = _, e.ak = w.app_key, e.uu = x, e.v = m, e.st = Date.now(), e.ev = n, e.te = S, e.wsr = isShow ? j : { "scene": 1011, "query": {}, "referrerInfo": {} }, "" !== p(e.ufo) && (e.ufo = e.ufo), e.ec = N, w.useOpen ? "" === b ? K.push(r) : (wx.Queue.push(r), K.concat()) : wx.Queue.push(r)
+            w.useOpen && t(), O++, e.as = D, e.at = M, e.rq_c = O, e.ifo = _, e.ak = w.app_key, e.uu = x, e.v = m, e.st = Date.now(), e.ev = n, e.te = S, e.wsr = isShow ? j : { "scene": 1011, "query": {}, "referrerInfo": {} }, "" !== p(e.ufo) && (e.ufo = e.ufo), e.ec = N, w.useOpen ? "" === b ? K.push(r) : (wx.Queue.push(r), K.concat()) : wx.Queue.push(r)
         }
     }
 
@@ -292,7 +292,12 @@
     }
     var m = "3.2.0",
         v = "glog",
-        w = require("./ald-game-conf");
+        w = {
+            app_key: window.aldKey,
+            getLocation: window.getLocation,
+            useOpen: window.useOpen,
+            openKey: window.openKey,
+        };
     "" === w.app_key && console.error("请在配置文件中填写您的app_key"), w.useOpen && console.warn("提示：开启了useOpen配置后，如果不上传用户opendId则不会上报数据。"), w.app_key = w.app_key.replace(/\s/g, "");
     var y = w.openKey,
         S = "wg";
@@ -329,7 +334,7 @@
         b = t(),
         N = 0,
         O = "",
-    j = wx.getLaunchOptionsSync(),
+        j = wx.getLaunchOptionsSync(),
         k = Date.now(),
         M = "" + Date.now() + Math.floor(1e7 * Math.random()),
         D = "" + Date.now() + Math.floor(1e7 * Math.random()),
@@ -379,7 +384,7 @@
         }) : f(e, "hide")
     }), wx.onError(function (e) {
         var t = g(I);
-        t.tp = "ald_error_message", t.ct = e, N++ , f(t, "event")
+        t.tp = "ald_error_message", t.ct = e, N++, f(t, "event")
     });
     var R = {
         aldSendEvent: function (e, t) {

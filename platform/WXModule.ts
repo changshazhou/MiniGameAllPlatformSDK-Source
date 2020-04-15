@@ -12,18 +12,27 @@ export default class WXModule extends PlatformModule {
     private baseUrl = "https://api.liteplay.com.cn/";
     constructor() {
         super();
+        this.bannerId = window["moosnowConfig"]["bannerId"];
+        this.videoId = window["moosnowConfig"]["videoId"];
+        this.interId = window["moosnowConfig"]["interId"];
+        this.initBanner();
+        this.initInter();
+        console.log('bannerId', this.bannerId, 'videoId', this.videoId, 'interId', this.interId)
     }
 
     /**
      * 游戏登录
      * @param callback 
+     * @param fail 
      */
-    public login(callback) {
+    public login(callback: Function, fail?: Function) {
 
         moosnow.http.getAllConfig(res => {
-        })
 
-        let self = this
+        });
+
+        let self = this;
+
         let userToken = moosnow.data.getToken();
         if (userToken) {
             self.getUserToken("", userToken, callback)
@@ -34,9 +43,29 @@ export default class WXModule extends PlatformModule {
                     if (res.code) {
                         //发起网络请求
                         self.getUserToken(res.code, "", callback)
-
                     } else {
-                        console.log('登录失败！' + res.errMsg)
+                        // (window[this.platformName] as any).showModal({
+                        //     title: "提示",
+                        //     content: "网络有点开小差了,",
+                        //     confirmText: "重启游戏",
+                        //     showCancel: false,
+                        //     cancelColor: '#000000',
+                        //     confirmColor: '#3CC51F',
+                        //     fail: null,
+                        //     complete: null,
+                        //     success(res) {
+                        //         window[self.platformName].exitMiniProgram({
+                        //             success: () => {
+                        //                 let item = {
+                        //                     appid: "wx840e2e246968f224",
+                        //                     img: "",
+                        //                     path: ""
+                        //                 } as moosnowAdRow
+                        //                 moosnow.platform.navigate2Mini(item)
+                        //             }
+                        //         })
+                        //     }
+                        // })
                     }
                 }
             })
@@ -53,7 +82,7 @@ export default class WXModule extends PlatformModule {
 
         let options = window[this.platformName].getLaunchOptionsSync();
         let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
-        let channel_appid = options.referrerInfo ? options.referrerInfo.appId : "0";
+        let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
 
         moosnow.data.setChannelAppId(channel_appid);
         moosnow.data.setChannelId(channel_id);
@@ -66,7 +95,7 @@ export default class WXModule extends PlatformModule {
         }
 
         moosnow.http.request(`${this.baseUrl}api/channel/login.html`, {
-            appid: window["moosnowAppId"],
+            appid: window["moosnowConfig"].moosnowAppId,
             code: code,
             user_id: user_id,
             channel_id: channel_id,

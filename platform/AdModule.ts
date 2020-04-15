@@ -1,5 +1,8 @@
 import BaseModule from "./BaseModule";
 import Common from "./Common";
+import moosnowResult from "./moosnowResult";
+
+
 
 export default class AdModule extends BaseModule {
 
@@ -19,7 +22,7 @@ export default class AdModule extends BaseModule {
      *   gameFloat 游戏页浮动广告 
      *   endPage 结束页广告
      */
-    public getAd(callback: (appList: moosnowResult) => {}) {
+    public getAd(callback: (appList: moosnowResult) => {}): void {
         let cache = this.getCache();
         if (!Common.isEmpty(cache)) {
             for (let k in cache) {
@@ -69,7 +72,7 @@ export default class AdModule extends BaseModule {
     private getRemoteAd(cb) {
         let url = this.baseUrl + 'wx_export/getExport';
         var signParams = {
-            appid: window["moosnowAppId"],
+            appid: window["moosnowConfig"].moosnowAppId,
         };
 
 
