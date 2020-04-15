@@ -1,19 +1,18 @@
 import PlatformModule from './PlatformModule';
+/**
+ * 微信平台
+ */
 export default class WXModule extends PlatformModule {
 
     public platformName: string = "wx";
-    public bannerId: string = "adunit-ea921b190e3b0d9e";
-    public videoId: string = "adunit-3f5c0e00d3a7966b";
-    public interId = "adunit-dbf4276f86e23075";
+    public bannerId: string = "";
+    public videoId: string = "";
+    public interId = "";
 
     private baseUrl = "https://api.liteplay.com.cn/";
     constructor() {
         super();
     }
-
-
-
-
 
     /**
      * 游戏登录

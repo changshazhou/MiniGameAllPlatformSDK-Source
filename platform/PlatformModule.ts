@@ -176,6 +176,13 @@ export default class PlatformModule extends BaseModule {
         window[this.platformName].getOpenDataContext().postMessage(data);
     }
     private prevNavigate = Date.now();
+    /**
+     * 跳转到指定App
+     * @param row 
+     * @param success 
+     * @param fail 
+     * @param complete 
+     */
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
@@ -219,7 +226,9 @@ export default class PlatformModule extends BaseModule {
             }
         })
     }
-
+    /**
+     * 更新版本
+     */
     private updateProgram() {
         let self = this;
         if (!window[this.platformName]) return;

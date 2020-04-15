@@ -10,7 +10,7 @@ export default class AdModule extends BaseModule {
     }
 
     /**
-     * 获取广告数据
+     * 获取广告数据 目前仅有indexLeft提供使用
      * @param {*} callback 
      * @returns  more 更多好玩 个人中心的广告 现已经不用了
      *   promotion 首页推广   首页开始按钮下的广告
@@ -263,16 +263,6 @@ export default class AdModule extends BaseModule {
             callback(imgUrl)
 
     }
-
-    /**
-     * 跳转成功之后数据上报
-     * @param {number} row  从loadAd接口中返回的数组项   @example indexLeft[0]
-     * @param {string} userid  小游戏中的用户Id
-     */
-    private collect(row, userid) {
-
-    }
-
 
     private mMemory = {};
     private getCache = function () {

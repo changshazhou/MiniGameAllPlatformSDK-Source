@@ -19,18 +19,22 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "1_0_3";
+    public version: string = "1.0.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
 
     constructor() {
         super();
+        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now()
+        this.request(versionUrl, {}, 'GET', (res) => {
+            if (this.version < res.version) {
+                console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]`)
+            }
+        })
     }
-    onEnable() {
 
-    }
 
     /**
-     * 
+     * 请求服务
      * @param {*} url 
      * @param {*} data 
      * @param {*} method 
@@ -71,7 +75,7 @@ export class HttpModule extends BaseModule {
                 // console.log('caller state change  ', xhr)
             }
         };
-        xhr.timeout = 3000;
+        xhr.timeout = 10000;
         xhr.ontimeout = function (event) {
             console.error('error ', event)
             if (fail)
@@ -106,21 +110,21 @@ export class HttpModule extends BaseModule {
         this.postData('api/channel/validUser.html')
     }
     /**
-      * Loading加载完成
+      * 点击了banner
       */
     public clickBanner() {
         this.postData('api/channel/clickBanner.html')
     }
 
     /**
-     * Loading加载完成
+     * 看完了视频
      */
     public clickVideo() {
         this.postData('api/channel/clickVideo.html')
     }
 
     /**
-     * 
+     * 导出跳转
      */
     public exportUser() {
         this.postData('api/channel/exportUser.html')

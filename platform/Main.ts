@@ -29,6 +29,9 @@ class Main {
         // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
     }
     private mAd: AdModule;
+    /**
+     * 墨雪广告
+     */
     public get ad() {
         return this.mAd;
     }
@@ -40,11 +43,17 @@ class Main {
 
 
     private mData: GameDataCenter = new GameDataCenter();
+    /**
+     * 本地内存
+     */
     public get data() {
         return this.mData;
     }
 
     private mSetting: SettingModule = new SettingModule();
+    /**
+     * 本地持久化缓存
+     */
     public get setting() {
         return this.mSetting;
     }

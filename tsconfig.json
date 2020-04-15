@@ -5,7 +5,7 @@
     "noEmitHelpers": true,
     "sourceMap": false,
     "declaration": true, // 是否自动创建类型声明文件
-    "declarationDir":"./"
+    "declarationDir":"./dist/help/"
   },
   "exclude": [
     "node_modules"
