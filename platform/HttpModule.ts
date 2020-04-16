@@ -256,7 +256,7 @@ export class HttpModule extends BaseModule {
                 (res) => {
                     this.cfgData = res;
                     if (moosnow.platform) {
-                        moosnow.platform.bannerShowCountLimit = res.bannerShowCountLimit;
+                        moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
 
 

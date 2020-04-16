@@ -1,7 +1,7 @@
 var conf = {
-    sdkAppId: window.moosnowAppId,
-    appConfig: window.moosnowConfig,
-    version: window.moosnowVersion
+    sdkAppId: window["moosnowConfig"]["moosnowAppId"],
+    appConfig: window["moosnowConfig"].url,
+    version: window["moosnowConfig"].version,
 };//
 
 ; (function () {
@@ -359,7 +359,7 @@ var conf = {
      */
     function checkVersion(version, callback) {
         loadCfg(res => {
-            callback(!(res.zs_version == version))
+            callback((res.zs_version == version))
         })
     }
 

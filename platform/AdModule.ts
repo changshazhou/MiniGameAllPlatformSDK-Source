@@ -1,6 +1,7 @@
 import BaseModule from "./BaseModule";
 import Common from "./Common";
 import moosnowResult from "./moosnowResult";
+import moosnowAdRow from "../dist/moosnowAdRow";
 
 
 
@@ -11,7 +12,34 @@ export default class AdModule extends BaseModule {
     constructor() {
         super();
     }
+    /**
+     * 随机去除重复数据
+     * @param source 
+     */
+    private getDistinctAd(source) {
+        let retValue: Array<moosnowAdRow> = [];
 
+        //第一步随机打乱    
+        let temp = source.sort((a, b) => {
+            return Math.random() > 0.5 ? 1 : -1
+        })
+
+        for (let i = 0; i < temp.length; i++) {
+            let item = temp[i] as moosnowAdRow;
+            let append = true;
+            for (let j = 0; j < retValue.length; j++) {
+                let retItem = retValue[j];
+                if (retItem.appid == item.appid) {
+                    append = false
+                    break;
+                }
+            }
+            if (append)
+                retValue.push(item)
+        }
+
+        return retValue;
+    }
     /**
      * 获取广告数据 目前仅有indexLeft提供使用
      * @param {*} callback 
@@ -25,10 +53,12 @@ export default class AdModule extends BaseModule {
     public getAd(callback: (appList: moosnowResult) => {}): void {
         let cache = this.getCache();
         if (!Common.isEmpty(cache)) {
-            for (let k in cache) {
-                cache[k].sort(item => Math.random() > 0.5 ? 1 : -1)
+            let distinctAd = this.getDistinctAd(cache.indexLeft)
+            let temp = {
+                ...cache,
+                indexLeft: distinctAd
             }
-            callback(cache)
+            callback(temp)
         }
         else
             this.getRemoteAd((res) => {
@@ -64,7 +94,12 @@ export default class AdModule extends BaseModule {
                     retValue = this.formatRow(retValue, item);
                 })
                 this.setCache(retValue)
-                callback(retValue)
+                let distinctAd = this.getDistinctAd(retValue.indexLeft)
+                let temp = {
+                    ...cache,
+                    indexLeft: distinctAd
+                }
+                callback(temp)
 
             })
     }
