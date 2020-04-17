@@ -734,7 +734,7 @@ var conf = {
     function disableAd(res, res2, callback) {
         let curTime = formatTime(new Date())
         let inDisabledRegion = false;
-        if (res.disabledRegion) {
+        if (res && res.disabledRegion) {
             for (let i = 0; i < res.disabledRegion.length; i++) {
                 let region = res.disabledRegion[i];
                 if (res2.data.city.indexOf(region) != -1

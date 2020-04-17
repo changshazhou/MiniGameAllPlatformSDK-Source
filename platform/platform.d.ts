@@ -1,8 +1,8 @@
-import { HttpModule } from "./HttpModule"
-import PlatformModule from "./PlatformModule"
-import AdModule from "./AdModule"
-import SettingModule from "./SettingModule"
-import GameDataCenter from "./GameDataCenter"
+import { HttpModule } from "./framework/HttpModule"
+import PlatformModule from "./platform/PlatformModule"
+import AdModule from "./ad/AdModule"
+import SettingModule from "./framework/SettingModule"
+import GameDataCenter from "./framework/GameDataCenter"
 
 
 // export { } // 这个必须有，将文件转化为模块

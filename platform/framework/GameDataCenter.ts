@@ -1,5 +1,5 @@
 import BaseModule from "./BaseModule";
-import Common from "./Common";
+import Common from "../utils/Common";
 
 export default class GameDataCenter extends BaseModule {
 

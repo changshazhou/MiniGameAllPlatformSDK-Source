@@ -1,5 +1,6 @@
 import BaseModule from "./BaseModule";
-import Common from "./Common";
+import Common from "../utils/Common";
+import { PlatformType } from "../enum/PlatformType";
 
 
 let ErrorType = {
@@ -159,7 +160,7 @@ export class HttpModule extends BaseModule {
      * @param name  打点名称
      */
     public point(name, data: any = null) {
-        if (moosnow.platform.getPlatform() == 'wx') {
+        if (Common.platform == PlatformType.WX) {
             (window['wx'] as any).aldSendEvent(name, data);
         }
     }
@@ -169,7 +170,7 @@ export class HttpModule extends BaseModule {
     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
     */
     public startGame(level) {
-        if (window["wx"])
+        if (Common.platform == PlatformType.WX)
             if (window['wx'].aldStage)
                 window['wx'].aldStage.onStart({
                     stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
@@ -185,7 +186,8 @@ export class HttpModule extends BaseModule {
      * @param {boolean} isWin 是否成功
      */
     public endGame(level, isWin) {
-        if (!window["wx"]) return;
+        if (Common.platform != PlatformType.WX) return;
+
         var event = isWin ? "complete" : "fail";
         var desc = isWin ? "关卡完成" : "关卡失败";
         if (window['wx'].aldStage)
@@ -208,16 +210,13 @@ export class HttpModule extends BaseModule {
      * @param {string} level 关卡数
      */
     public videoPoint(type, info, level) {
-        if (!window["wx"]) return;
+        if (Common.platform != PlatformType.WX) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
         if (window['wx'].aldSendEvent)
             window['wx'].aldSendEvent(name, { info, level: level + "" });
         else
             console.warn('阿拉丁文件未引入')
     }
-
-
-
 
     /**
      * 
@@ -247,7 +246,7 @@ export class HttpModule extends BaseModule {
     private cfgData = null;
     private areaData = null;
     public loadCfg(callback) {
-        if (this.cfgData) {
+        if (!Common.isEmpty(this.cfgData)) {
             callback(this.cfgData);
         }
         else {
@@ -258,8 +257,6 @@ export class HttpModule extends BaseModule {
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
-
-
                     callback(this.cfgData);
                 },
                 () => {

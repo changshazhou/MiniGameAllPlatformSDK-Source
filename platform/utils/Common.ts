@@ -1,3 +1,5 @@
+import { PlatformType } from "../enum/PlatformType";
+
 export default class Common {
     //
 
@@ -103,7 +105,7 @@ export default class Common {
         }
         return false;
     }
-    
+
     public static generateUUID(): string {
         var d = new Date().getTime();
         var uuid: string = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -125,5 +127,16 @@ export default class Common {
         return Object.prototype.toString.call(obj) === "[object String]";
     }
 
-
+    static get platform(): PlatformType {
+        if (window['tt'])
+            return PlatformType.BYTEDANCE
+        else if (window['swan'])
+            return PlatformType.BAIDU
+        else if (window['qq'])
+            return PlatformType.QQ
+        else if (window['wx'])
+            return PlatformType.WX
+        else
+            return PlatformType.PC
+    }
 }

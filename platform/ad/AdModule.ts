@@ -1,7 +1,7 @@
-import BaseModule from "./BaseModule";
-import Common from "./Common";
-import moosnowResult from "./moosnowResult";
-import moosnowAdRow from "../dist/moosnowAdRow";
+import BaseModule from "../framework/BaseModule";
+import Common from "../utils/Common";
+import moosnowResult from "../model/moosnowResult";
+import moosnowAdRow from "../../dist/moosnowAdRow";
 
 
 
@@ -104,7 +104,7 @@ export default class AdModule extends BaseModule {
             })
     }
 
-    private getRemoteAd(cb) {
+    public getRemoteAd(cb) {
         let url = this.baseUrl + 'wx_export/getExport';
         var signParams = {
             appid: window["moosnowConfig"].moosnowAppId,

@@ -1,33 +1,50 @@
-import PlatformModule from "./PlatformModule";
-import WXModule from "./WXModule";
-import AdModule from "./AdModule";
-import { HttpModule } from "./HttpModule";
-import OPPOModule from "./OPPOModule";
-import GameDataCenter from "./GameDataCenter";
-import SettingModule from "./SettingModule";
+import PlatformModule from "./platform/PlatformModule";
+import WXModule from "./platform/WXModule";
+import AdModule from "./ad/AdModule";
+import { HttpModule } from "./framework/HttpModule";
+import OPPOModule from "./platform/OPPOModule";
+import GameDataCenter from "./framework/GameDataCenter";
+import SettingModule from "./framework/SettingModule";
+import OPPOAdModule from "./ad/OPPOAdModule";
+import Common from "./utils/Common";
+import { PlatformType } from "./enum/PlatformType";
 
 class Main {
     constructor() {
         (window["moosnow"]) = this;
+        
         this.initPlatform();
         this.mHttp = new HttpModule();
-        this.mAd = new AdModule();
+        this.initAd();
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
     }
-    private mPlatform: PlatformModule;
-    public get platform() {
-        return this.mPlatform;
-    }
-    public initPlatform() {
-        if (window['wx'])
+    private initPlatform() {
+        if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
-        else if (window['qg'])
+        else if (Common.platform == PlatformType.OPPO)
             this.mPlatform = new OPPOModule();
         else
             this.mPlatform = new PlatformModule();
         // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
     }
+
+    private initAd() {
+        if (Common.platform == PlatformType.WX)
+            this.mAd = new AdModule();
+        else if (Common.platform == PlatformType.OPPO)
+            this.mAd = new OPPOAdModule();
+        else
+            this.mAd = new AdModule();
+    }
+
+
+    private mPlatform: PlatformModule;
+    public get platform() {
+        return this.mPlatform;
+    }
+
+
     private mAd: AdModule;
     /**
      * 墨雪广告

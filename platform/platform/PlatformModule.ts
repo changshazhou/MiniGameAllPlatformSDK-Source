@@ -1,7 +1,7 @@
-import MathUtils from "./MathUtils";
-import Common from "./Common";
-import BaseModule from "./BaseModule";
-import moosnowAdRow from "./moosnowAdRow";
+import MathUtils from "../utils/MathUtils";
+import Common from "../utils/Common";
+import BaseModule from "../framework/BaseModule";
+import moosnowAdRow from "../model/moosnowAdRow";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -98,18 +98,7 @@ export default class PlatformModule extends BaseModule {
         // }
         // return false;
     }
-    public getPlatform() {
-        if (window['tt'])
-            return 'tt';
-        else if (window['swan'])
-            return 'swan';
-        else if (window['qq'])
-            return 'qq';
-        else if (window['wx'])
-            return 'wx';
-        else
-            return 'pc';
-    }
+  
     private compareVersion(v1, v2) {
         v1 = v1.split('.')
         v2 = v2.split('.')
@@ -176,7 +165,7 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName].getOpenDataContext) return;
         window[this.platformName].getOpenDataContext().postMessage(data);
     }
-    private prevNavigate = Date.now();
+    public prevNavigate = Date.now();
     /**
      * 跳转到指定App
      * @param row 
@@ -712,7 +701,8 @@ export default class PlatformModule extends BaseModule {
         this.bannerShowCount = 0;
     }
     public _onBannerError(err) {
-        console.log('banner___error:', err.errCode, err.errMsg);
+        console.warn('banner___error:', err.errCode, err.errMsg);
+        this.banner = null;
     }
     public _bottomCenterBanner(size) {
         let wxsys = this.getSystemInfoSync();
@@ -735,7 +725,6 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) {
             return;
         }
-
         this.bannerShowCount++;
         if (this.banner) {
             if (this.bannerShowCount >= this.bannerShowCountLimit) {
@@ -748,6 +737,9 @@ export default class PlatformModule extends BaseModule {
             } else {
                 this.banner.hide();
             }
+        }
+        else {
+            this._prepareBanner();
         }
     }
 
@@ -856,6 +848,9 @@ export default class PlatformModule extends BaseModule {
             this.isInterLoaded = false;
             this.inter.load();
         }
+    }
+    public _onInterError() {
+
     }
     //----自定义--
     public initRank() {
