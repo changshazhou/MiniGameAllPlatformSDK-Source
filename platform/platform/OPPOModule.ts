@@ -1,15 +1,11 @@
 import PlatformModule from "./PlatformModule";
 import nativeAdRow from "../model/nativeAdRow";
-import moosnowAdRow from "../../dist/moosnowAdRow";
+import moosnowAdRow from "../model/moosnowAdRow";
 
 export default class OPPOModule extends PlatformModule {
 
     public platformName: string = "qg";
-    public bannerId: string = "";
-    public videoId: string = "";
     public appSid: string = "";
-    public interId: string = "";
-
     public interInterval: number = 30;
     public interSize: number = 5;
     public config: any = {};
@@ -19,24 +15,14 @@ export default class OPPOModule extends PlatformModule {
 
     private nativeIndex: number = 0;
     private nativeAd: any;
-    private moosnowConfig;
     private mNativeAds: Array<nativeAdRow>;
     private nativeShowCount: number = 0;
     public nativeShowCountLimit: number = 2;
     constructor() {
 
         super();
-
-        this.moosnowConfig = window["moosnowConfig"];
-        this.moosnowConfig.nativeAd = this.moosnowConfig.nativeAd.split(',')
-        this.bannerId = window["moosnowConfig"]["bannerId"];
-        this.videoId = window["moosnowConfig"]["videoId"];
-        this.interId = window["moosnowConfig"]["interId"];
         this.initAdService();
-        this.initBanner();
-        this.initInter();
-        this._prepareNative();
-        console.log('bannerId', this.bannerId, 'videoId', this.videoId, 'interId', this.interId)
+
 
 
     }
@@ -48,6 +34,9 @@ export default class OPPOModule extends PlatformModule {
             appId: this.moosnowConfig.moosnowAppId,
             success: function (res) {
                 console.log(`初始化广告`);
+                this.initBanner();
+                this.initInter();
+                this._prepareNative();
             },
             fail: function (res) {
                 console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
@@ -117,14 +106,14 @@ export default class OPPOModule extends PlatformModule {
         if (this.moosnowConfig.nativeId.length == 0) {
             return;
         }
-        if (this.nativeIndex > this.moosnowConfig.nativeAd.length - 1)
+        if (this.nativeIndex > this.moosnowConfig.nativeId.length - 1)
             this.nativeIndex = 0;
 
         if (this.nativeAd)
             this.nativeAd.destroy();
 
         this.nativeAd = window[this.platformName].createNativeAd({
-            posId: this.moosnowConfig.nativeAd[this.nativeIndex]
+            posId: this.moosnowConfig.nativeId[this.nativeIndex]
         })
         this.nativeAd.onLoad(this._onNativeLoad.bind(this));
         this.nativeAd.onError(this._onNativeError.bind(this));
@@ -334,7 +323,7 @@ export default class OPPOModule extends PlatformModule {
         let openId = moosnow.data.getToken();
         var signParams = {
             user_id: openId,
-            apk_id: window["moosnowConfig"].moosnowAppId,
+            apk_id: moosnow.platform.moosnowConfig.moosnowAppId,
             appid: appId,
             link_id: appId,
         };

@@ -5,19 +5,11 @@ import PlatformModule from './PlatformModule';
 export default class WXModule extends PlatformModule {
 
     public platformName: string = "wx";
-    public bannerId: string = "";
-    public videoId: string = "";
-    public interId = "";
-
     private baseUrl = "https://api.liteplay.com.cn/";
     constructor() {
         super();
-        this.bannerId = window["moosnowConfig"]["bannerId"];
-        this.videoId = window["moosnowConfig"]["videoId"];
-        this.interId = window["moosnowConfig"]["interId"];
         this.initBanner();
         this.initInter();
-        console.log('bannerId', this.bannerId, 'videoId', this.videoId, 'interId', this.interId)
     }
 
     /**
@@ -95,7 +87,7 @@ export default class WXModule extends PlatformModule {
         }
 
         moosnow.http.request(`${this.baseUrl}api/channel/login.html`, {
-            appid: window["moosnowConfig"].moosnowAppId,
+            appid: moosnow.platform.moosnowConfig.moosnowAppId,
             code: code,
             user_id: user_id,
             channel_id: channel_id,

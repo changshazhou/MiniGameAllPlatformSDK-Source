@@ -1,7 +1,7 @@
 import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
 import moosnowResult from "../model/moosnowResult";
-import moosnowAdRow from "../../dist/moosnowAdRow";
+import moosnowAdRow from "../model/moosnowAdRow";
 
 
 
@@ -52,7 +52,7 @@ export default class AdModule extends BaseModule {
      */
     public getAd(callback: (appList: moosnowResult) => {}): void {
         let cache = this.getCache();
-        if (!Common.isEmpty(cache)) {
+        if (!Common.isEmpty(cache.indexLeft)) {
             let distinctAd = this.getDistinctAd(cache.indexLeft)
             let temp = {
                 ...cache,
@@ -107,7 +107,7 @@ export default class AdModule extends BaseModule {
     public getRemoteAd(cb) {
         let url = this.baseUrl + 'wx_export/getExport';
         var signParams = {
-            appid: window["moosnowConfig"].moosnowAppId,
+            appid: moosnow.platform.moosnowConfig.moosnowAppId,
         };
 
 

@@ -144,7 +144,7 @@ export class HttpModule extends BaseModule {
 
         if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
             this.request(`${this.baseUrl}${url}`, {
-                appid: window["moosnowConfig"].moosnowAppId,
+                appid: moosnow.platform.moosnowConfig.moosnowAppId,
                 user_id: userToken,
                 channel_id: moosnow.data.getChannelId(),
                 channel_appid: moosnow.data.getChannelAppId()
@@ -250,7 +250,7 @@ export class HttpModule extends BaseModule {
             callback(this.cfgData);
         }
         else {
-            var url = window["moosnowConfig"].url + "?t=" + Date.now();
+            var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
             this.request(url, {}, 'GET',
                 (res) => {
                     this.cfgData = res;

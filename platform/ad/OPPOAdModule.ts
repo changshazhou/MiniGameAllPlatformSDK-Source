@@ -6,7 +6,7 @@ export default class OPPOAdModule extends AdModule {
 
         let url = 'https://platform.qwpo2018.com/api/apk_ad/index';
         var signParams = {
-            apk_id: window["moosnowConfig"].moosnowAppId,
+            apk_id:moosnow.platform.moosnowConfig.moosnowAppId,
         };
         let data = signParams;
         moosnow.http.request(url, data, 'POST',

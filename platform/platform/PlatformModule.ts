@@ -2,6 +2,8 @@ import MathUtils from "../utils/MathUtils";
 import Common from "../utils/Common";
 import BaseModule from "../framework/BaseModule";
 import moosnowAdRow from "../model/moosnowAdRow";
+import moosnowAppConfig from "../model/moosnowAppConfig";
+import { PlatformType } from "../enum/PlatformType";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -21,6 +23,7 @@ export default class PlatformModule extends BaseModule {
 
     constructor() {
         super();
+        this.initAppConfig();
         this._regisiterWXCallback();
         this.initShare(true);
         this.share_clickTime = null; //分享拉起时间
@@ -30,6 +33,8 @@ export default class PlatformModule extends BaseModule {
         this.updateProgram();
         this.initRecord();
     }
+
+    public moosnowConfig: moosnowAppConfig;
     public share_clickTime: number;
     public currentShareCallback: Function = null;
     public shareFail: boolean = null;
@@ -71,6 +76,22 @@ export default class PlatformModule extends BaseModule {
     //     if (!window[this.platformName]) return;
     //     Lite.event.sendEventImmediately('OnWXShow', this.getLaunchOption());
     // }
+
+    public initAppConfig() {
+        let winCfg = window["moosnowConfig"]
+        if (Common.platform == PlatformType.WX)
+            this.moosnowConfig = winCfg.wx;
+        else if (Common.platform == PlatformType.OPPO)
+            this.moosnowConfig = winCfg.oppo;
+        else
+            this.moosnowConfig = winCfg.wx;
+
+        this.bannerId = this.moosnowConfig["bannerId"];
+        this.videoId = this.moosnowConfig["videoId"];
+        this.interId = this.moosnowConfig["interId"];
+        console.log('moosnowConfig ', this.moosnowConfig)
+    }
+
     public isIphoneXModel() {
         if (!window[this.platformName]) return;
         let sysInfo = this.getSystemInfoSync();
@@ -98,7 +119,7 @@ export default class PlatformModule extends BaseModule {
         // }
         // return false;
     }
-  
+
     private compareVersion(v1, v2) {
         v1 = v1.split('.')
         v2 = v2.split('.')
