@@ -413,10 +413,10 @@ var conf = {
                 apk_id: conf.sdkAppId
             }, 'POST',
                 (res) => {
-                    let enabled = res.zs_version == conf.version;
+                    let enabled = res.data.zs_version == conf.version;
                     cfgData = Object.assign(res.data, {
-                        mistouchNum: enabled ? res.data.zs_switch : 0,
-                        mistouchPosNum: enabled ? res.data.zs_switch : 0,
+                        mistouchNum: res.data.zs_switch,
+                        mistouchPosNum: res.data.zs_switch,
                         showNative: enabled,
                         showInter: enabled,
                         showExportAd: enabled,

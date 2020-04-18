@@ -5,13 +5,44 @@ import PlatformModule from './PlatformModule';
 export default class WXModule extends PlatformModule {
 
     public platformName: string = "wx";
-    private baseUrl = "https://api.liteplay.com.cn/";
+    public baseUrl = "https://api.liteplay.com.cn/";
+    private versionRet: boolean = null;
     constructor() {
         super();
         this.initBanner();
         this.initInter();
     }
-
+    /**
+    * 检查当前版本的导出广告是否开启
+    * @param {string} version 
+    * @param {*} callback 
+    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
+    */
+    public checkVersionAd(version: string, callback) {
+        if (this.versionRet != null) {
+            callback(this.versionRet);
+            return;
+        } else {
+            var url = this.baseUrl + 'wx_list/getAppConfig';
+            var signParams = {
+                appid: this.moosnowConfig.moosnowAppId,
+            };
+            let data = signParams;
+            moosnow.http.request(url, data, 'POST',
+                (res) => {
+                    this.versionRet = res.data.version != version;
+                    console.log("获取广告开关：", this.versionRet);
+                    callback(this.versionRet);
+                },
+                () => {
+                    console.log('checkVersion fail');
+                },
+                () => {
+                    console.log('checkVersion complete');
+                }
+            );
+        }
+    }
     /**
      * 游戏登录
      * @param callback 
@@ -97,6 +128,9 @@ export default class WXModule extends PlatformModule {
                 moosnow.data.setToken(respone.data.user_id);
             }
             callback(respone)
+        }, () => {
+            //如果出错，不影响游戏
+            callback({})
         });
     }
 }

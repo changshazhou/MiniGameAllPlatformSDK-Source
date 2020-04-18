@@ -8,11 +8,12 @@ import SettingModule from "./framework/SettingModule";
 import OPPOAdModule from "./ad/OPPOAdModule";
 import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
+import WXAdModule from "./ad/WXAdModule";
 
 class Main {
     constructor() {
         (window["moosnow"]) = this;
-        
+
         this.initPlatform();
         this.mHttp = new HttpModule();
         this.initAd();
@@ -31,11 +32,11 @@ class Main {
 
     private initAd() {
         if (Common.platform == PlatformType.WX)
-            this.mAd = new AdModule();
+            this.mAd = new WXAdModule();
         else if (Common.platform == PlatformType.OPPO)
             this.mAd = new OPPOAdModule();
         else
-            this.mAd = new AdModule();
+            this.mAd = new WXAdModule();
     }
 
 

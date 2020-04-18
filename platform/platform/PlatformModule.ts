@@ -34,6 +34,7 @@ export default class PlatformModule extends BaseModule {
         this.initRecord();
     }
 
+    public baseUrl = "https://api.liteplay.com.cn/";
     public moosnowConfig: moosnowAppConfig;
     public share_clickTime: number;
     public currentShareCallback: Function = null;
@@ -153,6 +154,18 @@ export default class PlatformModule extends BaseModule {
     public checkVersion(version: string) {
         let sdkVersion = this.getSystemInfoSync().SDKVersion
         return (this.compareVersion(sdkVersion, version) >= 0);
+    }
+
+    /**
+     * 检查当前版本的导出广告是否开启
+     * @param {string} version 
+     * @param {*} callback 
+     * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
+     */
+    public checkVersionAd(version: string, callback) {
+        moosnow.http.loadCfg(res => {
+            callback((res.zs_version == version))
+        })
     }
 
     public isSmallWidth() {

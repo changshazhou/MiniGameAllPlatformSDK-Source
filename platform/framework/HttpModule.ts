@@ -26,13 +26,18 @@ export class HttpModule extends BaseModule {
 
     constructor() {
         super();
-        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now()
-        this.request(versionUrl, {}, 'GET', (res) => {
-            if (this.version < res.version) {
-                console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]`)
-            }
-        })
+        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
+        if (Common.platform == PlatformType.PC)
+            this.request(versionUrl, {}, 'GET', (res) => {
+                if (this.version < res.version) {
+                    console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]`)
+                }
+            })
     }
+
+
+  
+
 
 
     /**

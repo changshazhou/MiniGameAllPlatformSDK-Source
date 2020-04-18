@@ -6,12 +6,7 @@ export default class OPPOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
-    public interInterval: number = 30;
-    public interSize: number = 5;
-    public config: any = {};
-
-    public auditVersion: boolean = false;
-
+    public baseUrl = "https://api.liteplay.com.cn/";
 
     private nativeIndex: number = 0;
     private nativeAd: any;
@@ -23,8 +18,19 @@ export default class OPPOModule extends PlatformModule {
         super();
         this.initAdService();
 
+    }
 
 
+    /**
+    * 检查当前版本的导出广告是否开启
+    * @param {string} version 
+    * @param {*} callback 
+    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
+    */
+    public checkVersionAd(version: string, callback) {
+        moosnow.http.loadCfg(res => {
+            callback((res.zs_version == version))
+        })
     }
     private initAdService() {
         if (!window[this.platformName])
@@ -77,8 +83,6 @@ export default class OPPOModule extends PlatformModule {
     private mInterLen = 0;
     public showInter() {
         if (!this.inter) return;
-        if (this.mInterLen > this.config.interSize)
-            return;
         if (this.isInterLoaded) {
             let now = Date.now();
             this._showInter();
@@ -189,17 +193,14 @@ export default class OPPOModule extends PlatformModule {
         }
         if (this.banner) {
             let now = Date.now();
-            if (this.mPrevBanner == -1 || now - this.mPrevBanner > this.config.bannerInterval * 1000) {
-                this.mPrevBanner = now;
-                this.banner.hide();
-                let promiseShow = this.banner.show();
-                this.mBannerSize += 1;
-                if (promiseShow && promiseShow.catch)
-                    promiseShow.catch(err => {
-                        console.log('广告组件出现问题', err);
-                    });
-
-            }
+            this.mPrevBanner = now;
+            this.banner.hide();
+            let promiseShow = this.banner.show();
+            this.mBannerSize += 1;
+            if (promiseShow && promiseShow.catch)
+                promiseShow.catch(err => {
+                    console.log('广告组件出现问题', err);
+                });
         }
     }
 
@@ -339,5 +340,96 @@ export default class OPPOModule extends PlatformModule {
             () => {
                 console.log('upload navigate complete');
             });
+    }
+
+    /**
+     * 游戏登录
+     * @param callback 
+     * @param fail 
+     */
+    public login(callback: Function, fail?: Function) {
+
+        moosnow.http.getAllConfig(res => {
+
+        });
+
+        let self = this;
+
+        let userToken = moosnow.data.getToken();
+        if (userToken) {
+            self.getUserToken("", userToken, callback)
+        }
+        else {
+            window[this.platformName].login({
+                success(res) {
+                    if (res.code) {
+                        //发起网络请求
+                        self.getUserToken(res.code, "", callback)
+                    } else {
+                        // (window[this.platformName] as any).showModal({
+                        //     title: "提示",
+                        //     content: "网络有点开小差了,",
+                        //     confirmText: "重启游戏",
+                        //     showCancel: false,
+                        //     cancelColor: '#000000',
+                        //     confirmColor: '#3CC51F',
+                        //     fail: null,
+                        //     complete: null,
+                        //     success(res) {
+                        //         window[self.platformName].exitMiniProgram({
+                        //             success: () => {
+                        //                 let item = {
+                        //                     appid: "wx840e2e246968f224",
+                        //                     img: "",
+                        //                     path: ""
+                        //                 } as moosnowAdRow
+                        //                 moosnow.platform.navigate2Mini(item)
+                        //             }
+                        //         })
+                        //     }
+                        // })
+                    }
+                }
+            })
+        }
+    }
+
+    /**
+     * 
+     * @param code 
+     * @param user_id 
+     * @param callback 
+     */
+    private getUserToken(code, user_id, callback?) {
+
+        let options = window[this.platformName].getLaunchOptionsSync();
+        let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
+        let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
+
+        moosnow.data.setChannelAppId(channel_appid);
+        moosnow.data.setChannelId(channel_id);
+
+        if (window[this.platformName] && window[this.platformName].aldSendEvent) {
+            window[this.platformName].aldSendEvent("来源", {
+                origin: options.referrerInfo ? options.referrerInfo.appId : '未知',
+                path: options.query.from || 0
+            })
+        }
+
+        moosnow.http.request(`${this.baseUrl}api/channel/login.html`, {
+            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+            code: code,
+            user_id: user_id,
+            channel_id: channel_id,
+            channel_appid: channel_appid
+        }, "POST", (respone) => {
+            if (respone.code == 0 && respone.data && respone.data.user_id) {
+                moosnow.data.setToken(respone.data.user_id);
+            }
+            callback(respone)
+        }, () => {
+            //如果出错，不影响游戏
+            callback({})
+        });
     }
 }

@@ -7,7 +7,7 @@ import moosnowAdRow from "../model/moosnowAdRow";
 
 export default class AdModule extends BaseModule {
 
-    private baseUrl: string = "https://api.liteplay.com.cn/admin/";
+    public baseUrl: string = "https://api.liteplay.com.cn/admin/";
 
     constructor() {
         super();
@@ -121,6 +121,7 @@ export default class AdModule extends BaseModule {
                 }
             },
             () => {
+                cb([])
                 console.log('getRemoteAd fail');
             },
             () => {
