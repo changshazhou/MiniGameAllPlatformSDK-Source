@@ -9,6 +9,8 @@ import OPPOAdModule from "./ad/OPPOAdModule";
 import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
 import WXAdModule from "./ad/WXAdModule";
+import TTModule from "./ad/TTModule";
+import QQModule from "./ad/QQModule";
 
 class Main {
     constructor() {
@@ -25,6 +27,10 @@ class Main {
             this.mPlatform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
             this.mPlatform = new OPPOModule();
+        else if (Common.platform == PlatformType.BYTEDANCE)
+            this.mPlatform = new TTModule();
+        else if (Common.platform == PlatformType.QQ)
+            this.mPlatform = new QQModule();
         else
             this.mPlatform = new PlatformModule();
         // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)

@@ -24,19 +24,28 @@ export class HttpModule extends BaseModule {
     public version: string = "1.0.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
 
+    private mLaunchOptions: any
     constructor() {
         super();
-        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
-        if (Common.platform == PlatformType.PC)
+
+
+
+        if (Common.platform == PlatformType.PC) {
+            let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
                     console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]`)
                 }
             })
+        }
+
+        if (Common.platform == PlatformType.WX) {
+            this.mLaunchOptions = (window["wx"] as any).getLaunchOptionsSync();
+        }
     }
 
 
-  
+
 
 
 
@@ -347,9 +356,11 @@ export class HttpModule extends BaseModule {
                 this.disableAd(res, res2, (disable) => {
                     if (disable) {
                         callback(0)
+                        console.log('getMisTouchNum', 0, 'disableAd', disable)
                     }
                     else {
                         callback(parseInt(res.mistouchNum))
+                        console.log('getMisTouchNum', res.mistouchNum, 'disableAd', disable)
                     }
                 })
             })
@@ -365,9 +376,11 @@ export class HttpModule extends BaseModule {
                 this.disableAd(res, res2, (disable) => {
                     if (disable) {
                         callback(0)
+                        console.log('getMistouchPosNum', 0, 'disableAd', disable)
                     }
                     else {
                         callback(parseInt(res.mistouchPosNum))
+                        console.log('getMistouchPosNum', res.mistouchPosNum, 'disableAd', disable)
                     }
                 })
             })
@@ -399,7 +412,13 @@ export class HttpModule extends BaseModule {
                 }
             }
         }
-
+        if (this.mLaunchOptions) {
+            if ([1005, 1007, 1008, 1044].indexOf(this.mLaunchOptions.scene) != -1) {
+                callback(true)
+                console.log('mLaunchOptions', this.mLaunchOptions);
+                return;
+            }
+        }
         if (inDisabledRegion) {
             if (res.disabledTime && res.disabledTime.length == 2) {
                 if (curTime > res.disabledTime[0] && curTime < res.disabledTime[1]) {
