@@ -156,15 +156,22 @@ export class HttpModule extends BaseModule {
     private postData(url) {
         let userToken = moosnow.data.getToken();
 
-        if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0")
-            this.request(`${this.baseUrl}${url}`, {
-                appid: moosnow.platform.moosnowConfig.moosnowAppId,
-                user_id: userToken,
-                channel_id: moosnow.data.getChannelId(),
-                channel_appid: moosnow.data.getChannelAppId()
-            }, "POST", (respone) => {
+        if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
+            try {
+                this.request(`${this.baseUrl}${url}`, {
+                    appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                    user_id: userToken,
+                    channel_id: moosnow.data.getChannelId(),
+                    channel_appid: moosnow.data.getChannelAppId()
+                }, "POST", (respone) => {
 
-            });
+                });
+            }
+            catch (e) {
+                console.log('postData error ', e)
+            }
+
+        }
     }
 
 

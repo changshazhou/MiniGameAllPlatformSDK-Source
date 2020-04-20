@@ -39,7 +39,7 @@ gulp.task('tsc', () => {
 		]
 	}).then(bundle => {
 		return bundle.write({
-			file: './dist/moosnow.platform.sdk.js',
+			file: '../dist/moosnow.platform.sdk.js',
 			format: 'iife',
 			name: 'laya',
 			sourcemap: false
@@ -49,6 +49,23 @@ gulp.task('tsc', () => {
 
 	})
 });
+
+// 压缩js
+// gulp.task("compressJs", ["tsc"], function () {
+// 	if (config.compressJs) {
+// 		return gulp.src(config.compressJsFilter, { base: releaseDir })
+// 			.pipe(uglify({
+// 				mangle: {
+// 					keep_fnames: true
+// 				}
+// 			}))
+// 			.on('error', function (err) {
+// 				console.warn(err.toString());
+// 			})
+// 			.pipe(gulp.dest(releaseDir));
+// 	}
+// });
+
 
 // gulp.task('build', function () {
 // 	gulp.src('dist/*.js')       // 路径问题：gulpfile.js为路径的起点。此路径表示js文件下的所有js文件。

@@ -84,6 +84,12 @@ export default class PlatformModule extends BaseModule {
             this.moosnowConfig = winCfg.wx;
         else if (Common.platform == PlatformType.OPPO)
             this.moosnowConfig = winCfg.oppo;
+        else if (Common.platform == PlatformType.QQ)
+            this.moosnowConfig = winCfg.qq;
+        else if (Common.platform == PlatformType.BAIDU)
+            this.moosnowConfig = winCfg.db;
+        else if (Common.platform == PlatformType.BYTEDANCE)
+            this.moosnowConfig = winCfg.byte;
         else
             this.moosnowConfig = winCfg.wx;
 
