@@ -246,7 +246,7 @@ export default class PlatformModule extends BaseModule {
                     success();
             },
             fail: (err) => {
-                console.log('navigateToMiniProgram error ', err)
+                console.log('navigateToMini fail ', err, ' fail callback ', !!fail)
                 if (fail)
                     fail();
             },
