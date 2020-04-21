@@ -53,6 +53,8 @@ export default class PlatformModule extends BaseModule {
     public bannerWidth: number = 300;
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
+    public bannerCb: Function = null;
+
     public videoCb: Function = null;
     public videoLoading: boolean = false;
 
@@ -687,10 +689,12 @@ export default class PlatformModule extends BaseModule {
     private _onHideCallback(res) {
         //Lite.log.log('WX_hide');
         // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
-
-        if ((res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50) {
+        let isOpend = (res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50
+        if (isOpend) {
             moosnow.http.clickBanner();
         }
+        if (this.bannerCb)
+            this.bannerCb(isOpend);
     }
 
 
@@ -752,7 +756,12 @@ export default class PlatformModule extends BaseModule {
         // this.banner.style.left = (windowWidth - size.width) / 2;
         this.banner.style.top = windowHeight - size.height;
     }
-    public showBanner() {
+    /**
+     * 点击回调
+     * @param callback 
+     */
+    public showBanner(callback) {
+        this.bannerCb = callback;
         if (!window[this.platformName]) {
             return;
         }
@@ -762,6 +771,7 @@ export default class PlatformModule extends BaseModule {
             });
     }
     public hideBanner() {
+        this.bannerCb = null;
         if (!window[this.platformName]) {
             return;
         }

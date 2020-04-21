@@ -187,7 +187,8 @@ export default class OPPOModule extends PlatformModule {
     }
     private mBannerSize = 0;
     private mPrevBanner = -1
-    public showBanner() {
+    public showBanner(callback) {
+        this.bannerCb = callback;
         if (!window[this.platformName]) {
             return;
         }
