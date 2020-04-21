@@ -186,7 +186,7 @@ export default class PlatformModule extends BaseModule {
         return false;
     }
 
-    public login(success: Function, fail?: Function) {
+    public login(success?: Function, fail?: Function) {
         if (success) {
             let token = moosnow.data.getToken()
             if (!token) {

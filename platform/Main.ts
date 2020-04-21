@@ -1,4 +1,4 @@
-import PlatformModule from "./platform/PlatformModule";
+import PlatformModule, { VIDEO_STATUS, SHARE_MSG, VIDEO_MSG } from "./platform/PlatformModule";
 import WXModule from "./platform/WXModule";
 import AdModule from "./ad/AdModule";
 import { HttpModule } from "./framework/HttpModule";
@@ -13,8 +13,11 @@ import TTModule from "./ad/TTModule";
 import QQModule from "./ad/QQModule";
 
 class Main {
+    public VIDEO_STATUS;
     constructor() {
         (window["moosnow"]) = this;
+        
+        this.VIDEO_STATUS = VIDEO_STATUS;
 
         this.initPlatform();
         this.mHttp = new HttpModule();
@@ -22,6 +25,9 @@ class Main {
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
     }
+
+
+
     private initPlatform() {
         if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
@@ -81,6 +87,7 @@ class Main {
     public get setting() {
         return this.mSetting;
     }
+
 
 
 }

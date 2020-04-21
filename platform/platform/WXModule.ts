@@ -48,8 +48,7 @@ export default class WXModule extends PlatformModule {
      * @param callback 
      * @param fail 
      */
-    public login(callback: Function, fail?: Function) {
-
+    public login(callback?: Function, fail?: Function) {
         moosnow.http.getAllConfig(res => {
 
         });
@@ -67,28 +66,7 @@ export default class WXModule extends PlatformModule {
                         //发起网络请求
                         self.getUserToken(res.code, "", callback)
                     } else {
-                        // (window[this.platformName] as any).showModal({
-                        //     title: "提示",
-                        //     content: "网络有点开小差了,",
-                        //     confirmText: "重启游戏",
-                        //     showCancel: false,
-                        //     cancelColor: '#000000',
-                        //     confirmColor: '#3CC51F',
-                        //     fail: null,
-                        //     complete: null,
-                        //     success(res) {
-                        //         window[self.platformName].exitMiniProgram({
-                        //             success: () => {
-                        //                 let item = {
-                        //                     appid: "wx840e2e246968f224",
-                        //                     img: "",
-                        //                     path: ""
-                        //                 } as moosnowAdRow
-                        //                 moosnow.platform.navigate2Mini(item)
-                        //             }
-                        //         })
-                        //     }
-                        // })
+                        callback();
                     }
                 }
             })

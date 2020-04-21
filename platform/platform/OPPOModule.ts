@@ -347,7 +347,7 @@ export default class OPPOModule extends PlatformModule {
      * @param callback 
      * @param fail 
      */
-    public login(callback: Function, fail?: Function) {
+    public login(callback?: Function, fail?: Function) {
 
         moosnow.http.getAllConfig(res => {
 
