@@ -13,11 +13,12 @@ import TTModule from "./ad/TTModule";
 import QQModule from "./ad/QQModule";
 
 class Main {
-    public VIDEO_STATUS;
+    public VIDEO_STATUS = VIDEO_STATUS;
+    public VIDEO_MSG = VIDEO_MSG;
+    public SHARE_MSG = SHARE_MSG;
     constructor() {
         (window["moosnow"]) = this;
-        
-        this.VIDEO_STATUS = VIDEO_STATUS;
+
 
         this.initPlatform();
         this.mHttp = new HttpModule();
