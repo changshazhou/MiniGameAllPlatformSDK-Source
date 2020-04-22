@@ -1,4 +1,5 @@
 import PlatformModule from './PlatformModule';
+import Common from '../utils/Common';
 /**
  * 微信平台
  */
@@ -66,7 +67,8 @@ export default class WXModule extends PlatformModule {
                         //发起网络请求
                         self.getUserToken(res.code, "", callback)
                     } else {
-                        callback();
+                        if (Common.isFunction(callback))
+                            callback();
                     }
                 }
             })
@@ -105,10 +107,13 @@ export default class WXModule extends PlatformModule {
             if (respone.code == 0 && respone.data && respone.data.user_id) {
                 moosnow.data.setToken(respone.data.user_id);
             }
-            callback(respone)
+            if (Common.isFunction(callback))
+                callback(respone)
         }, () => {
             //如果出错，不影响游戏
-            callback({})
+
+            if (Common.isFunction(callback))
+                callback({})
         });
     }
 }

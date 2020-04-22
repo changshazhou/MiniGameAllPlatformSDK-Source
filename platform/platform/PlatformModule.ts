@@ -670,7 +670,7 @@ export default class PlatformModule extends BaseModule {
 
     private _regisiterOnShow() {
         let self = this;
-        window[this.platformName].onShow(function (res) {
+        window[this.platformName].onShow((res) => {
             self._onShowCallback(res);
         });
     }
@@ -683,7 +683,7 @@ export default class PlatformModule extends BaseModule {
 
     private _regisiterOnHide() {
         let self = this;
-        window[this.platformName].onHide(self._onHideCallback);
+        window[this.platformName].onHide(self._onHideCallback.bind(this));
     }
 
     private _onHideCallback(res) {
@@ -693,8 +693,12 @@ export default class PlatformModule extends BaseModule {
         if (isOpend) {
             moosnow.http.clickBanner();
         }
-        if (this.bannerCb)
+        if (this.bannerCb) {
             this.bannerCb(isOpend);
+        }
+        else {
+            console.log('banner callback is null ')
+        }
     }
 
 
@@ -771,7 +775,7 @@ export default class PlatformModule extends BaseModule {
             });
     }
     public hideBanner() {
-        this.bannerCb = null;
+        // this.bannerCb = null;
         if (!window[this.platformName]) {
             return;
         }
