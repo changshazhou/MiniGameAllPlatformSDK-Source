@@ -34,7 +34,9 @@ export class HttpModule extends BaseModule {
             let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
-                    console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]`)
+                    console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]  下载地址：${res.download}`)
+                    if (!Common.isEmpty(res.memo))
+                        console.warn(`${res.memo}`)
                 }
             })
         }

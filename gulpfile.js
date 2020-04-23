@@ -3,9 +3,10 @@ const rollup = require("rollup");
 const typescript = require('rollup-plugin-typescript2');//typescript2 plugin
 const glsl = require('rollup-plugin-glsl');
 const concat = require('gulp-concat');
-const uglify = require('gulp-uglify');
+// const uglify = require('gulp-uglify');
 
-
+const terser = require("rollup-plugin-terser");
+const uglify = require("rollup-plugin-uglify");
 
 gulp.task('tsc', () => {
 	return rollup.rollup({
@@ -30,6 +31,8 @@ gulp.task('tsc', () => {
 				sourceMap: false,
 				compress: false
 			}),
+			uglify.uglify(),
+			// terser.terser()
 			/*terser({
 				output: {
 				},
@@ -53,7 +56,7 @@ gulp.task('tsc', () => {
 // 压缩js
 // gulp.task("compressJs", ["tsc"], function () {
 // 	if (config.compressJs) {
-// 		return gulp.src(config.compressJsFilter, { base: releaseDir })
+// 		return gulp.src(['!b*.js', '*.js'], { base: './dist/' })
 // 			.pipe(uglify({
 // 				mangle: {
 // 					keep_fnames: true
