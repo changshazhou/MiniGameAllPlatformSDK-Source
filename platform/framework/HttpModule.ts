@@ -408,12 +408,12 @@ export class HttpModule extends BaseModule {
     private disableAd(res, res2, callback) {
         let curTime = Common.formatTime(new Date())
         let inDisabledRegion = false;
-        if (res.disabledRegion) {
+        if (res && res.disabledRegion) {
             for (let i = 0; i < res.disabledRegion.length; i++) {
                 let region = res.disabledRegion[i];
-                if (res2.data.city.indexOf(region) != -1
+                if (res2 && res2.data && (res2.data.city.indexOf(region) != -1
                     || res2.data.province.indexOf(region) != -1
-                    || res2.data.area.indexOf(region) != -1) {
+                    || res2.data.area.indexOf(region) != -1)) {
                     inDisabledRegion = true;
                     break;
                 }

@@ -109,6 +109,7 @@ export default class PlatformModule extends BaseModule {
         this.bannerId = this.moosnowConfig["bannerId"];
         this.videoId = this.moosnowConfig["videoId"];
         this.interId = this.moosnowConfig["interId"];
+        this.nativeId = this.moosnowConfig["nativeId"] as [];
         console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig))
     }
 

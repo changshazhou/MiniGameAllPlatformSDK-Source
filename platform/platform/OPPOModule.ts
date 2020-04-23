@@ -9,10 +9,9 @@ export default class OPPOModule extends PlatformModule {
     public baseUrl = "https://api.liteplay.com.cn/";
 
     constructor() {
-
         super();
+        
         this.initAdService();
-
     }
 
     /**
