@@ -19,7 +19,7 @@ export default class WXModule extends PlatformModule {
     * @param {*} callback 
     * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
     */
-    public checkVersionAd(version: string, callback) {
+    public checkVersion(version: string, callback) {
         if (this.versionRet != null) {
             callback(this.versionRet);
             return;
@@ -62,7 +62,7 @@ export default class WXModule extends PlatformModule {
         }
         else {
             window[this.platformName].login({
-                success(res) {
+                success: (res) => {
                     if (res.code) {
                         //发起网络请求
                         self.getUserToken(res.code, "", callback)
@@ -70,6 +70,9 @@ export default class WXModule extends PlatformModule {
                         if (Common.isFunction(callback))
                             callback();
                     }
+                },
+                fail: () => {
+
                 }
             })
         }

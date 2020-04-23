@@ -134,6 +134,8 @@ export default class Common {
             return PlatformType.BAIDU
         else if (window['qq'])
             return PlatformType.QQ
+        else if (window['qg'])
+            return PlatformType.OPPO
         else if (window['wx'])
             return PlatformType.WX
         else

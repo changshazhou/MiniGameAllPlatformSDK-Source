@@ -4,6 +4,7 @@ import BaseModule from "../framework/BaseModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 import { PlatformType } from "../enum/PlatformType";
+import nativeAdRow from "../model/nativeAdRow";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -45,15 +46,25 @@ export default class PlatformModule extends BaseModule {
     public banner: any = null;
     public video: any = null;
     public inter: any = null;
+    public native: any = null;
+    public nativeAdResult: nativeAdRow = null;
 
     public platformName: string = "wx";
     public bannerId: string = "";
     public videoId: string = "";
     public interId = "";
+
+    /**
+     * https://u.oppomobile.com/main/app.html 广告联盟网站中媒体管理 > 广告管理中广告名称下面的 id 即为 adUnitId
+     */
+    public nativeId: Array<number> = [];
+    public nativeIdIndex: number = 0;
+
     public bannerWidth: number = 300;
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
     public bannerCb: Function = null;
+    public isBannerShow: boolean = false;
 
     public videoCb: Function = null;
     public videoLoading: boolean = false;
@@ -98,7 +109,7 @@ export default class PlatformModule extends BaseModule {
         this.bannerId = this.moosnowConfig["bannerId"];
         this.videoId = this.moosnowConfig["videoId"];
         this.interId = this.moosnowConfig["interId"];
-        console.log('moosnowConfig ', this.moosnowConfig)
+        console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig))
     }
 
     public isIphoneXModel() {
@@ -154,12 +165,11 @@ export default class PlatformModule extends BaseModule {
 
         return 0
     }
-
     /**
-     * 检测版本是否可用
-     * @param version 需要检查的版本号
-     */
-    public checkVersion(version: string) {
+    * 检测版本是否可用
+    * @param version 需要检查的版本号
+    */
+    public supportVersion(version: string) {
         let sdkVersion = this.getSystemInfoSync().SDKVersion
         return (this.compareVersion(sdkVersion, version) >= 0);
     }
@@ -170,10 +180,8 @@ export default class PlatformModule extends BaseModule {
      * @param {*} callback 
      * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
      */
-    public checkVersionAd(version: string, callback) {
-        moosnow.http.loadCfg(res => {
-            callback((res.zs_version == version))
-        })
+    public checkVersion(version: string, callback) {
+        callback(true)
     }
 
     public isSmallWidth() {
@@ -200,6 +208,10 @@ export default class PlatformModule extends BaseModule {
 
         }
     }
+
+
+
+
 
     public postMessage(data: { action: number, data?: any }) {
         if (!window[this.platformName]) return;
@@ -764,8 +776,9 @@ export default class PlatformModule extends BaseModule {
      * 点击回调
      * @param callback 
      */
-    public showBanner(callback) {
+    public showBanner(callback?) {
         this.bannerCb = callback;
+        this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
@@ -774,8 +787,35 @@ export default class PlatformModule extends BaseModule {
                 console.log('广告组件出现问题', err);
             });
     }
+    /**
+     * 会自动隐藏的banner
+     * 一般用游戏中
+     */
+    public showAutoBanner() {
+        moosnow.http.getAllConfig(res => {
+            if (res.gameBanner == 1) {
+                moosnow.platform.showBanner();
+                let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
+
+                setTimeout(() => {
+                    if (this.isBannerShow) {
+                        this.hideBanner();
+                        setTimeout(() => {
+                            this.showBanner(this.bannerCb);
+                        }, 500);
+                    }
+                    else {
+                        this.hideBanner();
+                    }
+
+                }, time * 1000)
+            }
+        })
+    }
+
     public hideBanner() {
         // this.bannerCb = null;
+        this.isBannerShow = false;
         if (!window[this.platformName]) {
             return;
         }
@@ -879,7 +919,7 @@ export default class PlatformModule extends BaseModule {
     public prepareInter() {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createInterstitialAd != "function") return;
-        if (!this.checkVersion('2.8.0')) return;
+        if (!this.supportVersion('2.8.0')) return;
         this.inter = window[this.platformName].createInterstitialAd({
             adUnitId: this.interId
         });
@@ -903,9 +943,102 @@ export default class PlatformModule extends BaseModule {
             this.inter.load();
         }
     }
-    public _onInterError() {
-
+    public _onInterError(err) {
+        console.log(`插屏广告出错：`, err)
     }
+
+
+    public _prepareNative() {
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].createNativeAd != "function") return;
+        this.native = qg.createNativeAd({
+            adUnitId: this.nativeId[this.nativeIdIndex]
+        })
+        this.native.onLoad(this._onInterLoad.bind(this));
+        this.native.onError(this._onNativeError.bind(this));
+        this.native.load()
+    }
+
+    public _onNativeLoad(res) {
+        console.log(`加载原生广告成功`, res)
+        res.adList && res.adList.length > 0 && (this.nativeAdResult = res.adList[0]);
+        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId))
+            this.native.reportAdShow({
+                adId: this.nativeAdResult.adId
+            })
+    }
+
+    public _onNativeError(err) {
+        this.nativeAdResult = null;
+        console.log(`设置原生广告出错：`, err)
+        if (err.code == 20003) {
+            if (this.nativeIdIndex < this.nativeId.length - 1) {
+                this.nativeIdIndex += 1;
+                console.log('使用新ID加载原生广告', err)
+                this._destroyNative();
+                this._prepareNative();
+            }
+
+        }
+    }
+
+    private _destroyNative() {
+        this.native.offLoad() // 移除原生广告加载成功回调
+        this.native.offError() // 移除失败回调
+        this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
+        console.log('原生广告销毁')
+    }
+
+    /**
+     * 返回原生广告数据，开发者根据返回的数据来展现
+     * 没有广告返回null
+     * 
+     * 
+     * 例如 cocos
+     * let adData=moosnow.platform.getNativeAd();
+     * cc.loader.load(adData.imgUrlList[0], (err, texture) => {
+     *   adImg.active = true
+     *   adImg.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(texture)
+     * })
+     * 
+     * 例如 laya
+     * let adData=moosnow.platform.getNativeAd();
+     * new Laya.Image().skin=adData.imgUrlList[0];
+     * 
+     * 
+     * 
+     */
+    public getNativeAd(): nativeAdRow {
+        if (this.native)
+            this.native.load()
+        return { ...this.nativeAdResult };
+    }
+    /**
+     * 用户点击了展示原生广告的图片时，使用此方法
+     * 例如 cocos
+     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     *     moosnow.platform.clickNative();
+     * }, this)
+     * 
+     * 
+     * 例如 laya
+     * (new Laya.Image()).on(Laya.Event.MOUSE_UP, this, () => {
+     *     moosnow.platform.clickNative();
+     * })
+     * 
+     */
+    public clickNative() {
+        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId))
+            this.native.reportAdClick({
+                adId: this.nativeAdResult.adId
+            })
+    }
+
+
+
+
+
+
     //----自定义--
     public initRank() {
         let data = {

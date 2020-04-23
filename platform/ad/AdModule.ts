@@ -42,7 +42,7 @@ export default class AdModule extends BaseModule {
     }
     /**
      * 获取广告数据 目前仅有indexLeft提供使用
-     * @param {*} callback 
+     * @param {Function} callback 
      * @returns  more 更多好玩 个人中心的广告 现已经不用了
      *   promotion 首页推广   首页开始按钮下的广告
      *   indexFloat 首页浮动广告 首页右上的广告
@@ -50,7 +50,7 @@ export default class AdModule extends BaseModule {
      *   gameFloat 游戏页浮动广告 
      *   endPage 结束页广告
      */
-    public getAd(callback: (appList: moosnowResult) => {}): void {
+    public getAd(callback: Function): void {
         let cache = this.getCache();
         if (!Common.isEmpty(cache.indexLeft)) {
             let distinctAd = this.getDistinctAd(cache.indexLeft)
