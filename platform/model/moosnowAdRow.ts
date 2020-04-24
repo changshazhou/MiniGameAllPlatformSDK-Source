@@ -14,5 +14,8 @@ export default class moosnowAdRow {
      */
     public pkgName: string = "";
     public extraData: any = "";
+    /**
+     * 位置描述
+     */
     public position: string = "";
 }

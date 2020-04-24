@@ -230,9 +230,9 @@ export default class PlatformModule extends BaseModule {
      */
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
-
+        console.log('跳转数据：', row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log('>>>>>>>>>>>>>>>>>>>>> ')
+            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
             return;
         }
         this.prevNavigate = Date.now();

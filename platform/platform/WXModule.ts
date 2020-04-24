@@ -24,7 +24,7 @@ export default class WXModule extends PlatformModule {
             callback(this.versionRet);
             return;
         } else {
-            var url = this.baseUrl + 'wx_list/getAppConfig';
+            var url = this.baseUrl + 'admin/wx_list/getAppConfig';
             var signParams = {
                 appid: this.moosnowConfig.moosnowAppId,
             };
