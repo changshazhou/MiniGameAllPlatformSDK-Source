@@ -801,9 +801,9 @@ export default class PlatformModule extends BaseModule {
                 setTimeout(() => {
                     if (this.isBannerShow) {
                         this.hideBanner();
-                        setTimeout(() => {
-                            this.showBanner(this.bannerCb);
-                        }, 500);
+                        // setTimeout(() => {
+                        //     this.showBanner(this.bannerCb);
+                        // }, 500);
                     }
                     else {
                         this.hideBanner();

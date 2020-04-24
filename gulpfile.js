@@ -22,7 +22,7 @@ gulp.task('tsc', () => {
 			typescript({
 				tsconfig: "./tsconfig.json",
 				check: true, //Set to false to avoid doing any diagnostic checks on the code
-				tsconfigOverride: { compilerOptions: { removeComments: false } },
+				tsconfigOverride: { compilerOptions: { removeComments: true } },
 				include: /.*.ts/,
 			}),
 			glsl({
