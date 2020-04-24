@@ -18,6 +18,7 @@ export default class AdModule extends BaseModule {
      */
     private getDistinctAd(source) {
         let retValue: Array<moosnowAdRow> = [];
+        let retValue2: Array<moosnowAdRow> = [];
 
         //第一步随机打乱    
         let temp = source.sort((a, b) => {
@@ -36,9 +37,11 @@ export default class AdModule extends BaseModule {
             }
             if (append)
                 retValue.push(item)
+            else
+                retValue2.push(item)
         }
 
-        return retValue;
+        return [...retValue2, ...retValue2];
     }
     /**
      * 获取广告数据 目前仅有indexLeft提供使用
