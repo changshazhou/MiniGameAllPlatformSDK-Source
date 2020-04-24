@@ -41,7 +41,7 @@ export default class AdModule extends BaseModule {
                 retValue2.push(item)
         }
 
-        return [...retValue2, ...retValue2];
+        return [...retValue, ...retValue2];
     }
     /**
      * 获取广告数据 目前仅有indexLeft提供使用
