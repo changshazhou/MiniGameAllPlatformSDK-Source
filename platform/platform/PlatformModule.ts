@@ -776,23 +776,11 @@ export default class PlatformModule extends BaseModule {
     }
     public _bottomCenterBanner(size) {
         let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
+        // let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
         this.banner.style.height = size.height;
-        this.banner.style.left = (windowWidth - size.width) / 2;
-        let top = 0;
-        if (this.bannerPosition == BannerPosition.Bottom) {
-            top = windowHeight - size.height;
-        }
-        else if (this.bannerPosition == BannerPosition.Center)
-            top = (windowHeight - size.height) / 2;
-        else if (this.bannerPosition == BannerPosition.Top)
-            top = 0;
-        else
-            top = this.bannerStyle.top;
-
-        this.banner.style.top = top;
-        console.log('banner reseize ', this.banner.style, 'set top ', top)
+        // this.banner.style.left = (windowWidth - size.width) / 2;
+        this.banner.style.top = windowHeight - size.height;
     }
     /**
      * 
