@@ -1,8 +1,8 @@
-import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import Common from "../utils/Common";
+import OPPOModule from "./OPPOModule";
 
-export default class ZSOPPOModule extends PlatformModule {
+export default class ZSOPPOModule extends OPPOModule {
     public platformName: string = "qg";
     /**
         * 检查当前版本的导出广告是否开启

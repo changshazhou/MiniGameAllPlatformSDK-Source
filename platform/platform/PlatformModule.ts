@@ -208,7 +208,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public login(success?: Function, fail?: Function) {
-        if (success) {
+        if (Common.isFunction(success)) {
             let token = moosnow.data.getToken()
             if (!token) {
                 token = Common.generateUUID();

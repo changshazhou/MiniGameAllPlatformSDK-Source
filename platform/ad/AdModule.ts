@@ -218,6 +218,10 @@ export default class AdModule extends BaseModule {
             case '6':
                 retValue.exportPage.push(item)
                 break;
+            default:
+                retValue.indexLeft.push(item)
+                break;
+
         }
         return retValue;
     }

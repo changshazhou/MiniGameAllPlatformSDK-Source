@@ -1,4 +1,5 @@
 import AdModule from "./AdModule";
+import moosnowAdRow from "../model/moosnowAdRow";
 
 export default class ZSOPPOAdModule extends AdModule {
 
