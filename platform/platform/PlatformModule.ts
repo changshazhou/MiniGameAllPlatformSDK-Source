@@ -49,7 +49,7 @@ export default class PlatformModule extends BaseModule {
     public video: any = null;
     public inter: any = null;
     public native: any = null;
-    public nativeAdResult: nativeAdRow = null;
+
 
     public platformName: string = "wx";
     public bannerId: string = "";
@@ -76,6 +76,11 @@ export default class PlatformModule extends BaseModule {
     public interShowCount: number = 0;
     public interShowCountLimit: number = 3;
     public isInterLoaded: boolean = false;
+
+
+    public nativeAdResult: nativeAdRow = null;
+    public nativeCb: Function = null;
+    public nativeLoading: boolean = false;
 
     public record: any = null;
 
@@ -989,23 +994,39 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createNativeAd != "function") return;
         this.native = qg.createNativeAd({
-            adUnitId: this.nativeId[this.nativeIdIndex]
+            adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
         })
-        this.native.onLoad(this._onInterLoad.bind(this));
+        this.native.onLoad(this._onNativeLoad.bind(this));
         this.native.onError(this._onNativeError.bind(this));
+        this.nativeLoading = true;
         this.native.load()
     }
 
     public _onNativeLoad(res) {
+        this.nativeLoading = false;
         console.log(`加载原生广告成功`, res)
-        res.adList && res.adList.length > 0 && (this.nativeAdResult = res.adList[0]);
-        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId))
+
+        if (res && res.adList && res.adList.length > 0) {
+
+            if (this.nativeAdResult == null) {
+                this.nativeAdResult = res.adList[0]
+                if (Common.isFunction(this.nativeCb)) {
+                    this.nativeCb(Common.deepCopy(this.nativeAdResult))
+                }
+            }
+            else {
+                this.nativeAdResult = res.adList[0]
+            }
+        }
+        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
             this.native.reportAdShow({
                 adId: this.nativeAdResult.adId
-            })
+            });
+        }
     }
 
     public _onNativeError(err) {
+        this.nativeLoading = false;
         this.nativeAdResult = null;
         console.log(`设置原生广告出错：`, err)
         if (err.code == 20003) {
@@ -1020,6 +1041,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     private _destroyNative() {
+        this.nativeLoading = false;
         this.native.offLoad() // 移除原生广告加载成功回调
         this.native.offError() // 移除失败回调
         this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
@@ -1043,13 +1065,17 @@ export default class PlatformModule extends BaseModule {
      * let adData=moosnow.platform.getNativeAd();
      * new Laya.Image().skin=adData.imgUrlList[0];
      * 
-     * 
-     * 
+     * @param callback 回调函数
      */
-    public getNativeAd(): nativeAdRow {
-        if (this.native)
-            this.native.load()
-        return { ...this.nativeAdResult };
+    public showNativeAd(callback: Function) {
+        this.nativeCb = callback;
+        if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
+            if (this.native)
+                this.native.load();
+            let nativeData = Common.deepCopy(this.nativeAdResult)
+            callback(nativeData)
+        }
+
     }
     /**
      * 目前只有OPPO平台有此功能 

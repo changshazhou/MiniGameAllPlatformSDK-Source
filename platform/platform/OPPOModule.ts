@@ -53,22 +53,32 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName])
             return;
         let self = this;
-        window[this.platformName].initAdService({
-            isDebug: true,
-            appId: this.moosnowConfig.moosnowAppId,
-            success: (res) => {
-                console.log(`初始化广告`);
-                self.initBanner();
-                self.initInter();
-                self._prepareNative();
-            },
-            fail: (res) => {
-                console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
-            },
-            complete: (res) => {
-                console.log("initAdService  complete");
-            }
-        })
+
+        if (this.supportVersion("1051")) {
+            console.log(`初始化广告`);
+            self.initBanner();
+            self.initInter();
+            self._prepareNative();
+        }
+        else {
+            window[this.platformName].initAdService({
+                isDebug: true,
+                appId: this.moosnowConfig.moosnowAppId,
+                success: (res) => {
+                    console.log(`初始化广告`);
+                    self.initBanner();
+                    self.initInter();
+                    self._prepareNative();
+                },
+                fail: (res) => {
+                    console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
+                },
+                complete: (res) => {
+                    console.log("initAdService  complete");
+                }
+            })
+        }
+
     }
 
     public prevNavigate = Date.now();
