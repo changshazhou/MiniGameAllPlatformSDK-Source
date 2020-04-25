@@ -12,7 +12,10 @@ export default class ZSOPPOModule extends OPPOModule {
         */
     checkVersion(version, callback) {
         moosnow.http.loadCfg(res => {
-            callback((res.zs_version == moosnow.platform.moosnowConfig.version))
+            let openAd = (res.zs_version == moosnow.platform.moosnowConfig.version)
+            console.log(`版本检查 后台版本${res.zs_version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
+            console.log("获取广告开关：", openAd);
+            callback(openAd)
         })
     }
 
