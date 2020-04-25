@@ -1,7 +1,7 @@
 import PlatformModule, { VIDEO_STATUS, SHARE_MSG, VIDEO_MSG } from "./platform/PlatformModule";
 import WXModule from "./platform/WXModule";
 import AdModule from "./ad/AdModule";
-import { HttpModule } from "./framework/HttpModule";
+import { HttpModule } from "./http/HttpModule";
 import OPPOModule from "./platform/OPPOModule";
 import GameDataCenter from "./framework/GameDataCenter";
 import SettingModule from "./framework/SettingModule";
@@ -11,6 +11,9 @@ import { PlatformType } from "./enum/PlatformType";
 import WXAdModule from "./ad/WXAdModule";
 import TTModule from "./ad/TTModule";
 import QQModule from "./ad/QQModule";
+import ZSOPPOAdModule from "./ad/ZSOPPOAdModule";
+import ZSOPPOModule from "./platform/ZSOPPOModule";
+import { ZSHttpModule } from "./http/ZSHttpModule";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -21,19 +24,30 @@ class Main {
 
 
         this.initPlatform();
-        this.mHttp = new HttpModule();
+        this.initHttp();
         this.initAd();
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
     }
 
-
+    private initHttp() {
+        if (Common.platform == PlatformType.WX)
+            this.mHttp = new HttpModule();
+        else if (Common.platform == PlatformType.OPPO_ZS) {
+            this.mHttp = new ZSHttpModule();
+        }
+        else
+            this.mHttp = new HttpModule();
+    }
 
     private initPlatform() {
         if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
             this.mPlatform = new OPPOModule();
+        else if (Common.platform == PlatformType.OPPO_ZS) {
+            this.mPlatform = new ZSOPPOModule();
+        }
         else if (Common.platform == PlatformType.BYTEDANCE)
             this.mPlatform = new TTModule();
         else if (Common.platform == PlatformType.QQ)
@@ -46,8 +60,12 @@ class Main {
     private initAd() {
         if (Common.platform == PlatformType.WX)
             this.mAd = new WXAdModule();
-        else if (Common.platform == PlatformType.OPPO)
+        else if (Common.platform == PlatformType.OPPO) {
             this.mAd = new OPPOAdModule();
+        }
+        else if (Common.platform == PlatformType.OPPO_ZS) {
+            this.mAd = new ZSOPPOAdModule();
+        }
         else
             this.mAd = new WXAdModule();
     }

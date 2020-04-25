@@ -12,6 +12,10 @@ export enum PlatformType {
      */
     OPPO,
     /**
+     * OPPO
+     */
+    OPPO_ZS,
+    /**
      * 百度
      */
     BAIDU,

@@ -1,4 +1,4 @@
-import BaseModule from "./BaseModule";
+import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
 import { PlatformType } from "../enum/PlatformType";
 
@@ -266,8 +266,8 @@ export class HttpModule extends BaseModule {
     }
 
 
-    private cfgData = null;
-    private areaData = null;
+    public cfgData = null;
+    public areaData = null;
     public loadCfg(callback) {
         if (!Common.isEmpty(this.cfgData)) {
             callback(this.cfgData);

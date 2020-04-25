@@ -128,17 +128,39 @@ export default class Common {
     }
 
     static get platform(): PlatformType {
+        let winCfg = window["moosnowConfig"]
         if (window['tt'])
             return PlatformType.BYTEDANCE
         else if (window['swan'])
             return PlatformType.BAIDU
         else if (window['qq'])
             return PlatformType.QQ
-        else if (window['qg'])
-            return PlatformType.OPPO
+        else if (window['qg']) {
+            if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                return PlatformType.OPPO_ZS
+            else
+                return PlatformType.OPPO
+        }
         else if (window['wx'])
             return PlatformType.WX
         else
             return PlatformType.PC
+    }
+    static deepCopy(obj): object | [] {
+        //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝
+        var objClone = Array.isArray(obj) ? [] : {};
+        //进行深拷贝的不能为空，并且是对象或者是
+        if (obj && typeof obj === "object") {
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    if (obj[key] && typeof obj[key] === "object") {
+                        objClone[key] = this.deepCopy(obj[key]);
+                    } else {
+                        objClone[key] = obj[key];
+                    }
+                }
+            }
+        }
+        return objClone;
     }
 }

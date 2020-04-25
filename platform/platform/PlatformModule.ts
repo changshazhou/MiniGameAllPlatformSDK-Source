@@ -5,6 +5,8 @@ import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 import { PlatformType } from "../enum/PlatformType";
 import nativeAdRow from "../model/nativeAdRow";
+import { BannerPosition } from "../enum/bannerPosition";
+import bannerStyle from "../model/bannerStyle";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -64,6 +66,8 @@ export default class PlatformModule extends BaseModule {
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
     public bannerCb: Function = null;
+    public bannerPosition: BannerPosition = BannerPosition.Bottom;
+    public bannerStyle: bannerStyle = null;
     public isBannerShow: boolean = false;
 
     public videoCb: Function = null;
@@ -95,7 +99,7 @@ export default class PlatformModule extends BaseModule {
         let winCfg = window["moosnowConfig"]
         if (Common.platform == PlatformType.WX)
             this.moosnowConfig = winCfg.wx;
-        else if (Common.platform == PlatformType.OPPO)
+        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
             this.moosnowConfig = winCfg.oppo;
         else if (Common.platform == PlatformType.QQ)
             this.moosnowConfig = winCfg.qq;
@@ -209,9 +213,6 @@ export default class PlatformModule extends BaseModule {
 
         }
     }
-
-
-
 
 
     public postMessage(data: { action: number, data?: any }) {
@@ -529,6 +530,7 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) return;
         if (this.systemInfo == null) {
             this.systemInfo = window[this.platformName].getSystemInfoSync();
+            console.log('设备信息', this.systemInfo)
         }
         return this.systemInfo;
     }
@@ -728,6 +730,7 @@ export default class PlatformModule extends BaseModule {
         if (windowWidth < this.bannerWidth) {
             this.bannerWidth = windowWidth;
         }
+
         if (this.banner) {
             this.banner.offResize(this._bottomCenterBanner);
             this.banner.offError(this._onBannerError);
@@ -767,32 +770,59 @@ export default class PlatformModule extends BaseModule {
     }
     public _bottomCenterBanner(size) {
         let wxsys = this.getSystemInfoSync();
-        // let windowWidth = wxsys.windowWidth;
+        let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
         this.banner.style.height = size.height;
-        // this.banner.style.left = (windowWidth - size.width) / 2;
-        this.banner.style.top = windowHeight - size.height;
+        this.banner.style.left = (windowWidth - size.width) / 2;
+        let top = 0;
+        if (this.bannerPosition == BannerPosition.Bottom) {
+            top = windowHeight - size.height;
+        }
+        else if (this.bannerPosition == BannerPosition.Center)
+            top = (windowHeight - size.height) / 2;
+        else if (this.bannerPosition == BannerPosition.Top)
+            top = 0;
+        else
+            top = this.bannerStyle.top;
+
+        this.banner.style.top = top;
+        console.log('banner reseize ', this.banner.style, 'set top ', top)
     }
     /**
-     * 点击回调
-     * @param callback 
+     * 
+     * @param callback 点击回调
+     * @param position banner的位置，默认底部
+     * @param style 自定义样式
      */
-    public showBanner(callback?) {
+    public showBanner(callback?: Function, position: BannerPosition = BannerPosition.Bottom, style?: bannerStyle) {
+        console.log('显示banner')
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
-        if (this.banner)
-            this.banner.show().catch(err => {
-                console.log('广告组件出现问题', err);
-            });
+        this.bannerPosition = position;
+        this.bannerStyle = style;
+
+        if (this.banner) {
+            // let wxsys = this.getSystemInfoSync();
+            // let windowWidth = wxsys.windowWidth;
+            // let windowHeight = wxsys.windowHeight;
+            // if (position == BannerPosition.Bottom) {
+
+            // }
+            // this.banner.top = 1
+            console.log('show banner style ', this.banner.style)
+            this.banner.show()
+        }
     }
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
+     * 
      */
     public showAutoBanner() {
+        console.log('自动显示和隐藏banner')
         moosnow.http.getAllConfig(res => {
             if (res.gameBanner == 1) {
                 moosnow.platform.showBanner();
@@ -815,7 +845,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public hideBanner() {
-        // this.bannerCb = null;
+        console.log('隐藏banner')
         this.isBannerShow = false;
         if (!window[this.platformName]) {
             return;
@@ -870,20 +900,22 @@ export default class PlatformModule extends BaseModule {
         this.video.onClose(this._onVideoClose);
         this.video.onLoad(this._onVideoLoad);
         moosnow.platform.videoLoading = true;
-        this.video.load().then(() => {
-            if (show) {
-                this.video.show().then(() => { }).catch(err => {
-                    this._onVideoError(err.errMsg, err.errCode);
-                    console.log(err.errMsg);
-                });
-            }
-        }).catch(err => {
-            this._onVideoError(err.errMsg, err.errCode);
-            console.log(err.errMsg);
-        });
+        this.video.load()
+            .then(() => {
+                if (show) {
+                    this.video.show().then(() => { }).catch(err => {
+                        this._onVideoError(err.errMsg, err.errCode);
+                        console.log(err.errMsg);
+                    });
+                }
+            }).catch(err => {
+                this._onVideoError(err.errMsg, err.errCode);
+                console.log(err.errMsg);
+            });
     }
 
     public _onVideoError(msg, code) {
+        console.log('加载video失败回调', msg, code)
         moosnow.platform.videoLoading = false;
         if (moosnow.platform.videoCb) {
             moosnow.platform.videoCb(VIDEO_STATUS.ERR);
@@ -892,6 +924,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _onVideoClose(isEnd) {
+        console.log('video结束回调', isEnd.isEnded)
         moosnow.platform.videoLoading = false;
         if (!!isEnd.isEnded) {
             moosnow.http.clickVideo();
@@ -905,10 +938,13 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _onVideoLoad() {
+        console.log('加载video成功回调')
         moosnow.platform.videoLoading = false;
     }
 
     public showVideo(completeCallback = null) {
+
+        console.log('显示video')
         moosnow.platform.videoCb = completeCallback;
         this.createRewardAD(true);
     }
@@ -991,6 +1027,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     /**
+     * 目前只有OPPO平台有此功能
      * 返回原生广告数据，开发者根据返回的数据来展现
      * 没有广告返回null
      * 
@@ -1015,6 +1052,7 @@ export default class PlatformModule extends BaseModule {
         return { ...this.nativeAdResult };
     }
     /**
+     * 目前只有OPPO平台有此功能 
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
      * this.node.on(cc.Node.EventType.TOUCH_END, () => {
