@@ -84,6 +84,7 @@ export default class PlatformModule extends BaseModule {
 
     public record: any = null;
 
+
     private shareInfoArr: { img: string, title: string }[] = [];
     onEnable() {
 

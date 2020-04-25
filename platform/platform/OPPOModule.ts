@@ -92,8 +92,9 @@ export default class OPPOModule extends PlatformModule {
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
+        console.log('跳转数据：', row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log('>>>>>>>>>>>>>>>>>>>>> ')
+            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
             return;
         }
         this.prevNavigate = Date.now();
@@ -106,40 +107,42 @@ export default class OPPOModule extends PlatformModule {
         let { appid, path, extraData, pkgName } = row;
         extraData = extraData || {};
         // 跳转小游戏按钮，支持最低平台版本号'1044' (minPlatformVersion>='1044')
-        if (this.supportVersion(1044)) {
-            window[this.platformName].navigateToMiniGame({
-                appId: appid,
-                path: path,
-                pkgName: pkgName,
-                extraData: extraData,
-                success: () => {
-                    if (window[this.platformName] && window[this.platformName].aldSendEvent) {
-                        window[this.platformName].aldSendEvent('跳转', {
-                            position: row.position,
-                            appid,
-                            img: row.atlas || row.img
-                        })
-                    }
-                    moosnow.http.exportUser();
-                    if (success)
-                        success();
-                },
-                fail: (err) => {
-                    console.log('navigateToMiniProgram error ', err)
-                    if (fail)
-                        fail();
-                },
-                complete: () => {
-                    if (complete)
-                        complete();
-                }
-            })
+        if (!this.supportVersion(1044)) {
+            console.log('版本过低 平台不支持跳转')
+            return
         }
-
+        window[this.platformName].navigateToMiniGame({
+            appId: appid,
+            path: path,
+            pkgName: pkgName || appid,
+            extraData: extraData,
+            success: () => {
+                if (window[this.platformName] && window[this.platformName].aldSendEvent) {
+                    window[this.platformName].aldSendEvent('跳转', {
+                        position: row.position,
+                        appid,
+                        img: row.atlas || row.img
+                    })
+                }
+                moosnow.http.exportUser();
+                if (success)
+                    success();
+            },
+            fail: (err) => {
+                console.log('navigateToMiniProgram error ', err)
+                if (fail)
+                    fail();
+            },
+            complete: () => {
+                if (complete)
+                    complete();
+            }
+        })
     }
 
     public supportVersion(version: string | number) {
-        return window['Global'] && window['Global'].platformVersion >= version
+        let oppoSys = this.getSystemInfoSync();
+        return oppoSys.platformVersion >= version
     }
 
 

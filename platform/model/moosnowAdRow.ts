@@ -2,6 +2,9 @@
  * 广告结果
  */
 export default class moosnowAdRow {
+    /**
+     * 微信小程序的ID  
+     */
     public appid: string = "";
     public boxAppid: string = "";
     public desc: string = "";
