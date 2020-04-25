@@ -36,7 +36,7 @@ export default class OPPOModule extends PlatformModule {
             let data = signParams;
             moosnow.http.request(url, data, 'POST',
                 (res) => {
-                    this.versionRet = res.data.version != version;
+                    this.versionRet = res.data.version != moosnow.platform.moosnowConfig.version;
                     console.log("获取广告开关：", this.versionRet);
                     callback(this.versionRet);
                 },

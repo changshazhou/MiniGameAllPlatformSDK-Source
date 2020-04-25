@@ -12,7 +12,7 @@ export default class ZSOPPOModule extends OPPOModule {
         */
     checkVersion(version, callback) {
         moosnow.http.loadCfg(res => {
-            callback((res.zs_version == version))
+            callback((res.zs_version == moosnow.platform.moosnowConfig.version))
         })
     }
 
