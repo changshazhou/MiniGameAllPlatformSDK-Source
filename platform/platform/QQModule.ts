@@ -1,13 +1,64 @@
 import PlatformModule from './PlatformModule';
+import { BANNER_POSITION } from '../enum/BANNER_POSITION';
+import Common from '../utils/Common';
 export default class QQModule extends PlatformModule {
+    public platformName: string = "qq";
     constructor() {
         super();
-    }
-    public platformName: string = "qq";
-    public bannerId: string = "";
-    public videoId: string = "";
 
-    public _bottomCenterBanner() {
+        this.initBanner();
+
+    }
+
+    /**
+       * 
+       * @param callback 点击回调
+       * @param position banner的位置，默认底部
+       * @param style 自定义样式
+       */
+    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+        console.log('显示banner')
+        this.bannerCb = callback;
+        this.isBannerShow = true;
+        if (!window[this.platformName]) {
+            return;
+        }
+        this.bannerPosition = position;
+        this.bannerStyle = style;
+
+        if (this.banner) {
+            this.banner.show()
+        }
+    }
+    public _bottomCenterBanner(size) {
+        console.log('size', size)
+        if (Common.isEmpty(size)) {
+            console.log('设置的banner尺寸为空,不做调整')
+            return;
+        }
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let bannerHeigth = size.height
+
+        let top = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            top = windowHeight - bannerHeigth;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            top = (windowHeight - bannerHeigth) / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP)
+            top = 0;
+        else
+            top = this.bannerStyle.top;
+
+        this.banner.style.top = top;
+        this.banner.style.left = (windowWidth - size.width) / 2;
+        console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+
+    }
+
+    public _resetBanenrStyle(size) {
 
     }
 

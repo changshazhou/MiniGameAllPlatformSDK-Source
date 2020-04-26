@@ -54,7 +54,7 @@ var conf = {
                 }
             } else {
                 // cc.log('caller state change  ', xhr)
-                // console.log('caller state change  ', xhr)
+                console.log('caller state change  ', xhr)
             }
         };
         xhr.timeout = 3000;
@@ -107,8 +107,8 @@ var conf = {
             appid: appId,
             link_id: appId,
         };
-
-        let data = signParams
+        let data = signParams;
+        console.log('上报跳转', signParams)
         request(url, data, 'POST',
             (res) => {
                 console.log('upload navigate success', res)
@@ -301,7 +301,7 @@ var conf = {
         extraData = extraData || {};
         qg.navigateToMiniGame({
             pkgName: pkgName,
-            path: path||"?a=1",
+            path: path || "?a=1",
             extraData: extraData,
             success: () => {
                 collect(row)

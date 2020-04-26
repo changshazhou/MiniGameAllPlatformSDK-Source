@@ -1153,16 +1153,28 @@ export default class PlatformModule extends BaseModule {
 
 
 
-
+    /**
+     * 盒子广告
+     */
     public showAppBox() {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createAppBox != "function") return;
         moosnow.http.getAllConfig(res => {
             if (res.showAppBox == 1) {
-                this.box = window[this.platformName].createAppBox({
-                    adUnitId: this.moosnowConfig.boxId
-                })
+                if (!this.box) {
+                    this.box = window[this.platformName].createAppBox({
+                        adUnitId: this.moosnowConfig.boxId
+                    })
+
+                }
+                this.box.load().then(() => {
+                    this.box.show();
+                });
             }
+            else {
+                console.log('后台不允许显示Box，如有需要请联系运营')
+            }
+
         })
     }
 
