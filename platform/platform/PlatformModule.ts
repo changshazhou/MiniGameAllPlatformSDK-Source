@@ -988,30 +988,31 @@ export default class PlatformModule extends BaseModule {
         this.native.onLoad(this._onNativeLoad.bind(this));
         this.native.onError(this._onNativeError.bind(this));
         this.nativeLoading = true;
-        this.native.load()
+        // this.native.load()
     }
 
     public _onNativeLoad(res) {
         this.nativeLoading = false;
         console.log(`加载原生广告成功`, res)
-
         if (res && res.adList && res.adList.length > 0) {
+            this.nativeAdResult = res.adList[0];
+            if (!Common.isEmpty(this.nativeAdResult.adId)) {
+                console.log(`上报原生广告`)
+                this.native.reportAdShow({
+                    adId: this.nativeAdResult.adId
+                });
+            }
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(Common.deepCopy(this.nativeAdResult))
+            }
+        }
+        else {
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(null)
+            }
+        }
 
-            if (this.nativeAdResult == null) {
-                this.nativeAdResult = res.adList[0]
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(Common.deepCopy(this.nativeAdResult))
-                }
-            }
-            else {
-                this.nativeAdResult = res.adList[0]
-            }
-        }
-        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
-            this.native.reportAdShow({
-                adId: this.nativeAdResult.adId
-            });
-        }
+
     }
 
     public _onNativeError(err) {
@@ -1058,13 +1059,12 @@ export default class PlatformModule extends BaseModule {
      */
     public showNativeAd(callback: Function) {
         this.nativeCb = callback;
-        if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
-            if (this.native)
-                this.native.load();
-            let nativeData = Common.deepCopy(this.nativeAdResult)
-            callback(nativeData)
-        }
-
+        if (this.native)
+            this.native.load();
+        // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
+        //     let nativeData = Common.deepCopy(this.nativeAdResult)
+        //     callback(nativeData)
+        // }
     }
     /**
      * 目前只有OPPO平台有此功能 
