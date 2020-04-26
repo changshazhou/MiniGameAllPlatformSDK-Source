@@ -823,6 +823,7 @@ export default class PlatformModule extends BaseModule {
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
 
                 setTimeout(() => {
+                    console.log('自动隐藏时间已到，开始隐藏Banner')
                     if (this.isBannerShow) {
                         this.hideBanner();
                     }
