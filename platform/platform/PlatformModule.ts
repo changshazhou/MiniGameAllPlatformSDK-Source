@@ -851,6 +851,8 @@ export default class PlatformModule extends BaseModule {
             // this.banner.top = 1
             console.log('show banner style ', this.banner.style)
 
+            this.hideBanner();
+
             this._resetBanenrStyle({
                 width: this.banner.style.width,
                 height: this.banner.style.realHeight

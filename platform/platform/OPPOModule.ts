@@ -293,15 +293,14 @@ export default class OPPOModule extends PlatformModule {
             console.log('设置的banner width 不是数字，left 不做调整')
 
         let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - this.banner.style.height;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+
+        if (this.bannerPosition == BANNER_POSITION.CENTER)
             top = (windowHeight - this.banner.style.height) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
-        else
-            top = this.bannerStyle.top;
+        else {
+            top = windowHeight - this.banner.style.height;
+        }
 
         this.banner.style.top = top;
         console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)

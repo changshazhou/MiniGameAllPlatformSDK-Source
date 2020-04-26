@@ -1,4 +1,4 @@
-import PlatformModule from "../platform/PlatformModule";
+import PlatformModule from "./PlatformModule";
 
 export default class BDModule extends PlatformModule {
     constructor() {
