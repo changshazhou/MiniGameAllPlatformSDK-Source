@@ -816,7 +816,7 @@ export default class PlatformModule extends BaseModule {
      * 
      */
     public showAutoBanner() {
-        console.log('自动显示和隐藏banner')
+        console.log('执行自动显示和隐藏Banner功能')
         moosnow.http.getAllConfig(res => {
             if (res.gameBanner == 1) {
                 moosnow.platform.showBanner();
@@ -825,9 +825,6 @@ export default class PlatformModule extends BaseModule {
                 setTimeout(() => {
                     if (this.isBannerShow) {
                         this.hideBanner();
-                        // setTimeout(() => {
-                        //     this.showBanner(this.bannerCb);
-                        // }, 500);
                     }
                     else {
                         this.hideBanner();
@@ -951,6 +948,10 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createInterstitialAd != "function") return;
         if (!this.supportVersion('2.8.0')) return;
+        if (Common.isEmpty(this.interId)) {
+            console.warn('插屏广告ID为空，系统不加载')
+            return;
+        }
         this.inter = window[this.platformName].createInterstitialAd({
             adUnitId: this.interId
         });
@@ -1007,26 +1008,38 @@ export default class PlatformModule extends BaseModule {
             }
         }
         else {
+            console.log(`原生广告数据没有，回调Null`)
             if (Common.isFunction(this.nativeCb)) {
                 this.nativeCb(null)
             }
         }
-
-
     }
 
     public _onNativeError(err) {
         this.nativeLoading = false;
         this.nativeAdResult = null;
-        console.log(`设置原生广告出错：`, err)
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
+                console.log(`原生广告加载出错 `, err, '使用新ID加载原生广告')
                 this.nativeIdIndex += 1;
-                console.log('使用新ID加载原生广告', err)
                 this._destroyNative();
                 this._prepareNative();
             }
+            else {
+                console.log(`原生广告ID已经用完，本次没有广告`)
+                this.nativeIdIndex = 0;
+                if (Common.isFunction(this.nativeCb)) {
+                    this.nativeCb(null)
+                }
 
+            }
+
+        }
+        else {
+            console.log(`原生广告加载出错，本次没有广告`, err)
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(null)
+            }
         }
     }
 

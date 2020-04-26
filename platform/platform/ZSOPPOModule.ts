@@ -79,14 +79,14 @@ export default class ZSOPPOModule extends OPPOModule {
             appid: appId,
             link_id: appId,
         };
-
-        let data = signParams
+        let data = signParams;
+        console.log('跳转数据上报', data)
         moosnow.http.request(url, data, 'POST',
             (res) => {
-                console.log('upload navigate success', res)
+                console.log('跳转数据上报成功', res)
             },
             (res) => {
-                console.log('upload navigate fail', res)
+                console.log('跳转数据上报失败', res)
             },
             () => {
                 console.log('upload navigate complete');
