@@ -13,6 +13,8 @@ export default class OPPOModule extends PlatformModule {
     private versionRet: boolean = null;
     public bannerWidth: number = 600;
     public bannerHeight: number = 96;
+
+    private interLoadedShow: boolean = false;
     constructor() {
         super();
 
@@ -399,6 +401,7 @@ export default class OPPOModule extends PlatformModule {
             });
             this.inter.onLoad(this._onInterLoad.bind(this));
             this.inter.onClose(this._onInterClose.bind(this));
+            this.inter.load()
         }
         else {
             if (typeof window[this.platformName].createInsertAd != "function")
@@ -407,7 +410,31 @@ export default class OPPOModule extends PlatformModule {
                 adUnitId: this.interId
             });
             this.inter.onLoad(this._onInterLoad.bind(this));
+            this.inter.onShow(this._onInterOnShow.bind(this))
+            this.inter.load()
         }
 
+
     };
+
+    public showInter() {
+        if (this.inter)
+            this.inter.show();
+        else
+            this.interLoadedShow = true
+    }
+    public _onInterLoad() {
+        if (this.interLoadedShow) {
+            if (this.inter) {
+                this.inter.show();
+            }
+            else
+                this.interLoadedShow = false;
+        }
+
+    }
+    public _onInterOnShow() {
+        if (this.inter)
+            this.inter.load();
+    }
 }

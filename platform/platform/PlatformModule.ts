@@ -957,7 +957,7 @@ export default class PlatformModule extends BaseModule {
         });
         this.inter.onLoad(this._onInterLoad.bind(this));
         this.inter.onClose(this._onInterClose.bind(this));
-        // this.inter.load();
+        this.inter.load();
     }
     public showInter() {
         if (!this.inter) return;
