@@ -301,7 +301,7 @@ var conf = {
         extraData = extraData || {};
         qg.navigateToMiniGame({
             pkgName: pkgName,
-            path: path,
+            path: path||"?a=1",
             extraData: extraData,
             success: () => {
                 collect(row)

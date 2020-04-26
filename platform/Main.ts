@@ -10,15 +10,17 @@ import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
 import WXAdModule from "./ad/WXAdModule";
 import TTModule from "./ad/TTModule";
-import QQModule from "./ad/QQModule";
+import QQModule from "./platform/QQModule";
 import ZSOPPOAdModule from "./ad/ZSOPPOAdModule";
 import ZSOPPOModule from "./platform/ZSOPPOModule";
 import { ZSHttpModule } from "./http/ZSHttpModule";
+import { BANNER_POSITION } from "./enum/BANNER_POSITION";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
+    public BANNER_POSITION = BANNER_POSITION;
     constructor() {
         (window["moosnow"]) = this;
 

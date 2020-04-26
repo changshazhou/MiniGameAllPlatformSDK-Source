@@ -1,9 +1,9 @@
 import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import Common from "../utils/Common";
-import { BannerPosition } from "../enum/bannerPosition";
 import bannerStyle from "../model/bannerStyle";
 import { VIDEO_STATUS } from "../platform/PlatformModule";
+import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 
 export default class OPPOModule extends PlatformModule {
 
@@ -293,12 +293,12 @@ export default class OPPOModule extends PlatformModule {
             console.log('设置的banner width 不是数字，left 不做调整')
 
         let top = 0;
-        if (this.bannerPosition == BannerPosition.Bottom) {
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
             top = windowHeight - this.banner.style.height;
         }
-        else if (this.bannerPosition == BannerPosition.Center)
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
             top = (windowHeight - this.banner.style.height) / 2;
-        else if (this.bannerPosition == BannerPosition.Top)
+        else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
         else
             top = this.bannerStyle.top;
@@ -317,7 +317,7 @@ export default class OPPOModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(callback?: Function, position: BannerPosition = BannerPosition.Bottom, style?: bannerStyle) {
+    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         console.log('显示banner')
         this.bannerCb = callback;
         this.isBannerShow = true;

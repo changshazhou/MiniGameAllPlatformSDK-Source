@@ -1,5 +1,4 @@
-import PlatformModule from "../platform/PlatformModule";
-
+import PlatformModule from './PlatformModule';
 export default class QQModule extends PlatformModule {
     constructor() {
         super();

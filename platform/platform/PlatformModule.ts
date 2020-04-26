@@ -5,8 +5,8 @@ import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 import { PlatformType } from "../enum/PlatformType";
 import nativeAdRow from "../model/nativeAdRow";
-import { BannerPosition } from "../enum/bannerPosition";
 import bannerStyle from "../model/bannerStyle";
+import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 
 export const VIDEO_STATUS = {
     END: "__video_end",
@@ -49,12 +49,15 @@ export default class PlatformModule extends BaseModule {
     public video: any = null;
     public inter: any = null;
     public native: any = null;
+    public box: any = null;
 
 
     public platformName: string = "wx";
     public bannerId: string = "";
     public videoId: string = "";
     public interId = "";
+    public boxId = "";
+
 
     /**
      * https://u.oppomobile.com/main/app.html 广告联盟网站中媒体管理 > 广告管理中广告名称下面的 id 即为 adUnitId
@@ -66,7 +69,7 @@ export default class PlatformModule extends BaseModule {
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
     public bannerCb: Function = null;
-    public bannerPosition: BannerPosition = BannerPosition.Bottom;
+    public bannerPosition: string = BANNER_POSITION.BOTTOM;
     public bannerStyle: bannerStyle = null;
     public isBannerShow: boolean = false;
 
@@ -81,6 +84,11 @@ export default class PlatformModule extends BaseModule {
     public nativeAdResult: nativeAdRow = null;
     public nativeCb: Function = null;
     public nativeLoading: boolean = false;
+
+
+
+
+
 
     public record: any = null;
 
@@ -119,7 +127,9 @@ export default class PlatformModule extends BaseModule {
         this.bannerId = this.moosnowConfig["bannerId"];
         this.videoId = this.moosnowConfig["videoId"];
         this.interId = this.moosnowConfig["interId"];
+        this.boxId = this.moosnowConfig["boxId"];
         this.nativeId = this.moosnowConfig["nativeId"] as [];
+
         console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig))
     }
 
@@ -775,20 +785,53 @@ export default class PlatformModule extends BaseModule {
         this.banner = null;
     }
     public _bottomCenterBanner(size) {
+
+        // if (Common.isEmpty(size)) {
+        //     console.log('设置的banner尺寸为空,不做调整')
+        //     return;
+        // }
+
         let wxsys = this.getSystemInfoSync();
-        // let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        this.banner.style.height = size.height;
-        // this.banner.style.left = (windowWidth - size.width) / 2;
-        this.banner.style.top = windowHeight - size.height;
+        let windowWidth = wxsys.windowWidth;
+        // let windowHeight = wxsys.windowHeight;
+        // this.banner.style.height = size.height;
+        this.banner.style.left = (windowWidth - size.width) / 2;
+        // this.banner.style.top = windowHeight - size.height;
     }
+
+    public _resetBanenrStyle(size) {
+        if (Common.isEmpty(size)) {
+            console.log('设置的banner尺寸为空,不做调整')
+            return;
+        }
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let bannerHeigth = this.banner.style.realHeight
+
+        let top = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            top = windowHeight - bannerHeigth;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            top = (windowHeight - bannerHeigth) / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP)
+            top = 0;
+        else
+            top = this.bannerStyle.top;
+
+        this.banner.style.top = top;
+        console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+    }
+
+
     /**
      * 
      * @param callback 点击回调
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(callback?: Function, position: BannerPosition = BannerPosition.Bottom, style?: bannerStyle) {
+    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         console.log('显示banner')
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -807,6 +850,12 @@ export default class PlatformModule extends BaseModule {
             // }
             // this.banner.top = 1
             console.log('show banner style ', this.banner.style)
+
+            this._resetBanenrStyle({
+                width: this.banner.style.width,
+                height: this.banner.style.realHeight
+            })
+
             this.banner.show()
         }
     }
@@ -1104,6 +1153,18 @@ export default class PlatformModule extends BaseModule {
 
 
 
+
+    public showAppBox() {
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].createAppBox != "function") return;
+        moosnow.http.getAllConfig(res => {
+            if (res.showAppBox == 1) {
+                this.box = window[this.platformName].createAppBox({
+                    adUnitId: this.moosnowConfig.boxId
+                })
+            }
+        })
+    }
 
 
 
