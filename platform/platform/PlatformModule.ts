@@ -7,19 +7,10 @@ import { PlatformType } from "../enum/PlatformType";
 import nativeAdRow from "../model/nativeAdRow";
 import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 
-export const VIDEO_STATUS = {
-    END: "__video_end",
-    NOTEND: "__video_not_end",
-    ERR: "__video_error"
-}
-export const VIDEO_MSG = {
-    ERR: "今天视频已看完！请明天再试！",
-    NOTEND: "请完整观看完视频！"
-}
-export const SHARE_MSG = {
-    FAIL: "请分享到群！",
-}
+
+
 // var videoLoading: boolean = false;
 // var videoCb = null;
 export default class PlatformModule extends BaseModule {
@@ -66,6 +57,7 @@ export default class PlatformModule extends BaseModule {
     public nativeIdIndex: number = 0;
 
     public bannerWidth: number = 300;
+    public bannerHeigth: number = 96;
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
     public bannerCb: Function = null;
@@ -743,7 +735,14 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName].createBannerAd) return;
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
-        if (windowWidth < this.bannerWidth) {
+        //横屏模式
+        if (wxsys.windowHeight < wxsys.windowWidth) {
+            if (windowWidth < this.bannerWidth) {
+                this.bannerWidth = windowWidth;
+            }
+        }
+        else {
+            //竖屏
             this.bannerWidth = windowWidth;
         }
 
@@ -797,6 +796,9 @@ export default class PlatformModule extends BaseModule {
         // this.banner.style.height = size.height;
         this.banner.style.left = (windowWidth - size.width) / 2;
         // this.banner.style.top = windowHeight - size.height;
+        this.bannerWidth = this.banner.style.realWidth;
+        this.bannerHeigth = this.banner.style.realHeight;
+        console.log('_bottomCenterBanner', this.banner.style)
     }
 
     public _resetBanenrStyle(size) {
@@ -807,14 +809,12 @@ export default class PlatformModule extends BaseModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        let bannerHeigth = this.banner.style.realHeight
-
         let top = 0;
         if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - bannerHeigth;
+            top = windowHeight - this.bannerHeigth;
         }
         else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - bannerHeigth) / 2;
+            top = (windowHeight - this.bannerHeigth) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
         else
@@ -832,8 +832,11 @@ export default class PlatformModule extends BaseModule {
      * @param style 自定义样式
      */
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+        // if (this.isBannerShow)
+        //     return;
         console.log('显示banner')
         this.bannerCb = callback;
+
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
@@ -855,8 +858,12 @@ export default class PlatformModule extends BaseModule {
                 width: this.banner.style.width,
                 height: this.banner.style.realHeight
             })
-
-            this.banner.show()
+            this.banner.show().then(() => {
+                this._resetBanenrStyle({
+                    width: this.banner.style.width,
+                    height: this.banner.style.realHeight
+                })
+            })
         }
     }
     /**
@@ -887,6 +894,8 @@ export default class PlatformModule extends BaseModule {
 
     public hideBanner() {
         console.log('隐藏banner')
+        if (!this.isBannerShow)
+            return;
         this.isBannerShow = false;
         if (!window[this.platformName]) {
             return;
@@ -1007,7 +1016,7 @@ export default class PlatformModule extends BaseModule {
         });
         this.inter.onLoad(this._onInterLoad.bind(this));
         this.inter.onClose(this._onInterClose.bind(this));
-        this.inter.load();
+        // this.inter.load();
     }
     public showInter() {
         if (!this.inter) return;

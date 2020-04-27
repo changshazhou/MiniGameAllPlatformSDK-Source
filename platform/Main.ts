@@ -1,4 +1,4 @@
-import PlatformModule, { VIDEO_STATUS, SHARE_MSG, VIDEO_MSG } from "./platform/PlatformModule";
+import PlatformModule from "./platform/PlatformModule";
 import WXModule from "./platform/WXModule";
 import AdModule from "./ad/AdModule";
 import { HttpModule } from "./http/HttpModule";
@@ -14,7 +14,11 @@ import QQModule from "./platform/QQModule";
 import ZSOPPOAdModule from "./ad/ZSOPPOAdModule";
 import ZSOPPOModule from "./platform/ZSOPPOModule";
 import { ZSHttpModule } from "./http/ZSHttpModule";
+
 import { BANNER_POSITION } from "./enum/BANNER_POSITION";
+import { VIDEO_STATUS } from "./enum/VIDEO_STATUS";
+import { SHARE_MSG } from "./enum/SHARE_MSG";
+import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
