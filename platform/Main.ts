@@ -9,7 +9,7 @@ import OPPOAdModule from "./ad/OPPOAdModule";
 import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
 import WXAdModule from "./ad/WXAdModule";
-import TTModule from "./ad/TTModule";
+import TTModule from "./platform/TTModule";
 import QQModule from "./platform/QQModule";
 import ZSOPPOAdModule from "./ad/ZSOPPOAdModule";
 import ZSOPPOModule from "./platform/ZSOPPOModule";

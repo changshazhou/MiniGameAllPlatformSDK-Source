@@ -26,8 +26,16 @@ export default class QQModule extends PlatformModule {
         this.bannerPosition = position;
         this.bannerStyle = style;
 
+        this._resetBanenrStyle({
+
+        });
         if (this.banner) {
             this.banner.show()
+                .then(() => {
+                    this._resetBanenrStyle({
+
+                    });
+                })
         }
     }
     public _bottomCenterBanner(size) {
@@ -39,27 +47,32 @@ export default class QQModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        let bannerHeigth = size.height
+        this.bannerWidth = size.width;
+        this.bannerHeigth = size.height;
 
-        let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP)
-            top = 0;
-        else
-            top = this.bannerStyle.top;
 
-        this.banner.style.top = top;
+
         this.banner.style.left = (windowWidth - size.width) / 2;
         console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
 
     }
 
     public _resetBanenrStyle(size) {
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let top = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            top = windowHeight - this.bannerHeigth;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            top = (windowHeight - this.bannerHeigth) / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP)
+            top = 0;
+        else
+            top = this.bannerStyle.top;
 
+        this.banner.style.top = top;
     }
 
     public _createBannerAd() {

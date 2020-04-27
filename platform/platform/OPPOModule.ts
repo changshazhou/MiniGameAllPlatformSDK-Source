@@ -297,11 +297,9 @@ export default class OPPOModule extends PlatformModule {
             top = (windowHeight - this.banner.style.height) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
-        else if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+        else {
             top = windowHeight - this.banner.style.height;
         }
-        else
-            top = this.bannerStyle.top;
 
         this.banner.style.top = top;
         console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
