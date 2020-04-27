@@ -49,9 +49,6 @@ export default class QQModule extends PlatformModule {
         let windowHeight = wxsys.windowHeight;
         this.bannerWidth = size.width;
         this.bannerHeigth = size.height;
-
-
-
         this.banner.style.left = (windowWidth - size.width) / 2;
         console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
 

@@ -103,14 +103,31 @@ export default class PlatformModule extends BaseModule {
 
     public initAppConfig() {
         let winCfg = window["moosnowConfig"]
-        if (Common.platform == PlatformType.WX)
+        if (Common.platform == PlatformType.PC) {
+            if (winCfg.debug && winCfg[winCfg.debug]) {
+                if (winCfg.debug == "wx")
+                    this.moosnowConfig = winCfg.wx;
+                else if (winCfg.debug == "oppo")
+                    this.moosnowConfig = winCfg.oppo;
+                else if (winCfg.debug == "bd")
+                    this.moosnowConfig = winCfg.bd;
+                else if (winCfg.debug == "byte")
+                    this.moosnowConfig = winCfg.byte;
+                else if (winCfg.debug == "qq")
+                    this.moosnowConfig = winCfg.qq;
+                else this.moosnowConfig = winCfg.wx;
+            }
+            else
+                this.moosnowConfig = winCfg.wx;
+        }
+        else if (Common.platform == PlatformType.WX)
             this.moosnowConfig = winCfg.wx;
         else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
             this.moosnowConfig = winCfg.oppo;
         else if (Common.platform == PlatformType.QQ)
             this.moosnowConfig = winCfg.qq;
         else if (Common.platform == PlatformType.BAIDU)
-            this.moosnowConfig = winCfg.db;
+            this.moosnowConfig = winCfg.bd;
         else if (Common.platform == PlatformType.BYTEDANCE)
             this.moosnowConfig = winCfg.byte;
         else
@@ -782,6 +799,7 @@ export default class PlatformModule extends BaseModule {
     public _onBannerError(err) {
         console.warn('banner___error:', err.errCode, err.errMsg);
         this.banner = null;
+        this.isBannerShow = false;
     }
     public _bottomCenterBanner(size) {
 
@@ -854,8 +872,8 @@ export default class PlatformModule extends BaseModule {
             // this.banner.top = 1
             console.log('show banner style ', this.banner.style)
 
-            this.hideBanner();
-
+            // this.hideBanner();
+            this.banner.hide();
             this._resetBanenrStyle({
                 width: this.banner.style.width,
                 height: this.banner.style.realHeight

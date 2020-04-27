@@ -244,6 +244,21 @@ export default class OPPOModule extends PlatformModule {
 
 
 
+
+    public _onBannerError(err) {
+        console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
+        if (this.banner) {
+            this.banner.hide();
+            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offError(this._onBannerError);
+            this.banner.offLoad(this._onBannerLoad);
+            this.banner.offHide();
+            this.banner.destroy();
+            this.banner = null;
+        }
+
+    }
+
     public _prepareBanner() {
         if (!window[this.platformName].createBannerAd) return;
         let wxsys = this.getSystemInfoSync();
@@ -264,45 +279,42 @@ export default class OPPOModule extends PlatformModule {
         this.banner.onHide(this._onBannerHide.bind(this));
     }
     public _bottomCenterBanner(size) {
-        this._resetBanenrStyle(size)
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        console.log('_bottomCenterBanner size ', size)
+        this.bannerWidth = size.width;
+        this.bannerHeigth = size.height;
+
+        this.banner.style.left = (windowWidth - size.width) / 2;
+        this.banner.style.top = windowHeight - this.bannerHeigth;;
+        console.log('_bottomCenterBanner  ', this.banner.style)
     }
 
     public _resetBanenrStyle(size) {
-        if (Common.isEmpty(size)) {
-            console.log('设置的banner尺寸为空,不做调整')
-            return;
-        }
+
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
 
-        // console.log('banner位置或大小被重新设置，当前设备信息', wxsys, ' 设置尺寸', size)
-        if (!isNaN(size.height)) {
-            this.banner.style.height = size.height;
-        }
-        else {
-            if (isNaN(this.banner.style.height)) {
-                this.banner.style.height = this.bannerHeight
-            }
-        }
-        // console.log('设置的banner height 不是数字，height不做调整')
-        if (!isNaN(size.width)) {
-            this.banner.style.left = (windowWidth - size.width) / 2;
-        }
-        else
-            console.log('设置的banner width 不是数字，left 不做调整')
+        if (!isNaN(this.bannerWidth))
+            this.banner.style.width = this.bannerWidth;
+        if (!isNaN(this.bannerHeight))
+            this.banner.style.height = this.bannerHeight;
 
-        let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - this.banner.style.height) / 2;
+        let styleTop = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            styleTop = windowHeight - this.bannerHeigth;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            styleTop = (windowHeight - this.bannerHeigth) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
-            top = 0;
-        else {
-            top = windowHeight - this.banner.style.height;
-        }
+            styleTop = 0;
+        else
+            styleTop = this.bannerStyle.top;
 
-        this.banner.style.top = top;
-        console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+        this.banner.style.top = styleTop;
+        console.log('_resetBanenrStyle ', this.banner.style, 'set styleTop ', styleTop)
     }
 
     public _onBannerHide() {
@@ -322,6 +334,18 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) {
             return;
         }
+
+        if (this.bannerPosition != position) {
+            this.banner.hide();
+            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offError(this._onBannerError);
+            this.banner.offLoad(this._onBannerLoad);
+            this.banner.offHide();
+            this.banner.destroy();
+            this.banner = null;
+            this._prepareBanner();
+            console.log('位置要更换,销毁重建');
+        }
         this.bannerPosition = position;
         this.bannerStyle = style;
 
@@ -333,14 +357,51 @@ export default class OPPOModule extends PlatformModule {
 
             // }
             // this.banner.top = 1
-            console.log('show banner style 1', this.banner.style)
+            this.banner.hide();
+            // console.log('show banner style 1', this.banner.style)
             this._resetBanenrStyle({
                 width: this.banner.style.width,
                 height: this.banner.style.height
             });
-            console.log('show banner style 2', this.banner.style)
+            // console.log('show banner style 2', this.banner.style)
+
             this.banner.show()
+            // .then(() => {
+            //     this._resetBanenrStyle({
+            //         width: this.banner.style.width,
+            //         height: this.banner.style.height
+            //     });
+            // })
         }
+    }
+    public hideBanner() {
+        console.log('隐藏banner')
+        if (!this.isBannerShow)
+            return;
+        if (!window[this.platformName]) {
+            return;
+        }
+        this.bannerShowCount++;
+        if (this.banner) {
+            if (this.bannerShowCount >= this.bannerShowCountLimit) {
+                console.log('banner destroy');
+                this.banner.hide();
+                this.banner.offResize(this._bottomCenterBanner);
+                this.banner.offError(this._onBannerError);
+                this.banner.offLoad(this._onBannerLoad);
+                this.banner.offHide();
+                this.banner.destroy();
+                this.banner = null;
+                console.log('重新创建banner');
+                this._prepareBanner();
+            } else {
+                this.banner.hide();
+            }
+        }
+        else {
+            this._prepareBanner();
+        }
+        this.isBannerShow = false;
     }
 
     public createRewardAD(show) {
