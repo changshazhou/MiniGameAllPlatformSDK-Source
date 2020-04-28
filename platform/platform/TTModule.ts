@@ -1,15 +1,20 @@
 import PlatformModule from "./PlatformModule";
+import Common from "../../dist/utils/Common";
+import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
+import MathUtils from "../utils/MathUtils";
+import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
 
 export default class TTModule extends PlatformModule {
     constructor() {
         super();
+        this.initBanner();
+        this.initRecord();
     }
     public platformName: string = "tt";
-    public bannerId: string = "";
-    public videoId: string = "";
     public recordRes: any = null;
     public recordCb: any = null;
     public recordNumber: number = 0;
+
     public _bottomCenterBanner(size) {
         if (this.bannerWidth != size.width) {
             let wxsys = this.getSystemInfoSync();
@@ -102,6 +107,52 @@ export default class TTModule extends PlatformModule {
         } else {
             this.recordCb = callback;
             this.record.stop();
+        }
+    }
+
+    /**
+     * 
+     * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
+     * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+     */
+    public share(query: Object = {}, callback?: (shared: boolean) => void) {
+        this.currentShareCallback = callback;
+        let shareInfo = this._buildShareInfo(query);
+        console.log('shareInfo:', shareInfo);
+        window[this.platformName].shareAppMessage(shareInfo);
+    }
+
+
+    public _buildShareInfo(query: any) {
+        let title = "", imageUrl = ""
+        if (this.shareInfoArr.length > 0) {
+            let item = this.shareInfoArr[MathUtils.randomNumBoth(0, this.shareInfoArr.length - 1)];
+            title = item.title;
+            imageUrl = item.img;
+        }
+        let channel = SHARE_CHANNEL.LINK;
+
+        if ([SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
+            channel = query.channel;
+        }
+
+        return {
+            channel: channel,
+            title: title,
+            imageUrl: imageUrl,
+            query: moosnow.http._object2Query(query),
+            extra: {
+                videoPath: this.recordRes && this.recordRes.videoPath ? this.recordRes.videoPath : "",
+                videoTopics: [title]
+            },
+            success() {
+                if (this.currentShareCallback)
+                    this.currentShareCallback(true);
+            },
+            fail() {
+                if (this.currentShareCallback)
+                    this.currentShareCallback(false);
+            }
         }
     }
 }

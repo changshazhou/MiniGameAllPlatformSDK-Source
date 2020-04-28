@@ -110,7 +110,7 @@ export class HttpModule extends BaseModule {
         }
 
     }
-    private _object2Query(obj) {
+    public _object2Query(obj) {
         var args = []
         for (var k in obj)
             args.push(k + "=" + obj[k])

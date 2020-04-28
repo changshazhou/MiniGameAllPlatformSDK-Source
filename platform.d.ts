@@ -86,7 +86,7 @@ declare class HttpModule extends BaseModule {
      * @param {*} complete
      */
     request(url: string, data: any, method: 'POST' | 'GET', success?: Function, fail?: Function, complete?: Function): void;
-    private _object2Query;
+    public _object2Query;
     isDisableArea(callback: any): void;
     /**
        * Loading加载完成

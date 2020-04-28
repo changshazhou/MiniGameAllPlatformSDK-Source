@@ -85,7 +85,7 @@ export default class PlatformModule extends BaseModule {
     public record: any = null;
 
 
-    private shareInfoArr: { img: string, title: string }[] = [];
+    public shareInfoArr: { img: string, title: string }[] = [];
     onEnable() {
 
 
@@ -630,7 +630,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     //构建分享内容
-    private _buildShareInfo(query = null) {
+    public _buildShareInfo(query = null) {
         let title = "", imageUrl = ""
         if (this.shareInfoArr.length > 0) {
             let item = this.shareInfoArr[MathUtils.randomNumBoth(0, this.shareInfoArr.length - 1)];

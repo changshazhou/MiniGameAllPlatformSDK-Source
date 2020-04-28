@@ -13,19 +13,21 @@ import TTModule from "./platform/TTModule";
 import QQModule from "./platform/QQModule";
 import ZSOPPOAdModule from "./ad/ZSOPPOAdModule";
 import ZSOPPOModule from "./platform/ZSOPPOModule";
+import BDModule from "./platform/BDModule";
 import { ZSHttpModule } from "./http/ZSHttpModule";
 
 import { BANNER_POSITION } from "./enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "./enum/VIDEO_STATUS";
 import { SHARE_MSG } from "./enum/SHARE_MSG";
 import { VIDEO_MSG } from "./enum/VIDEO_MSG";
-import BDModule from "./platform/BDModule";
+import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
     public BANNER_POSITION = BANNER_POSITION;
+    public SHARE_CHANNEL = SHARE_CHANNEL
     constructor() {
         (window["moosnow"]) = this;
 
