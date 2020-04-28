@@ -1059,6 +1059,7 @@ export default class PlatformModule extends BaseModule {
     public _onInterLoad() {
         this.interShowCount = 0;
         this.isInterLoaded = true;
+        console.log('插屏广告加载完成')
     }
     public _onInterClose() {
         this.interShowCount++;

@@ -1,19 +1,38 @@
 import PlatformModule from "./PlatformModule";
-import Common from "../../dist/utils/Common";
+import Common from "../utils/Common";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import MathUtils from "../utils/MathUtils";
 import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
 
 export default class TTModule extends PlatformModule {
-    constructor() {
-        super();
-        this.initBanner();
-        this.initRecord();
-    }
     public platformName: string = "tt";
     public recordRes: any = null;
     public recordCb: any = null;
     public recordNumber: number = 0;
+
+    constructor() {
+        super();
+        this.initBanner();
+        this.initRecord();
+        this.initInter();
+    }
+
+    public prepareInter() {
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].createInterstitialAd != "function") return;
+
+        if (Common.isEmpty(this.interId)) {
+            console.warn('插屏广告ID为空，系统不加载')
+            return;
+        }
+        this.inter = window[this.platformName].createInterstitialAd({
+            adUnitId: this.interId
+        });
+        this.inter.onLoad(this._onInterLoad.bind(this));
+        this.inter.onClose(this._onInterClose.bind(this));
+        this.inter.load();
+    }
+
 
     public _bottomCenterBanner(size) {
         if (this.bannerWidth != size.width) {
