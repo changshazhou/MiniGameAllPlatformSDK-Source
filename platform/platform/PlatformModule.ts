@@ -559,6 +559,14 @@ export default class PlatformModule extends BaseModule {
         }
         return this.systemInfo;
     }
+    /**
+     * 横屏还是竖屏
+     * @param windowHeight 
+     * @param windowWidth 
+     */
+    public isLandscape(windowHeight, windowWidth) {
+        return windowHeight < windowWidth
+    }
 
     //-----------------分享------------------
     public initShare(shareInfoArr) {
@@ -894,7 +902,7 @@ export default class PlatformModule extends BaseModule {
     public showAutoBanner() {
         console.log('执行自动显示和隐藏Banner功能')
         moosnow.http.getAllConfig(res => {
-            if (res.gameBanner == 1) {
+            if (res && res.gameBanner == 1) {
                 moosnow.platform.showBanner();
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
 

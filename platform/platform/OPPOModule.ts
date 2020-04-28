@@ -11,7 +11,7 @@ export default class OPPOModule extends PlatformModule {
     public appSid: string = "";
     public baseUrl = "https://api.liteplay.com.cn/";
     private versionRet: boolean = null;
-    public bannerWidth: number = 600;
+    public bannerWidth: number = 760;
     public bannerHeight: number = 96;
 
     private interLoadedShow: boolean = false;
@@ -263,7 +263,14 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName].createBannerAd) return;
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
-        if (windowWidth < this.bannerWidth) {
+        //横屏模式 
+        if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth)) {
+            if (windowWidth < this.bannerWidth) {
+                this.bannerWidth = windowWidth;
+            }
+        }
+        else {
+            //竖屏
             this.bannerWidth = windowWidth;
         }
         if (this.banner) {
@@ -282,12 +289,27 @@ export default class OPPOModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        console.log('_bottomCenterBanner size ', size)
+        let statusBarHeight = wxsys.statusBarHeight;
+        let notchHeight = wxsys.notchHeight || 0
         this.bannerWidth = size.width;
         this.bannerHeigth = size.height;
 
         this.banner.style.left = (windowWidth - size.width) / 2;
-        this.banner.style.top = windowHeight - this.bannerHeigth;;
+        let styleTop = windowHeight - this.bannerHeigth;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            styleTop = windowHeight - this.bannerHeigth;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            styleTop = (windowHeight - this.bannerHeigth) / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP) {
+            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+                styleTop = 0
+            else
+                styleTop = statusBarHeight + notchHeight
+        }
+        else
+            styleTop = this.bannerStyle.top;
+        this.banner.style.top = styleTop;
         console.log('_bottomCenterBanner  ', this.banner.style)
     }
 
@@ -296,20 +318,26 @@ export default class OPPOModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
+        let statusBarHeight = wxsys.statusBarHeight;
+        let notchHeight = wxsys.notchHeight || 0
 
         if (!isNaN(this.bannerWidth))
             this.banner.style.width = this.bannerWidth;
         if (!isNaN(this.bannerHeight))
             this.banner.style.height = this.bannerHeight;
 
-        let styleTop = 0;
+        let styleTop = windowHeight - this.bannerHeigth;
         if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
             styleTop = windowHeight - this.bannerHeigth;
         }
         else if (this.bannerPosition == BANNER_POSITION.CENTER)
             styleTop = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP)
-            styleTop = 0;
+        else if (this.bannerPosition == BANNER_POSITION.TOP) {
+            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+                styleTop = 0
+            else
+                styleTop = statusBarHeight + notchHeight
+        }
         else
             styleTop = this.bannerStyle.top;
 
@@ -319,6 +347,18 @@ export default class OPPOModule extends PlatformModule {
 
     public _onBannerHide() {
         console.log('banner 已隐藏 ')
+    }
+
+    public destroyBanner() {
+        if (this.banner) {
+            this.banner.hide();
+            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offError(this._onBannerError);
+            this.banner.offLoad(this._onBannerLoad);
+            this.banner.offHide();
+            this.banner.destroy();
+            this.banner = null;
+        }
     }
 
     /**
@@ -334,20 +374,21 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) {
             return;
         }
-
-        if (this.bannerPosition != position) {
-            this.banner.hide();
-            this.banner.offResize(this._bottomCenterBanner);
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.offHide();
-            this.banner.destroy();
-            this.banner = null;
-            this._prepareBanner();
-            console.log('位置要更换,销毁重建');
-        }
         this.bannerPosition = position;
-        this.bannerStyle = style;
+        // if (this.banner) {
+        //     if (this.bannerPosition != position) {
+        //         this.bannerPosition = position;
+        //         this.bannerStyle = style;
+        //         this.destroyBanner();
+        //         this._prepareBanner();
+        //         console.log('位置要更换,销毁重建');
+        //     }
+        // }
+        // else {
+        //     this.bannerPosition = position;
+        //     this.bannerStyle = style;
+        //     this.initBanner();
+        // }
 
         if (this.banner) {
             // let wxsys = this.getSystemInfoSync();
@@ -357,21 +398,33 @@ export default class OPPOModule extends PlatformModule {
 
             // }
             // this.banner.top = 1
-            this.banner.hide();
+            // this.banner.hide();
             // console.log('show banner style 1', this.banner.style)
+
+            // console.log('show banner style 2', this.banner.style)
+            // this.banner.hide();
+
             this._resetBanenrStyle({
                 width: this.banner.style.width,
                 height: this.banner.style.height
             });
-            // console.log('show banner style 2', this.banner.style)
-
             this.banner.show()
+            setTimeout(() => {
+                this._resetBanenrStyle({
+                    width: this.banner.style.width,
+                    height: this.banner.style.height
+                });
+            }, 500)
+
             // .then(() => {
             //     this._resetBanenrStyle({
             //         width: this.banner.style.width,
             //         height: this.banner.style.height
             //     });
             // })
+        }
+        else {
+            this.initBanner();
         }
     }
     public hideBanner() {
