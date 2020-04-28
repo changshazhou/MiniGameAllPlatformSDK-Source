@@ -175,4 +175,9 @@ export default class TTModule extends PlatformModule {
             }
         }
     }
+
+
+    public showAppBox() {
+
+    }
 }

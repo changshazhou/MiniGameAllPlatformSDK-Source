@@ -27,7 +27,14 @@ class Main {
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
     public BANNER_POSITION = BANNER_POSITION;
-    public SHARE_CHANNEL = SHARE_CHANNEL
+    public SHARE_CHANNEL = SHARE_CHANNEL;
+    public APP_PLATFORM = PlatformType;
+    /**
+     * 获取当前的游戏平台
+     */
+    public getAppPlatform(): PlatformType {
+        return Common.platform;
+    }
     constructor() {
         (window["moosnow"]) = this;
 
@@ -39,19 +46,7 @@ class Main {
     }
 
     private initHttp() {
-        let winCfg = window["moosnowConfig"];
-        if (Common.platform == PlatformType.PC) {
-            if (winCfg.debug && winCfg[winCfg.debug]) {
-                if (winCfg.debug == "oppo") {
-                    if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1) {
-                        this.mHttp = new ZSHttpModule();
-                        return;
-                    }
-                }
-            }
-            this.mHttp = new HttpModule();
-        }
-        else if (Common.platform == PlatformType.WX)
+        if (Common.platform == PlatformType.WX)
             this.mHttp = new HttpModule();
         else if (Common.platform == PlatformType.OPPO_ZS) {
             this.mHttp = new ZSHttpModule();
@@ -62,36 +57,7 @@ class Main {
 
     private initPlatform() {
 
-        if (Common.platform == PlatformType.PC) {
-            let winCfg = window["moosnowConfig"];
-            if (winCfg.debug && winCfg[winCfg.debug]) {
-                if (winCfg.debug == "wx")
-                    this.mPlatform = new WXModule();
-                else if (winCfg.debug == "oppo") {
-                    if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                        this.mPlatform = new ZSOPPOModule();
-                    else
-                        this.mPlatform = new OPPOModule();
-                }
-                else if (winCfg.debug == "bd") {
-                    this.mPlatform = new QQModule();
-                }
-                else if (winCfg.debug == "qq") {
-                    this.mPlatform = new QQModule();
-                }
-                else if (winCfg.debug == "byte") {
-                    this.mPlatform = new TTModule();
-                }
-                else if (winCfg.debug == "bd") {
-                    this.mPlatform = new BDModule();
-                }
-                else
-                    this.mPlatform = new WXModule();
-            }
-            else
-                this.mPlatform = new PlatformModule();
-        }
-        else if (Common.platform == PlatformType.WX)
+        if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
             this.mPlatform = new OPPOModule();
@@ -112,23 +78,7 @@ class Main {
     }
 
     private initAd() {
-        let winCfg = window["moosnowConfig"];
-        if (Common.platform == PlatformType.PC) {
-            if (winCfg.debug && winCfg[winCfg.debug]) {
-                if (winCfg.debug == "oppo") {
-                    if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1) {
-                        this.mAd = new ZSOPPOAdModule();
-                        return;
-                    }
-                    else {
-                        this.mAd = new OPPOAdModule();
-                        return;
-                    }
-                }
-            }
-            this.mAd = new WXAdModule();
-        }
-        else if (Common.platform == PlatformType.WX)
+        if (Common.platform == PlatformType.WX)
             this.mAd = new WXAdModule();
         else if (Common.platform == PlatformType.OPPO) {
             this.mAd = new OPPOAdModule();

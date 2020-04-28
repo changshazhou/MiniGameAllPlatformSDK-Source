@@ -127,8 +127,13 @@ export default class Common {
         return Object.prototype.toString.call(obj) === "[object String]";
     }
 
+    /**
+     * 获取当前的运行平台
+     * PC状态下会返回debug平台
+     * debug没有时 默认返回微信平台
+     */
     static get platform(): PlatformType {
-        let winCfg = window["moosnowConfig"]
+        let winCfg = window["moosnowConfig"];
         if (window['tt'])
             return PlatformType.BYTEDANCE
         else if (window['swan'])
@@ -143,8 +148,27 @@ export default class Common {
         }
         else if (window['wx'])
             return PlatformType.WX
-        else
+        else {
+            if (winCfg.debug && winCfg[winCfg.debug]) {
+                if (winCfg.debug == "wx")
+                    return PlatformType.WX
+                else if (winCfg.debug == "oppo")
+                    if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                        return PlatformType.OPPO_ZS
+                    else
+                        return PlatformType.OPPO
+                else if (winCfg.debug == "bd")
+                    return PlatformType.BAIDU
+                else if (winCfg.debug == "byte")
+                    return PlatformType.BYTEDANCE
+                else if (winCfg.debug == "qq")
+                    return PlatformType.QQ
+                else
+                    return PlatformType.PC
+            }
             return PlatformType.PC
+        }
+
     }
     static deepCopy(obj): object | [] {
         //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝

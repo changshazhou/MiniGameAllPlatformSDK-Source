@@ -40,7 +40,7 @@ export default class OPPOModule extends PlatformModule {
             moosnow.http.request(url, data, 'POST',
                 (res) => {
                     this.versionRet = res.data.version != moosnow.platform.moosnowConfig.version;
-                    console.log(`版本检查 后台版本${res.zs_version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
+                    console.log(`版本检查 后台版本${res.data.version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
                     console.log("获取广告开关：", this.versionRet);
                     callback(this.versionRet);
                 },
@@ -374,7 +374,7 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerPosition = position;
+        // this.bannerPosition = position;
         // if (this.banner) {
         //     if (this.bannerPosition != position) {
         //         this.bannerPosition = position;

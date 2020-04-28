@@ -108,29 +108,9 @@ export default class AdModule extends BaseModule {
     }
 
     public getRemoteAd(cb) {
-        let url = this.baseUrl + 'wx_export/getExport';
-        var signParams = {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId,
-        };
+        cb([])
 
-
-        let data = signParams;
-        moosnow.http.request(url, data, 'POST',
-            (res) => {
-                let arr = res.data;
-                arr.sort(() => Math.random() > 0.5 ? 1 : -1);
-                if (cb) {
-                    cb(res.data);
-                }
-            },
-            () => {
-                cb([])
-                console.log('getRemoteAd fail');
-            },
-            () => {
-                console.log('getRemoteAd complete');
-            }
-        );
+      
     }
 
     private cacheImage = null;

@@ -102,25 +102,9 @@ export default class PlatformModule extends BaseModule {
     // }
 
     public initAppConfig() {
-        let winCfg = window["moosnowConfig"]
-        if (Common.platform == PlatformType.PC) {
-            if (winCfg.debug && winCfg[winCfg.debug]) {
-                if (winCfg.debug == "wx")
-                    this.moosnowConfig = winCfg.wx;
-                else if (winCfg.debug == "oppo")
-                    this.moosnowConfig = winCfg.oppo;
-                else if (winCfg.debug == "bd")
-                    this.moosnowConfig = winCfg.bd;
-                else if (winCfg.debug == "byte")
-                    this.moosnowConfig = winCfg.byte;
-                else if (winCfg.debug == "qq")
-                    this.moosnowConfig = winCfg.qq;
-                else this.moosnowConfig = winCfg.wx;
-            }
-            else
-                this.moosnowConfig = winCfg.wx;
-        }
-        else if (Common.platform == PlatformType.WX)
+        let winCfg = window["moosnowConfig"];
+        
+        if (Common.platform == PlatformType.WX)
             this.moosnowConfig = winCfg.wx;
         else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
             this.moosnowConfig = winCfg.oppo;

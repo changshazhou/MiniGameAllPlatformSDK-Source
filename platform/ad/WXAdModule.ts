@@ -10,7 +10,33 @@ export default class WXAdModule extends AdModule {
                 console.log('WXAdModule getRemoteAd', res)
             },
             () => {
-                super.getRemoteAd(cb);
+                this.repairAd(cb);
+                console.log('getRemoteAd fail');
+            },
+            () => {
+                console.log('getRemoteAd complete');
+            }
+        );
+    }
+
+    private repairAd(cb) {
+        let url = this.baseUrl + 'wx_export/getExport';
+        var signParams = {
+            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+        };
+
+
+        let data = signParams;
+        moosnow.http.request(url, data, 'POST',
+            (res) => {
+                let arr = res.data;
+                arr.sort(() => Math.random() > 0.5 ? 1 : -1);
+                if (cb) {
+                    cb(res.data);
+                }
+            },
+            () => {
+                cb([])
                 console.log('getRemoteAd fail');
             },
             () => {
