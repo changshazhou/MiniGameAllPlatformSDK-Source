@@ -111,8 +111,9 @@ export default class TTModule extends PlatformModule {
     }
 
     /**
-     * 
-     * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
+     * 分享
+     * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
+     * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
      * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
      */
     public share(query: Object = {}, callback?: (shared: boolean) => void) {
