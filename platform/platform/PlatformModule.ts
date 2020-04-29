@@ -680,6 +680,11 @@ export default class PlatformModule extends BaseModule {
     //-----------------录屏 具体逻辑在子类实现------------------
     public initRecord() { }
     public clipRecord() { }
+    /**
+     * 开始录屏
+     * @param duration 录屏时长
+     * @param callback 如果不是抖音回调参数=false
+     */
     public startRecord(duration = 300, callback = null) {
         if (!this.record) {
             if (callback)
@@ -687,6 +692,10 @@ export default class PlatformModule extends BaseModule {
             return;
         }
     }
+    /**
+     * 停止录屏
+     * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
+     */
     public stopRecord(callback = null) {
         if (!this.record) {
             if (callback)
