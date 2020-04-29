@@ -78,7 +78,7 @@ class Main {
     }
 
     private initAd() {
-        if (Common.platform == PlatformType.WX)
+        if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
             this.mAd = new WXAdModule();
         else if (Common.platform == PlatformType.OPPO) {
             this.mAd = new OPPOAdModule();

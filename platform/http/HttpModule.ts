@@ -281,7 +281,11 @@ export class HttpModule extends BaseModule {
                     callback(this.cfgData);
                 },
                 () => {
-                    callback({});
+                    callback({
+                        mistouchNum: 0,
+                        mistouchPosNum: 0,
+                        bannerShowCountLimit: 1
+                    });
                     console.log('load config json fail');
                 }
             );
