@@ -87,7 +87,7 @@ class Main {
             this.mAd = new ZSOPPOAdModule();
         }
         else
-            this.mAd = new WXAdModule();
+            this.mAd = new AdModule();
     }
 
 

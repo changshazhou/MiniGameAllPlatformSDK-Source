@@ -103,7 +103,7 @@ export default class PlatformModule extends BaseModule {
 
     public initAppConfig() {
         let winCfg = window["moosnowConfig"];
-        
+
         if (Common.platform == PlatformType.WX)
             this.moosnowConfig = winCfg.wx;
         else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
@@ -694,6 +694,12 @@ export default class PlatformModule extends BaseModule {
             return;
         }
     }
+
+    public pauseRecord() {
+    }
+    public resumeRecord() {
+    }
+
     //-----------------注册事件------------------
 
     /**

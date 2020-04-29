@@ -549,4 +549,8 @@ export default class OPPOModule extends PlatformModule {
         if (this.inter)
             this.inter.load();
     }
+
+    public showAutoBanner() {
+        console.log(' oppo 不支持自动')
+    }
 }

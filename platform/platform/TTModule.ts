@@ -129,6 +129,15 @@ export default class TTModule extends PlatformModule {
         }
     }
 
+    public pauseRecord() {
+        if (this.record)
+            this.record.pause()
+    }
+    public resumeRecord() {
+        if (this.record)
+            this.record.resume()
+    }
+
     /**
      * 分享
      * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
