@@ -40,10 +40,8 @@ export class HttpModule extends BaseModule {
                 }
             })
         }
+        this.mLaunchOptions = moosnow.platform.getLaunchOption();
 
-        if (Common.platform == PlatformType.WX) {
-            this.mLaunchOptions = (window["wx"] as any).getLaunchOptionsSync();
-        }
     }
 
 
@@ -283,7 +281,7 @@ export class HttpModule extends BaseModule {
                     callback(this.cfgData);
                 },
                 () => {
-                    callback(null);
+                    callback({});
                     console.log('load config json fail');
                 }
             );

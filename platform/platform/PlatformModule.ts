@@ -512,8 +512,10 @@ export default class PlatformModule extends BaseModule {
      * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量 
      */
     public getLaunchOption() {
-        if (!window[this.platformName]) return;
-        return window[this.platformName].getLaunchOptionsSync();
+        if (window[this.platformName] && window[this.platformName].getLaunchOptionsSync)
+            return window[this.platformName].getLaunchOptionsSync();
+        else
+            return {}
     }
 
     /**
