@@ -62,20 +62,24 @@ export default class WXModule extends PlatformModule {
             self.getUserToken("", userToken, callback)
         }
         else {
-            window[this.platformName].login({
-                success: (res) => {
-                    if (res.code) {
-                        //发起网络请求
-                        self.getUserToken(res.code, "", callback)
-                    } else {
-                        if (Common.isFunction(callback))
-                            callback();
-                    }
-                },
-                fail: () => {
+            if (window[this.platformName] && window[this.platformName].login)
+                window[this.platformName].login({
+                    success: (res) => {
+                        if (res.code) {
+                            //发起网络请求
+                            self.getUserToken(res.code, "", callback)
+                        } else {
+                            if (Common.isFunction(callback))
+                                callback();
+                        }
+                    },
+                    fail: () => {
 
-                }
-            })
+                    }
+                })
+            else {
+                super.login(callback, fail);
+            }
         }
     }
 
@@ -87,7 +91,7 @@ export default class WXModule extends PlatformModule {
      */
     private getUserToken(code, user_id, callback?) {
 
-        let options = window[this.platformName].getLaunchOptionsSync();
+        let options = this.getLaunchOption();
         let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
         let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
 
