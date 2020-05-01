@@ -783,9 +783,11 @@ export default class PlatformModule extends BaseModule {
             this.banner.offLoad(this._onBannerLoad);
         }
         this.banner = this._createBannerAd();
-        this.banner.onResize(this._bottomCenterBanner.bind(this));
-        this.banner.onError(this._onBannerError.bind(this));
-        this.banner.onLoad(this._onBannerLoad.bind(this));
+        if (this.banner) {
+            this.banner.onResize(this._bottomCenterBanner.bind(this));
+            this.banner.onError(this._onBannerError.bind(this));
+            this.banner.onLoad(this._onBannerLoad.bind(this));
+        }
     }
     public _createBannerAd() {
         if (!window[this.platformName]) return;
