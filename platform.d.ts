@@ -187,7 +187,6 @@ declare class bannerStyle {
 }
 
 
-
 declare class PlatformModule extends BaseModule {
     constructor();
     baseUrl: string;
@@ -213,6 +212,7 @@ declare class PlatformModule extends BaseModule {
     nativeId: Array<number>;
     nativeIdIndex: number;
     bannerWidth: number;
+    bannerHeigth: number;
     bannerShowCount: number;
     bannerShowCountLimit: number;
     bannerCb: Function;
@@ -228,7 +228,10 @@ declare class PlatformModule extends BaseModule {
     nativeCb: Function;
     nativeLoading: boolean;
     record: any;
-    private shareInfoArr;
+    shareInfoArr: {
+        img: string;
+        title: string;
+    }[];
     onEnable(): void;
     private vibrateSwitch;
     initAppConfig(): void;
@@ -306,18 +309,45 @@ declare class PlatformModule extends BaseModule {
      * wifiSignal	number	wifi 信号强度，范围 0 - 4	                        >= 1.9.0
      */
     getSystemInfoSync(): any;
+    /**
+     * 横屏还是竖屏
+     * @param windowHeight
+     * @param windowWidth
+     */
+    isLandscape(windowHeight: any, windowWidth: any): boolean;
     initShare(shareInfoArr: any): void;
     getShareInfo(ticket: string, success: (encryptedData: string, iv: string) => void, fail?: Function): void;
+    /**
+     * 分享
+     * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
+     * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
+     * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+     */
     share(query?: Object, callback?: (shared: boolean) => void): void;
     shareWithoutCheck(query?: Object, callback?: (shared: boolean) => void): void;
     private _share;
-    private _buildShareInfo;
+    _buildShareInfo(query?: any): {
+        title: string;
+        imageUrl: string;
+        query: any;
+    };
     private _onShareback;
     private _initLoginButton;
     initRecord(): void;
     clipRecord(): void;
+    /**
+     * 开始录屏
+     * @param duration 录屏时长
+     * @param callback 如果不是抖音回调参数=false
+     */
     startRecord(duration?: number, callback?: any): void;
+    /**
+     * 停止录屏
+     * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
+     */
     stopRecord(callback?: any): void;
+    pauseRecord(): void;
+    resumeRecord(): void;
     /**
      * 注册微信各种回调
      */
@@ -411,7 +441,6 @@ declare class PlatformModule extends BaseModule {
 }
 
 
-
 declare class GameDataCenter extends BaseModule {
     private TOKEN;
     private mUserToken;
@@ -425,8 +454,12 @@ declare class GameDataCenter extends BaseModule {
     setChannelAppId(value: any): void;
 }
 
+declare enum PlatformType {
 
+}
 declare class moosnow {
+
+
     static VIDEO_STATUS: {
         END: string;
         NOTEND: string;
@@ -445,6 +478,43 @@ declare class moosnow {
         BOTTOM: string;
         CUSTOM: string;
     }
+    static SHARE_CHANNEL: {
+        ARTICLE: string;
+        VIDEO: string;
+        TOKEN: string;
+        LINK: string;
+    };
+    static APP_PLATFORM: {
+        /**
+        * 微信
+        */
+        WX;
+        /**
+         * 字节跳动
+         */
+        BYTEDANCE,
+        /**
+         * OPPO
+         */
+        OPPO;
+        /**
+         * OPPO
+         */
+        OPPO_ZS;
+        /**
+         * 百度
+         */
+        BAIDU;
+        /**
+         * QQ
+         */
+        QQ;
+        /**
+         * PC电脑
+         */
+        PC;
+    };
+    static getAppPlatform(): PlatformType
     static http: HttpModule
     static platform: PlatformModule
     static ad: AdModule

@@ -967,6 +967,12 @@ export default class PlatformModule extends BaseModule {
             return;
         }
         if (!window[this.platformName].createRewardedVideoAd) {
+            moosnow.platform.videoCb(VIDEO_STATUS.END);
+            return;
+        }
+        if (Common.isEmpty(this.videoId)) {
+            console.warn(' video id is null')
+            moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
         if (this.video) {
@@ -974,10 +980,7 @@ export default class PlatformModule extends BaseModule {
             this.video.offError(this._onVideoError);
             this.video.offLoad(this._onVideoLoad);
         } else {
-            if (Common.isEmpty(this.videoId)) {
-                console.warn(' video id is null')
-                return;
-            }
+
             this.video = window[this.platformName].createRewardedVideoAd({
                 adUnitId: this.videoId
             });
