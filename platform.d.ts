@@ -155,6 +155,7 @@ declare class HttpModule extends BaseModule {
     getMistouchPosNum(callback: any): void;
     getBannerShowCountLimit(callback: any): void;
     private disableAd;
+    getShareInfo(cb: any): void;
 }
 
 declare class SettingModule extends BaseModule {

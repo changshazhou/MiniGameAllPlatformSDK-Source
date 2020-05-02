@@ -161,7 +161,7 @@ export default class TTModule extends PlatformModule {
         }
         let channel = SHARE_CHANNEL.LINK;
 
-        if ([SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
+        if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
             channel = query.channel;
         }
 

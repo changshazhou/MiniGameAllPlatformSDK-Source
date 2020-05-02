@@ -450,6 +450,14 @@ export class HttpModule extends BaseModule {
 
     }
 
-
+    public getShareInfo(cb) {
+        this.request(`${this.baseUrl}admin/wx_share/getShare`, {
+            appid: moosnow.platform.moosnowConfig.moosnowAppId
+        }, "POST", (res) => {
+            console.log('分享数据', res.data)
+            cb(res.data);
+            moosnow.platform.initShare(res.data);
+        });
+    }
 }
 
