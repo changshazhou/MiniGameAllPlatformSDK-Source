@@ -83,6 +83,7 @@ export default class TTModule extends PlatformModule {
         });
 
         this.record.onStop(res => {
+            console.log('on stop ', res)
             if (this.recordNumber >= 4) {
                 this.record.clipVideo({
                     path: res.videoPath,
@@ -115,17 +116,20 @@ export default class TTModule extends PlatformModule {
      * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
      */
     public stopRecord(callback = null) {
-        console.log('record stopRecord');
+        console.log(' stop Record  callback  ', !!callback);
         if (!this.record) {
             if (callback)
                 callback(false);
             return;
         }
+        console.log('record stop recordRes ', this.recordRes)
         if (this.recordRes) {
-            callback(this.recordRes);
+            if (Common.isFunction(callback))
+                callback(this.recordRes);
         } else {
             this.recordCb = callback;
             this.record.stop();
+            console.log('record stop  ', this.recordRes)
         }
     }
 

@@ -617,6 +617,7 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) return;
         let self = this;
         let shareInfo = this._buildShareInfo(query);
+        console.log('分享数据：', shareInfo)
         window[this.platformName].shareAppMessage(shareInfo);
     }
 

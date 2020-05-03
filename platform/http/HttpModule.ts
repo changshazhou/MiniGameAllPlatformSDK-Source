@@ -182,7 +182,8 @@ export class HttpModule extends BaseModule {
      */
     public point(name, data: any = null) {
         if (Common.platform == PlatformType.WX) {
-            (window['wx'] as any).aldSendEvent(name, data);
+            if (window['wx'].aldSendEvent)
+                (window['wx'] as any).aldSendEvent(name, data);
         }
     }
 
