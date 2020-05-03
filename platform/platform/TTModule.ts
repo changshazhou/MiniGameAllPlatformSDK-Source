@@ -54,8 +54,12 @@ export default class TTModule extends PlatformModule {
     public clipRecord() {
         if (!this.record) return;
         this.recordNumber++;
+        console.log('clipRecord', this.recordNumber)
         this.record.recordClip({
-            timeRange: [2, 2]
+            timeRange: [2, 2],
+            success: (r) => {
+                console.log('clipRecord 成功 ', r)
+            }
         })
     }
 
@@ -82,18 +86,20 @@ export default class TTModule extends PlatformModule {
                 callback(res);
         });
 
+        let recordRes = this.recordRes
         this.record.onStop(res => {
             console.log('on stop ', res)
             if (this.recordNumber >= 4) {
                 this.record.clipVideo({
                     path: res.videoPath,
-                    success(r) {
+                    success: (r) => {
                         console.log('record clip succes:', r);
                         this.recordRes = r;
+                        console.log('record clip recordRes :', this.recordRes);
                         if (this.recordCb)
                             this.recordCb(r);
                     },
-                    fail() {
+                    fail: () => {
                         console.log('record clip fail:', res);
                         this.recordRes = res;
                         if (this.recordCb)
@@ -168,14 +174,16 @@ export default class TTModule extends PlatformModule {
         if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
             channel = query.channel;
         }
-
+        console.log('this. recordRes ', this.recordRes)
+        let videoPath = (this.recordRes && this.recordRes.videoPath) ? this.recordRes.videoPath : "";
+        console.log('video path ', videoPath)
         return {
             channel: channel,
             title: title,
             imageUrl: imageUrl,
             query: moosnow.http._object2Query(query),
             extra: {
-                videoPath: this.recordRes && this.recordRes.videoPath ? this.recordRes.videoPath : "",
+                videoPath: videoPath,
                 videoTopics: [title]
             },
             success() {
