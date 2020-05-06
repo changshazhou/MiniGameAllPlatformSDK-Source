@@ -182,7 +182,7 @@ export class HttpModule extends BaseModule {
      */
     public point(name, data: any = null) {
         if (Common.platform == PlatformType.WX) {
-            if (window['wx'].aldSendEvent)
+            if (window['wx'] && window['wx'].aldSendEvent)
                 (window['wx'] as any).aldSendEvent(name, data);
         }
     }
@@ -193,7 +193,7 @@ export class HttpModule extends BaseModule {
     */
     public startGame(level) {
         if (Common.platform == PlatformType.WX)
-            if (window['wx'].aldStage)
+            if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onStart({
                     stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
                     stageName: level,//关卡名称，该字段必传
@@ -212,7 +212,7 @@ export class HttpModule extends BaseModule {
 
         var event = isWin ? "complete" : "fail";
         var desc = isWin ? "关卡完成" : "关卡失败";
-        if (window['wx'].aldStage)
+        if (window['wx'] && window['wx'].aldStage)
             window['wx'].aldStage.onEnd({
                 stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
                 stageName: level,//关卡名称，该字段必传
@@ -234,7 +234,7 @@ export class HttpModule extends BaseModule {
     public videoPoint(type, info, level) {
         if (Common.platform != PlatformType.WX) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
-        if (window['wx'].aldSendEvent)
+        if (window['wx'] && window['wx'].aldSendEvent)
             window['wx'].aldSendEvent(name, { info, level: level + "" });
         else
             console.warn('阿拉丁文件未引入')
