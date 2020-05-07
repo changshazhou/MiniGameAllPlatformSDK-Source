@@ -122,7 +122,7 @@ export default class TTModule extends PlatformModule {
      * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
      */
     public stopRecord(callback = null) {
-        console.log(' stop Record  callback  ', !!callback);
+        console.log(' stop Record  callback  ', !!callback); 
         if (!this.record) {
             if (callback)
                 callback(false);

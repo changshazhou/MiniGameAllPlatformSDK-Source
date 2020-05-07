@@ -68,8 +68,8 @@ export default class QQModule extends PlatformModule {
             top = 0;
         else
             top = this.bannerStyle.top;
-
-        this.banner.style.top = top;
+        if (this.banner)
+            this.banner.style.top = top;
     }
 
     public _createBannerAd() {
@@ -82,7 +82,10 @@ export default class QQModule extends PlatformModule {
         let windowHeight = wxsys.screenHeight;
         let centerPos = (windowWidth - this.bannerWidth) / 2;
         let top = windowHeight - height;
-
+        if (Common.isEmpty(this.bannerId)) {
+            console.warn('banner id is null')
+            return;
+        }
         let banner = window[this.platformName].createBannerAd({
             adUnitId: this.bannerId,
             style: {

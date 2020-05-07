@@ -1,4 +1,5 @@
 import PlatformModule from "./PlatformModule";
+import Common from "../utils/Common";
 
 export default class BDModule extends PlatformModule {
     constructor() {
@@ -19,7 +20,10 @@ export default class BDModule extends PlatformModule {
 
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
-
+        if (Common.isEmpty(this.bannerId)) {
+            console.warn('banner id is null')
+            return;
+        }
         let banner = window[this.platformName].createBannerAd({
             adUnitId: this.bannerId,
             appSid: this.appSid,
