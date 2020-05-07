@@ -985,6 +985,11 @@ export default class PlatformModule extends BaseModule {
             this.video = window[this.platformName].createRewardedVideoAd({
                 adUnitId: this.videoId
             });
+            if (!this.video) {
+                console.warn('创建视频广告失败')
+                return;
+            }
+
         }
         this.video.onError(this._onVideoError);
         this.video.onClose(this._onVideoClose);

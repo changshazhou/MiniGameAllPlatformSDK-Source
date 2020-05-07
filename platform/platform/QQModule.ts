@@ -1,6 +1,8 @@
 import PlatformModule from './PlatformModule';
 import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
+
+
 export default class QQModule extends PlatformModule {
     public platformName: string = "qq";
     constructor() {

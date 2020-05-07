@@ -3,6 +3,7 @@ import Common from "../utils/Common";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import MathUtils from "../utils/MathUtils";
 import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
+import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 
 export default class TTModule extends PlatformModule {
     public platformName: string = "tt";
@@ -39,8 +40,11 @@ export default class TTModule extends PlatformModule {
             let wxsys = this.getSystemInfoSync();
             let windowWidth = wxsys.windowWidth;
             let windowHeight = wxsys.windowHeight;
-            this.banner.style.top = windowHeight - (size.width / 16 * 9);
-            this.banner.style.left = (windowWidth - size.width) / 2;
+            if (this.banner) {
+                this.banner.style.top = windowHeight - (size.width / 16 * 9);
+                this.banner.style.left = (windowWidth - size.width) / 2;
+            }
+
         }
     }
 
@@ -89,7 +93,7 @@ export default class TTModule extends PlatformModule {
         let recordRes = this.recordRes
         this.record.onStop(res => {
             console.log('on stop ', res)
-            if (this.recordNumber >= 4) {
+            if (this.recordNumber >= 2) {
                 this.record.clipVideo({
                     path: res.videoPath,
                     success: (r) => {
@@ -122,7 +126,7 @@ export default class TTModule extends PlatformModule {
      * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
      */
     public stopRecord(callback = null) {
-        console.log(' stop Record  callback  ', !!callback); 
+        console.log(' stop Record  callback  ', !!callback);
         if (!this.record) {
             if (callback)
                 callback(false);
@@ -197,7 +201,67 @@ export default class TTModule extends PlatformModule {
         }
     }
 
+    private mBannerLoaded: boolean = false
+    public _onBannerLoad() {
+        this.bannerShowCount = 0;
+        this.mBannerLoaded = true;
+        if (this.isBannerShow) {
+            this.showBanner();
+        }
+    }
 
+    public _prepareBanner() {
+        this.mBannerLoaded = false;
+        super._prepareBanner();
+    }
+
+    /**
+    * 
+    * @param callback 点击回调
+    * @param position banner的位置，默认底部
+    * @param style 自定义样式
+    */
+    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+        // if (this.isBannerShow)
+        //     return;
+        console.log('显示banner')
+        this.bannerCb = callback;
+
+        this.isBannerShow = true;
+        if (!this.mBannerLoaded) {
+            return;
+        }
+
+        if (!window[this.platformName]) {
+            return;
+        }
+        this.bannerPosition = position;
+        this.bannerStyle = style;
+
+        if (this.banner) {
+            // let wxsys = this.getSystemInfoSync();
+            // let windowWidth = wxsys.windowWidth;
+            // let windowHeight = wxsys.windowHeight;
+            // if (position == BannerPosition.Bottom) {
+
+            // }
+            // this.banner.top = 1
+            console.log('show banner style ', this.banner.style)
+
+            // this.hideBanner();
+            this.banner.hide();
+            this._resetBanenrStyle({
+                width: this.banner.style.width,
+                height: this.banner.style.realHeight
+            })
+            this.banner.show().then(() => {
+                this._resetBanenrStyle({
+                    width: this.banner.style.width,
+                    height: this.banner.style.realHeight
+                })
+            })
+        }
+    }
     public showAppBox() {
 
     }
