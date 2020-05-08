@@ -33,11 +33,11 @@ export default class QQModule extends PlatformModule {
         });
         if (this.banner) {
             this.banner.show()
-                .then(() => {
-                    this._resetBanenrStyle({
+            .then(() => {
+                this._resetBanenrStyle({
 
-                    });
-                })
+                });
+            })
         }
     }
     public _bottomCenterBanner(size) {

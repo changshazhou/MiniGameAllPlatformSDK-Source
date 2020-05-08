@@ -614,7 +614,14 @@ export default class PlatformModule extends BaseModule {
     }
 
     private _share(query = null) {
-        if (!window[this.platformName]) return;
+        if (!window[this.platformName]) {
+            this.currentShareCallback(true)
+            return
+        };;
+        if (!window[this.platformName].shareAppMessage) {
+            this.currentShareCallback(true)
+            return
+        };
         let self = this;
         let shareInfo = this._buildShareInfo(query);
         console.log('分享数据：', shareInfo)

@@ -162,6 +162,14 @@ export default class TTModule extends PlatformModule {
         this.currentShareCallback = callback;
         let shareInfo = this._buildShareInfo(query);
         console.log('shareInfo:', shareInfo);
+        if (!window[this.platformName]) {
+            this.currentShareCallback(true)
+            return
+        };;
+        if (!window[this.platformName].shareAppMessage) {
+            this.currentShareCallback(true)
+            return
+        };
         window[this.platformName].shareAppMessage(shareInfo);
     }
 
