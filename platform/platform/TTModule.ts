@@ -4,6 +4,7 @@ import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import MathUtils from "../utils/MathUtils";
 import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import appLaunchOption from "../model/appLaunchOption";
 
 export default class TTModule extends PlatformModule {
     public platformName: string = "tt";
@@ -186,7 +187,7 @@ export default class TTModule extends PlatformModule {
         if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
             channel = query.channel;
         }
-        console.log('this. recordRes ', this.recordRes)
+        // console.log('this. recordRes ', this.recordRes)
         let videoPath = (this.recordRes && this.recordRes.videoPath) ? this.recordRes.videoPath : "";
         console.log('video path ', videoPath)
         return {
@@ -198,11 +199,13 @@ export default class TTModule extends PlatformModule {
                 videoPath: videoPath,
                 videoTopics: [title]
             },
-            success() {
+            success: () => {
+                console.log('share video success ')
                 if (this.currentShareCallback)
                     this.currentShareCallback(true);
             },
-            fail() {
+            fail: (e) => {
+                console.log('share video success ', e)
                 if (this.currentShareCallback)
                     this.currentShareCallback(false);
             }
@@ -271,6 +274,78 @@ export default class TTModule extends PlatformModule {
         }
     }
     public showAppBox() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].showMoreGamesModal) return;
+        const systemInfo = this.getSystemInfoSync();
+        if (systemInfo.platform == "ios") return;
+        // iOS 不支持，建议先检测再使用
+        if (systemInfo.platform !== "ios") {
+            // 打开互跳弹窗
+            let appLaunchOptions: Array<appLaunchOption> = [];
+            moosnow.ad.getAd((res: moosnowAdRow) => {
+                let opt = new appLaunchOption();
+                opt.appId = res.appid;
+                opt.query = res.path
+                opt.extraData = res.extraData;
+                appLaunchOptions.push(opt)
+            })
+            const banner = window[this.platformName].showMoreGamesModal({
+                style: {
+                    left: 20,
+                    top: 40,
+                    width: 150,
+                    height: 40
+                },
+                appLaunchOptions: appLaunchOptions,
+                success(res) {
+                    console.log("show app box success", res.errMsg);
+                },
+                fail(res) {
+                    console.log("show app box fail", res.errMsg);
+                }
+            });
+            // banner.show();
+            // banner.onTap(() => {
+            //     console.log("点击跳转游戏盒子");
+            // });
+        }
+    }
 
+    public showAppBox2() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createMoreGamesBanner) return;
+        const systemInfo = this.getSystemInfoSync();
+        if (systemInfo.platform == "ios") return;
+        // iOS 不支持，建议先检测再使用
+        if (systemInfo.platform !== "ios") {
+            // 打开互跳弹窗
+            let appLaunchOptions: Array<appLaunchOption> = [];
+            moosnow.ad.getAd((res: moosnowAdRow) => {
+                let opt = new appLaunchOption();
+                opt.appId = res.appid;
+                opt.query = res.path
+                opt.extraData = res.extraData;
+                appLaunchOptions.push(opt)
+            })
+            const banner = window[this.platformName].createMoreGamesBanner({
+                style: {
+                    left: 20,
+                    top: 40,
+                    width: 150,
+                    height: 40
+                },
+                appLaunchOptions: appLaunchOptions,
+                success(res) {
+                    console.log("show app box success", res.errMsg);
+                },
+                fail(res) {
+                    console.log("show app box fail", res.errMsg);
+                }
+            });
+            banner.show();
+            banner.onTap(() => {
+                console.log("点击跳转游戏盒子");
+            });
+        }
     }
 }
