@@ -540,7 +540,10 @@ export default class PlatformModule extends BaseModule {
     public getSystemInfoSync() {
         if (!window[this.platformName]) return;
         if (this.systemInfo == null) {
-            this.systemInfo = window[this.platformName].getSystemInfoSync();
+            if (window[this.platformName].getSystemInfoSync)
+                this.systemInfo = window[this.platformName].getSystemInfoSync();
+            else
+                this.systemInfo = {}
             console.log('设备信息', this.systemInfo)
         }
         return this.systemInfo;
@@ -557,6 +560,7 @@ export default class PlatformModule extends BaseModule {
     //-----------------分享------------------
     public initShare(shareInfoArr) {
         if (!window[this.platformName]) return;
+        if (!window[this.platformName].showShareMenu) return;
         this.shareInfoArr = shareInfoArr;
         window[this.platformName].showShareMenu({
             withShareTicket: true,
@@ -1207,10 +1211,12 @@ export default class PlatformModule extends BaseModule {
      * 
      */
     public clickNative() {
-        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId))
+        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
+            console.log('点击了原生广告', this.nativeAdResult.adId)
             this.native.reportAdClick({
                 adId: this.nativeAdResult.adId
             })
+        }
     }
 
 

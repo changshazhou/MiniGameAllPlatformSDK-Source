@@ -9,7 +9,7 @@ export default class WXAdModule extends AdModule {
                 cb(res)
                 console.log('WXAdModule getRemoteAd', res)
             },
-            () => {
+            (error) => {
                 this.repairAd(cb);
                 console.log('getRemoteAd fail');
             },
