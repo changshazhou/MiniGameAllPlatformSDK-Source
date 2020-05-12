@@ -18,7 +18,7 @@ export default class OPPOModule extends PlatformModule {
     private interLoadedShow: boolean = false;
     constructor() {
         super();
-
+        this._regisiterWXCallback();
         this.initAdService();
     }
 
@@ -694,9 +694,10 @@ export default class OPPOModule extends PlatformModule {
     private mClickedNativeCallback: Function
     private mIsClickedNative: boolean = false;
     private onAppShow() {
-        this.mIsClickedNative = false;
-        if (this.mIsClickedNative && Common.isFunction(this.mClickedNativeCallback)) {
-            this.mClickedNativeCallback();
+        if (this.mIsClickedNative) {
+            this.mIsClickedNative = false;
+            if (Common.isFunction(this.mClickedNativeCallback))
+                this.mClickedNativeCallback();
         }
     }
 }

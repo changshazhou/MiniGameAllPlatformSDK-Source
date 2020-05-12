@@ -120,6 +120,8 @@ export default class QQModule extends PlatformModule {
                     });
             }
             else {
+                if (Common.isFunction(this.mOnBoxCallback))
+                    this.mOnBoxCallback(-1);
                 console.log('后台不允许显示Box，如有需要请联系运营')
             }
 
@@ -128,6 +130,6 @@ export default class QQModule extends PlatformModule {
     private mOnBoxCallback: Function
     private onBoxClose() {
         if (Common.isFunction(this.mOnBoxCallback))
-            this.mOnBoxCallback();
+            this.mOnBoxCallback(0);
     }
 }

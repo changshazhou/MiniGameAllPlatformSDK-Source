@@ -729,13 +729,15 @@ export default class PlatformModule extends BaseModule {
     /**
      * 注册微信各种回调
      */
-    private _regisiterWXCallback() {
+    public _regisiterWXCallback() {
+        console.log('register callback ', this.platformName, !!window[this.platformName])
         if (!window[this.platformName]) return;
         this._regisiterOnShow();
         this._regisiterOnHide();
     }
 
     private _regisiterOnShow() {
+        console.log('register app on show ', !!window[this.platformName].onShow)
         if (!window[this.platformName].onShow) return;
         let self = this;
         window[this.platformName].onShow((res) => {
@@ -752,6 +754,7 @@ export default class PlatformModule extends BaseModule {
 
     private _regisiterOnHide() {
 
+        console.log('register app on hide ', !!window[this.platformName].onShow)
         if (!window[this.platformName].onHide) return;
         let self = this;
         window[this.platformName].onHide(self._onHideCallback.bind(this));
