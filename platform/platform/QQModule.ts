@@ -32,8 +32,9 @@ export default class QQModule extends PlatformModule {
 
         });
         if (this.banner) {
-            this.banner.show()
-                .then(() => {
+            let t = this.banner.show();
+            if (t)
+                t.then(() => {
                     this._resetBanenrStyle({
 
                     });
