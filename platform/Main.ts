@@ -21,6 +21,8 @@ import { VIDEO_STATUS } from "./enum/VIDEO_STATUS";
 import { SHARE_MSG } from "./enum/SHARE_MSG";
 import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
+import EventModule from "./framework/EventModule";
+import EventType from "./utils/EventType";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -29,20 +31,23 @@ class Main {
     public BANNER_POSITION = BANNER_POSITION;
     public SHARE_CHANNEL = SHARE_CHANNEL;
     public APP_PLATFORM = PlatformType;
+    public PLATFORM_EVENT = EventType;
     /**
      * 获取当前的游戏平台
      */
-    public getAppPlatform(): PlatformType {
+public getAppPlatform(): PlatformType {
         return Common.platform;
     }
     constructor() {
         (window["moosnow"]) = this;
 
+        this.mData = new GameDataCenter();
+        this.mSetting = new SettingModule();
+        this.mEvent = new EventModule();
+
         this.initPlatform();
         this.initHttp();
         this.initAd();
-        this.mData = new GameDataCenter();
-        this.mSetting = new SettingModule();
     }
 
     private initHttp() {
@@ -126,7 +131,10 @@ class Main {
     public get setting() {
         return this.mSetting;
     }
-
+    private mEvent: EventModule;
+    public get event() {
+        return this.mEvent;
+    }
 
 
 }

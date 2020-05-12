@@ -4,6 +4,7 @@ import Common from "../utils/Common";
 import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
+import EventType from "../utils/EventType";
 
 export default class OPPOModule extends PlatformModule {
 
@@ -83,6 +84,8 @@ export default class OPPOModule extends PlatformModule {
             })
         }
 
+
+        moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
     public prevNavigate = Date.now();
@@ -552,5 +555,148 @@ export default class OPPOModule extends PlatformModule {
 
     public showAutoBanner() {
         console.log(' oppo 不支持自动')
+    }
+
+    public reportMonitor(name: string, value: string) {
+        if (!window[this.platformName])
+            return;
+        if (!window[this.platformName].reportMonitor)
+            return;
+        window[this.platformName].reportMonitor('game_scene', 0)
+    }
+
+    public _prepareNative() {
+        if (!window[this.platformName]) return;
+        if (typeof window[this.platformName].createNativeAd != "function") return;
+        this.native = window[this.platformName].createNativeAd({
+            adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
+        })
+        this.native.onLoad(this._onNativeLoad.bind(this));
+        this.native.onError(this._onNativeError.bind(this));
+        this.nativeLoading = true;
+        // this.native.load()
+    }
+
+    public _onNativeLoad(res) {
+        this.nativeLoading = false;
+        console.log(`加载原生广告成功`, res)
+        if (res && res.adList && res.adList.length > 0) {
+            this.nativeAdResult = res.adList[0];
+            if (!Common.isEmpty(this.nativeAdResult.adId)) {
+                console.log(`上报原生广告`)
+                this.native.reportAdShow({
+                    adId: this.nativeAdResult.adId
+                });
+            }
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(Common.deepCopy(this.nativeAdResult))
+            }
+        }
+        else {
+            console.log(`原生广告数据没有，回调Null`)
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(null)
+            }
+        }
+    }
+
+    public _onNativeError(err) {
+        this.nativeLoading = false;
+        this.nativeAdResult = null;
+        if (err.code == 20003) {
+            if (this.nativeIdIndex < this.nativeId.length - 1) {
+                console.log(`原生广告加载出错 `, err, '使用新ID加载原生广告')
+                this.nativeIdIndex += 1;
+                this._destroyNative();
+                this._prepareNative();
+            }
+            else {
+                console.log(`原生广告ID已经用完，本次没有广告`)
+                this.nativeIdIndex = 0;
+                if (Common.isFunction(this.nativeCb)) {
+                    this.nativeCb(null)
+                }
+
+            }
+
+        }
+        else {
+            console.log(`原生广告加载出错，本次没有广告`, err)
+            if (Common.isFunction(this.nativeCb)) {
+                this.nativeCb(null)
+            }
+        }
+    }
+
+    public _destroyNative() {
+        this.nativeLoading = false;
+        this.native.offLoad() // 移除原生广告加载成功回调
+        this.native.offError() // 移除失败回调
+        this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
+        console.log('原生广告销毁')
+    }
+
+    /**
+    * 目前只有OPPO平台有此功能
+    * 返回原生广告数据，开发者根据返回的数据来展现
+    * 没有广告返回null
+    * 
+    * 
+    * 例如 cocos
+    * let adData=moosnow.platform.getNativeAd();
+    * cc.loader.load(adData.imgUrlList[0], (err, texture) => {
+    *   adImg.active = true
+    *   adImg.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(texture)
+    * })
+    * 
+    * 例如 laya
+    * let adData=moosnow.platform.getNativeAd();
+    * new Laya.Image().skin=adData.imgUrlList[0];
+    * 
+    * @param callback 回调函数
+    */
+    public showNativeAd(callback: Function) {
+        this.nativeCb = callback;
+        if (this.native)
+            this.native.load();
+        // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
+        //     let nativeData = Common.deepCopy(this.nativeAdResult)
+        //     callback(nativeData)
+        // }
+    }
+
+    /**
+     * 目前只有OPPO平台有此功能 
+     * 用户点击了展示原生广告的图片时，使用此方法
+     * 例如 cocos
+     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     *     moosnow.platform.clickNative();
+     * }, this)
+     * 
+     * 
+     * 例如 laya
+     * (new Laya.Image()).on(Laya.Event.MOUSE_UP, this, () => {
+     *     moosnow.platform.clickNative();
+     * })
+     * 
+     */
+    public clickNative(callback?: Function) {
+
+        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
+            this.mClickedNativeCallback = callback;
+            this.mIsClickedNative = true;
+            console.log('点击了原生广告', this.nativeAdResult.adId)
+            this.native.reportAdClick({
+                adId: this.nativeAdResult.adId
+            })
+        }
+    }
+    private mClickedNativeCallback: Function
+    private mIsClickedNative: boolean = false;
+    private onAppShow() {
+        this.mIsClickedNative = false;
+        if (this.mIsClickedNative && Common.isFunction(this.mClickedNativeCallback)) {
+            this.mClickedNativeCallback();
+        }
     }
 }

@@ -33,11 +33,11 @@ export default class QQModule extends PlatformModule {
         });
         if (this.banner) {
             this.banner.show()
-            .then(() => {
-                this._resetBanenrStyle({
+                .then(() => {
+                    this._resetBanenrStyle({
 
-                });
-            })
+                    });
+                })
         }
     }
     public _bottomCenterBanner(size) {
@@ -97,5 +97,37 @@ export default class QQModule extends PlatformModule {
             }
         });
         return banner;
+    }
+
+    /**
+     * 盒子广告
+     */
+    public showAppBox(callback?: Function) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createAppBox) return;
+        this.mOnBoxCallback = callback;
+        moosnow.http.getAllConfig(res => {
+            if (res && res.showAppBox == 1) {
+                if (!this.box) {
+                    this.box = window[this.platformName].createAppBox({
+                        adUnitId: this.moosnowConfig.boxId
+                    })
+                    this.box.onClose(this.onBoxClose.bind(this))
+                }
+                this.box.load()
+                    .then(() => {
+                        this.box.show();
+                    });
+            }
+            else {
+                console.log('后台不允许显示Box，如有需要请联系运营')
+            }
+
+        })
+    }
+    private mOnBoxCallback: Function
+    private onBoxClose() {
+        if (Common.isFunction(this.mOnBoxCallback))
+            this.mOnBoxCallback();
     }
 }

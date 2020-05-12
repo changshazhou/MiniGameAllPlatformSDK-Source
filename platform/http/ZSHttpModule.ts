@@ -55,6 +55,7 @@ export class ZSHttpModule extends HttpModule {
                 (res) => {
                     let enabled = res.data.zs_version == moosnow.platform.moosnowConfig.version;
                     this.cfgData = {
+
                         ...Common.deepCopy(res.data),
                         mistouchNum: res.data.zs_switch,
                         mistouchPosNum: res.data.zs_switch,
@@ -63,7 +64,10 @@ export class ZSHttpModule extends HttpModule {
                         showExportAd: enabled,
                         lureNative: res.zs_native_click_switch == 1,
                         lureExportAd: res.zs_jump_switch == 1,
-                        bannerShowCountLimit: 3
+                        bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit
+                    }
+                    if (moosnow.platform) {
+                        moosnow.platform.bannerShowCountLimit = parseInt(res.data.bannerShowCountLimit);
                     }
                     callback(this.cfgData);
                 },

@@ -8,6 +8,7 @@ import nativeAdRow from "../model/nativeAdRow";
 import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
+import EventType from "../utils/EventType";
 
 
 
@@ -735,6 +736,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     private _regisiterOnShow() {
+        if (!window[this.platformName].onShow) return;
         let self = this;
         window[this.platformName].onShow((res) => {
             self._onShowCallback(res);
@@ -743,19 +745,23 @@ export default class PlatformModule extends BaseModule {
 
     private _onShowCallback(res) {
         this._onShareback();
+        console.log('on show ', res)
         //Lite.log.log('WX_show:', res);
-        // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, res);
+        moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, res);
     }
 
     private _regisiterOnHide() {
+
+        if (!window[this.platformName].onHide) return;
         let self = this;
         window[this.platformName].onHide(self._onHideCallback.bind(this));
     }
 
     private _onHideCallback(res) {
         //Lite.log.log('WX_hide');
-        // Lite.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
-        let isOpend = (res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50
+        moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
+        console.log('on hide ', res)
+        let isOpend = res && ((res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50)
         if (isOpend) {
             moosnow.http.clickBanner();
         }
@@ -1097,74 +1103,15 @@ export default class PlatformModule extends BaseModule {
 
 
     public _prepareNative() {
-        if (!window[this.platformName]) return;
-        if (typeof window[this.platformName].createNativeAd != "function") return;
-        this.native = qg.createNativeAd({
-            adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
-        })
-        this.native.onLoad(this._onNativeLoad.bind(this));
-        this.native.onError(this._onNativeError.bind(this));
-        this.nativeLoading = true;
-        // this.native.load()
     }
 
     public _onNativeLoad(res) {
-        this.nativeLoading = false;
-        console.log(`加载原生广告成功`, res)
-        if (res && res.adList && res.adList.length > 0) {
-            this.nativeAdResult = res.adList[0];
-            if (!Common.isEmpty(this.nativeAdResult.adId)) {
-                console.log(`上报原生广告`)
-                this.native.reportAdShow({
-                    adId: this.nativeAdResult.adId
-                });
-            }
-            if (Common.isFunction(this.nativeCb)) {
-                this.nativeCb(Common.deepCopy(this.nativeAdResult))
-            }
-        }
-        else {
-            console.log(`原生广告数据没有，回调Null`)
-            if (Common.isFunction(this.nativeCb)) {
-                this.nativeCb(null)
-            }
-        }
     }
 
     public _onNativeError(err) {
-        this.nativeLoading = false;
-        this.nativeAdResult = null;
-        if (err.code == 20003) {
-            if (this.nativeIdIndex < this.nativeId.length - 1) {
-                console.log(`原生广告加载出错 `, err, '使用新ID加载原生广告')
-                this.nativeIdIndex += 1;
-                this._destroyNative();
-                this._prepareNative();
-            }
-            else {
-                console.log(`原生广告ID已经用完，本次没有广告`)
-                this.nativeIdIndex = 0;
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(null)
-                }
-
-            }
-
-        }
-        else {
-            console.log(`原生广告加载出错，本次没有广告`, err)
-            if (Common.isFunction(this.nativeCb)) {
-                this.nativeCb(null)
-            }
-        }
     }
 
-    private _destroyNative() {
-        this.nativeLoading = false;
-        this.native.offLoad() // 移除原生广告加载成功回调
-        this.native.offError() // 移除失败回调
-        this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
-        console.log('原生广告销毁')
+    public _destroyNative() {
     }
 
     /**
@@ -1187,13 +1134,8 @@ export default class PlatformModule extends BaseModule {
      * @param callback 回调函数
      */
     public showNativeAd(callback: Function) {
-        this.nativeCb = callback;
-        if (this.native)
-            this.native.load();
-        // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
-        //     let nativeData = Common.deepCopy(this.nativeAdResult)
-        //     callback(nativeData)
-        // }
+        if (Common.isFunction(callback))
+            callback();
     }
     /**
      * 目前只有OPPO平台有此功能 
@@ -1210,42 +1152,28 @@ export default class PlatformModule extends BaseModule {
      * })
      * 
      */
-    public clickNative() {
-        if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
-            console.log('点击了原生广告', this.nativeAdResult.adId)
-            this.native.reportAdClick({
-                adId: this.nativeAdResult.adId
-            })
-        }
+    public clickNative(callback?: Function) {
     }
 
 
 
     /**
      * 盒子广告
+     * @param callback 
      */
-    public showAppBox() {
-        if (!window[this.platformName]) return;
-        if (typeof window[this.platformName].createAppBox != "function") return;
-        moosnow.http.getAllConfig(res => {
-            if (res.showAppBox == 1) {
-                if (!this.box) {
-                    this.box = window[this.platformName].createAppBox({
-                        adUnitId: this.moosnowConfig.boxId
-                    })
-
-                }
-                this.box.load().then(() => {
-                    this.box.show();
-                });
-            }
-            else {
-                console.log('后台不允许显示Box，如有需要请联系运营')
-            }
-
-        })
+    public showAppBox(callback?: Function) {
+        if (Common.isFunction(callback))
+            callback();
     }
 
+    /**
+     * 平台数据上报
+     * @param name 
+     * @param value 
+     */
+    public reportMonitor(name?: string, value?: string) {
+
+    }
 
 
     //----自定义--
