@@ -14,6 +14,7 @@ export default class TTModule extends PlatformModule {
 
     constructor() {
         super();
+        this._regisiterWXCallback();
         this.initBanner();
         this.initRecord();
         this.initInter();

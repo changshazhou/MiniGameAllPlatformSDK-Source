@@ -10,6 +10,7 @@ export default class WXModule extends PlatformModule {
     private versionRet: boolean = null;
     constructor() {
         super();
+        this._regisiterWXCallback();
         this.initBanner();
         this.initInter();
     }

@@ -19,7 +19,7 @@ export default class PlatformModule extends BaseModule {
     constructor() {
         super();
         this.initAppConfig();
-        this._regisiterWXCallback();
+        // this._regisiterWXCallback();
         this.initShare(true);
         this.share_clickTime = null; //分享拉起时间
         this.currentShareCallback = null; //模拟分享回调
@@ -234,10 +234,10 @@ export default class PlatformModule extends BaseModule {
     public prevNavigate = Date.now();
     /**
      * 跳转到指定App
-     * @param row 
-     * @param success 
-     * @param fail 
-     * @param complete 
+     * @param row  跳转数据
+     * @param success  跳转成功
+     * @param fail 跳转失败
+     * @param complete  跳转完成
      */
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 

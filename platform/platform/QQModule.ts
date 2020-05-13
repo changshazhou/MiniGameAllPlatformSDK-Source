@@ -7,9 +7,37 @@ export default class QQModule extends PlatformModule {
     public platformName: string = "qq";
     constructor() {
         super();
-
+        this._regisiterWXCallback();
         this.initBanner();
 
+    }
+    public _createBannerAd() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createBannerAd) return;
+
+        let height = this.bannerHeigth = Math.round(this.bannerWidth / 300 * 72.8071);
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.screenWidth;
+        let windowHeight = wxsys.screenHeight;
+        let centerPos = (windowWidth - this.bannerWidth) / 2;
+        let top = windowHeight - height / 2;
+        if (Common.isEmpty(this.bannerId)) {
+            console.warn('banner id is null')
+            return;
+        }
+        console.log('create banner by banner id ', this.bannerId)
+        let style = {
+            top: top,
+            left: centerPos,
+            width: this.bannerWidth,
+            height: height
+        }
+        console.log('create banner style ', style)
+        let banner = window[this.platformName].createBannerAd({
+            adUnitId: this.bannerId,
+            style: style
+        });
+        return banner;
     }
 
     /**
@@ -42,19 +70,10 @@ export default class QQModule extends PlatformModule {
         }
     }
     public _bottomCenterBanner(size) {
-        console.log('size', size)
-        if (Common.isEmpty(size)) {
-            console.log('设置的banner尺寸为空,不做调整')
-            return;
-        }
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        this.bannerWidth = size.width;
-        this.bannerHeigth = size.height;
-        this.banner.style.left = (windowWidth - size.width) / 2;
-        console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
-
+        // 尺寸调整时会触发回调         
+        // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
+        console.log('Resize后正式宽高:', size.width, size.height);
+        // this._resetBanenrStyle(size);
     }
 
     public _resetBanenrStyle(size) {
@@ -71,34 +90,11 @@ export default class QQModule extends PlatformModule {
             top = 0;
         else
             top = this.bannerStyle.top;
-        if (this.banner)
+        if (this.banner && this.banner.style)
             this.banner.style.top = top;
     }
 
-    public _createBannerAd() {
-        if (!window[this.platformName]) return;
-        if (!window[this.platformName].createBannerAd) return;
 
-        let height = Math.round(this.bannerWidth / 300 * 72.8071);
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.screenWidth;
-        let windowHeight = wxsys.screenHeight;
-        let centerPos = (windowWidth - this.bannerWidth) / 2;
-        let top = windowHeight - height;
-        if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
-            return;
-        }
-        let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
-            style: {
-                top: top,
-                lef: centerPos,
-                width: this.bannerWidth
-            }
-        });
-        return banner;
-    }
 
     /**
      * 盒子广告
