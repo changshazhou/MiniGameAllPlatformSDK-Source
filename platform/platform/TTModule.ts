@@ -38,16 +38,19 @@ export default class TTModule extends PlatformModule {
 
 
     public _bottomCenterBanner(size) {
+        console.log('resize ', size)
         if (this.bannerWidth != size.width) {
             let wxsys = this.getSystemInfoSync();
             let windowWidth = wxsys.windowWidth;
             let windowHeight = wxsys.windowHeight;
             if (this.banner) {
-                this.banner.style.top = windowHeight - (size.width / 16 * 9);
+                this.banner.style.top = windowHeight - size.height - 10;// (size.width / 16 * 9);
                 this.banner.style.left = (windowWidth - size.width) / 2;
             }
 
         }
+        if (!isNaN(size.height))
+            this.bannerHeigth = size.height + 10;
     }
 
     public initRecord() {
