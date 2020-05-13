@@ -872,11 +872,17 @@ export default class PlatformModule extends BaseModule {
             top = (windowHeight - this.bannerHeigth) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
-        else
-            top = this.bannerStyle.top;
 
-        this.banner.style.top = top;
-        console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+        if (this.bannerStyle) {
+            this.banner.style = this.bannerStyle;
+        }
+        else {
+            this.banner.style.top = top;
+            console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+        }
+
+
+
     }
 
 
