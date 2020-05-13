@@ -1161,10 +1161,11 @@ export default class PlatformModule extends BaseModule {
 
 
     /**
-     * 盒子广告
-     * @param callback 
-     */
-    public showAppBox(callback?: Function) {
+    * 盒子广告
+    * @param callback 关闭回调
+    * @param remoteOn 被后台开关控制
+    */
+    public showAppBox(callback?: Function, remoteOn: boolean = true) {
         if (Common.isFunction(callback))
             callback();
     }

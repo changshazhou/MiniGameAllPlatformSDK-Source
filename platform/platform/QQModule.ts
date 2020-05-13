@@ -98,13 +98,34 @@ export default class QQModule extends PlatformModule {
 
     /**
      * 盒子广告
+     * @param callback 关闭回调
+     * @param remoteOn 被后台开关控制
      */
-    public showAppBox(callback?: Function) {
+    public showAppBox(callback?: Function, remoteOn: boolean = true) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createAppBox) return;
         this.mOnBoxCallback = callback;
         moosnow.http.getAllConfig(res => {
-            if (res && res.showAppBox == 1) {
+            if (remoteOn) {
+                if (res && res.showAppBox == 1) {
+                    if (!this.box) {
+                        this.box = window[this.platformName].createAppBox({
+                            adUnitId: this.moosnowConfig.boxId
+                        })
+                        this.box.onClose(this.onBoxClose.bind(this))
+                    }
+                    this.box.load()
+                        .then(() => {
+                            this.box.show();
+                        });
+                }
+                else {
+                    if (Common.isFunction(this.mOnBoxCallback))
+                        this.mOnBoxCallback(-1);
+                    console.log('后台不允许显示Box，如有需要请联系运营')
+                }
+            }
+            else {
                 if (!this.box) {
                     this.box = window[this.platformName].createAppBox({
                         adUnitId: this.moosnowConfig.boxId
@@ -116,14 +137,10 @@ export default class QQModule extends PlatformModule {
                         this.box.show();
                     });
             }
-            else {
-                if (Common.isFunction(this.mOnBoxCallback))
-                    this.mOnBoxCallback(-1);
-                console.log('后台不允许显示Box，如有需要请联系运营')
-            }
-
         })
     }
+
+
     private mOnBoxCallback: Function
     private onBoxClose() {
         if (Common.isFunction(this.mOnBoxCallback))
