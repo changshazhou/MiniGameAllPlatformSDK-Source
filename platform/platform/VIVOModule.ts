@@ -55,9 +55,9 @@ export default class VIVOModule extends PlatformModule {
         }
     }
     private initAdService() {
-        this.initBanner();
-        this.initInter();
-        this._prepareNative();
+        // this.initBanner();
+        // this.initInter();
+        // this._prepareNative();
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
@@ -629,6 +629,11 @@ export default class VIVOModule extends PlatformModule {
         this.nativeCb = callback;
         if (this.native)
             this.native.load();
+        else {
+            this._prepareNative();
+            if (this.native)
+                this.native.load();
+        }
         // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
         //     let nativeData = Common.deepCopy(this.nativeAdResult)
         //     callback(nativeData)

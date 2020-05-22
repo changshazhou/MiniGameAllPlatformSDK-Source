@@ -230,4 +230,32 @@ export default class Common {
             }, this)
         ))
     }
+
+    static formatMoney(value: number) {
+        let retValue: any = "0";
+        if (isNaN(value))
+            value = 0;
+        if (value < 9999) {
+            retValue = parseInt(`${value}`);
+        }
+        else if (value < 9999999) {
+            retValue = parseFloat(`${value / 1000}`).toFixed(2) + "K";
+        }
+        else if (value < 9999999999) {
+            retValue = parseFloat(`${value / 1000000}`).toFixed(2) + "M";
+        }
+        else if (value < 9999999999999) {
+            retValue = parseFloat(`${value / 1000000000}`).toFixed(2) + "G";
+        }
+        else if (value < 9999999999999999) {
+            retValue = parseFloat(`${value / 1000000000000}`).toFixed(2) + "T";
+        }
+        else if (value < 9999999999999999999)
+            retValue = parseFloat(`${value / 1000000000000000}`).toFixed(2) + "P";
+        else if (value < 9999999999999999999999)
+            retValue = parseFloat(`${value / 1000000000000000000}`).toFixed(2) + "E";
+        else
+            retValue = parseFloat(`${value / 1000000000000000000000}`).toFixed(2) + "B";
+        return retValue;
+    }
 }

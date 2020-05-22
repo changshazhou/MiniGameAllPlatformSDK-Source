@@ -4,7 +4,7 @@ const { ccclass, property } = cc._decorator;
 class FormModel {
     public name: string = "";
     public node: cc.Node = null;
-    public UIForm: UIForm = null;
+    public UIForm: IUIForm = null;
     public zIndex: number = 0;
     constructor() {
         this.name = "";
@@ -14,10 +14,9 @@ class FormModel {
     }
 
 }
-import BaseModule from '../../../framework/BaseModule'
-import ToastForm from '../../../../dist/ui/ToastForm';
-import UIForm from '../../../../dist/ui/cocos/adFrom';
 import Common from '../../../utils/Common';
+import CocosToastForm from './CocosToastForm';
+import CocosUIForm from './CocosUIForm';
 /**
   * HASDO:
   * 1栈方式管理UI，
@@ -36,7 +35,7 @@ import Common from '../../../utils/Common';
   * 2连续push相同UI（待测试）
   */
 @ccclass
-export class UIModule extends BaseModule {
+export class CocosUIModule extends cc.Component implements IUIModule {
 
     @property(cc.Node)
     rootCanvas: cc.Node = null;
@@ -44,7 +43,7 @@ export class UIModule extends BaseModule {
     constructor() {
         super();
         this.layerIndex = 0;
-        this.UIRoot = 'prefab/ui/';     //定义resources目录下存放UI预设的目录
+        this.UIRoot = 'moosnow/prefab/ui/';     //定义resources目录下存放UI预设的目录
         this.UIFormStack = [];
         this.cachedUIForms = [];
         this.toastForm = null;
@@ -53,7 +52,7 @@ export class UIModule extends BaseModule {
     public UIRoot: string = "";
     public UIFormStack: Array<any> = [];
     public cachedUIForms: Array<any> = [];
-    public toastForm: ToastForm = null;
+    public toastForm: any = null;
     start() {
         this.rootCanvas = cc.Canvas.instance.node;
     }
@@ -62,7 +61,7 @@ export class UIModule extends BaseModule {
         if (self.toastForm == null) {
             this._createUINode('toastForm', 1000, function (node, index) {
                 cc.Canvas.instance.node.addChild(node);
-                self.toastForm = node.getComponent(ToastForm);
+                self.toastForm = node.getComponent("toastForm");
                 node.zIndex = index;
                 self.toastForm.show(msg);
             });
@@ -70,35 +69,6 @@ export class UIModule extends BaseModule {
             self.toastForm.show(msg);
         }
     }
-    showLoading(title: string) {
-
-        if (window["wx"]) {
-            moosnow.platform.showLoading(title)
-        }
-        else {
-            moosnow.platform.showLoading(title)
-        }
-
-    }
-    hideLoading() {
-        if (window["wx"]) {
-            moosnow.platform.hideLoading();
-        }
-    }
-    showModal(title: string, content: string, cancelTitle: string, confirmTitle: string, confirm: () => {}) {
-        if (window["wx"]) {
-            moosnow.platform.showModal(title, content, cancelTitle, confirmTitle, confirm)
-        }
-    }
-
-    showModalWithoutCancel(title, content, confirmTitle, confirm) {
-        if (window["wx"]) {
-            moosnow.platform.showModalWithoutCancel(title, content, confirmTitle, confirm)
-        }
-    }
-
-
-
 
 
     /**
@@ -219,7 +189,7 @@ export class UIModule extends BaseModule {
         formModel.zIndex = formId;
         this.UIFormStack.push(formModel);
 
-        this._createUINode(name, formId, (node, index) => {
+        this._createUINode(name, formId, (node: cc.Node, index) => {
             for (let i = 0; i < self.UIFormStack.length; i++) {
                 const tempFormModel = self.UIFormStack[i];
                 if (tempFormModel.zIndex == index && tempFormModel.name == node.name) {
@@ -227,7 +197,10 @@ export class UIModule extends BaseModule {
                         this._removeStack(i);
                         return;
                     } else {
-                        let form = node.getComponent(UIForm);
+
+                        let form = node.getComponent(CocosUIForm);
+                        if (!form)
+                            form = node.addComponent(CocosUIForm)
                         form.formName = name;
                         tempFormModel.UIForm = form;
                         tempFormModel.node = node;

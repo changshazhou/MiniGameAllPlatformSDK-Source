@@ -1,12 +1,11 @@
-import Common from "../../utils/Common";
 
-export default class adFrom extends cc.Component  {
+export default class CocosAdFrom extends cc.Component implements IUIForm {
 
 
     public isPopEffect: boolean = false;
     public isMask: boolean = false;
     public fullView: boolean = true;
-    protected formName: string = "";
+    public formName: string = "";
     private maskName = "img_mask";
     constructor() {
         super();

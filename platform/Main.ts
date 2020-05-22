@@ -23,8 +23,11 @@ import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
-import LayaUIModule from "./ui/laya/LayaUIModule";
 import VIVOModule from "./platform/VIVOModule";
+import { CocosUIModule } from "./ui/cocos/common/CocosUIModule";
+import CocosUIForm from "./ui/cocos/common/CocosUIForm";
+import CocosFrom from "./ui/cocos/CocosForm";
+import CocosResourceModule from "./ui/cocos/CocosResourceModule";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -34,6 +37,7 @@ class Main {
     public SHARE_CHANNEL = SHARE_CHANNEL;
     public APP_PLATFORM = PlatformType;
     public PLATFORM_EVENT = EventType;
+    public UIForm = CocosUIForm
     /**
      * 获取当前的游戏平台
      */
@@ -46,11 +50,16 @@ class Main {
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();
-
-        // this.initUI();
+        this.initResource();
+        this.initUI();
         this.initPlatform();
         this.initHttp();
         this.initAd();
+    }
+
+
+    private initResource() {
+        this.mResource = new CocosResourceModule();
     }
 
     private initHttp() {
@@ -64,7 +73,7 @@ class Main {
     }
 
     private initPlatform() {
-        console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
+        // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
         if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
@@ -99,12 +108,9 @@ class Main {
         else
             this.mAd = new AdModule();
     }
-    // private initUI() {
-    //     if (window["Laya"])
-    //         this.mUi = new LayaUIModule();
-    //     else
-    //         this.mUi = new CocosUIModule();
-    // }
+    private initUI() {
+        this.mUi = new CocosUIModule();
+    }
 
     private mPlatform: PlatformModule;
     public get platform() {
@@ -134,6 +140,11 @@ class Main {
         return this.mData;
     }
 
+    private mResource: IResourceModule;
+    public get resource() {
+        return this.mResource;
+    }
+
     private mSetting: SettingModule = new SettingModule();
     /**
      * 本地持久化缓存
@@ -145,10 +156,15 @@ class Main {
     public get event() {
         return this.mEvent;
     }
-    // private mUi: UIModule;
-    // public get ui() {
-    //     return this.mUi;
-    // }
+    private mUi: IUIModule;
+    public get ui() {
+        return this.mUi;
+    }
+
+    private mForm: IForm = new CocosFrom();
+    public get form() {
+        return this.mForm;
+    }
 
 }
 new Main();
