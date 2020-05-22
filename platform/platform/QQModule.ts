@@ -105,6 +105,7 @@ export default class QQModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createAppBox) return;
         this.mOnBoxCallback = callback;
+        console.log("showAppBox");
         moosnow.http.getAllConfig(res => {
             if (remoteOn) {
                 if (res && res.showAppBox == 1) {
@@ -138,6 +139,31 @@ export default class QQModule extends PlatformModule {
                     });
             }
         })
+    }
+
+    public hideAppBox(callback?: Function) {
+        if (this.box) {
+            this.box.offClose(this.onBoxClose)
+            let promise = this.box.destroy();
+            console.log('box destroy ', promise)
+            if (promise) {
+                promise
+                    .then(() => {
+
+                        console.log('destroy successfully ', promise)
+                        this.box = null;
+                        if (Common.isFunction(callback))
+                            callback(true)
+                    })
+                    .catch(() => {
+                        console.log('destroy fail ', promise)
+                        this.box = null;
+                        if (Common.isFunction(callback))
+                            callback(false)
+                    })
+            }
+        }
+
     }
 
 

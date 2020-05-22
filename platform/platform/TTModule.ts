@@ -7,10 +7,12 @@ import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import appLaunchOption from "../model/appLaunchOption";
 
 export default class TTModule extends PlatformModule {
+
     public platformName: string = "tt";
     public recordRes: any = null;
     public recordCb: any = null;
     public recordNumber: number = 0;
+    public bannerWidth: number = 208;
 
     constructor() {
         super();
@@ -43,14 +45,14 @@ export default class TTModule extends PlatformModule {
             let wxsys = this.getSystemInfoSync();
             let windowWidth = wxsys.windowWidth;
             let windowHeight = wxsys.windowHeight;
+            this.bannerWidth = size.width;
             if (this.banner) {
-                this.banner.style.top = windowHeight - size.height - 10;// (size.width / 16 * 9);
+                this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+                this.banner.style.top = windowHeight - this.bannerHeigth;
                 this.banner.style.left = (windowWidth - size.width) / 2;
             }
 
         }
-        if (!isNaN(size.height))
-            this.bannerHeigth = size.height + 10;
     }
 
     public initRecord() {

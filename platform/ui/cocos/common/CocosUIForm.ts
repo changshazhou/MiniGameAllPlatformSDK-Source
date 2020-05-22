@@ -1,6 +1,6 @@
-import Common from "../../utils/Common";
+import Common from "../../../utils/Common";
 
-export default class adFrom extends cc.Component  {
+export default class CocosUIForm extends cc.Component {
 
 
     public isPopEffect: boolean = false;
@@ -31,7 +31,19 @@ export default class adFrom extends cc.Component  {
         let widget = mask.addComponent(cc.Widget);
         widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
         widget.left = widget.top = widget.right = widget.bottom = 0;
-
+        cc.loader.loadRes(skin, cc.SpriteFrame, (err, spriteFrame) => {
+            sprite.spriteFrame = spriteFrame;
+            sprite.type = cc.Sprite.Type.SLICED;
+            sprite.spriteFrame.insetBottom = 1;
+            sprite.spriteFrame.insetTop = 1;
+            sprite.spriteFrame.insetLeft = 1;
+            sprite.spriteFrame.insetRight = 1;
+            mask.width = this.node.width
+            mask.height = this.node.height
+            this.node.addChild(mask);
+            mask.name = this.maskName;
+            mask.zIndex = -1
+        })
         mask.on(cc.Node.EventType.TOUCH_START, this.onMaskMouseDown, this)
     }
 

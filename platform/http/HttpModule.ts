@@ -275,7 +275,11 @@ export class HttpModule extends BaseModule {
             var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
             this.request(url, {}, 'GET',
                 (res) => {
-                    this.cfgData = res;
+                    this.cfgData = {
+                        ...Common.deepCopy(res),
+                        zs_native_click_switch: res && res.lureNative ? res.lureNative : 0,
+                        zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0,
+                    };
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }

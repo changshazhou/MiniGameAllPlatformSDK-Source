@@ -23,6 +23,8 @@ import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
+import LayaUIModule from "./ui/laya/LayaUIModule";
+import VIVOModule from "./platform/VIVOModule";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -35,7 +37,7 @@ class Main {
     /**
      * 获取当前的游戏平台
      */
-public getAppPlatform(): PlatformType {
+    public getAppPlatform(): PlatformType {
         return Common.platform;
     }
     constructor() {
@@ -45,6 +47,7 @@ public getAppPlatform(): PlatformType {
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();
 
+        // this.initUI();
         this.initPlatform();
         this.initHttp();
         this.initAd();
@@ -61,11 +64,13 @@ public getAppPlatform(): PlatformType {
     }
 
     private initPlatform() {
-
+        console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
         if (Common.platform == PlatformType.WX)
             this.mPlatform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
             this.mPlatform = new OPPOModule();
+        else if (Common.platform == PlatformType.VIVO)
+            this.mPlatform = new VIVOModule();
         else if (Common.platform == PlatformType.OPPO_ZS) {
             this.mPlatform = new ZSOPPOModule();
         }
@@ -85,7 +90,7 @@ public getAppPlatform(): PlatformType {
     private initAd() {
         if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
             this.mAd = new WXAdModule();
-        else if (Common.platform == PlatformType.OPPO) {
+        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.VIVO) {
             this.mAd = new OPPOAdModule();
         }
         else if (Common.platform == PlatformType.OPPO_ZS) {
@@ -94,7 +99,12 @@ public getAppPlatform(): PlatformType {
         else
             this.mAd = new AdModule();
     }
-
+    // private initUI() {
+    //     if (window["Laya"])
+    //         this.mUi = new LayaUIModule();
+    //     else
+    //         this.mUi = new CocosUIModule();
+    // }
 
     private mPlatform: PlatformModule;
     public get platform() {
@@ -135,7 +145,10 @@ public getAppPlatform(): PlatformType {
     public get event() {
         return this.mEvent;
     }
-
+    // private mUi: UIModule;
+    // public get ui() {
+    //     return this.mUi;
+    // }
 
 }
 new Main();

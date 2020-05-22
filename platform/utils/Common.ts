@@ -127,47 +127,64 @@ export default class Common {
         return Object.prototype.toString.call(obj) === "[object String]";
     }
 
+    private static mPlatform: PlatformType
     /**
      * 获取当前的运行平台
      * PC状态下会返回debug平台
      * debug没有时 默认返回微信平台
      */
     static get platform(): PlatformType {
+        if (this.mPlatform) {
+            return this.mPlatform;
+        }
         let winCfg = window["moosnowConfig"];
         if (window['tt'])
-            return PlatformType.BYTEDANCE
+            this.mPlatform = PlatformType.BYTEDANCE
         else if (window['swan'])
-            return PlatformType.BAIDU
+            this.mPlatform = PlatformType.BAIDU
         else if (window['qq'])
-            return PlatformType.QQ
+            this.mPlatform = PlatformType.QQ
         else if (window['qg']) {
-            if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                return PlatformType.OPPO_ZS
-            else
-                return PlatformType.OPPO
+            if (window["qg"] && window["qg"].getSystemInfoSync) {
+                let sys = window["qg"].getSystemInfoSync();
+                console.log('平台判断', JSON.stringify(sys));
+                if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
+                    this.mPlatform = PlatformType.VIVO;
+                }
+            }
+            else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                this.mPlatform = PlatformType.OPPO_ZS
+            else {
+                this.mPlatform = PlatformType.OPPO
+            }
+
         }
         else if (window['wx'])
-            return PlatformType.WX
+            this.mPlatform = PlatformType.WX
         else {
             if (winCfg.debug && winCfg[winCfg.debug]) {
                 if (winCfg.debug == "wx")
-                    return PlatformType.WX
+                    this.mPlatform = PlatformType.WX
                 else if (winCfg.debug == "oppo")
                     if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                        return PlatformType.OPPO_ZS
+                        this.mPlatform = PlatformType.OPPO_ZS
                     else
-                        return PlatformType.OPPO
+                        this.mPlatform = PlatformType.OPPO
                 else if (winCfg.debug == "bd")
-                    return PlatformType.BAIDU
+                    this.mPlatform = PlatformType.BAIDU
                 else if (winCfg.debug == "byte")
-                    return PlatformType.BYTEDANCE
+                    this.mPlatform = PlatformType.BYTEDANCE
                 else if (winCfg.debug == "qq")
-                    return PlatformType.QQ
+                    this.mPlatform = PlatformType.QQ
+                else if (winCfg.debug == "vivo")
+                    this.mPlatform = PlatformType.VIVO
                 else
-                    return PlatformType.PC
+                    this.mPlatform = PlatformType.PC
             }
-            return PlatformType.PC
+            else
+                this.mPlatform = PlatformType.PC
         }
+        return this.mPlatform;
 
     }
     static deepCopy(obj): object | [] {
@@ -186,5 +203,31 @@ export default class Common {
             }
         }
         return objClone;
+    }
+
+    static popOpenAnim(node: cc.Node, callback?: Function) {
+
+        node.scale = 0.8;
+        node.runAction(
+            cc.sequence(
+                cc.scaleTo(0.1, 1.2, 1.2),
+                cc.scaleTo(0.1, 1, 1),
+                cc.callFunc(() => {
+                    if (callback)
+                        callback();
+                }, this)
+            )
+        )
+    }
+
+    static popCloseAnim(node: cc.Node, callback?: Function) {
+        node.scale = 1;
+        node.runAction(cc.sequence(
+            cc.scaleTo(0.1, 0, 0),
+            cc.callFunc(() => {
+                if (callback)
+                    callback();
+            }, this)
+        ))
     }
 }

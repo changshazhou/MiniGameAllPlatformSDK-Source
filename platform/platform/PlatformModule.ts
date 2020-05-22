@@ -109,6 +109,8 @@ export default class PlatformModule extends BaseModule {
             this.moosnowConfig = winCfg.wx;
         else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
             this.moosnowConfig = winCfg.oppo;
+        else if (Common.platform == PlatformType.VIVO)
+            this.moosnowConfig = winCfg.vivo;
         else if (Common.platform == PlatformType.QQ)
             this.moosnowConfig = winCfg.qq;
         else if (Common.platform == PlatformType.BAIDU)
@@ -897,13 +899,18 @@ export default class PlatformModule extends BaseModule {
         //     return;
         console.log('显示banner')
         this.bannerCb = callback;
-
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
         this.bannerPosition = position;
         this.bannerStyle = style;
+
+        if (this.mTimeoutId) {
+            clearTimeout(this.mTimeoutId);
+            this.mTimeoutId = null;
+        }
+
 
         if (this.banner) {
             // let wxsys = this.getSystemInfoSync();
@@ -929,6 +936,8 @@ export default class PlatformModule extends BaseModule {
             })
         }
     }
+
+    private mTimeoutId: number
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
@@ -941,7 +950,7 @@ export default class PlatformModule extends BaseModule {
                 moosnow.platform.showBanner();
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
 
-                setTimeout(() => {
+                this.mTimeoutId = setTimeout(() => {
                     console.log('自动隐藏时间已到，开始隐藏Banner')
                     if (this.isBannerShow) {
                         this.hideBanner();
@@ -1172,6 +1181,15 @@ export default class PlatformModule extends BaseModule {
     * @param remoteOn 被后台开关控制
     */
     public showAppBox(callback?: Function, remoteOn: boolean = true) {
+        if (Common.isFunction(callback))
+            callback();
+    }
+
+    /**
+     * 
+     * @param callback 
+     */
+    public hideAppBox(callback?: Function) {
         if (Common.isFunction(callback))
             callback();
     }

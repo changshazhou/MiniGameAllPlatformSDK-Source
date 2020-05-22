@@ -6,7 +6,7 @@ import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
 
-export default class OPPOModule extends PlatformModule {
+export default class VIVOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
@@ -55,36 +55,9 @@ export default class OPPOModule extends PlatformModule {
         }
     }
     private initAdService() {
-        if (!window[this.platformName])
-            return;
-
-        let self = this;
-        if (window[this.platformName].initAdService) {
-            window[this.platformName].initAdService({
-                isDebug: true,
-                appId: this.moosnowConfig.moosnowAppId,
-                success: (res) => {
-                    console.log(`初始化广告`);
-                    self.initBanner();
-                    self.initInter();
-                    self._prepareNative();
-                },
-                fail: (res) => {
-                    console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
-                },
-                complete: (res) => {
-                    console.log("initAdService  complete");
-                }
-            })
-        }
-        else {
-            console.log(`初始化广告`);
-            self.initBanner();
-            self.initInter();
-            self._prepareNative();
-        }
-
-
+        this.initBanner();
+        this.initInter();
+        this._prepareNative();
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
@@ -250,16 +223,7 @@ export default class OPPOModule extends PlatformModule {
 
     public _onBannerError(err) {
         console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
-        if (this.banner) {
-            this.banner.hide();
-            this.banner.offResize(this._bottomCenterBanner);
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.offHide();
-            this.banner.destroy();
-            this.banner = null;
-        }
-
+        this.destroyBanner();
     }
 
     public _prepareBanner() {
@@ -277,20 +241,36 @@ export default class OPPOModule extends PlatformModule {
             this.bannerWidth = windowWidth;
         }
         if (this.banner) {
-            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offSize(this._bottomCenterBanner);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
-            this.banner.offHide();
+            this.banner.offClose(this._onBannerClose)
         }
         this.banner = this._createBannerAd();
-        this.banner.onResize(this._bottomCenterBanner.bind(this));
-        this.banner.onError(this._onBannerError.bind(this));
-        this.banner.onLoad(this._onBannerLoad.bind(this));
-        this.banner.onHide(this._onBannerHide.bind(this));
+        if (this.banner) {
+            this.banner.onSize(this._bottomCenterBanner.bind(this));
+            this.banner.onError(this._onBannerError.bind(this));
+            this.banner.onLoad(this._onBannerLoad.bind(this));
+            this.banner.onClose(this._onBannerClose.bind(this))
+        }
+
     }
+
+    private mShowTime: number;
+    private mMinInterval: number = 10
     public _createBannerAd() {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
+        if (!this.mShowTime)
+            this.mShowTime = Date.now();
+        else {
+            if (Date.now() - this.mShowTime <= this.mMinInterval * 1000) {
+                console.log(`banner创建太频繁了 ${this.mMinInterval}秒内只能显示一次`)
+                return;
+            }
+        }
+
+
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
@@ -371,17 +351,20 @@ export default class OPPOModule extends PlatformModule {
         console.log('_resetBanenrStyle ', this.banner.style, 'set styleTop ', styleTop)
     }
 
+    public _onBannerClose() {
+        console.log('banner 已关闭 ')
+    }
+
     public _onBannerHide() {
         console.log('banner 已隐藏 ')
     }
 
     public destroyBanner() {
         if (this.banner) {
-            this.banner.hide();
             this.banner.offResize(this._bottomCenterBanner);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
-            this.banner.offHide();
+            this.banner.offClose(this._onBannerClose);
             this.banner.destroy();
             this.banner = null;
         }
@@ -394,60 +377,33 @@ export default class OPPOModule extends PlatformModule {
      * @param style 自定义样式
      */
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+
         console.log('显示banner')
         this.bannerCb = callback;
         this.isBannerShow = true;
-        if (!window[this.platformName]) {
-            return;
-        }
-        // this.bannerPosition = position;
-        // if (this.banner) {
-        //     if (this.bannerPosition != position) {
-        //         this.bannerPosition = position;
-        //         this.bannerStyle = style;
-        //         this.destroyBanner();
-        //         this._prepareBanner();
-        //         console.log('位置要更换,销毁重建');
-        //     }
-        // }
-        // else {
-        //     this.bannerPosition = position;
-        //     this.bannerStyle = style;
-        //     this.initBanner();
-        // }
-
+        if (!window[this.platformName]) return;
         if (this.banner) {
-            // let wxsys = this.getSystemInfoSync();
-            // let windowWidth = wxsys.windowWidth;
-            // let windowHeight = wxsys.windowHeight;
-            // if (position == BannerPosition.Bottom) {
-
-            // }
-            // this.banner.top = 1
-            // this.banner.hide();
-            // console.log('show banner style 1', this.banner.style)
-
-            // console.log('show banner style 2', this.banner.style)
-            // this.banner.hide();
-
-            this._resetBanenrStyle({
-                width: this.banner.style.width,
-                height: this.banner.style.height
+            let adshow = this.banner.show();
+            adshow && adshow.then(() => {
+                console.log("banner广告展示成功");
+            }).catch((err) => {
+                switch (err.code) {
+                    case 30003:
+                        console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入")
+                        break;
+                    case 30009:
+                        console.log("10秒内调用广告次数超过1次，10秒后再调用")
+                        break;
+                    case 30002:
+                        console.log("加载广告失败，重新加载广告")
+                        break;
+                    default:
+                        // 参考 https://minigame.vivo.com.cn/documents/#/lesson/open-ability/ad?id=广告错误码信息 对错误码做分类处理
+                        console.log("banner广告展示失败")
+                        console.log(JSON.stringify(err))
+                        break;
+                }
             });
-            this.banner.show()
-            setTimeout(() => {
-                this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.height
-                });
-            }, 500)
-
-            // .then(() => {
-            //     this._resetBanenrStyle({
-            //         width: this.banner.style.width,
-            //         height: this.banner.style.height
-            //     });
-            // })
         }
         else {
             this.initBanner();
@@ -463,16 +419,7 @@ export default class OPPOModule extends PlatformModule {
         this.bannerShowCount++;
         if (this.banner) {
             if (this.bannerShowCount >= this.bannerShowCountLimit) {
-                console.log('banner destroy');
-                this.banner.hide();
-                this.banner.offResize(this._bottomCenterBanner);
-                this.banner.offError(this._onBannerError);
-                this.banner.offLoad(this._onBannerLoad);
-                this.banner.offHide();
-                this.banner.destroy();
-                this.banner = null;
-                console.log('重新创建banner');
-                this._prepareBanner();
+                this.destroyBanner();
             } else {
                 this.banner.hide();
             }

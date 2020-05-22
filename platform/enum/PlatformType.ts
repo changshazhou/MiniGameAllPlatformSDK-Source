@@ -26,5 +26,9 @@ export enum PlatformType {
     /**
      * PC电脑
      */
-    PC
+    PC,
+    /**
+     * VIVO
+     */
+    VIVO
 }
