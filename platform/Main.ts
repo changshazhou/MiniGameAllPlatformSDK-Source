@@ -28,6 +28,8 @@ import { CocosUIModule } from "./ui/cocos/common/CocosUIModule";
 import CocosUIForm from "./ui/cocos/common/CocosUIForm";
 import CocosFrom from "./ui/cocos/CocosForm";
 import CocosResourceModule from "./ui/cocos/CocosResourceModule";
+import EntityModule from "./framework/EntityModule";
+import { AD_POSITION } from "../dist/enum/AD_POSITION";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -38,6 +40,8 @@ class Main {
     public APP_PLATFORM = PlatformType;
     public PLATFORM_EVENT = EventType;
     public UIForm = CocosUIForm
+    public Common = Common
+    public AD_POSITION = AD_POSITION;
     /**
      * 获取当前的游戏平台
      */
@@ -164,6 +168,11 @@ class Main {
     private mForm: IForm = new CocosFrom();
     public get form() {
         return this.mForm;
+    }
+
+    private mEntity: EntityModule = new EntityModule();
+    public get entity() {
+        return this.mEntity;
     }
 
 }

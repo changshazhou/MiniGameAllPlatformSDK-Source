@@ -1,11 +1,12 @@
 import UIForms from "../../enum/UIFORMS";
 import CocosAdFrom from "./CocosAdFrom";
+import EventType from "../../utils/EventType";
 
 export default class CocosFrom implements IForm {
 
 
     constructor() {
-        this.registerScript();
+        // this.registerScript();
     }
 
     public registerScript() {
@@ -22,15 +23,19 @@ export default class CocosFrom implements IForm {
     public showToast(msg: string) {
         moosnow.ui.showToast(msg)
     }
+    /**
+     * 
+     * @param params 
+     */
     public showAd(params: { showAd, callback }) {
         let ad = moosnow.ui.getUIFrom(UIForms.AdForm)
         if (!ad) {
             ad = moosnow.ui.pushUIForm(UIForms.AdForm, null, () => {
-                moosnow.event.sendEventImmediately("ON_AD_SHOW", { showAd: params.showAd, callback: params.callback })
+                moosnow.event.sendEventImmediately(EventType.ON_AD_SHOW, { showAd: params.showAd, callback: params.callback })
             })
         }
         else {
-            moosnow.event.sendEventImmediately("ON_AD_SHOW", { showAd: params.showAd, callback: params.callback })
+            moosnow.event.sendEventImmediately(EventType.ON_AD_SHOW, { showAd: params.showAd, callback: params.callback })
         }
 
     }

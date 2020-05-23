@@ -1,5 +1,6 @@
-import Common from "../../../utils/Common";
+const { ccclass, property } = cc._decorator;
 
+@ccclass
 export default class CocosUIForm extends cc.Component implements IUIForm {
 
 

@@ -2,6 +2,7 @@ export default class UIForms {
 
 
     private static get mapping() {
+        
         return {
             adForm: {
                 [moosnow.APP_PLATFORM.WX]: "adForm",
