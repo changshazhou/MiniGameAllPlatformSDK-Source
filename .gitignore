@@ -76,5 +76,4 @@ bin/3dAssets/
 node_modules/
 release/oppogame/
 release/wxgame/
-dist/
 *.zip

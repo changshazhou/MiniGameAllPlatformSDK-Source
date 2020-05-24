@@ -40,7 +40,6 @@ export class IUIModule extends BaseModule {
         this.UIFormStack = [];
         this.cachedUIForms = [];
         this.toastForm = null;
-        this.rootCanvas = cc.Canvas.instance.node;
     }
 
     public layerIndex: number = 0;

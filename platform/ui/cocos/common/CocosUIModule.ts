@@ -19,10 +19,9 @@ export class CocosUIModule extends IUIModule {
         this.UIFormStack = [];
         this.cachedUIForms = [];
         this.toastForm = null;
-        this.rootCanvas = cc.Canvas.instance.node;
     }
     start() {
 
     }
-  
+
 }
