@@ -40,15 +40,16 @@ export default class TTModule extends PlatformModule {
 
 
     public _bottomCenterBanner(size) {
-        console.log('resize ', size)
         if (this.bannerWidth != size.width) {
             let wxsys = this.getSystemInfoSync();
             let windowWidth = wxsys.windowWidth;
             let windowHeight = wxsys.windowHeight;
             this.bannerWidth = size.width;
+            this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+            let top = windowHeight - this.bannerHeigth - 10
+            console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
             if (this.banner) {
-                this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
-                this.banner.style.top = windowHeight - this.bannerHeigth;
+                this.banner.style.top = top;
                 this.banner.style.left = (windowWidth - size.width) / 2;
             }
 
@@ -100,7 +101,7 @@ export default class TTModule extends PlatformModule {
         let recordRes = this.recordRes
         this.record.onStop(res => {
             console.log('on stop ', res)
-            if (this.recordNumber >= 2) {
+            if (this.recordNumber >= 4) {
                 this.record.clipVideo({
                     path: res.videoPath,
                     success: (r) => {
@@ -231,7 +232,31 @@ export default class TTModule extends PlatformModule {
         this.mBannerLoaded = false;
         super._prepareBanner();
     }
+    public _resetBanenrStyle(size) {
+        if (Common.isEmpty(size)) {
+            console.log('设置的banner尺寸为空,不做调整')
+            return;
+        }
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let top = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            top = windowHeight - this.bannerHeigth - 10
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            top = (windowHeight - this.bannerHeigth) / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP)
+            top = 0;
 
+        if (this.bannerStyle) {
+            this.banner.style = this.bannerStyle;
+        }
+        else {
+            this.banner.style.top = top;
+            console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+        }
+    }
     /**
     * 
     * @param callback 点击回调

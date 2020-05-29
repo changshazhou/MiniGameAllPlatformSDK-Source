@@ -3,4 +3,5 @@ export declare const SHARE_CHANNEL: {
     VIDEO: string;
     TOKEN: string;
     LINK: string;
+    NONE: string;
 };
