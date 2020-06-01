@@ -21,4 +21,6 @@ export default class moosnowAdRow {
      * 位置描述
      */
     public position: string = "";
+    public onCancel: Function = null;
+
 }

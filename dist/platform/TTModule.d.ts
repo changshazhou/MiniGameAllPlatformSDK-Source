@@ -45,6 +45,7 @@ export default class TTModule extends PlatformModule {
     private mBannerLoaded;
     _onBannerLoad(): void;
     _prepareBanner(): void;
+    _resetBanenrStyle(size: any): void;
     /**
     *
     * @param callback 点击回调

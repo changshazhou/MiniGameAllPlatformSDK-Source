@@ -24,12 +24,13 @@ import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
 import VIVOModule from "./platform/VIVOModule";
-import { CocosUIModule } from "./ui/cocos/common/CocosUIModule";
-import CocosUIForm from "./ui/cocos/common/CocosUIForm";
-import CocosFrom from "./ui/cocos/CocosForm";
-import CocosResourceModule from "./ui/cocos/CocosResourceModule";
 import EntityModule from "./framework/EntityModule";
-import { AD_POSITION } from "../dist/enum/AD_POSITION";
+import { AD_POSITION } from "./enum/AD_POSITION";
+import moosnowForm from "./model/moosnowForm";
+import { BaseUIModule } from "./ui/engine/BaseUIModule";
+import BaseEntityModule from "./ui/engine/BaseEntityModule";
+import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
+import { CocosUIModule } from "./ui/cocos/CocosUIModule";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -39,7 +40,6 @@ class Main {
     public SHARE_CHANNEL = SHARE_CHANNEL;
     public APP_PLATFORM = PlatformType;
     public PLATFORM_EVENT = EventType;
-    public UIForm = CocosUIForm
     public Common = Common
     public AD_POSITION = AD_POSITION;
     /**
@@ -54,16 +54,20 @@ class Main {
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();
-        this.initResource();
-        this.initUI();
         this.initPlatform();
         this.initHttp();
         this.initAd();
+        this.initUI();
+        this.initEntity();
+
     }
 
+    private initUI() {
+        this.mUi = new CocosUIModule();
+    }
 
-    private initResource() {
-        this.mResource = new CocosResourceModule();
+    private initEntity() {
+        this.mEntity = new CocosEntityModule();
     }
 
     private initHttp() {
@@ -112,10 +116,6 @@ class Main {
         else
             this.mAd = new AdModule();
     }
-    private initUI() {
-        this.mUi = new CocosUIModule();
-    }
-
     private mPlatform: PlatformModule;
     public get platform() {
         return this.mPlatform;
@@ -160,17 +160,17 @@ class Main {
     public get event() {
         return this.mEvent;
     }
-    private mUi: IUIModule;
+    private mUi: BaseUIModule;
     public get ui() {
         return this.mUi;
     }
 
-    private mForm: IForm = new CocosFrom();
+    private mForm: moosnowForm = new moosnowForm();
     public get form() {
         return this.mForm;
     }
 
-    private mEntity: EntityModule = new EntityModule();
+    private mEntity: BaseEntityModule = new BaseEntityModule();
     public get entity() {
         return this.mEntity;
     }

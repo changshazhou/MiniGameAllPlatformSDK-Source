@@ -263,7 +263,7 @@
         PlatformType[PlatformType["VIVO"] = 7] = "VIVO";
     })(PlatformType || (PlatformType = {}));
 
-    var Common = /** @class */ (function () {
+    var Common$1 = /** @class */ (function () {
         function Common() {
         }
         //
@@ -556,6 +556,7 @@
         EventType.ON_PLATFORM_SHOW = "ON_PLATFORM_SHOW";
         EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
         EventType.ON_AD_SHOW = "ON_AD_SHOW";
+        EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
         return EventType;
     }());
 
@@ -626,17 +627,17 @@
         // }
         PlatformModule.prototype.initAppConfig = function () {
             var winCfg = window["moosnowConfig"];
-            if (Common.platform == PlatformType.WX)
+            if (Common$1.platform == PlatformType.WX)
                 this.moosnowConfig = winCfg.wx;
-            else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
+            else if (Common$1.platform == PlatformType.OPPO || Common$1.platform == PlatformType.OPPO_ZS)
                 this.moosnowConfig = winCfg.oppo;
-            else if (Common.platform == PlatformType.VIVO)
+            else if (Common$1.platform == PlatformType.VIVO)
                 this.moosnowConfig = winCfg.vivo;
-            else if (Common.platform == PlatformType.QQ)
+            else if (Common$1.platform == PlatformType.QQ)
                 this.moosnowConfig = winCfg.qq;
-            else if (Common.platform == PlatformType.BAIDU)
+            else if (Common$1.platform == PlatformType.BAIDU)
                 this.moosnowConfig = winCfg.bd;
-            else if (Common.platform == PlatformType.BYTEDANCE)
+            else if (Common$1.platform == PlatformType.BYTEDANCE)
                 this.moosnowConfig = winCfg.byte;
             else
                 this.moosnowConfig = winCfg.wx;
@@ -730,10 +731,10 @@
             return false;
         };
         PlatformModule.prototype.login = function (success, fail) {
-            if (Common.isFunction(success)) {
+            if (Common$1.isFunction(success)) {
                 var token = moosnow.data.getToken();
                 if (!token) {
-                    token = Common.generateUUID();
+                    token = Common$1.generateUUID();
                     token = token.replace(/-/g, '');
                     moosnow.data.setToken(token);
                 }
@@ -1325,7 +1326,7 @@
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var left = (windowWidth - this.bannerWidth) / 2;
-            if (Common.isEmpty(this.bannerId)) {
+            if (Common$1.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
@@ -1363,7 +1364,7 @@
             console.log('_bottomCenterBanner', this.banner.style);
         };
         PlatformModule.prototype._resetBanenrStyle = function (size) {
-            if (Common.isEmpty(size)) {
+            if (Common$1.isEmpty(size)) {
                 console.log('设置的banner尺寸为空,不做调整');
                 return;
             }
@@ -1498,7 +1499,7 @@
                 moosnow.platform.videoCb(VIDEO_STATUS.END);
                 return;
             }
-            if (Common.isEmpty(this.videoId)) {
+            if (Common$1.isEmpty(this.videoId)) {
                 console.warn(' video id is null');
                 moosnow.platform.videoCb(VIDEO_STATUS.END);
                 return;
@@ -1576,7 +1577,7 @@
                 return;
             if (!this.supportVersion('2.8.0'))
                 return;
-            if (Common.isEmpty(this.interId)) {
+            if (Common$1.isEmpty(this.interId)) {
                 console.warn('插屏广告ID为空，系统不加载');
                 return;
             }
@@ -1636,7 +1637,7 @@
          * @param callback 回调函数
          */
         PlatformModule.prototype.showNativeAd = function (callback) {
-            if (Common.isFunction(callback))
+            if (Common$1.isFunction(callback))
                 callback();
         };
         /**
@@ -1663,7 +1664,7 @@
         */
         PlatformModule.prototype.showAppBox = function (callback, remoteOn) {
             if (remoteOn === void 0) { remoteOn = true; }
-            if (Common.isFunction(callback))
+            if (Common$1.isFunction(callback))
                 callback();
         };
         /**
@@ -1671,7 +1672,7 @@
          * @param callback
          */
         PlatformModule.prototype.hideAppBox = function (callback) {
-            if (Common.isFunction(callback))
+            if (Common$1.isFunction(callback))
                 callback();
         };
         /**
@@ -1779,7 +1780,7 @@
                                 self.getUserToken(res.code, "", callback);
                             }
                             else {
-                                if (Common.isFunction(callback))
+                                if (Common$1.isFunction(callback))
                                     callback();
                             }
                         },
@@ -1819,11 +1820,11 @@
                 if (respone.code == 0 && respone.data && respone.data.user_id) {
                     moosnow.data.setToken(respone.data.user_id);
                 }
-                if (Common.isFunction(callback))
+                if (Common$1.isFunction(callback))
                     callback(respone);
             }, function () {
                 //如果出错，不影响游戏
-                if (Common.isFunction(callback))
+                if (Common$1.isFunction(callback))
                     callback({});
             });
         };
@@ -1941,7 +1942,7 @@
         AdModule.prototype.getAd = function (callback) {
             var _this = this;
             var cache = this.getCache();
-            if (!Common.isEmpty(cache.indexLeft)) {
+            if (!Common$1.isEmpty(cache.indexLeft)) {
                 var distinctAd = this.getDistinctAd(cache.indexLeft);
                 var temp = __assign(__assign({}, cache), { indexLeft: distinctAd });
                 callback(temp);
@@ -2115,16 +2116,16 @@
             _this.appid = "";
             _this.secret = "";
             _this.versionNumber = "";
-            _this.version = "1.2.3";
+            _this.version = "1.2.4";
             _this.baseUrl = "https://api.liteplay.com.cn/";
             _this.cfgData = null;
             _this.areaData = null;
-            if (Common.platform == PlatformType.PC) {
+            if (Common$1.platform == PlatformType.PC) {
                 var versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
                 _this.request(versionUrl, {}, 'GET', function (res) {
                     if (_this.version < res.version) {
                         console.warn("\u60A8\u7684SDK\u7248\u672C\u53F7[" + _this.version + "]\u4E0D\u662F\u6700\u65B0\u7248\u672C\uFF0C\u8BF7\u5C3D\u5FEB\u5347\u7EA7\uFF0C\u6700\u65B0\u7248\u672C[" + res.version + "]  \u4E0B\u8F7D\u5730\u5740\uFF1A" + res.download);
-                        if (!Common.isEmpty(res.memo))
+                        if (!Common$1.isEmpty(res.memo))
                             console.warn("" + res.memo);
                     }
                 });
@@ -2228,7 +2229,7 @@
          */
         HttpModule.prototype.postData = function (url) {
             var userToken = moosnow.data.getToken();
-            if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
+            if (!Common$1.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
                 try {
                     this.request("" + this.baseUrl + url, {
                         appid: moosnow.platform.moosnowConfig.moosnowAppId,
@@ -2249,7 +2250,7 @@
          */
         HttpModule.prototype.point = function (name, data) {
             if (data === void 0) { data = null; }
-            if (Common.platform == PlatformType.WX) {
+            if (Common$1.platform == PlatformType.WX) {
                 if (window['wx'] && window['wx'].aldSendEvent)
                     window['wx'].aldSendEvent(name, data);
             }
@@ -2259,7 +2260,7 @@
         * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
         */
         HttpModule.prototype.startGame = function (level) {
-            if (Common.platform == PlatformType.WX)
+            if (Common$1.platform == PlatformType.WX)
                 if (window['wx'] && window['wx'].aldStage)
                     window['wx'].aldStage.onStart({
                         stageId: level,
@@ -2275,7 +2276,7 @@
          * @param {boolean} isWin 是否成功
          */
         HttpModule.prototype.endGame = function (level, isWin) {
-            if (Common.platform != PlatformType.WX)
+            if (Common$1.platform != PlatformType.WX)
                 return;
             var event = isWin ? "complete" : "fail";
             var desc = isWin ? "关卡完成" : "关卡失败";
@@ -2299,7 +2300,7 @@
          * @param {string} level 关卡数
          */
         HttpModule.prototype.videoPoint = function (type, info, level) {
-            if (Common.platform != PlatformType.WX)
+            if (Common$1.platform != PlatformType.WX)
                 return;
             var name = type == 0 ? "点击视频" : "观看完成视频";
             if (window['wx'] && window['wx'].aldSendEvent)
@@ -2328,13 +2329,13 @@
         };
         HttpModule.prototype.loadCfg = function (callback) {
             var _this = this;
-            if (!Common.isEmpty(this.cfgData)) {
+            if (!Common$1.isEmpty(this.cfgData)) {
                 callback(this.cfgData);
             }
             else {
                 var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.lureNative ? res.lureNative : 0, zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0 });
+                    _this.cfgData = __assign(__assign({}, Common$1.deepCopy(res)), { zs_native_click_switch: res && res.lureNative ? res.lureNative : 0, zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0 });
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
@@ -2375,7 +2376,7 @@
             });
         };
         HttpModule.prototype.disabledForceExport = function (res, res2, callback) {
-            var curTime = Common.formatTime(new Date());
+            var curTime = Common$1.formatTime(new Date());
             var inDisabledRegion = false;
             if (res.disabledForceExport) {
                 for (var i = 0; i < res.disabledForceExport.length; i++) {
@@ -2456,7 +2457,7 @@
             });
         };
         HttpModule.prototype.disableAd = function (res, res2, callback) {
-            var curTime = Common.formatTime(new Date());
+            var curTime = Common$1.formatTime(new Date());
             var inDisabledRegion = false;
             if (res && res.disabledRegion) {
                 for (var i = 0; i < res.disabledRegion.length; i++) {
@@ -2766,7 +2767,7 @@
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
             var left = (windowWidth - this.bannerWidth) / 2;
-            if (Common.isEmpty(this.bannerId)) {
+            if (Common$1.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
@@ -2958,7 +2959,7 @@
                 this.video.offLoad(this._onVideoLoad);
             }
             else {
-                if (Common.isEmpty(this.videoId)) {
+                if (Common$1.isEmpty(this.videoId)) {
                     console.warn(' video id is null');
                     return;
                 }
@@ -2980,7 +2981,7 @@
             }
         };
         OPPOModule.prototype.prepareInter = function () {
-            if (Common.isEmpty(this.interId)) {
+            if (Common$1.isEmpty(this.interId)) {
                 console.warn('插屏广告ID为空，系统不加载');
                 return;
             }
@@ -3055,19 +3056,19 @@
             console.log("\u52A0\u8F7D\u539F\u751F\u5E7F\u544A\u6210\u529F", res);
             if (res && res.adList && res.adList.length > 0) {
                 this.nativeAdResult = res.adList[0];
-                if (!Common.isEmpty(this.nativeAdResult.adId)) {
+                if (!Common$1.isEmpty(this.nativeAdResult.adId)) {
                     console.log("\u4E0A\u62A5\u539F\u751F\u5E7F\u544A");
                     this.native.reportAdShow({
                         adId: this.nativeAdResult.adId
                     });
                 }
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                if (Common$1.isFunction(this.nativeCb)) {
+                    this.nativeCb(Common$1.deepCopy(this.nativeAdResult));
                 }
             }
             else {
                 console.log("\u539F\u751F\u5E7F\u544A\u6570\u636E\u6CA1\u6709\uFF0C\u56DE\u8C03Null");
-                if (Common.isFunction(this.nativeCb)) {
+                if (Common$1.isFunction(this.nativeCb)) {
                     this.nativeCb(null);
                 }
             }
@@ -3085,14 +3086,14 @@
                 else {
                     console.log("\u539F\u751F\u5E7F\u544AID\u5DF2\u7ECF\u7528\u5B8C\uFF0C\u672C\u6B21\u6CA1\u6709\u5E7F\u544A");
                     this.nativeIdIndex = 0;
-                    if (Common.isFunction(this.nativeCb)) {
+                    if (Common$1.isFunction(this.nativeCb)) {
                         this.nativeCb(null);
                     }
                 }
             }
             else {
                 console.log("\u539F\u751F\u5E7F\u544A\u52A0\u8F7D\u51FA\u9519\uFF0C\u672C\u6B21\u6CA1\u6709\u5E7F\u544A", err);
-                if (Common.isFunction(this.nativeCb)) {
+                if (Common$1.isFunction(this.nativeCb)) {
                     this.nativeCb(null);
                 }
             }
@@ -3148,7 +3149,7 @@
          *
          */
         OPPOModule.prototype.clickNative = function (callback) {
-            if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
+            if (this.nativeAdResult && !Common$1.isEmpty(this.nativeAdResult.adId)) {
                 this.mClickedNativeCallback = callback;
                 this.mIsClickedNative = true;
                 console.log('点击了原生广告', this.nativeAdResult.adId);
@@ -3160,7 +3161,7 @@
         OPPOModule.prototype.onAppShow = function () {
             if (this.mIsClickedNative) {
                 this.mIsClickedNative = false;
-                if (Common.isFunction(this.mClickedNativeCallback))
+                if (Common$1.isFunction(this.mClickedNativeCallback))
                     this.mClickedNativeCallback();
             }
         };
@@ -3178,7 +3179,7 @@
             return _this;
         }
         GameDataCenter.prototype.getToken = function () {
-            if (Common.isEmpty(this.mUserToken))
+            if (Common$1.isEmpty(this.mUserToken))
                 this.mUserToken = moosnow.setting.getString(this.TOKEN, "");
             return this.mUserToken;
         };
@@ -3388,7 +3389,7 @@
                 return;
             if (typeof window[this.platformName].createInterstitialAd != "function")
                 return;
-            if (Common.isEmpty(this.interId)) {
+            if (Common$1.isEmpty(this.interId)) {
                 console.warn('插屏广告ID为空，系统不加载');
                 return;
             }
@@ -3400,15 +3401,16 @@
             this.inter.load();
         };
         TTModule.prototype._bottomCenterBanner = function (size) {
-            console.log('resize ', size);
             if (this.bannerWidth != size.width) {
                 var wxsys = this.getSystemInfoSync();
                 var windowWidth = wxsys.windowWidth;
                 var windowHeight = wxsys.windowHeight;
                 this.bannerWidth = size.width;
+                this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+                var top_1 = windowHeight - this.bannerHeigth - 10;
+                console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top_1);
                 if (this.banner) {
-                    this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
-                    this.banner.style.top = windowHeight - this.bannerHeigth;
+                    this.banner.style.top = top_1;
                     this.banner.style.left = (windowWidth - size.width) / 2;
                 }
             }
@@ -3459,7 +3461,7 @@
             var recordRes = this.recordRes;
             this.record.onStop(function (res) {
                 console.log('on stop ', res);
-                if (_this.recordNumber >= 2) {
+                if (_this.recordNumber >= 4) {
                     _this.record.clipVideo({
                         path: res.videoPath,
                         success: function (r) {
@@ -3501,7 +3503,7 @@
             }
             console.log('record stop recordRes ', this.recordRes);
             if (this.recordRes) {
-                if (Common.isFunction(callback))
+                if (Common$1.isFunction(callback))
                     callback(this.recordRes);
             }
             else {
@@ -3588,6 +3590,30 @@
         TTModule.prototype._prepareBanner = function () {
             this.mBannerLoaded = false;
             _super.prototype._prepareBanner.call(this);
+        };
+        TTModule.prototype._resetBanenrStyle = function (size) {
+            if (Common$1.isEmpty(size)) {
+                console.log('设置的banner尺寸为空,不做调整');
+                return;
+            }
+            var wxsys = this.getSystemInfoSync();
+            var windowWidth = wxsys.windowWidth;
+            var windowHeight = wxsys.windowHeight;
+            var top = 0;
+            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+                top = windowHeight - this.bannerHeigth - 10;
+            }
+            else if (this.bannerPosition == BANNER_POSITION.CENTER)
+                top = (windowHeight - this.bannerHeigth) / 2;
+            else if (this.bannerPosition == BANNER_POSITION.TOP)
+                top = 0;
+            if (this.bannerStyle) {
+                this.banner.style = this.bannerStyle;
+            }
+            else {
+                this.banner.style.top = top;
+                console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top);
+            }
         };
         /**
         *
@@ -3736,7 +3762,7 @@
             var windowHeight = wxsys.screenHeight;
             var centerPos = (windowWidth - this.bannerWidth) / 2;
             var top = windowHeight - height / 2;
-            if (Common.isEmpty(this.bannerId)) {
+            if (Common$1.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
@@ -3832,7 +3858,7 @@
                         });
                     }
                     else {
-                        if (Common.isFunction(_this.mOnBoxCallback))
+                        if (Common$1.isFunction(_this.mOnBoxCallback))
                             _this.mOnBoxCallback(-1);
                         console.log('后台不允许显示Box，如有需要请联系运营');
                     }
@@ -3862,20 +3888,20 @@
                         .then(function () {
                         console.log('destroy successfully ', promise_1);
                         _this.box = null;
-                        if (Common.isFunction(callback))
+                        if (Common$1.isFunction(callback))
                             callback(true);
                     })
                         .catch(function () {
                         console.log('destroy fail ', promise_1);
                         _this.box = null;
-                        if (Common.isFunction(callback))
+                        if (Common$1.isFunction(callback))
                             callback(false);
                     });
                 }
             }
         };
         QQModule.prototype.onBoxClose = function () {
-            if (Common.isFunction(this.mOnBoxCallback))
+            if (Common$1.isFunction(this.mOnBoxCallback))
                 this.mOnBoxCallback(0);
         };
         return QQModule;
@@ -3905,6 +3931,7 @@
              * 位置描述
              */
             this.position = "";
+            this.onCancel = null;
         }
         return moosnowAdRow;
     }());
@@ -4008,7 +4035,7 @@
             var _this = this;
             _super.prototype.navigate2Mini.call(this, row, function () {
                 _this.navigateCallback(row.appid);
-                if (Common.isFunction(success))
+                if (Common$1.isFunction(success))
                     success();
             }, fail, complete);
         };
@@ -4054,7 +4081,7 @@
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.screenWidth;
             var windowHeight = wxsys.screenHeight;
-            if (Common.isEmpty(this.bannerId)) {
+            if (Common$1.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
@@ -4219,7 +4246,7 @@
                     apk_id: moosnow.platform.moosnowConfig.moosnowAppId
                 }, 'POST', function (res) {
                     var enabled = res.data.zs_version == moosnow.platform.moosnowConfig.version;
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res.data)), { mistouchNum: res.data.zs_switch, mistouchPosNum: res.data.zs_switch, showNative: enabled, showInter: enabled, showExportAd: enabled, lureNative: res.zs_native_click_switch == 1, lureExportAd: res.zs_jump_switch == 1, bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit });
+                    _this.cfgData = __assign(__assign({}, Common$1.deepCopy(res.data)), { mistouchNum: res.data.zs_switch, mistouchPosNum: res.data.zs_switch, showNative: enabled, showInter: enabled, showExportAd: enabled, lureNative: res.zs_native_click_switch == 1, lureExportAd: res.zs_jump_switch == 1, bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit });
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.data.bannerShowCountLimit);
                     }
@@ -4762,7 +4789,7 @@
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
             var left = (windowWidth - this.bannerWidth) / 2;
-            if (Common.isEmpty(this.bannerId)) {
+            if (Common$1.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
@@ -4924,7 +4951,7 @@
                 this.video.offLoad(this._onVideoLoad);
             }
             else {
-                if (Common.isEmpty(this.videoId)) {
+                if (Common$1.isEmpty(this.videoId)) {
                     console.warn(' video id is null');
                     return;
                 }
@@ -4946,7 +4973,7 @@
             }
         };
         VIVOModule.prototype.prepareInter = function () {
-            if (Common.isEmpty(this.interId)) {
+            if (Common$1.isEmpty(this.interId)) {
                 console.warn('插屏广告ID为空，系统不加载');
                 return;
             }
@@ -5021,19 +5048,19 @@
             console.log("\u52A0\u8F7D\u539F\u751F\u5E7F\u544A\u6210\u529F", res);
             if (res && res.adList && res.adList.length > 0) {
                 this.nativeAdResult = res.adList[0];
-                if (!Common.isEmpty(this.nativeAdResult.adId)) {
+                if (!Common$1.isEmpty(this.nativeAdResult.adId)) {
                     console.log("\u4E0A\u62A5\u539F\u751F\u5E7F\u544A");
                     this.native.reportAdShow({
                         adId: this.nativeAdResult.adId
                     });
                 }
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                if (Common$1.isFunction(this.nativeCb)) {
+                    this.nativeCb(Common$1.deepCopy(this.nativeAdResult));
                 }
             }
             else {
                 console.log("\u539F\u751F\u5E7F\u544A\u6570\u636E\u6CA1\u6709\uFF0C\u56DE\u8C03Null");
-                if (Common.isFunction(this.nativeCb)) {
+                if (Common$1.isFunction(this.nativeCb)) {
                     this.nativeCb(null);
                 }
             }
@@ -5051,14 +5078,14 @@
                 else {
                     console.log("\u539F\u751F\u5E7F\u544AID\u5DF2\u7ECF\u7528\u5B8C\uFF0C\u672C\u6B21\u6CA1\u6709\u5E7F\u544A");
                     this.nativeIdIndex = 0;
-                    if (Common.isFunction(this.nativeCb)) {
+                    if (Common$1.isFunction(this.nativeCb)) {
                         this.nativeCb(null);
                     }
                 }
             }
             else {
                 console.log("\u539F\u751F\u5E7F\u544A\u52A0\u8F7D\u51FA\u9519\uFF0C\u672C\u6B21\u6CA1\u6709\u5E7F\u544A", err);
-                if (Common.isFunction(this.nativeCb)) {
+                if (Common$1.isFunction(this.nativeCb)) {
                     this.nativeCb(null);
                 }
             }
@@ -5119,7 +5146,7 @@
          *
          */
         VIVOModule.prototype.clickNative = function (callback) {
-            if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
+            if (this.nativeAdResult && !Common$1.isEmpty(this.nativeAdResult.adId)) {
                 this.mClickedNativeCallback = callback;
                 this.mIsClickedNative = true;
                 console.log('点击了原生广告', this.nativeAdResult.adId);
@@ -5131,12 +5158,693 @@
         VIVOModule.prototype.onAppShow = function () {
             if (this.mIsClickedNative) {
                 this.mIsClickedNative = false;
-                if (Common.isFunction(this.mClickedNativeCallback))
+                if (Common$1.isFunction(this.mClickedNativeCallback))
                     this.mClickedNativeCallback();
             }
         };
         return VIVOModule;
     }(PlatformModule));
+
+    var AD_POSITION;
+    (function (AD_POSITION) {
+        /**
+         * 不显示
+         */
+        AD_POSITION[AD_POSITION["NONE"] = 0] = "NONE";
+        AD_POSITION[AD_POSITION["BANNER"] = 1] = "BANNER";
+        AD_POSITION[AD_POSITION["FLOAT"] = 2] = "FLOAT";
+        /**
+         * 侧拉广告
+         */
+        AD_POSITION[AD_POSITION["SIDE"] = 4] = "SIDE";
+        AD_POSITION[AD_POSITION["CENTER"] = 8] = "CENTER";
+        AD_POSITION[AD_POSITION["EXPORT"] = 16] = "EXPORT";
+        /**
+         * 返回按钮
+         */
+        AD_POSITION[AD_POSITION["BACK"] = 32] = "BACK";
+        /**
+         * 黑色半透明遮挡
+         */
+        AD_POSITION[AD_POSITION["MASK"] = 64] = "MASK";
+        /**
+         * 延迟显示
+         */
+        AD_POSITION[AD_POSITION["WAIT"] = 128] = "WAIT";
+        /**
+         * 左右两侧
+         */
+        AD_POSITION[AD_POSITION["LEFTRIGHT"] = 256] = "LEFTRIGHT";
+        /**
+        * 左右两侧
+        */
+        AD_POSITION[AD_POSITION["extend1"] = 512] = "extend1";
+        /**
+        * 左右两侧
+        */
+        AD_POSITION[AD_POSITION["extend2"] = 1024] = "extend2";
+        AD_POSITION[AD_POSITION["extend3"] = 2048] = "extend3";
+        AD_POSITION[AD_POSITION["extend4"] = 4096] = "extend4";
+        AD_POSITION[AD_POSITION["extend5"] = 8192] = "extend5";
+    })(AD_POSITION || (AD_POSITION = {}));
+
+    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var BaseForm = /** @class */ (function () {
+        function BaseForm() {
+            this.mIntervalArr = {};
+        }
+        BaseForm.prototype.schedule = function (callback, time) {
+            var id = setInterval(function () {
+                if (callback)
+                    callback();
+            }, time * 1000);
+            this.mIntervalArr[id] = callback;
+        };
+        BaseForm.prototype.unschedule = function (callback) {
+            for (var key in this.mIntervalArr) {
+                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
+                    clearInterval(parseInt(key));
+                }
+            }
+        };
+        BaseForm.prototype.initProperty = function (form) {
+            for (var v in form) {
+                if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
+                    this[v] = form[v];
+                }
+            }
+        };
+        BaseForm = __decorate([
+            ccclass
+        ], BaseForm);
+        return BaseForm;
+    }());
+
+    var _a$1 = cc._decorator, ccclass$1 = _a$1.ccclass, property$1 = _a$1.property;
+    var AdForm = /** @class */ (function (_super) {
+        __extends(AdForm, _super);
+        function AdForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.pauseContainer = null;
+            _this.pauseView = null;
+            _this.pauseLayout = null;
+            _this.centerContainer = null;
+            _this.centerView = null;
+            _this.centerLayout = null;
+            _this.exportContainer = null;
+            _this.exportView = null;
+            _this.exportLayout = null;
+            _this.exportClose = null;
+            _this.exportMask = null;
+            _this.exportCloseTxt = null;
+            _this.floatContainer = null;
+            _this.floatFull = null;
+            _this.bannerContainer = null;
+            _this.bannerView = null;
+            _this.bannerLayout = null;
+            _this.endContainer = null;
+            _this.endView = null;
+            _this.endLayout = null;
+            _this.failContainer = null;
+            _this.failView = null;
+            _this.failLayout = null;
+            _this.gameOverContainer = null;
+            _this.gameOverView = null;
+            _this.gameOverLayout = null;
+            _this.respawnContainer = null;
+            _this.respawnScrollView = null;
+            _this.respawnLayout = null;
+            _this.playerDiedContainer = null;
+            _this.playerDiedScrollView = null;
+            _this.playerDiedLayout = null;
+            _this.leftContainer = null;
+            _this.leftView = null;
+            _this.leftLayout = null;
+            _this.rightView = null;
+            _this.rightLayout = null;
+            _this.drawerContainer = null;
+            _this.drawerView = null;
+            _this.drawerLayout = null;
+            _this.drawerShow = null;
+            _this.drawerHide = null;
+            _this.mAdItemList = [];
+            _this.mScrollVec = [];
+            _this.mZindex = 9999;
+            _this.mShowAd = moosnow.AD_POSITION.NONE;
+            _this.mMoveSpeed = 2;
+            _this.mFloatIndex = 0;
+            _this.mFloatRefresh = 3;
+            _this.mFloatCache = {};
+            _this.mSecond = 3;
+            return _this;
+        }
+        AdForm.prototype.setPosition = function (source, position) {
+            if (position === void 0) { position = ""; }
+            var retValue = Common.deepCopy(source);
+            retValue.forEach(function (item) {
+                item.position = position;
+            });
+            return retValue;
+        };
+        /**
+         *
+         * @param scrollView
+         * @param layout
+         * @param positionTag
+         * @param entityName
+         */
+        AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
+            var _this = this;
+            if (!entityName) {
+                console.warn('entityName is null 无法初始化 ');
+                return;
+            }
+            moosnow.ad.getAd(function (res) {
+                var source = _this.setPosition(res.indexLeft, "");
+                source.forEach(function (item, idx) {
+                    var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
+                    _this.mAdItemList.push(adItemCtl);
+                });
+                if (layout.type == cc.Layout.Type.GRID) {
+                    if (scrollView.vertical) {
+                        _this.mScrollVec.push({
+                            scrollView: scrollView,
+                            move2Up: false
+                        });
+                    }
+                    else {
+                        _this.mScrollVec.push({
+                            scrollView: scrollView,
+                            move2Left: false
+                        });
+                    }
+                }
+                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+                    _this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Left: false
+                    });
+                }
+                else if (layout.type == cc.Layout.Type.VERTICAL) {
+                    _this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Up: false
+                    });
+                }
+            });
+        };
+        AdForm.prototype.addEvent = function () {
+            this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+        };
+        AdForm.prototype.removeEvent = function () {
+            this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+        };
+        AdForm.prototype.onAdChange = function (data) {
+            this.displayChange(data.showAd, data.callback);
+            // if (!isNaN(data.zIndex)) {
+            //     this.node.zIndex = data.zIndex;
+            // }
+            // else {
+            //     this.node.zIndex = this.mZindex;
+            // }
+        };
+        /**
+          *
+          * @param data
+          */
+        AdForm.prototype.willShow = function (data) {
+            this.mAdItemList = [];
+            this.mScrollVec = [];
+            this.addEvent();
+            if (data)
+                this.displayChange(data.showAd, data.callback);
+            else
+                this.displayChange(AD_POSITION.NONE, null);
+        };
+        AdForm.prototype.displayChange = function (data, callback) {
+            if (callback === void 0) { callback = null; }
+            var curApp = moosnow.getAppPlatform();
+            if (moosnow.APP_PLATFORM.WX == curApp || curApp == moosnow.APP_PLATFORM.OPPO) {
+                this.mShowAd = data;
+                this.displayAd(true);
+                this.mBackCall = callback;
+            }
+            else {
+                this.onBack();
+            }
+        };
+        AdForm.prototype.onBack = function () {
+            if (this.mBackCall) {
+                this.mBackCall();
+            }
+        };
+        AdForm.prototype.onFwUpdate = function (dt) {
+            for (var i = 0; i < this.mScrollVec.length; i++) {
+                var item = this.mScrollVec[i];
+                var scrollView = item.scrollView;
+                if (scrollView.isScrolling())
+                    continue;
+                var scrollOffset = scrollView.getMaxScrollOffset();
+                var maxH = scrollOffset.y / 2 + 20;
+                var maxW = scrollOffset.x / 2 + 20;
+                var contentPos = scrollView.getContentPosition();
+                if (item.move2Up == true) {
+                    if (contentPos.y > maxH) {
+                        item.move2Up = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed));
+                }
+                else if (item.move2Up == false) {
+                    if (contentPos.y < -maxH) {
+                        item.move2Up = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed));
+                }
+                if (item.move2Left == true) {
+                    if (contentPos.x > maxW) {
+                        item.move2Left = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y));
+                }
+                else if (item.move2Left == false) {
+                    if (contentPos.x < -maxW) {
+                        item.move2Left = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y));
+                }
+            }
+        };
+        AdForm.prototype.willHide = function () {
+            this.removeEvent();
+            this.mAdItemList.forEach(function (item) {
+                moosnow.entity.hideEntity(item, null);
+            });
+            this.mAdItemList = [];
+            this.mScrollVec = [];
+        };
+        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points) {
+            var _this = this;
+            moosnow.ad.getAd(function (res) {
+                _this.mAdData = res;
+                var source = __spreadArrays(res.indexLeft);
+                points.forEach(function (item, idx) {
+                    var showIndex = idx; //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
+                    var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动" });
+                    var itemName = prefabs.length - 1 >= idx ? prefabs[idx] : prefabs[0];
+                    var logic = moosnow.entity.showEntity(itemName, parentNode, adRow);
+                    _this.mFloatCache[idx] = {
+                        index: showIndex,
+                        logic: logic,
+                        onCancel: adRow.onCancel
+                    };
+                    _this.floatAnim(item);
+                });
+                _this.updateFloat(Common.deepCopy(res));
+                setInterval(function () {
+                    _this.updateFloat(Common.deepCopy(res));
+                }, _this.mFloatRefresh * 1000);
+            });
+        };
+        AdForm.prototype.floatAnim = function (floatNode) {
+            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
+        };
+        AdForm.prototype.updateFloat = function (source) {
+            for (var key in this.mFloatCache) {
+                var showIndex = this.mFloatCache[key].index;
+                var logic = this.mFloatCache[key].logic;
+                if (showIndex < source.indexLeft.length - 1)
+                    showIndex++;
+                else
+                    showIndex = 0;
+                this.mFloatCache[key].index = showIndex;
+                logic.refreshImg(__assign(__assign({}, source.indexLeft[showIndex]), { onCancel: this.mFloatCache[key].onCancel }));
+            }
+        };
+        AdForm.prototype.hasAd = function (ad) {
+            return (this.mShowAd & ad) == ad;
+        };
+        AdForm.prototype.showExportClose = function () {
+            this.mSecond -= 1;
+            this.exportCloseTxt.active = true;
+            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
+            if (this.mSecond <= 0) {
+                this.exportClose.active = true;
+                this.exportCloseTxt.active = false;
+                this.unschedule(this.showExportClose);
+                return;
+            }
+            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
+        };
+        AdForm.prototype.displayAd = function (visible) {
+            var _this = this;
+            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+            this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+            this.centerContainer.active = visible && this.hasAd(AD_POSITION.CENTER);
+            this.leftContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
+            this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
+            // this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            // this.endContainer.active && this.initEndExport();
+            this.exportClose.active = false;
+            this.exportCloseTxt.active = false;
+            this.unschedule(this.showExportClose);
+            if (this.hasAd(AD_POSITION.BACK)) {
+                if (this.hasAd(AD_POSITION.WAIT)) {
+                    this.mSecond = 3;
+                    this.showExportClose();
+                    this.schedule(this.showExportClose, 1);
+                }
+                else {
+                    this.exportClose.active = true;
+                    this.exportCloseTxt.active = false;
+                }
+            }
+            else {
+                this.exportClose.active = false;
+                this.exportCloseTxt.active = false;
+            }
+            this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            if (visible && this.hasAd(AD_POSITION.EXPORT)) {
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.exportAutoNavigate == 1) {
+                        moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
+                    }
+                });
+            }
+        };
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "pauseContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "pauseView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "pauseLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "centerContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "centerView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "centerLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "exportContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "exportView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "exportLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "exportClose", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "exportMask", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "exportCloseTxt", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "floatContainer", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "floatFull", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "bannerContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "bannerView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "bannerLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "endContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "endView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "endLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "failContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "failView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "failLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "gameOverContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "gameOverView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "gameOverLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "respawnContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "respawnScrollView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "respawnLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "playerDiedContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "playerDiedScrollView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "playerDiedLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "leftContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "leftView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "leftLayout", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "rightView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "rightLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "drawerContainer", void 0);
+        __decorate([
+            property$1(cc.ScrollView)
+        ], AdForm.prototype, "drawerView", void 0);
+        __decorate([
+            property$1(cc.Layout)
+        ], AdForm.prototype, "drawerLayout", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "drawerShow", void 0);
+        __decorate([
+            property$1(cc.Node)
+        ], AdForm.prototype, "drawerHide", void 0);
+        AdForm = __decorate([
+            ccclass$1
+        ], AdForm);
+        return AdForm;
+    }(BaseForm));
+
+    var _a$2 = cc._decorator, ccclass$2 = _a$2.ccclass, property$2 = _a$2.property;
+    var CocosAdForm = /** @class */ (function (_super) {
+        __extends(CocosAdForm, _super);
+        function CocosAdForm() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        CocosAdForm.prototype.addEvent = function () {
+            if (this.exportClose)
+                this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+        };
+        CocosAdForm.prototype.removeEvent = function () {
+            if (this.exportClose)
+                this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+        };
+        CocosAdForm = __decorate([
+            ccclass$2
+        ], CocosAdForm);
+        return CocosAdForm;
+    }(AdForm));
+
+    /**
+     * 广告结果
+     */
+    var moosnowForm = /** @class */ (function () {
+        function moosnowForm() {
+        }
+        Object.defineProperty(moosnowForm.prototype, "adForm", {
+            /**
+             * 广告form
+             */
+            get: function () {
+                if (!this.mAdForm)
+                    this.mAdForm = new CocosAdForm();
+                return this.mAdForm;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        return moosnowForm;
+    }());
+
+    var _a$3 = cc._decorator, ccclass$3 = _a$3.ccclass, property$3 = _a$3.property;
+    var BaseEntityModule = /** @class */ (function (_super) {
+        __extends(BaseEntityModule, _super);
+        function BaseEntityModule() {
+            var _this = _super.call(this) || this;
+            _this.entityLogics = [];
+            _this._serializeId = 0;
+            _this.paused = true;
+            _this.prefabPath = "prefab/entity/";
+            _this.mEntity3DPools = [];
+            _this.mEntity3DLogics = [];
+            _this.entityPools = [];
+            _this.mIsSlow = true;
+            _this.entityLogics = [];
+            _this.mEntity3DPools = [];
+            _this.mEntity3DLogics = [];
+            _this._serializeId = 0;
+            return _this;
+            // this.resume();
+            // window["moosnow"].entity = this;
+        }
+        BaseEntityModule.prototype.update = function (dt) {
+            if (this.paused)
+                return;
+            for (var i = 0; i < this.entityLogics.length; i++) {
+                var element = this.entityLogics[i];
+                element.onFwUpdate(dt);
+            }
+        };
+        BaseEntityModule.prototype.pause = function () {
+            this.paused = true;
+        };
+        BaseEntityModule.prototype.resume = function () {
+            this.paused = false;
+        };
+        BaseEntityModule.prototype.getAllEntity = function (name) {
+            return this.entityLogics.filter(function (item) { return item.poolName == name; });
+        };
+        BaseEntityModule.prototype.showEntity = function (name, parentNode, data) {
+            var logic = this._showEntity(name);
+            logic.id = this._serializeId--;
+            logic.node.parent = parentNode;
+            logic.willShow(data);
+            logic.node.active = true;
+            logic.node.zIndex = logic.id;
+            logic.onShow(data);
+            this.entityLogics.push(logic);
+            return logic;
+        };
+        BaseEntityModule.prototype.hideEntity = function (logic, data, isDestory) {
+            if (isDestory === void 0) { isDestory = false; }
+            this._hideEntity(logic, data, isDestory);
+        };
+        BaseEntityModule.prototype.hideAllEntity = function (name, isDestory) {
+            if (isDestory === void 0) { isDestory = false; }
+            for (var i = 0; i < this.entityLogics.length; i++) {
+                var item = this.entityLogics[i];
+                if (item.poolName == name) {
+                    this.hideEntity(item, null, isDestory);
+                    i--;
+                }
+            }
+        };
+        BaseEntityModule.prototype._showEntity = function (name) {
+            var pool = this._getOrNewEntityPool(name);
+            var entity = pool.get();
+            if (entity == null) {
+                entity = this._createEntity(name);
+            }
+            var logic = entity.getComponent("EntityLogic");
+            logic.poolName = pool.name;
+            return logic;
+        };
+        BaseEntityModule.prototype._hideEntity = function (logic, data, isDestory) {
+            if (isDestory === void 0) { isDestory = false; }
+            if (isDestory) {
+                logic.willHide(data);
+                logic.node.active = false;
+                logic.onHide(data);
+                logic.destroy();
+            }
+            else {
+                var pool = this._getOrNewEntityPool(logic.poolName);
+                logic.willHide(data);
+                pool.put(logic.node);
+                logic.node.active = false;
+                logic.onHide(data);
+            }
+            cc.js.array.remove(this.entityLogics, logic);
+        };
+        BaseEntityModule.prototype._createEntity = function (name) {
+            var prefab = this._getPrefabByName(name);
+            return cc.instantiate(prefab);
+        };
+        BaseEntityModule.prototype._getPrefabByName = function (name) {
+            var profab = cc.loader.getRes(this.prefabPath + '' + name, cc.Prefab);
+            return profab;
+        };
+        BaseEntityModule.prototype._getOrNewEntityPool = function (name) {
+            var pool = this._getEntityPool(name);
+            if (pool == null) {
+                pool = this._newEntityPool(name);
+            }
+            return pool;
+        };
+        BaseEntityModule.prototype._getEntityPool = function (name) {
+            for (var i = 0; i < this.entityPools.length; i++) {
+                var pool = this.entityPools[i];
+                if (pool.name === name) {
+                    return pool;
+                }
+            }
+            return null;
+        };
+        BaseEntityModule.prototype._newEntityPool = function (name) {
+            var pool = new cc.NodePool(name);
+            pool.name = name;
+            this.entityPools.push(pool);
+            return pool;
+        };
+        BaseEntityModule = __decorate([
+            ccclass$3
+        ], BaseEntityModule);
+        return BaseEntityModule;
+    }(BaseModule));
+
+    var _a$4 = cc._decorator, ccclass$4 = _a$4.ccclass, property$4 = _a$4.property;
+    var CocosEntityModule = /** @class */ (function (_super) {
+        __extends(CocosEntityModule, _super);
+        function CocosEntityModule() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.prefabPath = "prefab/entity/";
+            return _this;
+        }
+        return CocosEntityModule;
+    }(BaseEntityModule));
 
     var FormModel = /** @class */ (function () {
         function FormModel() {
@@ -5168,9 +5876,9 @@
       * 1由于UI是异步加载，导致UI栈顺序会错乱 (fixed)
       * 2连续push相同UI（待测试）
       */
-    var IUIModule = /** @class */ (function (_super) {
-        __extends(IUIModule, _super);
-        function IUIModule() {
+    var BaseUIModule = /** @class */ (function (_super) {
+        __extends(BaseUIModule, _super);
+        function BaseUIModule() {
             var _this = _super.call(this) || this;
             _this.rootCanvas = null;
             _this.layerIndex = 0;
@@ -5185,12 +5893,13 @@
             _this.toastForm = null;
             return _this;
         }
-        IUIModule.prototype.showToast = function (msg) {
+        BaseUIModule.prototype.showToast = function (msg) {
+            var _this = this;
             var self = this;
             if (self.toastForm == null) {
                 this._createUINode('toastForm', 1000, function (node, index) {
                     cc.Canvas.instance.node.addChild(node);
-                    self.toastForm = node.getComponent("toastForm");
+                    self.toastForm = _this._findComponent(node, "toastForm");
                     node.zIndex = index;
                     self.toastForm.show(msg);
                 });
@@ -5205,7 +5914,7 @@
          * @param {Object} data 携带的自定义数据
          * @param {Function} callback ui显示后回调:(formModel,data:Object)
          */
-        IUIModule.prototype.pushUIForm = function (name, data, callback) {
+        BaseUIModule.prototype.pushUIForm = function (name, data, callback) {
             var self = this;
             var cachedFormModel = this._getUINodeFromCacheByName(name);
             if (cachedFormModel == null) {
@@ -5230,7 +5939,7 @@
          * 从栈顶隐藏一个UI
          * @param {bool} destroy 是否销毁
          */
-        IUIModule.prototype.pop = function (destroy, cb) {
+        BaseUIModule.prototype.pop = function (destroy, cb) {
             if (destroy === void 0) { destroy = false; }
             if (this.UIFormStack.length == 0)
                 return;
@@ -5246,7 +5955,7 @@
         * 获取一个UIForm
         * @param {string} name
         */
-        IUIModule.prototype.getUIFrom = function (name) {
+        BaseUIModule.prototype.getUIFrom = function (name) {
             for (var i = 0; i < this.UIFormStack.length; i++) {
                 var formModel = this.UIFormStack[i];
                 if (formModel.name == name) {
@@ -5259,7 +5968,7 @@
          * @param {string} name 预设名
          * @param {any} data 携带的自定义数据
          */
-        IUIModule.prototype.hideUIForm = function (name, data, cb) {
+        BaseUIModule.prototype.hideUIForm = function (name, data, cb) {
             for (var i = 0; i < this.UIFormStack.length; i++) {
                 var formModel = this.UIFormStack[i];
                 if (formModel.name == name) {
@@ -5267,13 +5976,13 @@
                 }
             }
         };
-        IUIModule.prototype.hideAllUIForm = function () {
+        BaseUIModule.prototype.hideAllUIForm = function () {
             for (var i = this.UIFormStack.length - 1; i >= 0; i--) {
                 var formModel = this.UIFormStack[i];
                 this._hideUIForm(formModel, null);
             }
         };
-        IUIModule.prototype.destroyUIForm = function (name, data) {
+        BaseUIModule.prototype.destroyUIForm = function (name, data) {
             for (var i = 0; i < this.UIFormStack.length; i++) {
                 var formModel = this.UIFormStack[i];
                 if (formModel.name == name) {
@@ -5281,7 +5990,7 @@
                 }
             }
         };
-        IUIModule.prototype._formatUIFormName = function (name) {
+        BaseUIModule.prototype._formatUIFormName = function (name) {
             return name.replace(/\//g, "_");
         };
         /**
@@ -5290,7 +5999,7 @@
          * @param {string} name resources下的路径
          * @param {Function} callback 参数 node
          */
-        IUIModule.prototype._createUINode = function (name, formId, callback) {
+        BaseUIModule.prototype._createUINode = function (name, formId, callback) {
             var path = this.UIRoot + name;
             cc.loader.loadRes(path, cc.Prefab, function (err, prefab) {
                 var formNode = cc.instantiate(prefab);
@@ -5303,7 +6012,7 @@
          * @param {string} name
          * @param {Function} callback (node, index)
          */
-        IUIModule.prototype._createUIFormModel = function (name, callback) {
+        BaseUIModule.prototype._createUIFormModel = function (name, callback) {
             var _this = this;
             //防止异步加载UI层级错乱方案
             //1异步加载预设前初始化一个model,记录将要加载的预设名以及zindex
@@ -5337,7 +6046,7 @@
                 }
             });
         };
-        IUIModule.prototype._getUINodeFromCacheByName = function (name) {
+        BaseUIModule.prototype._getUINodeFromCacheByName = function (name) {
             for (var i = 0; i < this.cachedUIForms.length; i++) {
                 var element = this.cachedUIForms[i];
                 if (element.node != null && element.name == name) {
@@ -5347,7 +6056,7 @@
             }
             return null;
         };
-        IUIModule.prototype._showUIForm = function (formModel, data) {
+        BaseUIModule.prototype._showUIForm = function (formModel, data) {
             cc.Canvas.instance.node.addChild(formModel.node);
             formModel.UIForm.willShow(data);
             formModel.node.active = true;
@@ -5358,17 +6067,17 @@
             formModel.UIForm.onShow(data);
             if (formModel.UIForm.isPopEffect) {
                 var owner = formModel.node;
-                Common.popOpenAnim(owner);
+                Common$1.popOpenAnim(owner);
             }
         };
-        IUIModule.prototype._hideUIForm = function (formModel, data, cb) {
+        BaseUIModule.prototype._hideUIForm = function (formModel, data, cb) {
             formModel.UIForm.willHide(data);
             formModel.UIForm.onHide(data);
             this._removeStack(formModel);
             this.cachedUIForms.push(formModel);
             if (formModel.UIForm.isPopEffect) {
                 var owner = formModel.node;
-                Common.popCloseAnim(owner, function () {
+                Common$1.popCloseAnim(owner, function () {
                     formModel.node.active = false;
                     formModel.node.removeFromParent(false);
                     // formModel.node.removeSelf();
@@ -5386,7 +6095,7 @@
                 });
             }
         };
-        IUIModule.prototype._destroyUIForm = function (formModel, data) {
+        BaseUIModule.prototype._destroyUIForm = function (formModel, data) {
             formModel.UIForm.willHide(data);
             formModel.node.removeFromParent();
             formModel.UIForm.onHide(data);
@@ -5394,7 +6103,7 @@
             this._removeStack(formModel);
             formModel.node.destroy();
         };
-        IUIModule.prototype._removeStack = function (removeItem) {
+        BaseUIModule.prototype._removeStack = function (removeItem) {
             var _this = this;
             if (isNaN(removeItem)) {
                 this.UIFormStack.forEach(function (item, idx) {
@@ -5406,587 +6115,33 @@
             else
                 this.UIFormStack.splice(removeItem, 1);
         };
-        return IUIModule;
+        return BaseUIModule;
     }(BaseModule));
 
-    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    /**
+      * HASDO:
+      * 1栈方式管理UI，
+      * 2缓存UI
+      * 3入栈（显示UI）
+      * 4出栈（关闭UI）
+      * 5关闭指定UI
+      *
+      * TODO:
+      * 1上层UI遮盖下层UI逻辑回调
+      * 2设置label默认字体
+      * 3按需清理缓存
+      *
+      * ISSUE
+      * 1由于UI是异步加载，导致UI栈顺序会错乱 (fixed)
+      * 2连续push相同UI（待测试）
+      */
     var CocosUIModule = /** @class */ (function (_super) {
         __extends(CocosUIModule, _super);
         function CocosUIModule() {
-            var _this = _super.call(this) || this;
-            _this.rootCanvas = null;
-            _this.layerIndex = 0;
-            _this.UIRoot = 'moosnow/prefab/ui/'; //定义resources目录下存放UI预设的目录
-            _this.UIFormStack = [];
-            _this.cachedUIForms = [];
-            _this.toastForm = null;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        CocosUIModule.prototype.start = function () {
-        };
-        __decorate([
-            property(cc.Node)
-        ], CocosUIModule.prototype, "rootCanvas", void 0);
         return CocosUIModule;
-    }(IUIModule));
-
-    var _a$1 = cc._decorator, ccclass$1 = _a$1.ccclass, property$1 = _a$1.property;
-    var CocosUIForm = /** @class */ (function (_super) {
-        __extends(CocosUIForm, _super);
-        function CocosUIForm() {
-            var _this = _super.call(this) || this;
-            _this.isPopEffect = false;
-            _this.isMask = false;
-            _this.fullView = true;
-            _this.formName = "";
-            _this.maskName = "img_mask";
-            _this.formName = "";
-            return _this;
-        }
-        CocosUIForm.prototype.start = function () {
-            if (this.isMask) {
-                this.addMask();
-            }
-        };
-        CocosUIForm.prototype.addMask = function () {
-            var _this = this;
-            if (this.node.getChildByName(this.maskName)) {
-                this.node.active = true;
-                return;
-            }
-            var skin = "texture/game/img_mask.png";
-            var mask = new cc.Node();
-            var sprite = mask.addComponent(cc.Sprite);
-            var widget = mask.addComponent(cc.Widget);
-            widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
-            widget.left = widget.top = widget.right = widget.bottom = 0;
-            cc.loader.loadRes(skin, cc.SpriteFrame, function (err, spriteFrame) {
-                sprite.spriteFrame = spriteFrame;
-                sprite.type = cc.Sprite.Type.SLICED;
-                sprite.spriteFrame.insetBottom = 1;
-                sprite.spriteFrame.insetTop = 1;
-                sprite.spriteFrame.insetLeft = 1;
-                sprite.spriteFrame.insetRight = 1;
-                mask.width = _this.node.width;
-                mask.height = _this.node.height;
-                _this.node.addChild(mask);
-                mask.name = _this.maskName;
-                mask.zIndex = -1;
-            });
-            mask.on(cc.Node.EventType.TOUCH_START, this.onMaskMouseDown, this);
-        };
-        CocosUIForm.prototype.removeMask = function () {
-            if (this.node.getChildByName(this.maskName)) {
-                this.node.active = false;
-                return;
-            }
-        };
-        CocosUIForm.prototype.onMaskMouseDown = function (e) {
-            e.stopPropagation();
-        };
-        /**
-        * 隐藏UIForm
-        */
-        CocosUIForm.prototype.hide = function () {
-            // MLF.UI.destroyUIForm(this.formName)
-        };
-        Object.defineProperty(CocosUIForm.prototype, "FormData", {
-            /**
-             * 父类缓存willShow，onShow传递到实体的逻辑数据
-             */
-            get: function () {
-                return this.mFormData;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CocosUIForm.prototype.willShow = function (data) {
-            this.mFormData = data;
-        };
-        CocosUIForm.prototype.onShow = function (data) {
-        };
-        CocosUIForm.prototype.willHide = function (data) {
-        };
-        CocosUIForm.prototype.onHide = function (data) {
-        };
-        CocosUIForm.prototype.onEnable = function () {
-        };
-        CocosUIForm.prototype.onDisable = function () {
-        };
-        CocosUIForm.prototype.hideAnim = function (cb) {
-            cb();
-        };
-        CocosUIForm = __decorate([
-            ccclass$1
-        ], CocosUIForm);
-        return CocosUIForm;
-    }(cc.Component));
-
-    var UIForms = /** @class */ (function () {
-        function UIForms() {
-        }
-        Object.defineProperty(UIForms, "mapping", {
-            get: function () {
-                var _a, _b, _c, _d, _e, _f, _g;
-                return {
-                    adForm: (_a = {},
-                        _a[moosnow.APP_PLATFORM.WX] = "adForm",
-                        _a[moosnow.APP_PLATFORM.OPPO] = "adFormOPPO",
-                        _a[moosnow.APP_PLATFORM.OPPO_ZS] = "adFormOPPO",
-                        _a[moosnow.APP_PLATFORM.VIVO] = "adFormOPPO",
-                        _a[moosnow.APP_PLATFORM.QQ] = "adFormQQ",
-                        _a),
-                    pauseForm: (_b = {},
-                        _b[moosnow.APP_PLATFORM.WX] = "pauseForm",
-                        _b[moosnow.APP_PLATFORM.BYTEDANCE] = "pauseFormTT",
-                        _b[moosnow.APP_PLATFORM.OPPO] = "pauseFormOPPO",
-                        _b[moosnow.APP_PLATFORM.OPPO_ZS] = "pauseFormOPPO",
-                        _b[moosnow.APP_PLATFORM.VIVO] = "pauseFormOPPO",
-                        _b[moosnow.APP_PLATFORM.QQ] = "pauseFormTT",
-                        _b),
-                    respawnForm: (_c = {},
-                        _c[moosnow.APP_PLATFORM.WX] = "respawnForm",
-                        _c[moosnow.APP_PLATFORM.BYTEDANCE] = "respawnFormTT",
-                        _c[moosnow.APP_PLATFORM.OPPO] = "respawnFormOPPO",
-                        _c[moosnow.APP_PLATFORM.OPPO_ZS] = "respawnFormOPPO",
-                        _c[moosnow.APP_PLATFORM.VIVO] = "respawnFormOPPO",
-                        _c[moosnow.APP_PLATFORM.QQ] = "respawnFormQQ",
-                        _c),
-                    endForm: (_d = {},
-                        _d[moosnow.APP_PLATFORM.WX] = "endForm",
-                        _d[moosnow.APP_PLATFORM.BYTEDANCE] = "endFormTT",
-                        _d[moosnow.APP_PLATFORM.OPPO] = "endFormOPPO",
-                        _d[moosnow.APP_PLATFORM.OPPO_ZS] = "endFormOPPO",
-                        _d[moosnow.APP_PLATFORM.VIVO] = "endFormOPPO",
-                        _d),
-                    totalForm: (_e = {},
-                        _e[moosnow.APP_PLATFORM.WX] = "totalForm",
-                        _e[moosnow.APP_PLATFORM.BYTEDANCE] = "totalFormTT",
-                        _e[moosnow.APP_PLATFORM.QQ] = "totalFormQQ",
-                        _e),
-                    tryForm: (_f = {},
-                        _f[moosnow.APP_PLATFORM.WX] = "tryForm",
-                        _f[moosnow.APP_PLATFORM.BYTEDANCE] = "tryFormTT",
-                        _f[moosnow.APP_PLATFORM.QQ] = "tryFormTT",
-                        _f),
-                    mistouchForm: (_g = {},
-                        _g[moosnow.APP_PLATFORM.WX] = "mistouchForm",
-                        _g[moosnow.APP_PLATFORM.QQ] = "mistouchFormQQ",
-                        _g),
-                };
-            },
-            enumerable: true,
-            configurable: true
-        });
-        UIForms.convertUIName = function (mappingForm) {
-            if (!mappingForm) {
-                console.warn("convertUIName fail  mappingForm is null ");
-                return null;
-            }
-            var curApp = moosnow.getAppPlatform();
-            if (mappingForm[curApp])
-                return mappingForm[curApp];
-            else if (mappingForm[moosnow.APP_PLATFORM.WX])
-                return mappingForm[moosnow.APP_PLATFORM.WX];
-            else {
-                console.warn("convertUIName fail ", mappingForm);
-                return null;
-            }
-            return null;
-        };
-        Object.defineProperty(UIForms, "AdForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.adForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIForms, "TotalForm", {
-            /**
-             * 结算页
-             */
-            get: function () {
-                return this.convertUIName(this.mapping.totalForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(UIForms, "EndForm", {
-            /**
-             * 结束页
-             */
-            get: function () {
-                return this.convertUIName(this.mapping.endForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIForms, "PauseForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.pauseForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIForms, "RespawnForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.respawnForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIForms, "MistouchForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.mistouchForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIForms, "TryForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.tryForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        UIForms.HomeForm = "homeForm";
-        UIForms.SkinForm = "skinForm";
-        UIForms.GameForm = "gameForm";
-        UIForms.CoinForm = "coinForm";
-        UIForms.PrevHomeForm = "prevHomeForm";
-        UIForms.ToastForm = "toastForm";
-        UIForms.SetForm = "setForm";
-        UIForms.PrizeForm = "prizeForm";
-        return UIForms;
-    }());
-
-    var CocosAdFrom = /** @class */ (function (_super) {
-        __extends(CocosAdFrom, _super);
-        function CocosAdFrom() {
-            var _this = _super.call(this) || this;
-            _this.isPopEffect = false;
-            _this.isMask = false;
-            _this.fullView = true;
-            _this.formName = "";
-            _this.maskName = "img_mask";
-            _this.formName = "";
-            return _this;
-        }
-        CocosAdFrom.prototype.start = function () {
-            if (this.isMask) {
-                this.addMask();
-            }
-        };
-        CocosAdFrom.prototype.addMask = function () {
-            if (this.node.getChildByName(this.maskName)) {
-                this.node.active = true;
-                return;
-            }
-            var skin = "texture/game/img_mask.png";
-            var mask = new cc.Node();
-            var sprite = mask.addComponent(cc.Sprite);
-            var widget = mask.addComponent(cc.Widget);
-            widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
-            widget.left = widget.top = widget.right = widget.bottom = 0;
-            mask.on(cc.Node.EventType.TOUCH_START, this.onMaskMouseDown, this);
-        };
-        CocosAdFrom.prototype.removeMask = function () {
-            if (this.node.getChildByName(this.maskName)) {
-                this.node.active = false;
-                return;
-            }
-        };
-        CocosAdFrom.prototype.onMaskMouseDown = function (e) {
-            e.stopPropagation();
-        };
-        /**
-        * 隐藏UIForm
-        */
-        CocosAdFrom.prototype.hide = function () {
-            // MLF.UI.destroyUIForm(this.formName)
-        };
-        Object.defineProperty(CocosAdFrom.prototype, "FormData", {
-            /**
-             * 父类缓存willShow，onShow传递到实体的逻辑数据
-             */
-            get: function () {
-                return this.mFormData;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CocosAdFrom.prototype.willShow = function (data) {
-            this.mFormData = data;
-        };
-        CocosAdFrom.prototype.onShow = function (data) {
-        };
-        CocosAdFrom.prototype.willHide = function (data) {
-        };
-        CocosAdFrom.prototype.onHide = function (data) {
-        };
-        CocosAdFrom.prototype.onEnable = function () {
-        };
-        CocosAdFrom.prototype.onDisable = function () {
-        };
-        CocosAdFrom.prototype.hideAnim = function (cb) {
-            cb();
-        };
-        return CocosAdFrom;
-    }(cc.Component));
-
-    var CocosFrom = /** @class */ (function () {
-        function CocosFrom() {
-            // this.registerScript();
-        }
-        CocosFrom.prototype.registerScript = function () {
-            var script = [
-                { name: UIForms.AdForm, script: CocosAdFrom }
-            ];
-            script.forEach(function (item) {
-                moosnow.resource.loadAsset(item.name, cc.Prefab, function (err, prefab) {
-                });
-            });
-        };
-        CocosFrom.prototype.showToast = function (msg) {
-            moosnow.ui.showToast(msg);
-        };
-        /**
-         *
-         * @param params
-         */
-        CocosFrom.prototype.showAd = function (params) {
-            var ad = moosnow.ui.getUIFrom(UIForms.AdForm);
-            if (!ad) {
-                ad = moosnow.ui.pushUIForm(UIForms.AdForm, null, function () {
-                    moosnow.event.sendEventImmediately(EventType.ON_AD_SHOW, { showAd: params.showAd, callback: params.callback });
-                });
-            }
-            else {
-                moosnow.event.sendEventImmediately(EventType.ON_AD_SHOW, { showAd: params.showAd, callback: params.callback });
-            }
-        };
-        CocosFrom.prototype.showReward = function () {
-            moosnow.ui.pushUIForm("");
-        };
-        return CocosFrom;
-    }());
-
-    var CocosResourceModule = /** @class */ (function (_super) {
-        __extends(CocosResourceModule, _super);
-        function CocosResourceModule() {
-            return _super.call(this) || this;
-        }
-        CocosResourceModule.prototype.onEnable = function () {
-        };
-        /**
-         * 加载resources下的cc.SpriteFrame, cc.AnimationClip, cc.Prefab
-         * 不带扩展名
-         * @method loadAsset
-         * @param {String} url resources下路径
-         * @param {typeof cc.Asset} assetType cc.SpriteFrame, cc.AnimationClip, cc.Prefab..
-         * @param {Function} [callback] (err:Error,asset:cc.Asset)
-         * @param {typeof cc.Asset} callback.asset cc.SpriteFrame, cc.AnimationClip, cc.Prefab..
-         */
-        CocosResourceModule.prototype.loadAsset = function (url, assetType, callback) {
-            var res = cc.loader.getRes(url, assetType);
-            if (res) {
-                if (callback) {
-                    callback(null, res);
-                }
-                return;
-            }
-            cc.loader.loadRes(url, assetType, function (err, asset) {
-                if (callback) {
-                    callback(err, asset);
-                }
-            });
-        };
-        /**
-        * 加载resources目录下某个目录下的指定类型的资源(用于预加载整个目录资源)
-        * @param {string} dir resources下的目录
-        * @param {typeof cc.Asset} type
-        * @param {Function} progressCallback (precent:number)
-        * @param {Function} completeCallback (err:Error,reses:Asset[])
-        */
-        CocosResourceModule.prototype.loadAssetDir = function (dir, type, progressCallback, completeCallback) {
-            cc.loader.loadResDir(dir, type, function (completedCount, totalCount, item) {
-                var precent = completedCount / totalCount * 100;
-                precent = Math.ceil(precent);
-                if (progressCallback) {
-                    progressCallback(precent);
-                }
-            }, function (err, res) {
-                if (completeCallback) {
-                    completeCallback(err, res);
-                }
-            });
-        };
-        CocosResourceModule.prototype.onDisable = function () {
-        };
-        return CocosResourceModule;
-    }(cc.Component));
-
-    var _a$2 = cc._decorator, ccclass$2 = _a$2.ccclass, property$2 = _a$2.property;
-    var EntityModule = /** @class */ (function (_super) {
-        __extends(EntityModule, _super);
-        function EntityModule() {
-            var _this = _super.call(this) || this;
-            _this.entityLogics = [];
-            _this._serializeId = 0;
-            _this.paused = true;
-            _this.prefabPath = "prefab/entity/";
-            _this.mEntity3DPools = [];
-            _this.mEntity3DLogics = [];
-            _this.entityPools = [];
-            _this.mIsSlow = true;
-            _this.entityLogics = [];
-            _this.mEntity3DPools = [];
-            _this.mEntity3DLogics = [];
-            _this._serializeId = 0;
-            _this._serializeId = 0;
-            return _this;
-        }
-        EntityModule.prototype.start = function () {
-            window["moosnow"].entity = this;
-            this.resume();
-        };
-        EntityModule.prototype.update = function (dt) {
-            if (this.paused)
-                return;
-            for (var i = 0; i < this.entityLogics.length; i++) {
-                var element = this.entityLogics[i];
-                element.onFwUpdate(dt);
-            }
-        };
-        EntityModule.prototype.pause = function () {
-            this.paused = true;
-        };
-        EntityModule.prototype.resume = function () {
-            this.paused = false;
-        };
-        EntityModule.prototype.getAllEntity = function (name) {
-            return this.entityLogics.filter(function (item) { return item.poolName == name; });
-        };
-        EntityModule.prototype.showEntity = function (name, parentNode, data) {
-            var logic = this._showEntity(name);
-            logic.id = this._serializeId--;
-            logic.node.parent = parentNode;
-            logic.willShow(data);
-            logic.node.active = true;
-            logic.node.zIndex = logic.id;
-            logic.onShow(data);
-            this.entityLogics.push(logic);
-            return logic;
-        };
-        EntityModule.prototype.hideEntity = function (logic, data, isDestory) {
-            if (isDestory === void 0) { isDestory = false; }
-            this._hideEntity(logic, data, isDestory);
-        };
-        EntityModule.prototype.hideAllEntity = function (name, isDestory) {
-            if (isDestory === void 0) { isDestory = false; }
-            for (var i = 0; i < this.entityLogics.length; i++) {
-                var item = this.entityLogics[i];
-                if (item.poolName == name) {
-                    this.hideEntity(item, null, isDestory);
-                    i--;
-                }
-            }
-        };
-        EntityModule.prototype._showEntity = function (name) {
-            var pool = this._getOrNewEntityPool(name);
-            var entity = pool.get();
-            if (entity == null) {
-                entity = this._createEntity(name);
-            }
-            var logic = this._findComponent(entity, "EntityLogic");
-            logic.poolName = pool.name;
-            return logic;
-        };
-        EntityModule.prototype._hideEntity = function (logic, data, isDestory) {
-            if (isDestory === void 0) { isDestory = false; }
-            if (isDestory) {
-                logic.willHide(data);
-                logic.node.active = false;
-                logic.onHide(data);
-                logic.destroy();
-            }
-            else {
-                var pool = this._getOrNewEntityPool(logic.poolName);
-                logic.willHide(data);
-                pool.put(logic.node);
-                logic.node.active = false;
-                logic.onHide(data);
-            }
-            cc.js.array.remove(this.entityLogics, logic);
-        };
-        EntityModule.prototype._createEntity = function (name) {
-            var prefab = this._getPrefabByName(name);
-            return cc.instantiate(prefab);
-        };
-        EntityModule.prototype._getPrefabByName = function (name) {
-            var profab = cc.loader.getRes(this.prefabPath + '' + name, cc.Prefab);
-            return profab;
-        };
-        EntityModule.prototype._getOrNewEntityPool = function (name) {
-            var pool = this._getEntityPool(name);
-            if (pool == null) {
-                pool = this._newEntityPool(name);
-            }
-            return pool;
-        };
-        EntityModule.prototype._getEntityPool = function (name) {
-            for (var i = 0; i < this.entityPools.length; i++) {
-                var pool = this.entityPools[i];
-                if (pool.name === name) {
-                    return pool;
-                }
-            }
-            return null;
-        };
-        EntityModule.prototype._newEntityPool = function (name) {
-            var pool = new cc.NodePool(name);
-            pool.name = name;
-            this.entityPools.push(pool);
-            return pool;
-        };
-        EntityModule = __decorate([
-            ccclass$2
-        ], EntityModule);
-        return EntityModule;
-    }(BaseModule));
-
-    var AD_POSITION;
-    (function (AD_POSITION) {
-        /**
-         * 不显示
-         */
-        AD_POSITION[AD_POSITION["NONE"] = 0] = "NONE";
-        AD_POSITION[AD_POSITION["BANNER"] = 1] = "BANNER";
-        AD_POSITION[AD_POSITION["FLOAT"] = 2] = "FLOAT";
-        /**
-         * 侧拉广告
-         */
-        AD_POSITION[AD_POSITION["SIDE"] = 4] = "SIDE";
-        AD_POSITION[AD_POSITION["CENTER"] = 8] = "CENTER";
-        AD_POSITION[AD_POSITION["EXPORT"] = 16] = "EXPORT";
-        /**
-         * 返回按钮
-         */
-        AD_POSITION[AD_POSITION["BACK"] = 32] = "BACK";
-        /**
-         * 黑色半透明遮挡
-         */
-        AD_POSITION[AD_POSITION["MASK"] = 64] = "MASK";
-        /**
-         * 延迟显示
-         */
-        AD_POSITION[AD_POSITION["WAIT"] = 128] = "WAIT";
-        /**
-         * 左右两侧
-         */
-        AD_POSITION[AD_POSITION["LEFTRIGHT"] = 256] = "LEFTRIGHT";
-    })(AD_POSITION || (AD_POSITION = {}));
+    }(BaseUIModule));
 
     var Main = /** @class */ (function () {
         function Main() {
@@ -5997,36 +6152,38 @@
             this.SHARE_CHANNEL = SHARE_CHANNEL;
             this.APP_PLATFORM = PlatformType;
             this.PLATFORM_EVENT = EventType;
-            this.UIForm = CocosUIForm;
-            this.Common = Common;
+            this.Common = Common$1;
             this.AD_POSITION = AD_POSITION;
             this.mData = new GameDataCenter();
             this.mSetting = new SettingModule();
-            this.mForm = new CocosFrom();
-            this.mEntity = new EntityModule();
+            this.mForm = new moosnowForm();
+            this.mEntity = new BaseEntityModule();
             (window["moosnow"]) = this;
             this.mData = new GameDataCenter();
             this.mSetting = new SettingModule();
             this.mEvent = new EventModule();
-            this.initResource();
-            this.initUI();
             this.initPlatform();
             this.initHttp();
             this.initAd();
+            this.initUI();
+            this.initEntity();
         }
         /**
          * 获取当前的游戏平台
          */
         Main.prototype.getAppPlatform = function () {
-            return Common.platform;
+            return Common$1.platform;
         };
-        Main.prototype.initResource = function () {
-            this.mResource = new CocosResourceModule();
+        Main.prototype.initUI = function () {
+            this.mUi = new CocosUIModule();
+        };
+        Main.prototype.initEntity = function () {
+            this.mEntity = new CocosEntityModule();
         };
         Main.prototype.initHttp = function () {
-            if (Common.platform == PlatformType.WX)
+            if (Common$1.platform == PlatformType.WX)
                 this.mHttp = new HttpModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common$1.platform == PlatformType.OPPO_ZS) {
                 this.mHttp = new ZSHttpModule();
             }
             else
@@ -6034,20 +6191,20 @@
         };
         Main.prototype.initPlatform = function () {
             // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
-            if (Common.platform == PlatformType.WX)
+            if (Common$1.platform == PlatformType.WX)
                 this.mPlatform = new WXModule();
-            else if (Common.platform == PlatformType.OPPO)
+            else if (Common$1.platform == PlatformType.OPPO)
                 this.mPlatform = new OPPOModule();
-            else if (Common.platform == PlatformType.VIVO)
+            else if (Common$1.platform == PlatformType.VIVO)
                 this.mPlatform = new VIVOModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common$1.platform == PlatformType.OPPO_ZS) {
                 this.mPlatform = new ZSOPPOModule();
             }
-            else if (Common.platform == PlatformType.BYTEDANCE)
+            else if (Common$1.platform == PlatformType.BYTEDANCE)
                 this.mPlatform = new TTModule();
-            else if (Common.platform == PlatformType.QQ)
+            else if (Common$1.platform == PlatformType.QQ)
                 this.mPlatform = new QQModule();
-            else if (Common.platform == PlatformType.BAIDU)
+            else if (Common$1.platform == PlatformType.BAIDU)
                 this.mPlatform = new BDModule();
             else {
                 this.mPlatform = new PlatformModule();
@@ -6055,19 +6212,16 @@
             // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
         };
         Main.prototype.initAd = function () {
-            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
+            if (Common$1.platform == PlatformType.WX || Common$1.platform == PlatformType.PC)
                 this.mAd = new WXAdModule();
-            else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.VIVO) {
+            else if (Common$1.platform == PlatformType.OPPO || Common$1.platform == PlatformType.VIVO) {
                 this.mAd = new OPPOAdModule();
             }
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common$1.platform == PlatformType.OPPO_ZS) {
                 this.mAd = new ZSOPPOAdModule();
             }
             else
                 this.mAd = new AdModule();
-        };
-        Main.prototype.initUI = function () {
-            this.mUi = new CocosUIModule();
         };
         Object.defineProperty(Main.prototype, "platform", {
             get: function () {
