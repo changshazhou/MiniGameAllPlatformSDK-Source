@@ -19,5 +19,4 @@ import { BaseUIModule } from "../engine/BaseUIModule";
   */
 export class CocosUIModule extends BaseUIModule {
 
-
 }

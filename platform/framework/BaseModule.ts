@@ -2,6 +2,10 @@
 export default class BaseModule {
     protected moduleName: string = "";
 
+    public preload(url, callback) {
+        if (callback)
+            callback();
+    }
 
     /**
      * 

@@ -24,13 +24,13 @@ import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
 import VIVOModule from "./platform/VIVOModule";
-import EntityModule from "./framework/EntityModule";
 import { AD_POSITION } from "./enum/AD_POSITION";
-import moosnowForm from "./model/moosnowForm";
 import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
 import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
 import { CocosUIModule } from "./ui/cocos/CocosUIModule";
+import FormControl from "./ui/FormControl";
+import Form from "./ui/Form";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -156,19 +156,38 @@ class Main {
     public get setting() {
         return this.mSetting;
     }
+    /**
+     * 事件消息
+     */
     private mEvent: EventModule;
     public get event() {
         return this.mEvent;
     }
+    /**
+     * UI控制
+     */
     private mUi: BaseUIModule;
     public get ui() {
         return this.mUi;
     }
 
-    private mForm: moosnowForm = new moosnowForm();
+    /**
+     * form UI 操作
+     */
+    private mForm: Form = new Form();
     public get form() {
         return this.mForm;
     }
+
+    /**
+     * form表单控制
+     */
+    private mControl: FormControl = new FormControl();
+    public get control() {
+        return this.mControl;
+    }
+
+
 
     private mEntity: BaseEntityModule = new BaseEntityModule();
     public get entity() {

@@ -45,6 +45,12 @@ declare class nativeAdRow {
 
 declare class BaseModule {
     protected moduleName: string;
+    preload(url: any, callback: any): void;
+    /**
+     *
+     */
+    _findComponent(node: any, classname: any): any;
+    _findComponentByName(instance: any, classname: any): any;
 }
 
 declare class AdModule extends BaseModule {
@@ -887,8 +893,19 @@ declare class BaseUIModule extends BaseModule {
     _destroyUIForm(formModel: FormModel, data: any): void;
     _removeStack(removeItem: any): void;
 }
-declare class moosnowForm {
+declare class FormControl {
     public adForm: AdForm
+}
+/**
+ * 广告结果
+ */
+declare class Form {
+    /**
+     * 显示广告
+     * @param adType
+     * @param callback
+     */
+    showAd(adType: AD_POSITION, callback: Function): void;
 }
 
 declare class moosnow {
@@ -931,7 +948,9 @@ declare class moosnow {
     static ui: BaseUIModule
     static resource: IResourceModule
     static entity: BaseEntityModule
-    static form: moosnowForm
+    static form: Form
+    static control: FormControl
+
 }
 
 

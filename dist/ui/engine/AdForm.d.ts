@@ -53,7 +53,7 @@ export default class AdForm extends BaseForm {
      * @param positionTag
      * @param entityName
      */
-    initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string): void;
+    initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string | cc.Prefab): void;
     addEvent(): void;
     removeEvent(): void;
     private mZindex;

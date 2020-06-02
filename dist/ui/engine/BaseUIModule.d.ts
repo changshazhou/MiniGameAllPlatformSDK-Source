@@ -54,7 +54,7 @@ export declare class BaseUIModule extends BaseModule {
      * @param {string} name 预设名
      * @param {any} data 携带的自定义数据
      */
-    hideUIForm(name: string, data: any, cb?: any): void;
+    hideUIForm(name: string | cc.Component | Laya.Script, data: any, cb?: any): void;
     hideAllUIForm(): void;
     destroyUIForm(name: string, data: any): void;
     _formatUIFormName(name: string): string;

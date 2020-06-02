@@ -1,5 +1,6 @@
 export default class BaseModule {
     protected moduleName: string;
+    preload(url: any, callback: any): void;
     /**
      *
      */

@@ -123,13 +123,26 @@ export class BaseUIModule extends BaseModule {
      * @param {string} name 预设名
      * @param {any} data 携带的自定义数据
      */
-    hideUIForm(name: string, data: any, cb?: any) {
-        for (let i = 0; i < this.UIFormStack.length; i++) {
-            const formModel = this.UIFormStack[i];
-            if (formModel.name == name) {
-                this._hideUIForm(formModel, data, cb);
+    hideUIForm(name: string | cc.Component | Laya.Script, data: any, cb?: any) {
+
+        if (name instanceof String) {
+            for (let i = 0; i < this.UIFormStack.length; i++) {
+                const formModel = this.UIFormStack[i];
+                if (formModel.name == name) {
+                    this._hideUIForm(formModel, data, cb);
+                }
             }
         }
+        else {
+            for (let i = 0; i < this.UIFormStack.length; i++) {
+                const formModel = this.UIFormStack[i];
+                if (formModel == name) {
+                    this._hideUIForm(formModel, data, cb);
+                }
+            }
+        }
+
+
     }
 
     hideAllUIForm() {

@@ -1,6 +1,7 @@
 import EventType from "../../utils/EventType";
 import { AD_POSITION } from "../../enum/AD_POSITION";
 import BaseForm from "./BaseForm";
+import Common from "../../utils/Common";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -171,50 +172,52 @@ export default class AdForm extends BaseForm {
      * @param positionTag 
      * @param entityName 
      */
-    public initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string) {
+    public initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string | cc.Prefab) {
         if (!entityName) {
             console.warn('entityName is null 无法初始化 ')
             return;
         }
-        moosnow.ad.getAd((res) => {
-            let source = this.setPosition(res.indexLeft, "");
+        moosnow.entity.preload(entityName, () => {
+            moosnow.ad.getAd((res) => {
+                let source = this.setPosition(res.indexLeft, "");
 
-            source.forEach((item, idx) => {
-                let adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
-                this.mAdItemList.push(adItemCtl);
-            })
-            if (layout.type == cc.Layout.Type.GRID) {
-                if (scrollView.vertical) {
-                    this.mScrollVec.push({
-                        scrollView,
-                        move2Up: false
-                    })
+                source.forEach((item, idx) => {
+                    let adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
+                    this.mAdItemList.push(adItemCtl);
+                })
+                if (layout.type == cc.Layout.Type.GRID) {
+                    if (scrollView.vertical) {
+                        this.mScrollVec.push({
+                            scrollView,
+                            move2Up: false
+                        })
+                    }
+                    else {
+                        this.mScrollVec.push({
+                            scrollView,
+                            move2Left: false
+                        })
+                    }
                 }
-                else {
+                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
                     this.mScrollVec.push({
                         scrollView,
                         move2Left: false
                     })
                 }
-            }
-            else if (layout.type == cc.Layout.Type.HORIZONTAL) {
-                this.mScrollVec.push({
-                    scrollView,
-                    move2Left: false
-                })
-            }
-            else if (layout.type == cc.Layout.Type.VERTICAL) {
-                this.mScrollVec.push({
-                    scrollView,
-                    move2Up: false
-                })
-            }
+                else if (layout.type == cc.Layout.Type.VERTICAL) {
+                    this.mScrollVec.push({
+                        scrollView,
+                        move2Up: false
+                    })
+                }
+            })
+
         })
-
-
-
-
     }
+
+    
+
     public addEvent() {
         this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this)
         moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)

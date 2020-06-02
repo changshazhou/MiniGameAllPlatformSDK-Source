@@ -1,6 +1,8 @@
+import BaseModule from "../../framework/BaseModule";
+
 const { ccclass, property } = cc._decorator;
 @ccclass
-export default class BaseForm {
+export default class BaseForm extends BaseModule {
 
     private mIntervalArr: Object = {};
     public schedule(callback: Function, time: number) {

@@ -511,6 +511,10 @@
         function BaseModule() {
             this.moduleName = "";
         }
+        BaseModule.prototype.preload = function (url, callback) {
+            if (callback)
+                callback();
+        };
         /**
          *
          */
@@ -5165,7 +5169,7 @@
         return VIVOModule;
     }(PlatformModule));
 
-    var AD_POSITION;
+    var AD_POSITION$1;
     (function (AD_POSITION) {
         /**
          * 不显示
@@ -5206,510 +5210,9 @@
         AD_POSITION[AD_POSITION["extend3"] = 2048] = "extend3";
         AD_POSITION[AD_POSITION["extend4"] = 4096] = "extend4";
         AD_POSITION[AD_POSITION["extend5"] = 8192] = "extend5";
-    })(AD_POSITION || (AD_POSITION = {}));
+    })(AD_POSITION$1 || (AD_POSITION$1 = {}));
 
     var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
-    var BaseForm = /** @class */ (function () {
-        function BaseForm() {
-            this.mIntervalArr = {};
-        }
-        BaseForm.prototype.schedule = function (callback, time) {
-            var id = setInterval(function () {
-                if (callback)
-                    callback();
-            }, time * 1000);
-            this.mIntervalArr[id] = callback;
-        };
-        BaseForm.prototype.unschedule = function (callback) {
-            for (var key in this.mIntervalArr) {
-                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                    clearInterval(parseInt(key));
-                }
-            }
-        };
-        BaseForm.prototype.initProperty = function (form) {
-            for (var v in form) {
-                if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
-                    this[v] = form[v];
-                }
-            }
-        };
-        BaseForm = __decorate([
-            ccclass
-        ], BaseForm);
-        return BaseForm;
-    }());
-
-    var _a$1 = cc._decorator, ccclass$1 = _a$1.ccclass, property$1 = _a$1.property;
-    var AdForm = /** @class */ (function (_super) {
-        __extends(AdForm, _super);
-        function AdForm() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.pauseContainer = null;
-            _this.pauseView = null;
-            _this.pauseLayout = null;
-            _this.centerContainer = null;
-            _this.centerView = null;
-            _this.centerLayout = null;
-            _this.exportContainer = null;
-            _this.exportView = null;
-            _this.exportLayout = null;
-            _this.exportClose = null;
-            _this.exportMask = null;
-            _this.exportCloseTxt = null;
-            _this.floatContainer = null;
-            _this.floatFull = null;
-            _this.bannerContainer = null;
-            _this.bannerView = null;
-            _this.bannerLayout = null;
-            _this.endContainer = null;
-            _this.endView = null;
-            _this.endLayout = null;
-            _this.failContainer = null;
-            _this.failView = null;
-            _this.failLayout = null;
-            _this.gameOverContainer = null;
-            _this.gameOverView = null;
-            _this.gameOverLayout = null;
-            _this.respawnContainer = null;
-            _this.respawnScrollView = null;
-            _this.respawnLayout = null;
-            _this.playerDiedContainer = null;
-            _this.playerDiedScrollView = null;
-            _this.playerDiedLayout = null;
-            _this.leftContainer = null;
-            _this.leftView = null;
-            _this.leftLayout = null;
-            _this.rightView = null;
-            _this.rightLayout = null;
-            _this.drawerContainer = null;
-            _this.drawerView = null;
-            _this.drawerLayout = null;
-            _this.drawerShow = null;
-            _this.drawerHide = null;
-            _this.mAdItemList = [];
-            _this.mScrollVec = [];
-            _this.mZindex = 9999;
-            _this.mShowAd = moosnow.AD_POSITION.NONE;
-            _this.mMoveSpeed = 2;
-            _this.mFloatIndex = 0;
-            _this.mFloatRefresh = 3;
-            _this.mFloatCache = {};
-            _this.mSecond = 3;
-            return _this;
-        }
-        AdForm.prototype.setPosition = function (source, position) {
-            if (position === void 0) { position = ""; }
-            var retValue = Common.deepCopy(source);
-            retValue.forEach(function (item) {
-                item.position = position;
-            });
-            return retValue;
-        };
-        /**
-         *
-         * @param scrollView
-         * @param layout
-         * @param positionTag
-         * @param entityName
-         */
-        AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
-            var _this = this;
-            if (!entityName) {
-                console.warn('entityName is null 无法初始化 ');
-                return;
-            }
-            moosnow.ad.getAd(function (res) {
-                var source = _this.setPosition(res.indexLeft, "");
-                source.forEach(function (item, idx) {
-                    var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
-                    _this.mAdItemList.push(adItemCtl);
-                });
-                if (layout.type == cc.Layout.Type.GRID) {
-                    if (scrollView.vertical) {
-                        _this.mScrollVec.push({
-                            scrollView: scrollView,
-                            move2Up: false
-                        });
-                    }
-                    else {
-                        _this.mScrollVec.push({
-                            scrollView: scrollView,
-                            move2Left: false
-                        });
-                    }
-                }
-                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
-                    _this.mScrollVec.push({
-                        scrollView: scrollView,
-                        move2Left: false
-                    });
-                }
-                else if (layout.type == cc.Layout.Type.VERTICAL) {
-                    _this.mScrollVec.push({
-                        scrollView: scrollView,
-                        move2Up: false
-                    });
-                }
-            });
-        };
-        AdForm.prototype.addEvent = function () {
-            this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
-        };
-        AdForm.prototype.removeEvent = function () {
-            this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
-        };
-        AdForm.prototype.onAdChange = function (data) {
-            this.displayChange(data.showAd, data.callback);
-            // if (!isNaN(data.zIndex)) {
-            //     this.node.zIndex = data.zIndex;
-            // }
-            // else {
-            //     this.node.zIndex = this.mZindex;
-            // }
-        };
-        /**
-          *
-          * @param data
-          */
-        AdForm.prototype.willShow = function (data) {
-            this.mAdItemList = [];
-            this.mScrollVec = [];
-            this.addEvent();
-            if (data)
-                this.displayChange(data.showAd, data.callback);
-            else
-                this.displayChange(AD_POSITION.NONE, null);
-        };
-        AdForm.prototype.displayChange = function (data, callback) {
-            if (callback === void 0) { callback = null; }
-            var curApp = moosnow.getAppPlatform();
-            if (moosnow.APP_PLATFORM.WX == curApp || curApp == moosnow.APP_PLATFORM.OPPO) {
-                this.mShowAd = data;
-                this.displayAd(true);
-                this.mBackCall = callback;
-            }
-            else {
-                this.onBack();
-            }
-        };
-        AdForm.prototype.onBack = function () {
-            if (this.mBackCall) {
-                this.mBackCall();
-            }
-        };
-        AdForm.prototype.onFwUpdate = function (dt) {
-            for (var i = 0; i < this.mScrollVec.length; i++) {
-                var item = this.mScrollVec[i];
-                var scrollView = item.scrollView;
-                if (scrollView.isScrolling())
-                    continue;
-                var scrollOffset = scrollView.getMaxScrollOffset();
-                var maxH = scrollOffset.y / 2 + 20;
-                var maxW = scrollOffset.x / 2 + 20;
-                var contentPos = scrollView.getContentPosition();
-                if (item.move2Up == true) {
-                    if (contentPos.y > maxH) {
-                        item.move2Up = false;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed));
-                }
-                else if (item.move2Up == false) {
-                    if (contentPos.y < -maxH) {
-                        item.move2Up = true;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed));
-                }
-                if (item.move2Left == true) {
-                    if (contentPos.x > maxW) {
-                        item.move2Left = false;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y));
-                }
-                else if (item.move2Left == false) {
-                    if (contentPos.x < -maxW) {
-                        item.move2Left = true;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y));
-                }
-            }
-        };
-        AdForm.prototype.willHide = function () {
-            this.removeEvent();
-            this.mAdItemList.forEach(function (item) {
-                moosnow.entity.hideEntity(item, null);
-            });
-            this.mAdItemList = [];
-            this.mScrollVec = [];
-        };
-        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points) {
-            var _this = this;
-            moosnow.ad.getAd(function (res) {
-                _this.mAdData = res;
-                var source = __spreadArrays(res.indexLeft);
-                points.forEach(function (item, idx) {
-                    var showIndex = idx; //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
-                    var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动" });
-                    var itemName = prefabs.length - 1 >= idx ? prefabs[idx] : prefabs[0];
-                    var logic = moosnow.entity.showEntity(itemName, parentNode, adRow);
-                    _this.mFloatCache[idx] = {
-                        index: showIndex,
-                        logic: logic,
-                        onCancel: adRow.onCancel
-                    };
-                    _this.floatAnim(item);
-                });
-                _this.updateFloat(Common.deepCopy(res));
-                setInterval(function () {
-                    _this.updateFloat(Common.deepCopy(res));
-                }, _this.mFloatRefresh * 1000);
-            });
-        };
-        AdForm.prototype.floatAnim = function (floatNode) {
-            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
-        };
-        AdForm.prototype.updateFloat = function (source) {
-            for (var key in this.mFloatCache) {
-                var showIndex = this.mFloatCache[key].index;
-                var logic = this.mFloatCache[key].logic;
-                if (showIndex < source.indexLeft.length - 1)
-                    showIndex++;
-                else
-                    showIndex = 0;
-                this.mFloatCache[key].index = showIndex;
-                logic.refreshImg(__assign(__assign({}, source.indexLeft[showIndex]), { onCancel: this.mFloatCache[key].onCancel }));
-            }
-        };
-        AdForm.prototype.hasAd = function (ad) {
-            return (this.mShowAd & ad) == ad;
-        };
-        AdForm.prototype.showExportClose = function () {
-            this.mSecond -= 1;
-            this.exportCloseTxt.active = true;
-            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
-            if (this.mSecond <= 0) {
-                this.exportClose.active = true;
-                this.exportCloseTxt.active = false;
-                this.unschedule(this.showExportClose);
-                return;
-            }
-            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
-        };
-        AdForm.prototype.displayAd = function (visible) {
-            var _this = this;
-            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
-            this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
-            this.centerContainer.active = visible && this.hasAd(AD_POSITION.CENTER);
-            this.leftContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
-            this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
-            // this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-            // this.endContainer.active && this.initEndExport();
-            this.exportClose.active = false;
-            this.exportCloseTxt.active = false;
-            this.unschedule(this.showExportClose);
-            if (this.hasAd(AD_POSITION.BACK)) {
-                if (this.hasAd(AD_POSITION.WAIT)) {
-                    this.mSecond = 3;
-                    this.showExportClose();
-                    this.schedule(this.showExportClose, 1);
-                }
-                else {
-                    this.exportClose.active = true;
-                    this.exportCloseTxt.active = false;
-                }
-            }
-            else {
-                this.exportClose.active = false;
-                this.exportCloseTxt.active = false;
-            }
-            this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-            if (visible && this.hasAd(AD_POSITION.EXPORT)) {
-                moosnow.http.getAllConfig(function (res) {
-                    if (res.exportAutoNavigate == 1) {
-                        moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
-                    }
-                });
-            }
-        };
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "pauseContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "pauseView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "pauseLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "centerContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "centerView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "centerLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "exportContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "exportView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "exportLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "exportClose", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "exportMask", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "exportCloseTxt", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "floatContainer", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "floatFull", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "bannerContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "bannerView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "bannerLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "endContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "endView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "endLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "failContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "failView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "failLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "gameOverContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "gameOverView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "gameOverLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "respawnContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "respawnScrollView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "respawnLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "playerDiedContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "playerDiedScrollView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "playerDiedLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "leftContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "leftView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "leftLayout", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "rightView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "rightLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "drawerContainer", void 0);
-        __decorate([
-            property$1(cc.ScrollView)
-        ], AdForm.prototype, "drawerView", void 0);
-        __decorate([
-            property$1(cc.Layout)
-        ], AdForm.prototype, "drawerLayout", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "drawerShow", void 0);
-        __decorate([
-            property$1(cc.Node)
-        ], AdForm.prototype, "drawerHide", void 0);
-        AdForm = __decorate([
-            ccclass$1
-        ], AdForm);
-        return AdForm;
-    }(BaseForm));
-
-    var _a$2 = cc._decorator, ccclass$2 = _a$2.ccclass, property$2 = _a$2.property;
-    var CocosAdForm = /** @class */ (function (_super) {
-        __extends(CocosAdForm, _super);
-        function CocosAdForm() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        CocosAdForm.prototype.addEvent = function () {
-            if (this.exportClose)
-                this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
-        };
-        CocosAdForm.prototype.removeEvent = function () {
-            if (this.exportClose)
-                this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
-        };
-        CocosAdForm = __decorate([
-            ccclass$2
-        ], CocosAdForm);
-        return CocosAdForm;
-    }(AdForm));
-
-    /**
-     * 广告结果
-     */
-    var moosnowForm = /** @class */ (function () {
-        function moosnowForm() {
-        }
-        Object.defineProperty(moosnowForm.prototype, "adForm", {
-            /**
-             * 广告form
-             */
-            get: function () {
-                if (!this.mAdForm)
-                    this.mAdForm = new CocosAdForm();
-                return this.mAdForm;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        return moosnowForm;
-    }());
-
-    var _a$3 = cc._decorator, ccclass$3 = _a$3.ccclass, property$3 = _a$3.property;
     var BaseEntityModule = /** @class */ (function (_super) {
         __extends(BaseEntityModule, _super);
         function BaseEntityModule() {
@@ -5748,6 +5251,40 @@
             return this.entityLogics.filter(function (item) { return item.poolName == name; });
         };
         BaseEntityModule.prototype.showEntity = function (name, parentNode, data) {
+        };
+        BaseEntityModule.prototype.hideEntity = function (logic, data, isDestory) {
+            if (isDestory === void 0) { isDestory = false; }
+        };
+        BaseEntityModule.prototype.hideAllEntity = function (name, isDestory) {
+            if (isDestory === void 0) { isDestory = false; }
+        };
+        BaseEntityModule = __decorate([
+            ccclass
+        ], BaseEntityModule);
+        return BaseEntityModule;
+    }(BaseModule));
+
+    var ENGINE_TYPE = {
+        COCOS: "cc",
+        LAYA: "Laya",
+        NONE: ""
+    };
+
+    var _a$1 = cc._decorator, ccclass$1 = _a$1.ccclass, property$1 = _a$1.property;
+    var CocosEntityModule = /** @class */ (function (_super) {
+        __extends(CocosEntityModule, _super);
+        function CocosEntityModule() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.prefabPath = "moosnow/prefab/entity/";
+            return _this;
+        }
+        CocosEntityModule.prototype.preload = function (name, callback) {
+            cc.loader.loadRes(this.prefabPath + '' + name, cc.Prefab, function (error, resource) {
+                if (callback)
+                    callback(error, resource);
+            });
+        };
+        CocosEntityModule.prototype.showEntity = function (name, parentNode, data) {
             var logic = this._showEntity(name);
             logic.id = this._serializeId--;
             logic.node.parent = parentNode;
@@ -5758,11 +5295,79 @@
             this.entityLogics.push(logic);
             return logic;
         };
-        BaseEntityModule.prototype.hideEntity = function (logic, data, isDestory) {
+        CocosEntityModule.prototype._createEntity = function (name) {
+            var prefab;
+            if (this._getEngine(name) == ENGINE_TYPE.NONE)
+                prefab = this._getPrefabByName(name);
+            else
+                prefab = name;
+            return cc.instantiate(prefab);
+        };
+        CocosEntityModule.prototype._showEntity = function (name) {
+            var pool = this._getOrNewEntityPool(name);
+            var entity = pool.get();
+            if (entity == null) {
+                entity = this._createEntity(name);
+            }
+            var logic = this._findComponent(entity, "EntityLogic");
+            logic.poolName = pool.name;
+            return logic;
+        };
+        CocosEntityModule.prototype._getPrefabByName = function (name) {
+            var profab = cc.loader.getRes(this.prefabPath + '' + name, cc.Prefab);
+            return profab;
+        };
+        CocosEntityModule.prototype._getOrNewEntityPool = function (name) {
+            var poolName = this._getPoolName(name);
+            var pool = this._getEntityPool(poolName);
+            if (pool == null) {
+                pool = this._newEntityPool(poolName);
+            }
+            return pool;
+        };
+        CocosEntityModule.prototype._getEngine = function (instance) {
+            if (window[ENGINE_TYPE.COCOS] && instance instanceof cc.Prefab) {
+                return ENGINE_TYPE.COCOS;
+            }
+            else if (window[ENGINE_TYPE.LAYA] && instance instanceof Laya.Prefab) {
+                return ENGINE_TYPE.LAYA;
+            }
+            else
+                return ENGINE_TYPE.NONE;
+        };
+        CocosEntityModule.prototype._getPoolName = function (name) {
+            var poolName = "";
+            var engine = this._getEngine(name);
+            if (engine == ENGINE_TYPE.COCOS) {
+                poolName = name.name;
+            }
+            else if (engine == ENGINE_TYPE.LAYA) {
+                poolName = name.json.name;
+            }
+            else
+                poolName = "" + name;
+            return poolName;
+        };
+        CocosEntityModule.prototype._getEntityPool = function (name) {
+            for (var i = 0; i < this.entityPools.length; i++) {
+                var pool = this.entityPools[i];
+                if (pool.name === name) {
+                    return pool;
+                }
+            }
+            return null;
+        };
+        CocosEntityModule.prototype._newEntityPool = function (name) {
+            var pool = new cc.NodePool(name);
+            pool.name = name;
+            this.entityPools.push(pool);
+            return pool;
+        };
+        CocosEntityModule.prototype.hideEntity = function (logic, data, isDestory) {
             if (isDestory === void 0) { isDestory = false; }
             this._hideEntity(logic, data, isDestory);
         };
-        BaseEntityModule.prototype.hideAllEntity = function (name, isDestory) {
+        CocosEntityModule.prototype.hideAllEntity = function (name, isDestory) {
             if (isDestory === void 0) { isDestory = false; }
             for (var i = 0; i < this.entityLogics.length; i++) {
                 var item = this.entityLogics[i];
@@ -5772,17 +5377,7 @@
                 }
             }
         };
-        BaseEntityModule.prototype._showEntity = function (name) {
-            var pool = this._getOrNewEntityPool(name);
-            var entity = pool.get();
-            if (entity == null) {
-                entity = this._createEntity(name);
-            }
-            var logic = entity.getComponent("EntityLogic");
-            logic.poolName = pool.name;
-            return logic;
-        };
-        BaseEntityModule.prototype._hideEntity = function (logic, data, isDestory) {
+        CocosEntityModule.prototype._hideEntity = function (logic, data, isDestory) {
             if (isDestory === void 0) { isDestory = false; }
             if (isDestory) {
                 logic.willHide(data);
@@ -5799,50 +5394,6 @@
             }
             cc.js.array.remove(this.entityLogics, logic);
         };
-        BaseEntityModule.prototype._createEntity = function (name) {
-            var prefab = this._getPrefabByName(name);
-            return cc.instantiate(prefab);
-        };
-        BaseEntityModule.prototype._getPrefabByName = function (name) {
-            var profab = cc.loader.getRes(this.prefabPath + '' + name, cc.Prefab);
-            return profab;
-        };
-        BaseEntityModule.prototype._getOrNewEntityPool = function (name) {
-            var pool = this._getEntityPool(name);
-            if (pool == null) {
-                pool = this._newEntityPool(name);
-            }
-            return pool;
-        };
-        BaseEntityModule.prototype._getEntityPool = function (name) {
-            for (var i = 0; i < this.entityPools.length; i++) {
-                var pool = this.entityPools[i];
-                if (pool.name === name) {
-                    return pool;
-                }
-            }
-            return null;
-        };
-        BaseEntityModule.prototype._newEntityPool = function (name) {
-            var pool = new cc.NodePool(name);
-            pool.name = name;
-            this.entityPools.push(pool);
-            return pool;
-        };
-        BaseEntityModule = __decorate([
-            ccclass$3
-        ], BaseEntityModule);
-        return BaseEntityModule;
-    }(BaseModule));
-
-    var _a$4 = cc._decorator, ccclass$4 = _a$4.ccclass, property$4 = _a$4.property;
-    var CocosEntityModule = /** @class */ (function (_super) {
-        __extends(CocosEntityModule, _super);
-        function CocosEntityModule() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.prefabPath = "prefab/entity/";
-            return _this;
-        }
         return CocosEntityModule;
     }(BaseEntityModule));
 
@@ -5969,10 +5520,20 @@
          * @param {any} data 携带的自定义数据
          */
         BaseUIModule.prototype.hideUIForm = function (name, data, cb) {
-            for (var i = 0; i < this.UIFormStack.length; i++) {
-                var formModel = this.UIFormStack[i];
-                if (formModel.name == name) {
-                    this._hideUIForm(formModel, data, cb);
+            if (name instanceof String) {
+                for (var i = 0; i < this.UIFormStack.length; i++) {
+                    var formModel = this.UIFormStack[i];
+                    if (formModel.name == name) {
+                        this._hideUIForm(formModel, data, cb);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < this.UIFormStack.length; i++) {
+                    var formModel = this.UIFormStack[i];
+                    if (formModel == name) {
+                        this._hideUIForm(formModel, data, cb);
+                    }
                 }
             }
         };
@@ -6143,6 +5704,530 @@
         return CocosUIModule;
     }(BaseUIModule));
 
+    var _a$2 = cc._decorator, ccclass$2 = _a$2.ccclass, property$2 = _a$2.property;
+    var BaseForm = /** @class */ (function (_super) {
+        __extends(BaseForm, _super);
+        function BaseForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mIntervalArr = {};
+            return _this;
+        }
+        BaseForm.prototype.schedule = function (callback, time) {
+            var id = setInterval(function () {
+                if (callback)
+                    callback();
+            }, time * 1000);
+            this.mIntervalArr[id] = callback;
+        };
+        BaseForm.prototype.unschedule = function (callback) {
+            for (var key in this.mIntervalArr) {
+                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
+                    clearInterval(parseInt(key));
+                }
+            }
+        };
+        BaseForm.prototype.initProperty = function (form) {
+            for (var v in form) {
+                if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
+                    this[v] = form[v];
+                }
+            }
+        };
+        BaseForm = __decorate([
+            ccclass$2
+        ], BaseForm);
+        return BaseForm;
+    }(BaseModule));
+
+    var _a$3 = cc._decorator, ccclass$3 = _a$3.ccclass, property$3 = _a$3.property;
+    var AdForm = /** @class */ (function (_super) {
+        __extends(AdForm, _super);
+        function AdForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.pauseContainer = null;
+            _this.pauseView = null;
+            _this.pauseLayout = null;
+            _this.centerContainer = null;
+            _this.centerView = null;
+            _this.centerLayout = null;
+            _this.exportContainer = null;
+            _this.exportView = null;
+            _this.exportLayout = null;
+            _this.exportClose = null;
+            _this.exportMask = null;
+            _this.exportCloseTxt = null;
+            _this.floatContainer = null;
+            _this.floatFull = null;
+            _this.bannerContainer = null;
+            _this.bannerView = null;
+            _this.bannerLayout = null;
+            _this.endContainer = null;
+            _this.endView = null;
+            _this.endLayout = null;
+            _this.failContainer = null;
+            _this.failView = null;
+            _this.failLayout = null;
+            _this.gameOverContainer = null;
+            _this.gameOverView = null;
+            _this.gameOverLayout = null;
+            _this.respawnContainer = null;
+            _this.respawnScrollView = null;
+            _this.respawnLayout = null;
+            _this.playerDiedContainer = null;
+            _this.playerDiedScrollView = null;
+            _this.playerDiedLayout = null;
+            _this.leftContainer = null;
+            _this.leftView = null;
+            _this.leftLayout = null;
+            _this.rightView = null;
+            _this.rightLayout = null;
+            _this.drawerContainer = null;
+            _this.drawerView = null;
+            _this.drawerLayout = null;
+            _this.drawerShow = null;
+            _this.drawerHide = null;
+            _this.mAdItemList = [];
+            _this.mScrollVec = [];
+            _this.mZindex = 9999;
+            _this.mShowAd = moosnow.AD_POSITION.NONE;
+            _this.mMoveSpeed = 2;
+            _this.mFloatIndex = 0;
+            _this.mFloatRefresh = 3;
+            _this.mFloatCache = {};
+            _this.mSecond = 3;
+            return _this;
+        }
+        AdForm.prototype.setPosition = function (source, position) {
+            if (position === void 0) { position = ""; }
+            var retValue = Common$1.deepCopy(source);
+            retValue.forEach(function (item) {
+                item.position = position;
+            });
+            return retValue;
+        };
+        /**
+         *
+         * @param scrollView
+         * @param layout
+         * @param positionTag
+         * @param entityName
+         */
+        AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
+            var _this = this;
+            if (!entityName) {
+                console.warn('entityName is null 无法初始化 ');
+                return;
+            }
+            moosnow.entity.preload(entityName, function () {
+                moosnow.ad.getAd(function (res) {
+                    var source = _this.setPosition(res.indexLeft, "");
+                    source.forEach(function (item, idx) {
+                        var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
+                        _this.mAdItemList.push(adItemCtl);
+                    });
+                    if (layout.type == cc.Layout.Type.GRID) {
+                        if (scrollView.vertical) {
+                            _this.mScrollVec.push({
+                                scrollView: scrollView,
+                                move2Up: false
+                            });
+                        }
+                        else {
+                            _this.mScrollVec.push({
+                                scrollView: scrollView,
+                                move2Left: false
+                            });
+                        }
+                    }
+                    else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+                        _this.mScrollVec.push({
+                            scrollView: scrollView,
+                            move2Left: false
+                        });
+                    }
+                    else if (layout.type == cc.Layout.Type.VERTICAL) {
+                        _this.mScrollVec.push({
+                            scrollView: scrollView,
+                            move2Up: false
+                        });
+                    }
+                });
+            });
+        };
+        AdForm.prototype.addEvent = function () {
+            this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+        };
+        AdForm.prototype.removeEvent = function () {
+            this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+        };
+        AdForm.prototype.onAdChange = function (data) {
+            this.displayChange(data.showAd, data.callback);
+            // if (!isNaN(data.zIndex)) {
+            //     this.node.zIndex = data.zIndex;
+            // }
+            // else {
+            //     this.node.zIndex = this.mZindex;
+            // }
+        };
+        /**
+          *
+          * @param data
+          */
+        AdForm.prototype.willShow = function (data) {
+            this.mAdItemList = [];
+            this.mScrollVec = [];
+            this.addEvent();
+            if (data)
+                this.displayChange(data.showAd, data.callback);
+            else
+                this.displayChange(AD_POSITION$1.NONE, null);
+        };
+        AdForm.prototype.displayChange = function (data, callback) {
+            if (callback === void 0) { callback = null; }
+            var curApp = moosnow.getAppPlatform();
+            if (moosnow.APP_PLATFORM.WX == curApp || curApp == moosnow.APP_PLATFORM.OPPO) {
+                this.mShowAd = data;
+                this.displayAd(true);
+                this.mBackCall = callback;
+            }
+            else {
+                this.onBack();
+            }
+        };
+        AdForm.prototype.onBack = function () {
+            if (this.mBackCall) {
+                this.mBackCall();
+            }
+        };
+        AdForm.prototype.onFwUpdate = function (dt) {
+            for (var i = 0; i < this.mScrollVec.length; i++) {
+                var item = this.mScrollVec[i];
+                var scrollView = item.scrollView;
+                if (scrollView.isScrolling())
+                    continue;
+                var scrollOffset = scrollView.getMaxScrollOffset();
+                var maxH = scrollOffset.y / 2 + 20;
+                var maxW = scrollOffset.x / 2 + 20;
+                var contentPos = scrollView.getContentPosition();
+                if (item.move2Up == true) {
+                    if (contentPos.y > maxH) {
+                        item.move2Up = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed));
+                }
+                else if (item.move2Up == false) {
+                    if (contentPos.y < -maxH) {
+                        item.move2Up = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed));
+                }
+                if (item.move2Left == true) {
+                    if (contentPos.x > maxW) {
+                        item.move2Left = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y));
+                }
+                else if (item.move2Left == false) {
+                    if (contentPos.x < -maxW) {
+                        item.move2Left = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y));
+                }
+            }
+        };
+        AdForm.prototype.willHide = function () {
+            this.removeEvent();
+            this.mAdItemList.forEach(function (item) {
+                moosnow.entity.hideEntity(item, null);
+            });
+            this.mAdItemList = [];
+            this.mScrollVec = [];
+        };
+        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points) {
+            var _this = this;
+            moosnow.ad.getAd(function (res) {
+                _this.mAdData = res;
+                var source = __spreadArrays(res.indexLeft);
+                points.forEach(function (item, idx) {
+                    var showIndex = idx; //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
+                    var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动" });
+                    var itemName = prefabs.length - 1 >= idx ? prefabs[idx] : prefabs[0];
+                    var logic = moosnow.entity.showEntity(itemName, parentNode, adRow);
+                    _this.mFloatCache[idx] = {
+                        index: showIndex,
+                        logic: logic,
+                        onCancel: adRow.onCancel
+                    };
+                    _this.floatAnim(item);
+                });
+                _this.updateFloat(Common$1.deepCopy(res));
+                setInterval(function () {
+                    _this.updateFloat(Common$1.deepCopy(res));
+                }, _this.mFloatRefresh * 1000);
+            });
+        };
+        AdForm.prototype.floatAnim = function (floatNode) {
+            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
+        };
+        AdForm.prototype.updateFloat = function (source) {
+            for (var key in this.mFloatCache) {
+                var showIndex = this.mFloatCache[key].index;
+                var logic = this.mFloatCache[key].logic;
+                if (showIndex < source.indexLeft.length - 1)
+                    showIndex++;
+                else
+                    showIndex = 0;
+                this.mFloatCache[key].index = showIndex;
+                logic.refreshImg(__assign(__assign({}, source.indexLeft[showIndex]), { onCancel: this.mFloatCache[key].onCancel }));
+            }
+        };
+        AdForm.prototype.hasAd = function (ad) {
+            return (this.mShowAd & ad) == ad;
+        };
+        AdForm.prototype.showExportClose = function () {
+            this.mSecond -= 1;
+            this.exportCloseTxt.active = true;
+            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
+            if (this.mSecond <= 0) {
+                this.exportClose.active = true;
+                this.exportCloseTxt.active = false;
+                this.unschedule(this.showExportClose);
+                return;
+            }
+            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
+        };
+        AdForm.prototype.displayAd = function (visible) {
+            var _this = this;
+            this.floatContainer.active = visible && this.hasAd(AD_POSITION$1.FLOAT);
+            this.bannerContainer.active = visible && this.hasAd(AD_POSITION$1.BANNER);
+            this.centerContainer.active = visible && this.hasAd(AD_POSITION$1.CENTER);
+            this.leftContainer.active = visible && this.hasAd(AD_POSITION$1.LEFTRIGHT);
+            this.exportMask.active = visible && this.hasAd(AD_POSITION$1.MASK);
+            // this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            // this.endContainer.active && this.initEndExport();
+            this.exportClose.active = false;
+            this.exportCloseTxt.active = false;
+            this.unschedule(this.showExportClose);
+            if (this.hasAd(AD_POSITION$1.BACK)) {
+                if (this.hasAd(AD_POSITION$1.WAIT)) {
+                    this.mSecond = 3;
+                    this.showExportClose();
+                    this.schedule(this.showExportClose, 1);
+                }
+                else {
+                    this.exportClose.active = true;
+                    this.exportCloseTxt.active = false;
+                }
+            }
+            else {
+                this.exportClose.active = false;
+                this.exportCloseTxt.active = false;
+            }
+            this.exportContainer.active = visible && this.hasAd(AD_POSITION$1.EXPORT);
+            if (visible && this.hasAd(AD_POSITION$1.EXPORT)) {
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.exportAutoNavigate == 1) {
+                        moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common$1.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
+                    }
+                });
+            }
+        };
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "pauseContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "pauseView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "pauseLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "centerContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "centerView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "centerLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "exportContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "exportView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "exportLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "exportClose", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "exportMask", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "exportCloseTxt", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "floatContainer", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "floatFull", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "bannerContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "bannerView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "bannerLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "endContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "endView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "endLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "failContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "failView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "failLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "gameOverContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "gameOverView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "gameOverLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "respawnContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "respawnScrollView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "respawnLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "playerDiedContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "playerDiedScrollView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "playerDiedLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "leftContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "leftView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "leftLayout", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "rightView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "rightLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "drawerContainer", void 0);
+        __decorate([
+            property$3(cc.ScrollView)
+        ], AdForm.prototype, "drawerView", void 0);
+        __decorate([
+            property$3(cc.Layout)
+        ], AdForm.prototype, "drawerLayout", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "drawerShow", void 0);
+        __decorate([
+            property$3(cc.Node)
+        ], AdForm.prototype, "drawerHide", void 0);
+        AdForm = __decorate([
+            ccclass$3
+        ], AdForm);
+        return AdForm;
+    }(BaseForm));
+
+    var _a$4 = cc._decorator, ccclass$4 = _a$4.ccclass, property$4 = _a$4.property;
+    var CocosAdForm = /** @class */ (function (_super) {
+        __extends(CocosAdForm, _super);
+        function CocosAdForm() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        CocosAdForm.prototype.addEvent = function () {
+            if (this.exportClose)
+                this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+        };
+        CocosAdForm.prototype.removeEvent = function () {
+            if (this.exportClose)
+                this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+        };
+        CocosAdForm = __decorate([
+            ccclass$4
+        ], CocosAdForm);
+        return CocosAdForm;
+    }(AdForm));
+
+    /**
+     * 广告结果
+     */
+    var FormControl = /** @class */ (function () {
+        function FormControl() {
+        }
+        Object.defineProperty(FormControl.prototype, "adForm", {
+            /**
+             * 广告form
+             */
+            get: function () {
+                if (!this.mAdForm)
+                    this.mAdForm = new CocosAdForm();
+                return this.mAdForm;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        return FormControl;
+    }());
+
+    /**
+     * 广告结果
+     */
+    var Form = /** @class */ (function () {
+        function Form() {
+        }
+        /**
+         * 显示广告
+         * @param adType
+         * @param callback
+         */
+        Form.prototype.showAd = function (adType, callback) {
+            if (adType === void 0) { adType = AD_POSITION.NONE; }
+            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback });
+        };
+        return Form;
+    }());
+
     var Main = /** @class */ (function () {
         function Main() {
             this.VIDEO_STATUS = VIDEO_STATUS;
@@ -6153,10 +6238,17 @@
             this.APP_PLATFORM = PlatformType;
             this.PLATFORM_EVENT = EventType;
             this.Common = Common$1;
-            this.AD_POSITION = AD_POSITION;
+            this.AD_POSITION = AD_POSITION$1;
             this.mData = new GameDataCenter();
             this.mSetting = new SettingModule();
-            this.mForm = new moosnowForm();
+            /**
+             * form UI 操作
+             */
+            this.mForm = new Form();
+            /**
+             * form表单控制
+             */
+            this.mControl = new FormControl();
             this.mEntity = new BaseEntityModule();
             (window["moosnow"]) = this;
             this.mData = new GameDataCenter();
@@ -6291,6 +6383,13 @@
         Object.defineProperty(Main.prototype, "form", {
             get: function () {
                 return this.mForm;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Main.prototype, "control", {
+            get: function () {
+                return this.mControl;
             },
             enumerable: true,
             configurable: true
