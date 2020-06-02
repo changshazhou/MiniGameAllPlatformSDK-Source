@@ -355,16 +355,23 @@ export default class AdForm extends BaseForm {
     private mFloatIndex = 0;
     private mFloatRefresh = 3;
     private mFloatCache = {};
-    private mAdData: moosnowResult
-    public initFloatAd(parentNode, prefabs, points: Array<cc.Vec2>) {
+    private mAdData: moosnowResult;
+    /**
+     * 
+     * @param parentNode 父节点
+     * @param prefabs 匹配的预制体
+     * @param points 需要显示的坐标点
+     */
+    public initFloatAd(parentNode, prefabs: [], points: []) {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
             moosnow.ad.getAd((res: moosnowResult) => {
                 this.mAdData = res;
                 let source = [...res.indexLeft];
 
                 prefabs.forEach((prefabName, idx) => {
-                    let showIndex = idx  //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
-                    let adRow = { ...source[showIndex], position: "首页浮动", x: points[idx].x, y: points[idx].y }
+                    let showIndex = idx
+                    let point = points[idx] as any;
+                    let adRow = { ...source[showIndex], position: "首页浮动", x: point.x, y: point.y }
                     let logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                     this.mFloatCache[idx] = {
                         index: showIndex,

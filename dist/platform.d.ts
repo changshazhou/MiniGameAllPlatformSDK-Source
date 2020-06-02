@@ -901,8 +901,45 @@ declare class BaseUIModule extends BaseModule {
     _destroyUIForm(formModel: FormModel, data: any): void;
     _removeStack(removeItem: any): void;
 }
+declare class MistouchForm extends BaseForm {
+    clickProgress: any;
+    btnBanner: any;
+    logo: any;
+    mBeginPos: any;
+    mEndPos: any;
+    private mMaxNum;
+    private mCurrentNum;
+    private mNavigateIndex;
+    private mBannerShow;
+    private mShowTime;
+    private mBannerClickType;
+    private LogicData;
+    initPos(): void;
+    willShow(data: any): void;
+    willHide(): void;
+    private subProgress;
+    addEvent(): void;
+    removeEvent(): void;
+    private bannerClickCallback;
+    onLogoUp(): void;
+    onLogoDown(): void;
+    onBannerClick(): void;
+    /**
+     * 点击完成回调
+     */
+    onCompleted(): void;
+    private resetProgress;
+    private onHideBanner;
+    update(): void;
+}
 declare class FormControl {
-    public adForm: AdForm
+    private mAdForm;
+    /**
+     * 广告form
+     */
+    get adForm(): AdForm;
+    private mMistouchForm;
+    get mistouchForm(): MistouchForm;
 }
 /**
  * 广告结果
@@ -919,6 +956,10 @@ declare class Form {
      * @param zIndex  层级
      */
     showAd(adType: AD_POSITION, callback: Function, zIndex?: number): void;
+    /**
+    * 显示狂点页面
+    */
+    showMistouch(): void;
 }
 declare class DelayMove extends BaseModule {
     posButton: cc.Node;

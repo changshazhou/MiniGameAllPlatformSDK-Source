@@ -1,3 +1,4 @@
+import Common from "../utils/Common";
 
 export default class BaseModule {
     protected moduleName: string = "";
@@ -17,6 +18,16 @@ export default class BaseModule {
                 clearInterval(parseInt(key))
             }
         }
+    }
+
+    public scheduleOnce(callback: Function, time: number) {
+        let self = this;
+        let id = setTimeout(() => {
+            clearTimeout(id);
+            if (callback)
+                callback.apply(self)
+
+        }, time * 1000)
     }
 
     public initProperty(form) {

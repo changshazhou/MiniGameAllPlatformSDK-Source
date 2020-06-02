@@ -3,6 +3,7 @@ export default class BaseModule {
     private mIntervalArr;
     schedule(callback: Function, time: number): void;
     unschedule(callback: any): void;
+    scheduleOnce(callback: Function, time: number): void;
     initProperty(form: any): void;
     preload(url: any, callback: any): void;
     /**

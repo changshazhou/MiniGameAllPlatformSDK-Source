@@ -81,7 +81,13 @@ export default class AdForm extends BaseForm {
     private mFloatRefresh;
     private mFloatCache;
     private mAdData;
-    initFloatAd(parentNode: any, prefabs: any, points: Array<cc.Vec2>): void;
+    /**
+     *
+     * @param parentNode 父节点
+     * @param prefabs 匹配的预制体
+     * @param points 需要显示的坐标点
+     */
+    initFloatAd(parentNode: any, prefabs: [], points: []): void;
     floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;
