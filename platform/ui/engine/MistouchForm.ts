@@ -78,7 +78,8 @@ export default class MistouchForm extends BaseForm {
             this.unschedule(this.resetProgress)
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            this.onCompleted();
+            if (this.LogicData && this.LogicData.onCompleted)
+                this.onCompleted();
         }
     }
 
@@ -117,7 +118,8 @@ export default class MistouchForm extends BaseForm {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
             moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
-            this.onCompleted();
+            if (this.LogicData && this.LogicData.onCompleted)
+                this.onCompleted();
         }
     }
 

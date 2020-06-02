@@ -88,8 +88,13 @@ export default class Form {
     /**
      * 显示狂点页面
      */
-    public showMistouch() {
-        moosnow.ui.pushUIForm(UIForms.MistouchForm, {}, () => {
+    public showMistouch(callback) {
+        moosnow.ui.pushUIForm(UIForms.MistouchForm, {
+            onCompleted: () => {
+                if (callback)
+                    callback();
+            }
+        }, () => {
 
         })
     }

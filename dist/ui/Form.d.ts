@@ -30,5 +30,5 @@ export default class Form {
     /**
      * 显示狂点页面
      */
-    showMistouch(): void;
+    showMistouch(callback: any): void;
 }
