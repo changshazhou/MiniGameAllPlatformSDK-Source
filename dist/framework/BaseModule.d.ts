@@ -1,5 +1,9 @@
 export default class BaseModule {
     protected moduleName: string;
+    private mIntervalArr;
+    schedule(callback: Function, time: number): void;
+    unschedule(callback: any): void;
+    initProperty(form: any): void;
     preload(url: any, callback: any): void;
     /**
      *

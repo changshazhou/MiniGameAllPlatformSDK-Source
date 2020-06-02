@@ -4,6 +4,9 @@ export default class GameDataCenter extends BaseModule {
     private mUserToken;
     getToken(): string;
     setToken(v: any): void;
+    private mCurrentMisTouchCount;
+    getCurrentMisTouchCount(): number;
+    setCurrentMisTouchCount(num: number): void;
     private mChannel_id;
     getChannelId(): string;
     setChannelId(value: any): void;

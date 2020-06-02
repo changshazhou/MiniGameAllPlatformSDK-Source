@@ -216,7 +216,7 @@ export default class AdForm extends BaseForm {
         })
     }
 
-    
+
 
     public addEvent() {
         this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this)

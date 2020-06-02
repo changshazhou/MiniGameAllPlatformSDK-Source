@@ -16,6 +16,16 @@ export default class GameDataCenter extends BaseModule {
         moosnow.setting.setValue(this.TOKEN, v);
     }
 
+    private mCurrentMisTouchCount: number = 0;
+    getCurrentMisTouchCount() {
+        // if (!this.mCurrentMisTouchCount)
+        //     this.mCurrentMisTouchCount = Lite.setting.getInt(this.MIS_TOUCH_POS_COUNT, 0);
+        return this.mCurrentMisTouchCount
+    }
+    setCurrentMisTouchCount(num: number) {
+        this.mCurrentMisTouchCount = num;
+        // Lite.setting.setValue(this.MIS_TOUCH_POS_COUNT, num);
+    }
 
     private mChannel_id: string = "0";
     getChannelId() {

@@ -31,6 +31,7 @@ import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
 import { CocosUIModule } from "./ui/cocos/CocosUIModule";
 import FormControl from "./ui/FormControl";
 import Form from "./ui/Form";
+import Delay from "./framework/Delay";
 
 class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -192,6 +193,13 @@ class Main {
     private mEntity: BaseEntityModule = new BaseEntityModule();
     public get entity() {
         return this.mEntity;
+    }
+
+
+
+    private mDelay: Delay = new Delay();
+    public get delay() {
+        return this.mDelay;
     }
 
 }

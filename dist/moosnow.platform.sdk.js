@@ -510,7 +510,30 @@
     var BaseModule = /** @class */ (function () {
         function BaseModule() {
             this.moduleName = "";
+            this.mIntervalArr = {};
         }
+        BaseModule.prototype.schedule = function (callback, time) {
+            var self = this;
+            var id = setInterval(function () {
+                if (callback)
+                    callback.apply(self);
+            }, time * 1000);
+            this.mIntervalArr[id] = callback;
+        };
+        BaseModule.prototype.unschedule = function (callback) {
+            for (var key in this.mIntervalArr) {
+                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
+                    clearInterval(parseInt(key));
+                }
+            }
+        };
+        BaseModule.prototype.initProperty = function (form) {
+            for (var v in form) {
+                if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
+                    this[v] = form[v];
+                }
+            }
+        };
         BaseModule.prototype.preload = function (url, callback) {
             if (callback)
                 callback();
@@ -3178,6 +3201,7 @@
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.TOKEN = "token";
             _this.mUserToken = "";
+            _this.mCurrentMisTouchCount = 0;
             _this.mChannel_id = "0";
             _this.mChannel_appid = "0";
             return _this;
@@ -3189,6 +3213,15 @@
         };
         GameDataCenter.prototype.setToken = function (v) {
             moosnow.setting.setValue(this.TOKEN, v);
+        };
+        GameDataCenter.prototype.getCurrentMisTouchCount = function () {
+            // if (!this.mCurrentMisTouchCount)
+            //     this.mCurrentMisTouchCount = Lite.setting.getInt(this.MIS_TOUCH_POS_COUNT, 0);
+            return this.mCurrentMisTouchCount;
+        };
+        GameDataCenter.prototype.setCurrentMisTouchCount = function (num) {
+            this.mCurrentMisTouchCount = num;
+            // Lite.setting.setValue(this.MIS_TOUCH_POS_COUNT, num);
         };
         GameDataCenter.prototype.getChannelId = function () {
             return this.mChannel_id;
@@ -5708,31 +5741,8 @@
     var BaseForm = /** @class */ (function (_super) {
         __extends(BaseForm, _super);
         function BaseForm() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.mIntervalArr = {};
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        BaseForm.prototype.schedule = function (callback, time) {
-            var id = setInterval(function () {
-                if (callback)
-                    callback();
-            }, time * 1000);
-            this.mIntervalArr[id] = callback;
-        };
-        BaseForm.prototype.unschedule = function (callback) {
-            for (var key in this.mIntervalArr) {
-                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                    clearInterval(parseInt(key));
-                }
-            }
-        };
-        BaseForm.prototype.initProperty = function (form) {
-            for (var v in form) {
-                if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
-                    this[v] = form[v];
-                }
-            }
-        };
         BaseForm = __decorate([
             ccclass$2
         ], BaseForm);
@@ -6228,6 +6238,172 @@
         return Form;
     }());
 
+    var DelayMove = /** @class */ (function (_super) {
+        __extends(DelayMove, _super);
+        function DelayMove() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.moveNode = null;
+            _this.distince = -100;
+            _this.showBanner = true;
+            _this.pos1 = cc.Vec2.ZERO;
+            _this.pos2 = cc.Vec2.ZERO;
+            _this.mMistouchPosNum = 0;
+            _this.mMistouchPosSecond = 4;
+            return _this;
+        }
+        DelayMove.prototype.initPos = function () {
+        };
+        /**
+         *
+         * @param moveNode
+         * @param distince
+         * @param showBanner
+         */
+        DelayMove.prototype.move = function (moveNode, distince, showBanner) {
+            var _this = this;
+            this.moveNode = moveNode;
+            this.distince = distince;
+            this.showBanner = showBanner;
+            this.initPos();
+            var count = moosnow.data.getCurrentMisTouchCount();
+            moosnow.data.setCurrentMisTouchCount(count + 1);
+            this.moveNode.active = false;
+            moosnow.http.getAllConfig(function (res) {
+                if (!isNaN(res.mistouchPosSecond))
+                    _this.mMistouchPosSecond = parseFloat(res.mistouchPosSecond);
+                moosnow.http.getMistouchPosNum(function (num) {
+                    _this.mMistouchPosNum = num;
+                    _this.movePosition();
+                });
+            });
+        };
+        DelayMove.prototype.movePosition = function () {
+            if (this.mMistouchPosNum == 0) {
+                this.moveNode.active = true;
+                this.moveNode.x = this.pos1.x;
+                this.moveNode.y = this.pos1.y;
+                if (this.showBanner)
+                    moosnow.platform.showBanner();
+            }
+            else {
+                var count = moosnow.data.getCurrentMisTouchCount();
+                if (count % this.mMistouchPosNum == 0) {
+                    this.copyNode();
+                    this.schedule(this.onPosCallback, this.mMistouchPosSecond);
+                }
+            }
+        };
+        DelayMove.prototype.copyNode = function () {
+        };
+        DelayMove.prototype.onPosCallback = function (tempButtom) {
+            if (this.showBanner)
+                moosnow.platform.showBanner();
+            this.removeTemp(tempButtom);
+            this.moveNode.active = true;
+            this.moveNode.x = this.pos1.x;
+            this.moveNode.y = this.pos1.y;
+            this.unschedule(this.onPosCallback);
+        };
+        DelayMove.prototype.removeTemp = function (tempButtom) {
+            tempButtom.active = false;
+            tempButtom.removeFromParent();
+            tempButtom.destroy();
+        };
+        return DelayMove;
+    }(BaseModule));
+
+    var CocosDelayMove = /** @class */ (function (_super) {
+        __extends(CocosDelayMove, _super);
+        function CocosDelayMove() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.moveNode = null;
+            _this.distince = -100;
+            _this.showBanner = true;
+            return _this;
+        }
+        CocosDelayMove.prototype.initPos = function () {
+            if (!this.pos1)
+                this.pos1 = this.moveNode.position.clone();
+            if (!this.pos2)
+                this.pos2 = this.pos1.add(new cc.Vec2(0, this.distince));
+        };
+        CocosDelayMove.prototype.copyNode = function () {
+            var tempButtom = cc.instantiate(this.moveNode);
+            tempButtom.active = true;
+            this.moveNode.parent.addChild(tempButtom);
+            tempButtom.x = this.pos2.x;
+            tempButtom.y = this.pos2.y;
+        };
+        CocosDelayMove.prototype.removeTemp = function (tempButtom) {
+            tempButtom.active = false;
+            tempButtom.removeFromParent();
+            tempButtom.destroy();
+        };
+        return CocosDelayMove;
+    }(DelayMove));
+
+    var DelayShow = /** @class */ (function (_super) {
+        __extends(DelayShow, _super);
+        function DelayShow() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mNode = null;
+            return _this;
+        }
+        DelayShow.prototype.show = function (node, delayTime) {
+            if (delayTime === void 0) { delayTime = 3; }
+            if (!node)
+                return;
+            this.mNode = node;
+            this.hideNode();
+            this.schedule(this.showNode, delayTime * 1000);
+        };
+        DelayShow.prototype.hide = function (node, delayTime) {
+            if (delayTime === void 0) { delayTime = 3; }
+            this.mNode = node;
+            this.schedule(this.hideNode, delayTime * 1000);
+        };
+        DelayShow.prototype.clear = function () {
+            this.unschedule(this.showNode);
+            this.unschedule(this.hideNode);
+        };
+        DelayShow.prototype.hideNode = function () {
+            this.mNode.active = false;
+        };
+        DelayShow.prototype.showNode = function () {
+            this.mNode.active = true;
+            this.unschedule(this.showNode);
+        };
+        return DelayShow;
+    }(BaseModule));
+
+    var Delay = /** @class */ (function (_super) {
+        __extends(Delay, _super);
+        function Delay() {
+            return _super.call(this) || this;
+        }
+        Object.defineProperty(Delay.prototype, "DelayMove", {
+            get: function () {
+                if (!this.mDelayMove) {
+                    this.mDelayMove = new CocosDelayMove();
+                }
+                return this.mDelayMove;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Delay.prototype, "DelayShow", {
+            get: function () {
+                if (!this.mDelayShow) {
+                    this.mDelayShow = new DelayShow();
+                }
+                return this.mDelayShow;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Delay;
+    }(BaseModule));
+
     var Main = /** @class */ (function () {
         function Main() {
             this.VIDEO_STATUS = VIDEO_STATUS;
@@ -6250,6 +6426,7 @@
              */
             this.mControl = new FormControl();
             this.mEntity = new BaseEntityModule();
+            this.mDelay = new Delay();
             (window["moosnow"]) = this;
             this.mData = new GameDataCenter();
             this.mSetting = new SettingModule();
@@ -6397,6 +6574,13 @@
         Object.defineProperty(Main.prototype, "entity", {
             get: function () {
                 return this.mEntity;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Main.prototype, "delay", {
+            get: function () {
+                return this.mDelay;
             },
             enumerable: true,
             configurable: true

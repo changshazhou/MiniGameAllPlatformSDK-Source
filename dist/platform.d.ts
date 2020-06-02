@@ -466,6 +466,9 @@ declare class GameDataCenter extends BaseModule {
     private mUserToken;
     getToken(): string;
     setToken(v: any): void;
+    private mCurrentMisTouchCount;
+    getCurrentMisTouchCount(): number;
+    setCurrentMisTouchCount(num: number): void;
     private mChannel_id;
     getChannelId(): string;
     setChannelId(value: any): void;
@@ -907,6 +910,37 @@ declare class Form {
      */
     showAd(adType: AD_POSITION, callback: Function): void;
 }
+declare class DelayMove extends BaseModule {
+    posButton: cc.Node;
+    moveDis: number;
+    showBanner: boolean;
+    private pos1;
+    private pos2;
+    private mMistouchPosNum;
+    private mMistouchPosSecond;
+    /**
+     *
+     * @param moveNode
+     * @param distince
+     * @param showBanner
+     */
+    move(moveNode: any, distince: any, showBanner: any): void;
+    private setPos;
+    private onPosCallback;
+    private removeTemp;
+}
+declare class DelayShow extends BaseModule {
+    show(node: any, delayTime?: number): void;
+    hideNode(node: any): void;
+    private showNode;
+}
+declare class Delay extends BaseModule {
+    private mMistouchPos;
+    private mDelayMove;
+    get DelayMove(): DelayMove;
+    private mDelayShow;
+    get DelayShow(): DelayShow;
+}
 
 declare class moosnow {
 
@@ -950,7 +984,7 @@ declare class moosnow {
     static entity: BaseEntityModule
     static form: Form
     static control: FormControl
-
+    static delay: Delay
 }
 
 
