@@ -5791,11 +5791,11 @@
             _this.leftLayout = null;
             _this.rightView = null;
             _this.rightLayout = null;
-            _this.drawerContainer = null;
-            _this.drawerView = null;
-            _this.drawerLayout = null;
-            _this.drawerShow = null;
-            _this.drawerHide = null;
+            _this.sideContainer = null;
+            _this.sideView = null;
+            _this.sideLayout = null;
+            _this.btnSideShow = null;
+            _this.btnSideHide = null;
             _this.mAdItemList = [];
             _this.mScrollVec = [];
             _this.mIndex = 999;
@@ -5946,6 +5946,27 @@
                 }
             }
         };
+        AdForm.prototype.sideOut = function () {
+            var _this = this;
+            var wxsys = moosnow.platform.getSystemInfoSync();
+            var statusBarHeight = 0;
+            var notchHeight = 0;
+            if (wxsys) {
+                statusBarHeight = wxsys.statusBarHeight || 0;
+                notchHeight = wxsys.notchHeight || 0;
+            }
+            this.sideView.node.runAction(cc.sequence(cc.moveTo(1, statusBarHeight + notchHeight + this.sideView.node.width + 20, 0), cc.callFunc(function () {
+                _this.btnSideShow.active = false;
+                _this.btnSideHide.active = true;
+            })));
+        };
+        AdForm.prototype.sideIn = function () {
+            var _this = this;
+            this.sideView.node.runAction(cc.sequence(cc.moveTo(1, 0, 0), cc.callFunc(function () {
+                _this.btnSideShow.active = true;
+                _this.btnSideHide.active = false;
+            })));
+        };
         AdForm.prototype.willHide = function () {
             this.removeEvent();
             this.mAdItemList.forEach(function (item) {
@@ -6014,8 +6035,7 @@
             this.centerContainer.active = visible && this.hasAd(AD_POSITION$1.CENTER);
             this.leftContainer.active = visible && this.hasAd(AD_POSITION$1.LEFTRIGHT);
             this.exportMask.active = visible && this.hasAd(AD_POSITION$1.MASK);
-            // this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-            // this.endContainer.active && this.initEndExport();
+            this.sideContainer.active = visible && this.hasAd(AD_POSITION$1.SIDE);
             this.exportClose.active = false;
             this.exportCloseTxt.active = false;
             this.unschedule(this.showExportClose);
@@ -6156,19 +6176,19 @@
         ], AdForm.prototype, "rightLayout", void 0);
         __decorate([
             property$3(cc.Node)
-        ], AdForm.prototype, "drawerContainer", void 0);
+        ], AdForm.prototype, "sideContainer", void 0);
         __decorate([
             property$3(cc.ScrollView)
-        ], AdForm.prototype, "drawerView", void 0);
+        ], AdForm.prototype, "sideView", void 0);
         __decorate([
             property$3(cc.Layout)
-        ], AdForm.prototype, "drawerLayout", void 0);
+        ], AdForm.prototype, "sideLayout", void 0);
         __decorate([
             property$3(cc.Node)
-        ], AdForm.prototype, "drawerShow", void 0);
+        ], AdForm.prototype, "btnSideShow", void 0);
         __decorate([
             property$3(cc.Node)
-        ], AdForm.prototype, "drawerHide", void 0);
+        ], AdForm.prototype, "btnSideHide", void 0);
         AdForm = __decorate([
             ccclass$3
         ], AdForm);
@@ -6184,11 +6204,19 @@
         CocosAdForm.prototype.addEvent = function () {
             if (this.exportClose)
                 this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            if (this.btnSideShow)
+                this.btnSideShow.on(cc.Node.EventType.TOUCH_START, this.sideOut, this);
+            if (this.btnSideHide)
+                this.btnSideHide.on(cc.Node.EventType.TOUCH_START, this.sideIn, this);
             _super.prototype.addEvent.call(this);
         };
         CocosAdForm.prototype.removeEvent = function () {
             if (this.exportClose)
                 this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
+            if (this.btnSideShow)
+                this.btnSideShow.off(cc.Node.EventType.TOUCH_START, this.sideOut, this);
+            if (this.btnSideHide)
+                this.btnSideHide.off(cc.Node.EventType.TOUCH_START, this.sideIn, this);
             _super.prototype.removeEvent.call(this);
         };
         CocosAdForm.prototype.floatAnim = function (floatNode) {
@@ -6222,6 +6250,145 @@
         return FormControl;
     }());
 
+    var UIForms = /** @class */ (function () {
+        function UIForms() {
+        }
+        Object.defineProperty(UIForms, "mapping", {
+            get: function () {
+                var _a, _b, _c, _d, _e, _f, _g;
+                return {
+                    adForm: (_a = {},
+                        _a[moosnow.APP_PLATFORM.WX] = "adForm",
+                        _a[moosnow.APP_PLATFORM.OPPO] = "adFormOPPO",
+                        _a[moosnow.APP_PLATFORM.OPPO_ZS] = "adFormOPPO",
+                        _a[moosnow.APP_PLATFORM.VIVO] = "adFormOPPO",
+                        _a[moosnow.APP_PLATFORM.QQ] = "adFormQQ",
+                        _a),
+                    pauseForm: (_b = {},
+                        _b[moosnow.APP_PLATFORM.WX] = "pauseForm",
+                        _b[moosnow.APP_PLATFORM.BYTEDANCE] = "pauseFormTT",
+                        _b[moosnow.APP_PLATFORM.OPPO] = "pauseFormOPPO",
+                        _b[moosnow.APP_PLATFORM.OPPO_ZS] = "pauseFormOPPO",
+                        _b[moosnow.APP_PLATFORM.VIVO] = "pauseFormOPPO",
+                        _b[moosnow.APP_PLATFORM.QQ] = "pauseFormTT",
+                        _b),
+                    respawnForm: (_c = {},
+                        _c[moosnow.APP_PLATFORM.WX] = "respawnForm",
+                        _c[moosnow.APP_PLATFORM.BYTEDANCE] = "respawnFormTT",
+                        _c[moosnow.APP_PLATFORM.OPPO] = "respawnFormOPPO",
+                        _c[moosnow.APP_PLATFORM.OPPO_ZS] = "respawnFormOPPO",
+                        _c[moosnow.APP_PLATFORM.VIVO] = "respawnFormOPPO",
+                        _c[moosnow.APP_PLATFORM.QQ] = "respawnFormQQ",
+                        _c),
+                    endForm: (_d = {},
+                        _d[moosnow.APP_PLATFORM.WX] = "endForm",
+                        _d[moosnow.APP_PLATFORM.BYTEDANCE] = "endFormTT",
+                        _d[moosnow.APP_PLATFORM.OPPO] = "endFormOPPO",
+                        _d[moosnow.APP_PLATFORM.OPPO_ZS] = "endFormOPPO",
+                        _d[moosnow.APP_PLATFORM.VIVO] = "endFormOPPO",
+                        _d),
+                    totalForm: (_e = {},
+                        _e[moosnow.APP_PLATFORM.WX] = "totalForm",
+                        _e[moosnow.APP_PLATFORM.BYTEDANCE] = "totalFormTT",
+                        _e[moosnow.APP_PLATFORM.QQ] = "totalFormQQ",
+                        _e),
+                    tryForm: (_f = {},
+                        _f[moosnow.APP_PLATFORM.WX] = "tryForm",
+                        _f[moosnow.APP_PLATFORM.BYTEDANCE] = "tryFormTT",
+                        _f[moosnow.APP_PLATFORM.QQ] = "tryFormTT",
+                        _f),
+                    mistouchForm: (_g = {},
+                        _g[moosnow.APP_PLATFORM.WX] = "mistouchForm",
+                        _g[moosnow.APP_PLATFORM.QQ] = "mistouchFormQQ",
+                        _g),
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        UIForms.convertUIName = function (mappingForm) {
+            if (!mappingForm) {
+                console.warn("convertUIName fail  mappingForm is null ");
+                return null;
+            }
+            var curApp = moosnow.getAppPlatform();
+            if (mappingForm[curApp])
+                return mappingForm[curApp];
+            else if (mappingForm[moosnow.APP_PLATFORM.WX])
+                return mappingForm[moosnow.APP_PLATFORM.WX];
+            else {
+                console.warn("convertUIName fail ", mappingForm);
+                return null;
+            }
+            return null;
+        };
+        Object.defineProperty(UIForms, "AdForm", {
+            get: function () {
+                return this.convertUIName(this.mapping.adForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(UIForms, "TotalForm", {
+            /**
+             * 结算页
+             */
+            get: function () {
+                return this.convertUIName(this.mapping.totalForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(UIForms, "EndForm", {
+            /**
+             * 结束页
+             */
+            get: function () {
+                return this.convertUIName(this.mapping.endForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(UIForms, "PauseForm", {
+            get: function () {
+                return this.convertUIName(this.mapping.pauseForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(UIForms, "RespawnForm", {
+            get: function () {
+                return this.convertUIName(this.mapping.respawnForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(UIForms, "MistouchForm", {
+            get: function () {
+                return this.convertUIName(this.mapping.mistouchForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(UIForms, "TryForm", {
+            get: function () {
+                return this.convertUIName(this.mapping.tryForm);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        UIForms.HomeForm = "homeForm";
+        UIForms.SkinForm = "skinForm";
+        UIForms.GameForm = "gameForm";
+        UIForms.CoinForm = "coinForm";
+        UIForms.PrevHomeForm = "prevHomeForm";
+        UIForms.ToastForm = "toastForm";
+        UIForms.SetForm = "setForm";
+        UIForms.PrizeForm = "prizeForm";
+        return UIForms;
+    }());
+
     /**
      * 广告结果
      */
@@ -6229,13 +6396,32 @@
         function Form() {
         }
         /**
-         * 显示广告
-         * @param adType
-         * @param callback
+         * 预加载广告
          */
-        Form.prototype.showAd = function (adType, callback) {
+        Form.prototype.preloadAd = function () {
+            moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null);
+        };
+        /**
+         * 显示广告
+         * @param adType 广告类型
+         * @param callback  有返回按钮时的回调
+         * @param zIndex  层级
+         */
+        Form.prototype.showAd = function (adType, callback, zIndex) {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
-            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback });
+            if (zIndex === void 0) { zIndex = 999; }
+            var adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
+            if (adForm) {
+                adForm.node.zIndex = zIndex;
+                moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback });
+            }
+            else {
+                moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, function () {
+                    var adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
+                    adForm.node.zIndex = zIndex;
+                    moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback });
+                });
+            }
         };
         return Form;
     }());

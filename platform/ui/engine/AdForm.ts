@@ -138,19 +138,19 @@ export default class AdForm extends BaseForm {
     public rightLayout: cc.Layout = null;
 
     @property(cc.Node)
-    public drawerContainer: cc.Node = null;
+    public sideContainer: cc.Node = null;
 
     @property(cc.ScrollView)
-    public drawerView: cc.ScrollView = null;
+    public sideView: cc.ScrollView = null;
 
     @property(cc.Layout)
-    public drawerLayout: cc.Layout = null;
+    public sideLayout: cc.Layout = null;
 
     @property(cc.Node)
-    public drawerShow: cc.Node = null;
+    public btnSideShow: cc.Node = null;
 
     @property(cc.Node)
-    public drawerHide: cc.Node = null;
+    public btnSideHide: cc.Node = null;
 
 
     private mAdItemList = [];
@@ -248,7 +248,7 @@ export default class AdForm extends BaseForm {
     public willShow(data) {
 
         this.mAdItemList = [];
-        this.mScrollVec = []
+        this.mScrollVec = [];
         this.addEvent();
         if (data)
             this.displayChange(data.showAd, data.callback)
@@ -317,7 +317,33 @@ export default class AdForm extends BaseForm {
         }
 
     }
+    public sideOut() {
+        let wxsys = moosnow.platform.getSystemInfoSync();
+        let statusBarHeight = 0;
+        let notchHeight = 0;
+        if (wxsys) {
+            statusBarHeight = wxsys.statusBarHeight || 0;
+            notchHeight = wxsys.notchHeight || 0;
+        }
 
+        this.sideView.node.runAction(cc.sequence(
+            cc.moveTo(1, statusBarHeight + notchHeight + this.sideView.node.width + 20, 0),
+            cc.callFunc(() => {
+                this.btnSideShow.active = false;
+                this.btnSideHide.active = true;
+            })
+        ))
+    }
+
+    public sideIn() {
+        this.sideView.node.runAction(cc.sequence(
+            cc.moveTo(1, 0, 0),
+            cc.callFunc(() => {
+                this.btnSideShow.active = true;
+                this.btnSideHide.active = false;
+            })
+        ))
+    }
     public willHide() {
         this.removeEvent();
         this.mAdItemList.forEach(item => {
@@ -412,9 +438,8 @@ export default class AdForm extends BaseForm {
 
         this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
 
+        this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
 
-        // this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-        // this.endContainer.active && this.initEndExport();
 
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;

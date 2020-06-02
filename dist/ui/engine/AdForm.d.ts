@@ -38,11 +38,11 @@ export default class AdForm extends BaseForm {
     leftLayout: cc.Layout;
     rightView: cc.ScrollView;
     rightLayout: cc.Layout;
-    drawerContainer: cc.Node;
-    drawerView: cc.ScrollView;
-    drawerLayout: cc.Layout;
-    drawerShow: cc.Node;
-    drawerHide: cc.Node;
+    sideContainer: cc.Node;
+    sideView: cc.ScrollView;
+    sideLayout: cc.Layout;
+    btnSideShow: cc.Node;
+    btnSideHide: cc.Node;
     private mAdItemList;
     setPosition(source: Array<moosnowAdRow>, position?: string): Array<moosnowAdRow>;
     private mScrollVec;
@@ -74,6 +74,8 @@ export default class AdForm extends BaseForm {
     onBack(): void;
     private mMoveSpeed;
     onFwUpdate(dt: any): void;
+    sideOut(): void;
+    sideIn(): void;
     willHide(): void;
     private mFloatIndex;
     private mFloatRefresh;
