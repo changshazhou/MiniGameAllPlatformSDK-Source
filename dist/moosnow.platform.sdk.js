@@ -5798,7 +5798,7 @@
             _this.drawerHide = null;
             _this.mAdItemList = [];
             _this.mScrollVec = [];
-            _this.mZindex = 9999;
+            _this.mIndex = 999;
             _this.mShowAd = moosnow.AD_POSITION.NONE;
             _this.mMoveSpeed = 2;
             _this.mFloatIndex = 0;
@@ -5865,21 +5865,20 @@
             });
         };
         AdForm.prototype.addEvent = function () {
-            this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
             moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
         };
         AdForm.prototype.removeEvent = function () {
-            this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
         };
         AdForm.prototype.onAdChange = function (data) {
             this.displayChange(data.showAd, data.callback);
-            // if (!isNaN(data.zIndex)) {
-            //     this.node.zIndex = data.zIndex;
-            // }
-            // else {
-            //     this.node.zIndex = this.mZindex;
-            // }
+            this.onAfterShow(this.mIndex);
+        };
+        /**
+         *
+         * @param zindex
+         */
+        AdForm.prototype.onAfterShow = function (zindex) {
         };
         /**
           *
@@ -5957,29 +5956,29 @@
         };
         AdForm.prototype.initFloatAd = function (parentNode, prefabs, points) {
             var _this = this;
-            moosnow.ad.getAd(function (res) {
-                _this.mAdData = res;
-                var source = __spreadArrays(res.indexLeft);
-                points.forEach(function (item, idx) {
-                    var showIndex = idx; //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
-                    var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动" });
-                    var itemName = prefabs.length - 1 >= idx ? prefabs[idx] : prefabs[0];
-                    var logic = moosnow.entity.showEntity(itemName, parentNode, adRow);
-                    _this.mFloatCache[idx] = {
-                        index: showIndex,
-                        logic: logic,
-                        onCancel: adRow.onCancel
-                    };
-                    _this.floatAnim(item);
-                });
-                _this.updateFloat(Common$1.deepCopy(res));
-                setInterval(function () {
+            cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, function () {
+                moosnow.ad.getAd(function (res) {
+                    _this.mAdData = res;
+                    var source = __spreadArrays(res.indexLeft);
+                    prefabs.forEach(function (prefabName, idx) {
+                        var showIndex = idx; //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
+                        var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动", x: points[idx].x, y: points[idx].y });
+                        var logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
+                        _this.mFloatCache[idx] = {
+                            index: showIndex,
+                            logic: logic,
+                            onCancel: adRow.onCancel
+                        };
+                        _this.floatAnim(logic.node);
+                    });
                     _this.updateFloat(Common$1.deepCopy(res));
-                }, _this.mFloatRefresh * 1000);
+                    setInterval(function () {
+                        _this.updateFloat(Common$1.deepCopy(res));
+                    }, _this.mFloatRefresh * 1000);
+                });
             });
         };
         AdForm.prototype.floatAnim = function (floatNode) {
-            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
         };
         AdForm.prototype.updateFloat = function (source) {
             for (var key in this.mFloatCache) {
@@ -6185,12 +6184,15 @@
         CocosAdForm.prototype.addEvent = function () {
             if (this.exportClose)
                 this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+            _super.prototype.addEvent.call(this);
         };
         CocosAdForm.prototype.removeEvent = function () {
             if (this.exportClose)
                 this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this);
-            moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+            _super.prototype.removeEvent.call(this);
+        };
+        CocosAdForm.prototype.floatAnim = function (floatNode) {
+            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
         };
         CocosAdForm = __decorate([
             ccclass$4

@@ -10,12 +10,22 @@ export default class CocosAdForm extends AdForm {
     public addEvent() {
         if (this.exportClose)
             this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this)
-        moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
+        super.addEvent();
     }
     public removeEvent() {
         if (this.exportClose)
             this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this)
-        moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
+        super.removeEvent();
     }
-
+    public floatAnim(floatNode) {
+        floatNode.runAction(
+            cc.sequence(
+                cc.rotateTo(0.3, 10),
+                cc.rotateTo(0.6, -10),
+                cc.rotateTo(0.3, 0),
+                cc.scaleTo(0.3, 0.8),
+                cc.scaleTo(0.3, 1)
+            ).repeatForever()
+        )
+    }
 }

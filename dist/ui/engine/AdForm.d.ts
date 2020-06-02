@@ -56,8 +56,13 @@ export default class AdForm extends BaseForm {
     initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string | cc.Prefab): void;
     addEvent(): void;
     removeEvent(): void;
-    private mZindex;
     onAdChange(data: any): void;
+    private mIndex;
+    /**
+     *
+     * @param zindex
+     */
+    onAfterShow(zindex: number): void;
     /**
       *
       * @param data
@@ -75,7 +80,7 @@ export default class AdForm extends BaseForm {
     private mFloatCache;
     private mAdData;
     initFloatAd(parentNode: any, prefabs: any, points: Array<cc.Vec2>): void;
-    private floatAnim;
+    floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;
     private mSecond;

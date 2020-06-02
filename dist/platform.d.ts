@@ -789,11 +789,16 @@ declare class AdForm extends BaseForm {
      * @param positionTag
      * @param entityName
      */
-    initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string): void;
-    private addEvent;
-    private removeEvent;
-    private mZindex;
-    private onAdChange;
+    initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string | cc.Prefab): void;
+    addEvent(): void;
+    removeEvent(): void;
+    onAdChange(data: any): void;
+    private mIndex;
+    /**
+     *
+     * @param zindex
+     */
+    onAfterShow(zindex: number): void;
     /**
       *
       * @param data
@@ -802,7 +807,7 @@ declare class AdForm extends BaseForm {
     private mShowAd;
     private mBackCall;
     displayChange(data: any, callback?: any): void;
-    private onBack;
+    onBack(): void;
     private mMoveSpeed;
     onFwUpdate(dt: any): void;
     willHide(): void;
@@ -811,7 +816,7 @@ declare class AdForm extends BaseForm {
     private mFloatCache;
     private mAdData;
     initFloatAd(parentNode: any, prefabs: any, points: Array<cc.Vec2>): void;
-    private floatAnim;
+    floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;
     private mSecond;
@@ -986,5 +991,3 @@ declare class moosnow {
     static control: FormControl
     static delay: Delay
 }
-
-

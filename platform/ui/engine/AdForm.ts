@@ -65,8 +65,6 @@ export default class AdForm extends BaseForm {
     public bannerLayout: cc.Layout = null;
 
 
-
-
     @property(cc.Node)
     public endContainer: cc.Node = null;
 
@@ -219,26 +217,29 @@ export default class AdForm extends BaseForm {
 
 
     public addEvent() {
-        this.exportClose.on(cc.Node.EventType.TOUCH_END, this.onBack, this)
         moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
     }
     public removeEvent() {
-        this.exportClose.off(cc.Node.EventType.TOUCH_END, this.onBack, this)
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
     }
 
-    private mZindex: number = 9999;
     public onAdChange(data) {
 
         this.displayChange(data.showAd, data.callback)
 
-        // if (!isNaN(data.zIndex)) {
-        //     this.node.zIndex = data.zIndex;
-        // }
-        // else {
-        //     this.node.zIndex = this.mZindex;
-        // }
+        this.onAfterShow(this.mIndex);
+
     }
+
+    private mIndex: number = 999;
+    /**
+     * 
+     * @param zindex 
+     */
+    public onAfterShow(zindex: number) {
+
+    }
+
 
     /**
       * 
@@ -330,40 +331,33 @@ export default class AdForm extends BaseForm {
     private mFloatCache = {};
     private mAdData: moosnowResult
     public initFloatAd(parentNode, prefabs, points: Array<cc.Vec2>) {
-        moosnow.ad.getAd((res: moosnowResult) => {
-            this.mAdData = res;
-            let source = [...res.indexLeft];
+        cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
+            moosnow.ad.getAd((res: moosnowResult) => {
+                this.mAdData = res;
+                let source = [...res.indexLeft];
 
-            points.forEach((item, idx) => {
-                let showIndex = idx  //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
-                let adRow = { ...source[showIndex], position: "首页浮动" }
-                let itemName = prefabs.length - 1 >= idx ? prefabs[idx] : prefabs[0];
-
-                let logic = moosnow.entity.showEntity(itemName, parentNode, adRow);
-                this.mFloatCache[idx] = {
-                    index: showIndex,
-                    logic: logic,
-                    onCancel: adRow.onCancel
-                };
-                this.floatAnim(item);
-            })
-            this.updateFloat(Common.deepCopy(res));
-            setInterval(() => {
+                prefabs.forEach((prefabName, idx) => {
+                    let showIndex = idx  //Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1);
+                    let adRow = { ...source[showIndex], position: "首页浮动", x: points[idx].x, y: points[idx].y }
+                    let logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
+                    this.mFloatCache[idx] = {
+                        index: showIndex,
+                        logic: logic,
+                        onCancel: adRow.onCancel
+                    };
+                    this.floatAnim(logic.node);
+                })
                 this.updateFloat(Common.deepCopy(res));
-            }, this.mFloatRefresh * 1000)
+                setInterval(() => {
+                    this.updateFloat(Common.deepCopy(res));
+                }, this.mFloatRefresh * 1000)
+            })
+
         })
 
     }
-    private floatAnim(floatNode) {
-        floatNode.runAction(
-            cc.sequence(
-                cc.rotateTo(0.3, 10),
-                cc.rotateTo(0.6, -10),
-                cc.rotateTo(0.3, 0),
-                cc.scaleTo(0.3, 0.8),
-                cc.scaleTo(0.3, 1)
-            ).repeatForever()
-        )
+    public floatAnim(floatNode) {
+
     }
 
 
