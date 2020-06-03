@@ -29,7 +29,7 @@ import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
 import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
 import { CocosUIModule } from "./ui/cocos/CocosUIModule";
-import FormControl from "./ui/FormControl";
+import LogicControl from "./ui/LogicControl";
 import Form from "./ui/Form";
 import Delay from "./framework/Delay";
 
@@ -183,7 +183,7 @@ export default class Main {
     /**
      * form表单控制
      */
-    private mControl: FormControl = new FormControl();
+    private mControl: LogicControl = new LogicControl();
     public get control() {
         return this.mControl;
     }

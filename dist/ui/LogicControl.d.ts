@@ -3,10 +3,16 @@ import MistouchForm from "./engine/MistouchForm";
 import CocosMistouchFormTT from "./cocos/CocosMistouchFormTT";
 import CocosMistouchFormQQ from "./cocos/CocosMistouchFormQQ";
 import AdFormQQ from "./engine/AdFormQQ";
+import AdViewItem from "./engine/AdViewItem";
 /**
- * 广告结果
+ * 页面逻辑控制
  */
-export default class FormControl {
+export default class LogicControl {
+    private mAdViewItem;
+    /**
+     * 返回一个AdViewItem实例
+     */
+    newViewItem(): AdViewItem;
     private mAdForm;
     get adForm(): AdForm;
     private mAdFormQQ;

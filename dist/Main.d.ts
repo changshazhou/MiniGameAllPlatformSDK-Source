@@ -10,7 +10,7 @@ import EventType from "./utils/EventType";
 import { AD_POSITION } from "./enum/AD_POSITION";
 import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
-import FormControl from "./ui/FormControl";
+import LogicControl from "./ui/LogicControl";
 import Form from "./ui/Form";
 import Delay from "./framework/Delay";
 export default class Main {
@@ -92,7 +92,7 @@ export default class Main {
      * form表单控制
      */
     private mControl;
-    get control(): FormControl;
+    get control(): LogicControl;
     private mEntity;
     get entity(): BaseEntityModule;
     private mDelay;

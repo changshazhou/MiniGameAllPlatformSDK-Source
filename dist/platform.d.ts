@@ -45,6 +45,11 @@ declare class nativeAdRow {
 
 declare class BaseModule {
     protected moduleName: string;
+    private mIntervalArr;
+    schedule(callback: Function, time: number): void;
+    unschedule(callback: any): void;
+    scheduleOnce(callback: Function, time: number): void;
+    initProperty(form: any): void;
     preload(url: any, callback: any): void;
     /**
      *
@@ -1006,13 +1011,43 @@ declare class CocosMistouchFormQQ extends MistouchFormQQ {
     mBeginPos: any;
     mEndPos: any;
 }
-
-declare class FormControl {
-    private mAdForm;
+declare class BaseLogic extends BaseModule {
+    private mLogicData;
     /**
-     * 广告form
+    * 父类缓存willShow，onShow传递到实体的逻辑数据
+    */
+    get LogicData(): any;
+    willShow(data?: any): void;
+    onShow(data: any): void;
+    willHide(data: any): void;
+    onHide(data: any): void;
+}
+declare class AdViewItem extends BaseLogic {
+    logo: cc.Sprite;
+    title: cc.Label;
+    animLogo: cc.Sprite;
+    nameBg: cc.Sprite;
+    changeView: boolean;
+    mAdItem: moosnowAdRow;
+    initItem(): void;
+    private onClickAd;
+    private findNextAd;
+    private onAdViewChange;
+    onShow(): void;
+    onHide(): void;
+    willShow(cell: moosnowAdRow): void;
+    refreshImg(cell: moosnowAdRow): void;
+}
+declare class LogicControl {
+    private mAdViewItem;
+    /**
+     * 返回一个AdViewItem实例
      */
+    newViewItem(): AdViewItem;
+    private mAdForm;
     get adForm(): AdForm;
+    private mAdFormQQ;
+    get adFormQQ(): any;
     private mMistouchForm;
     get mistouchForm(): MistouchForm;
     private mMistouchFormTT;
@@ -1115,6 +1150,6 @@ declare class moosnow {
     static resource: IResourceModule
     static entity: BaseEntityModule
     static form: Form
-    static control: FormControl
+    static control: LogicControl
     static delay: Delay
 }

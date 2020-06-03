@@ -616,6 +616,7 @@ var mx = (function () {
         EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
         EventType.ON_AD_SHOW = "ON_AD_SHOW";
         EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
+        EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
         return EventType;
     }());
 
@@ -6666,13 +6667,163 @@ var mx = (function () {
         return CocosMistouchFormQQ;
     }(MistouchFormQQ));
 
-    /**
-     * 广告结果
-     */
-    var FormControl = /** @class */ (function () {
-        function FormControl() {
+    var BaseLogic = /** @class */ (function (_super) {
+        __extends(BaseLogic, _super);
+        function BaseLogic() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(FormControl.prototype, "adForm", {
+        Object.defineProperty(BaseLogic.prototype, "LogicData", {
+            /**
+            * 父类缓存willShow，onShow传递到实体的逻辑数据
+            */
+            get: function () {
+                return this.mLogicData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BaseLogic.prototype.willShow = function (data) {
+            this.mLogicData = data;
+        };
+        BaseLogic.prototype.onShow = function (data) {
+        };
+        BaseLogic.prototype.willHide = function (data) {
+        };
+        BaseLogic.prototype.onHide = function (data) {
+        };
+        return BaseLogic;
+    }(BaseModule));
+
+    var AdViewItem = /** @class */ (function (_super) {
+        __extends(AdViewItem, _super);
+        function AdViewItem() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.logo = null;
+            _this.title = null;
+            _this.animLogo = null;
+            _this.nameBg = null;
+            _this.changeView = false;
+            return _this;
+            // update (dt) {}
+        }
+        AdViewItem.prototype.initItem = function () {
+            this.logo.node.on(cc.Node.EventType.TOUCH_END, this.onClickAd, this);
+        };
+        AdViewItem.prototype.onClickAd = function () {
+            var _this = this;
+            var openAd = __assign({}, this.mAdItem);
+            if (this.changeView) {
+                var nextAd = this.findNextAd();
+                moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
+                    current: openAd,
+                    next: nextAd
+                });
+                var callback = this.mAdItem.onCancel;
+                console.log('回调函数', !!callback);
+                this.refreshImg(__assign(__assign({}, nextAd), { onCancel: callback }));
+            }
+            moosnow.platform.navigate2Mini(openAd, function () { }, function () {
+                if (_this.mAdItem.onCancel)
+                    _this.mAdItem.onCancel();
+            });
+        };
+        AdViewItem.prototype.findNextAd = function () {
+            if (!this.LogicData.source)
+                return null;
+            if (!this.LogicData.showAppId)
+                return null;
+            for (var i = 0; i < this.LogicData.source.length; i++) {
+                var isShow = false;
+                for (var j = 0; j < this.LogicData.showAppId.length; j++) {
+                    if (this.LogicData.showAppId[j].appid == this.LogicData.source[i].appid) {
+                        isShow = true;
+                    }
+                }
+                if (!isShow) {
+                    return this.LogicData.source[i];
+                }
+            }
+            return null;
+        };
+        AdViewItem.prototype.onAdViewChange = function (e) {
+            var current = e.current, next = e.next;
+            for (var i = 0; i < this.LogicData.showAppId.length; i++) {
+                if (current.appid == this.LogicData.showAppId[i]) {
+                    this.LogicData.showAppId[i] = next.appid;
+                }
+            }
+            for (var i = 0; i < this.LogicData.source.length; i++) {
+                if (next.appid == this.LogicData.source[i].appid) {
+                    this.LogicData.source.splice(i, 1);
+                    this.LogicData.source.push(current);
+                    break;
+                }
+            }
+        };
+        AdViewItem.prototype.onShow = function () {
+            if (this.LogicData.onCancel) {
+                console.log('ad view item ', this.LogicData);
+            }
+            if (this.changeView) {
+                moosnow.event.addListener(EventType.AD_VIEW_REFRESH, this, this.onAdViewChange);
+            }
+        };
+        AdViewItem.prototype.onHide = function () {
+            if (this.mAdItem)
+                this.mAdItem.onCancel = null;
+            moosnow.event.removeListener(EventType.AD_VIEW_REFRESH, this);
+        };
+        AdViewItem.prototype.willShow = function (cell) {
+            _super.prototype.willShow.call(this, cell);
+        };
+        AdViewItem.prototype.refreshImg = function (cell) {
+        };
+        return AdViewItem;
+    }(BaseLogic));
+
+    var CocosAdViewItem = /** @class */ (function (_super) {
+        __extends(CocosAdViewItem, _super);
+        function CocosAdViewItem() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        CocosAdViewItem.prototype.willShow = function (cell) {
+            var _this = this;
+            _super.prototype.willShow.call(this, cell);
+            this.mAdItem = cell;
+            cc.loader.load(cell.img, function (err, tex) {
+                var spriteFrame = new cc.SpriteFrame(tex);
+                _this.logo.spriteFrame = spriteFrame;
+            });
+            if (this.title)
+                this.title.string = (cell.title);
+        };
+        CocosAdViewItem.prototype.refreshImg = function (cell) {
+            var _this = this;
+            this.mAdItem = cell;
+            cc.loader.load(cell.img, function (err, tex) {
+                var spriteFrame = new cc.SpriteFrame(tex);
+                _this.logo.spriteFrame = spriteFrame;
+            });
+            if (this.title)
+                this.title.string = (cell.title);
+        };
+        return CocosAdViewItem;
+    }(AdViewItem));
+
+    /**
+     * 页面逻辑控制
+     */
+    var LogicControl = /** @class */ (function () {
+        function LogicControl() {
+        }
+        /**
+         * 返回一个AdViewItem实例
+         */
+        LogicControl.prototype.newViewItem = function () {
+            return new CocosAdViewItem();
+        };
+        ;
+        Object.defineProperty(LogicControl.prototype, "adForm", {
             get: function () {
                 if (!this.mAdForm)
                     this.mAdForm = new CocosAdForm();
@@ -6682,7 +6833,7 @@ var mx = (function () {
             configurable: true
         });
         ;
-        Object.defineProperty(FormControl.prototype, "adFormQQ", {
+        Object.defineProperty(LogicControl.prototype, "adFormQQ", {
             get: function () {
                 if (!this.mAdForm)
                     this.mAdForm = new CocosAdForm();
@@ -6692,7 +6843,7 @@ var mx = (function () {
             configurable: true
         });
         ;
-        Object.defineProperty(FormControl.prototype, "mistouchForm", {
+        Object.defineProperty(LogicControl.prototype, "mistouchForm", {
             get: function () {
                 if (!this.mMistouchForm)
                     this.mMistouchForm = new CocosMistouchForm();
@@ -6701,7 +6852,7 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(FormControl.prototype, "mistouchFormTT", {
+        Object.defineProperty(LogicControl.prototype, "mistouchFormTT", {
             get: function () {
                 if (!this.mMistouchFormTT)
                     this.mMistouchFormTT = new CocosMistouchFormTT();
@@ -6710,7 +6861,7 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(FormControl.prototype, "mistouchFormQQ", {
+        Object.defineProperty(LogicControl.prototype, "mistouchFormQQ", {
             get: function () {
                 if (!this.mMistouchFormQQ)
                     this.mMistouchFormQQ = new CocosMistouchFormQQ();
@@ -6719,7 +6870,7 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        return FormControl;
+        return LogicControl;
     }());
 
     /**
@@ -6992,7 +7143,7 @@ var mx = (function () {
             /**
              * form表单控制
              */
-            this.mControl = new FormControl();
+            this.mControl = new LogicControl();
             this.mEntity = new BaseEntityModule();
             this.mDelay = new Delay();
             (window["moosnow"]) = this;

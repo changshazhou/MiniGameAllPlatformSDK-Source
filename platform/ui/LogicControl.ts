@@ -9,11 +9,23 @@ import MistouchFormTT from "./engine/MistouchFormTT";
 import MistouchFormQQ from "./engine/MistouchFormQQ";
 import CocosAdFormQQ from "./cocos/CocosAdFormQQ";
 import AdFormQQ from "./engine/AdFormQQ";
+import AdViewItem from "./engine/AdViewItem";
+import CocosAdViewItem from "./cocos/CocosAdViewItem";
 
 /**
- * 广告结果
+ * 页面逻辑控制
  */
-export default class FormControl {
+export default class LogicControl {
+
+    private mAdViewItem: AdViewItem;
+    /**
+     * 返回一个AdViewItem实例
+     */
+    public newViewItem(): AdViewItem {
+        return new CocosAdViewItem();
+    };
+
+
     private mAdForm: AdForm;
     public get adForm(): AdForm {
         if (!this.mAdForm)
