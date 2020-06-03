@@ -31,7 +31,7 @@ gulp.task('tsc', () => {
 				sourceMap: false,
 				compress: false
 			}),
-			uglify.uglify(),
+			// uglify.uglify(),
 			// terser.terser()
 			/*terser({
 				output: {
@@ -44,7 +44,7 @@ gulp.task('tsc', () => {
 		return bundle.write({
 			file: './dist/moosnow.platform.sdk.js',
 			format: 'iife',
-			name: 'laya',
+			name: 'mx',
 			sourcemap: false
 		});
 	}).catch(err => {

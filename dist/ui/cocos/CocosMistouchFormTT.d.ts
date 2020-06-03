@@ -8,4 +8,7 @@ export default class CocosMistouchFormTT extends MistouchFormTT {
     step1: cc.Node;
     step2: cc.Node;
     logo: cc.Node;
+    playBoxAnim(animName: any): void;
+    addEvent(): void;
+    removeEvent(): void;
 }

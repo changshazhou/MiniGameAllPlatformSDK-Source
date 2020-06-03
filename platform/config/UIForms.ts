@@ -2,14 +2,10 @@ export default class UIForms {
 
 
     private static get mapping() {
-        
+
         return {
             adForm: {
-                [moosnow.APP_PLATFORM.WX]: "adForm",
-                [moosnow.APP_PLATFORM.OPPO]: "adFormOPPO",
-                [moosnow.APP_PLATFORM.OPPO_ZS]: "adFormOPPO",
-                [moosnow.APP_PLATFORM.VIVO]: "adFormOPPO",
-                [moosnow.APP_PLATFORM.QQ]: "adFormQQ"
+                [moosnow.APP_PLATFORM.WX]: "adForm"
             },
             pauseForm: {
                 [moosnow.APP_PLATFORM.WX]: "pauseForm",

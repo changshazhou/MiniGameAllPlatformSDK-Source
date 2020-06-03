@@ -17,9 +17,9 @@ export default class MistouchFormTT extends MistouchForm {
     addEvent(): void;
     removeEvent(): void;
     openBox(): void;
-    private checkboxChange;
+    checkboxChange(): void;
     private showCheckbox;
-    private playBoxAnim;
+    playBoxAnim(animName: any): void;
     onLogoUp(): void;
     onBannerClick(): void;
     resetProgress(): void;

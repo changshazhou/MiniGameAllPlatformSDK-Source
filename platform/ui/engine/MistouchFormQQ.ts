@@ -3,6 +3,7 @@ import MistouchForm from "./MistouchForm";
 import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIForms from "../../config/UIForms";
+import Common from "../../utils/Common";
 
 export default class MistouchFormQQ extends MistouchForm {
     clickProgress: any = null;

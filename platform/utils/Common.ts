@@ -207,10 +207,10 @@ export default class Common {
     }
 
     static getEngine(instance) {
-        if (window[ENGINE_TYPE.COCOS] && instance instanceof cc.Prefab) {
+        if (window[ENGINE_TYPE.COCOS] && typeof instance != "string") {
             return ENGINE_TYPE.COCOS
         }
-        else if (window[ENGINE_TYPE.LAYA] && instance instanceof Laya.Prefab) {
+        else if (window[ENGINE_TYPE.LAYA] && typeof instance != "string") {
             return ENGINE_TYPE.LAYA
         }
         else

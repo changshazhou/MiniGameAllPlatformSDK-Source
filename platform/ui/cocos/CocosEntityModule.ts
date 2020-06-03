@@ -2,6 +2,7 @@
 
 import BaseEntityModule from '../engine/BaseEntityModule';
 import { ENGINE_TYPE } from '../../enum/ENGINE_TYPE';
+import Common from '../../utils/Common';
 
 export class CocosEntityModule extends BaseEntityModule {
 
@@ -28,16 +29,16 @@ export class CocosEntityModule extends BaseEntityModule {
     }
 
 
-    public _createEntity(name: string | cc.Prefab | Laya.Prefab) {
+    public _createEntity(name) {
         let prefab
-        if (this._getEngine(name) == ENGINE_TYPE.NONE)
+        if (Common.getEngine(name) == ENGINE_TYPE.NONE)
             prefab = this._getPrefabByName(name);
         else
             prefab = name;
         return cc.instantiate(prefab);
     }
 
-    public _showEntity(name: string | cc.Prefab | Laya.Prefab) {
+    public _showEntity(name) {
 
         let pool = this._getOrNewEntityPool(name);
         let entity = pool.get();
@@ -54,7 +55,7 @@ export class CocosEntityModule extends BaseEntityModule {
         return profab;
     }
 
-    public _getOrNewEntityPool(name: string | cc.Prefab | Laya.Prefab) {
+    public _getOrNewEntityPool(name) {
         let poolName = this._getPoolName(name)
         let pool = this._getEntityPool(poolName);
         if (pool == null) {
@@ -63,25 +64,15 @@ export class CocosEntityModule extends BaseEntityModule {
         return pool;
     }
 
-    private _getEngine(instance) {
-        if (window[ENGINE_TYPE.COCOS] && instance instanceof cc.Prefab) {
-            return ENGINE_TYPE.COCOS
-        }
-        else if (window[ENGINE_TYPE.LAYA] && instance instanceof Laya.Prefab) {
-            return ENGINE_TYPE.LAYA
-        }
-        else
-            return ENGINE_TYPE.NONE;
-    }
 
-    private _getPoolName(name: string | cc.Prefab | Laya.Prefab) {
+    private _getPoolName(name) {
         let poolName = "";
-        let engine = this._getEngine(name);
+        let engine = Common.getEngine(name);
         if (engine == ENGINE_TYPE.COCOS) {
-            poolName = (name as cc.Prefab).name
+            poolName = (name as any).name
         }
         else if (engine == ENGINE_TYPE.LAYA) {
-            poolName = (name as Laya.Prefab).json.name
+            poolName = (name as any).json.name
         }
         else
             poolName = "" + name;

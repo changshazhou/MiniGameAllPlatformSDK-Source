@@ -1036,9 +1036,11 @@ declare class Form {
      */
     showAd(adType: AD_POSITION, callback: Function, zIndex?: number): void;
     /**
-    * 显示狂点页面
-    */
-    showMistouch(): void;
+     * 显示狂点页面
+     * @param callback 点击完成回调
+     * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
+     */
+    showMistouch(callback?: Function, type?: number): void;
 }
 declare class DelayMove extends BaseModule {
     posButton: cc.Node;

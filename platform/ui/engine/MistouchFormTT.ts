@@ -47,19 +47,10 @@ export default class MistouchFormTT extends MistouchForm {
     }
     public addEvent() {
 
-        this.unchecked.node.on(cc.Node.EventType.TOUCH_END, this.checkboxChange, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-        this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.openBox, this)
-
-
     }
 
     public removeEvent() {
-        this.unchecked.node.off(cc.Node.EventType.TOUCH_END, this.checkboxChange, this)
-        this.btnReceive.off(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-        this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.openBox, this)
+
     }
 
     public openBox() {
@@ -86,7 +77,7 @@ export default class MistouchFormTT extends MistouchForm {
         }
     }
 
-    private checkboxChange() {
+    public checkboxChange() {
         this.mOpenVideo = !this.mOpenVideo;
         this.showCheckbox();
     }
@@ -99,10 +90,7 @@ export default class MistouchFormTT extends MistouchForm {
         }
     }
 
-    private playBoxAnim(animName) {
-        let anim = this.logo.getComponent(cc.Animation);
-        if (!anim.getAnimationState(animName).isPlaying)
-            anim.play(animName)
+    public playBoxAnim(animName) {
     }
 
     public onLogoUp() {
