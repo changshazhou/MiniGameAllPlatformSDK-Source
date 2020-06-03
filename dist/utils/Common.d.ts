@@ -33,6 +33,7 @@ export default class Common {
      */
     static get platform(): PlatformType;
     static deepCopy(obj: any): object | [];
+    static getEngine(instance: any): string;
     static popOpenAnim(node: cc.Node, callback?: Function): void;
     static popCloseAnim(node: cc.Node, callback?: Function): void;
     static formatMoney(value: number): any;

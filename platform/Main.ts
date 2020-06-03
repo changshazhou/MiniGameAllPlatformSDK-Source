@@ -33,7 +33,7 @@ import FormControl from "./ui/FormControl";
 import Form from "./ui/Form";
 import Delay from "./framework/Delay";
 
-class Main {
+export default class Main {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;

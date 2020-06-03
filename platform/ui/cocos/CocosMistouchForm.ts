@@ -1,19 +1,12 @@
 
 import MistouchForm from "../engine/MistouchForm";
 import EventType from "../../utils/EventType";
-const { ccclass, property } = cc._decorator;
 
-@ccclass
 export default class CocosMistouchForm extends MistouchForm {
 
-    @property(cc.ProgressBar)
-    clickProgress: cc.ProgressBar = null;
-
-    @property(cc.Node)
-    btnBanner: cc.Node = null;
-
-    @property(cc.Node)
-    logo: cc.Node = null;
+    clickProgress: any = null;
+    btnBanner: any = null;
+    logo: any = null;
 
     public mBeginPos: cc.Vec2;
     public mEndPos: cc.Vec2;

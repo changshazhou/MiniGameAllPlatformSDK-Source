@@ -180,7 +180,7 @@ export class HttpModule extends BaseModule {
      * 数据打点
      * @param name  打点名称
      */
-    public point(name, data: any = null) {
+    public point(name: string, data: any = null) {
         if (Common.platform == PlatformType.WX) {
             if (window['wx'] && window['wx'].aldSendEvent)
                 (window['wx'] as any).aldSendEvent(name, data);
@@ -191,7 +191,7 @@ export class HttpModule extends BaseModule {
     * 统计开始游戏
     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
     */
-    public startGame(level) {
+    public startGame(level: string) {
         if (Common.platform == PlatformType.WX)
             if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onStart({
@@ -207,7 +207,7 @@ export class HttpModule extends BaseModule {
      * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
      * @param {boolean} isWin 是否成功
      */
-    public endGame(level, isWin) {
+    public endGame(level: string, isWin: boolean) {
         if (Common.platform != PlatformType.WX) return;
 
         var event = isWin ? "complete" : "fail";
@@ -231,7 +231,7 @@ export class HttpModule extends BaseModule {
      * @param {string} info 信息 ex:“领取三倍金币”
      * @param {string} level 关卡数
      */
-    public videoPoint(type, info, level) {
+    public videoPoint(type, info: string, level: string) {
         if (Common.platform != PlatformType.WX) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
         if (window['wx'] && window['wx'].aldSendEvent)

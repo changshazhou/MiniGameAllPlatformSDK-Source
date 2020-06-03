@@ -14,17 +14,15 @@ export default class MistouchForm extends BaseForm {
     public mBeginPos: any;
     public mEndPos: any;
 
-    private mMaxNum: number = 10;
-    private mCurrentNum: number = 0;
-    private mNavigateIndex: number = 0;
-    private mBannerShow: boolean = false;
-    private mShowTime: number = 0;
+    public mMaxNum: number = 10;
+    public mCurrentNum: number = 0;
+    public mNavigateIndex: number = 0;
+    public mBannerShow: boolean = false;
+    public mShowTime: number = 0;
 
 
 
-    private mBannerClickType: MISTOUCH_BANNER_TYPE = MISTOUCH_BANNER_TYPE.AUTO_HIDE;
-
-    private LogicData;
+    public mBannerClickType: MISTOUCH_BANNER_TYPE = MISTOUCH_BANNER_TYPE.AUTO_HIDE;
 
 
     public initPos() {
@@ -32,10 +30,8 @@ export default class MistouchForm extends BaseForm {
     }
 
     willShow(data) {
-
+        super.willShow(data);
         this.btnBanner.active = true;
-
-        this.LogicData = data;
 
         this.initPos();
 
@@ -61,7 +57,7 @@ export default class MistouchForm extends BaseForm {
 
     }
 
-    private subProgress() {
+    public subProgress() {
         if (this.mCurrentNum > 0)
             this.mCurrentNum -= 0.1
     }
@@ -72,14 +68,14 @@ export default class MistouchForm extends BaseForm {
 
     }
 
-    private bannerClickCallback(isOpend) {
+    public bannerClickCallback(isOpend) {
         if (isOpend) {
             this.unschedule(this.onHideBanner)
             this.unschedule(this.resetProgress)
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            if (this.LogicData && this.LogicData.onCompleted)
-                this.onCompleted();
+            if (this.FormData && this.FormData.onCompleted)
+                this.FormData.onCompleted();
         }
     }
 
@@ -118,25 +114,18 @@ export default class MistouchForm extends BaseForm {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
             moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
-            if (this.LogicData && this.LogicData.onCompleted)
-                this.onCompleted();
+            if (this.FormData && this.FormData.onCompleted)
+                this.FormData.onCompleted(true);
         }
     }
 
-    /**
-     * 点击完成回调
-     */
-    public onCompleted() {
-
-    }
-
-    private resetProgress() {
+    public resetProgress() {
         this.mCurrentNum = 0;
         moosnow.platform.hideBanner();
         this.mBannerShow = false;
     }
 
-    private onHideBanner() {
+    public onHideBanner() {
         moosnow.platform.hideBanner();
     }
 

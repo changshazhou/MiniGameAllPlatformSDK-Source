@@ -1,4 +1,5 @@
 import { PlatformType } from "../enum/PlatformType";
+import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 
 export default class Common {
     //
@@ -205,30 +206,50 @@ export default class Common {
         return objClone;
     }
 
-    static popOpenAnim(node: cc.Node, callback?: Function) {
+    static getEngine(instance) {
+        if (window[ENGINE_TYPE.COCOS] && instance instanceof cc.Prefab) {
+            return ENGINE_TYPE.COCOS
+        }
+        else if (window[ENGINE_TYPE.LAYA] && instance instanceof Laya.Prefab) {
+            return ENGINE_TYPE.LAYA
+        }
+        else
+            return ENGINE_TYPE.NONE;
+    }
 
-        node.scale = 0.8;
-        node.runAction(
-            cc.sequence(
-                cc.scaleTo(0.1, 1.2, 1.2),
-                cc.scaleTo(0.1, 1, 1),
+
+    static popOpenAnim(node: cc.Node, callback?: Function) {
+        if (this.getEngine(node) == ENGINE_TYPE.COCOS) {
+            node.scale = 0.8;
+            node.runAction(
+                cc.sequence(
+                    cc.scaleTo(0.1, 1.2, 1.2),
+                    cc.scaleTo(0.1, 1, 1),
+                    cc.callFunc(() => {
+                        if (callback)
+                            callback();
+                    }, this)
+                )
+            )
+            return;
+        }
+        callback();
+
+    }
+
+    static popCloseAnim(node: cc.Node, callback?: Function) {
+        if (this.getEngine(node) == ENGINE_TYPE.COCOS) {
+            node.scale = 1;
+            node.runAction(cc.sequence(
+                cc.scaleTo(0.1, 0, 0),
                 cc.callFunc(() => {
                     if (callback)
                         callback();
                 }, this)
-            )
-        )
-    }
-
-    static popCloseAnim(node: cc.Node, callback?: Function) {
-        node.scale = 1;
-        node.runAction(cc.sequence(
-            cc.scaleTo(0.1, 0, 0),
-            cc.callFunc(() => {
-                if (callback)
-                    callback();
-            }, this)
-        ))
+            ))
+            return;
+        }
+        callback();
     }
 
     static formatMoney(value: number) {

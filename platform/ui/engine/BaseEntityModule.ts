@@ -1,8 +1,6 @@
 import BaseModule from "../../framework/BaseModule";
 
-const { ccclass, property } = cc._decorator;
 
-@ccclass
 export default class BaseEntityModule extends BaseModule {
 
 

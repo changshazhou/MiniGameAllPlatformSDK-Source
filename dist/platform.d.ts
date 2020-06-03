@@ -901,37 +901,112 @@ declare class BaseUIModule extends BaseModule {
     _destroyUIForm(formModel: FormModel, data: any): void;
     _removeStack(removeItem: any): void;
 }
+declare enum MISTOUCH_BANNER_TYPE {
+    AUTO_HIDE = 1,
+    MAST = 2
+}
+
 declare class MistouchForm extends BaseForm {
     clickProgress: any;
     btnBanner: any;
     logo: any;
     mBeginPos: any;
     mEndPos: any;
-    private mMaxNum;
-    private mCurrentNum;
-    private mNavigateIndex;
-    private mBannerShow;
-    private mShowTime;
-    private mBannerClickType;
-    private LogicData;
+    mMaxNum: number;
+    mCurrentNum: number;
+    mNavigateIndex: number;
+    mBannerShow: boolean;
+    mShowTime: number;
+    mBannerClickType: MISTOUCH_BANNER_TYPE;
     initPos(): void;
     willShow(data: any): void;
     willHide(): void;
-    private subProgress;
+    subProgress(): void;
     addEvent(): void;
     removeEvent(): void;
-    private bannerClickCallback;
+    bannerClickCallback(isOpend: any): void;
     onLogoUp(): void;
     onLogoDown(): void;
     onBannerClick(): void;
-    /**
-     * 点击完成回调
-     */
-    onCompleted(): void;
-    private resetProgress;
-    private onHideBanner;
+    resetProgress(): void;
+    onHideBanner(): void;
     update(): void;
 }
+declare class MistouchFormTT extends MistouchForm {
+    clickProgress: cc.ProgressBar;
+    btnReceive: cc.Node;
+    btnConfirm: cc.Node;
+    checked: cc.Sprite;
+    unchecked: cc.Sprite;
+    step1: cc.Node;
+    step2: cc.Node;
+    logo: cc.Node;
+    mMaxNum: number;
+    mCurrentNum: number;
+    mOpenVideo: boolean;
+    willShow(data: any): void;
+    willHide(): void;
+    subProgress(): void;
+    addEvent(): void;
+    removeEvent(): void;
+    openBox(): void;
+    private checkboxChange;
+    private showCheckbox;
+    private playBoxAnim;
+    onLogoUp(): void;
+    onBannerClick(): void;
+    resetProgress(): void;
+    update(): void;
+}
+declare class CocosMistouchFormTT extends MistouchFormTT {
+    clickProgress: cc.ProgressBar;
+    btnReceive: cc.Node;
+    btnConfirm: cc.Node;
+    checked: cc.Sprite;
+    unchecked: cc.Sprite;
+    step1: cc.Node;
+    step2: cc.Node;
+    logo: cc.Node;
+}
+declare class MistouchFormQQ extends MistouchForm {
+    clickProgress: any;
+    btnBanner: any;
+    logo: any;
+    hand: any;
+    pinch1: any;
+    pinch2: any;
+    pinch3: any;
+    pinch4: any;
+    pinch5: any;
+    pinch6: any;
+    mBeginPos: any;
+    mEndPos: any;
+    willShow(data: any): void;
+    mistouchAppBox(): boolean;
+    subProgress(): void;
+    addEvent(): void;
+    removeEvent(): void;
+    onLogoUp(): void;
+    onLogoDown(): void;
+    initPos(): void;
+    onHideBanner(): void;
+    onBannerClick(): void;
+}
+declare class CocosMistouchFormQQ extends MistouchFormQQ {
+    clickProgress: any;
+    btnBanner: any;
+    logo: any;
+    hand: any;
+    pinch1: any;
+    pinch2: any;
+    pinch3: any;
+    pinch4: any;
+    pinch5: any;
+    pinch6: any;
+    mBeginPos: any;
+    mEndPos: any;
+}
+
 declare class FormControl {
     private mAdForm;
     /**
@@ -940,6 +1015,10 @@ declare class FormControl {
     get adForm(): AdForm;
     private mMistouchForm;
     get mistouchForm(): MistouchForm;
+    private mMistouchFormTT;
+    get mistouchFormTT(): CocosMistouchFormTT;
+    private mMistouchFormQQ;
+    get mistouchFormQQ(): CocosMistouchFormQQ;
 }
 /**
  * 广告结果
@@ -1019,10 +1098,10 @@ declare class moosnow {
         TOKEN: string;
         LINK: string;
     };
-    static Common = Common;
-    static EVENT_TYPE = EventType;
-    static APP_PLATFORM = PlatformType;
-    static AD_POSITION = AD_POSITION;
+    static Common: typeof Common;
+    static EVENT_TYPE: typeof EventType;
+    static APP_PLATFORM: typeof PlatformType;
+    static AD_POSITION: typeof AD_POSITION;
     static getAppPlatform(): PlatformType
     static http: HttpModule
     static platform: PlatformModule

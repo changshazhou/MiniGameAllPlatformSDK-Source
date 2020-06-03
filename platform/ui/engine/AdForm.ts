@@ -3,154 +3,52 @@ import { AD_POSITION } from "../../enum/AD_POSITION";
 import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
 
-const { ccclass, property } = cc._decorator;
-@ccclass
+
 export default class AdForm extends BaseForm {
 
-    @property(cc.Node)
-    public pauseContainer: cc.Node = null;
 
-    @property(cc.ScrollView)
-    public pauseView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public pauseLayout: cc.Layout = null;
-
-
-    @property(cc.Node)
-    public centerContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public centerView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public centerLayout: cc.Layout = null;
-
-
-    @property(cc.Node)
-    public exportContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public exportView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public exportLayout: cc.Layout = null;
-
-    @property(cc.Node)
-    public exportClose: cc.Node = null;
-
-    @property(cc.Node)
-    public exportMask: cc.Node = null;
-
-
-
-    @property(cc.Node)
-    public exportCloseTxt: cc.Node = null;
-
-    @property(cc.Node)
-    public floatContainer: cc.Node = null;
-
-    @property(cc.Node)
-    public floatFull: cc.Node = null;
-
-
-
-    @property(cc.Node)
-    public bannerContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public bannerView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public bannerLayout: cc.Layout = null;
-
-
-    @property(cc.Node)
-    public endContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public endView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public endLayout: cc.Layout = null;
-
-
-    @property(cc.Node)
-    public failContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public failView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public failLayout: cc.Layout = null;
-
-
-    @property(cc.Node)
-    public gameOverContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public gameOverView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public gameOverLayout: cc.Layout = null;
-
-
-
-
-    @property(cc.Node)
-    public respawnContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public respawnScrollView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public respawnLayout: cc.Layout = null;
-
-
-
-
-
-    @property(cc.Node)
-    public playerDiedContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public playerDiedScrollView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public playerDiedLayout: cc.Layout = null;
-
-
-
-
-    @property(cc.Node)
-    public leftContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public leftView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public leftLayout: cc.Layout = null;
-
-    @property(cc.ScrollView)
-    public rightView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public rightLayout: cc.Layout = null;
-
-    @property(cc.Node)
-    public sideContainer: cc.Node = null;
-
-    @property(cc.ScrollView)
-    public sideView: cc.ScrollView = null;
-
-    @property(cc.Layout)
-    public sideLayout: cc.Layout = null;
-
-    @property(cc.Node)
-    public btnSideShow: cc.Node = null;
-
-    @property(cc.Node)
-    public btnSideHide: cc.Node = null;
+    public pauseContainer: any = null;
+    public pauseView: any = null;
+    public pauseLayout: any = null;
+    public centerContainer: any = null;
+    public centerView: any = null;
+    public centerLayout: any = null;
+    public exportContainer: any = null;
+    public exportView: any = null;
+    public exportLayout: any = null;
+    public exportClose: any = null;
+    public exportMask: any = null;
+    public exportCloseTxt: any = null;
+    public floatContainer: any = null;
+    public floatFull: any = null;
+    public bannerContainer: any = null;
+    public bannerView: any = null;
+    public bannerLayout: any = null;
+    public endContainer: any = null;
+    public endView: any = null;
+    public endLayout: any = null;
+    public failContainer: any = null;
+    public failView: any = null;
+    public failLayout: any = null;
+    public gameOverContainer: any = null;
+    public gameOverView: any = null;
+    public gameOverLayout: any = null;
+    public respawnContainer: any = null;
+    public respawnScrollView: any = null;
+    public respawnLayout: any = null;
+    public playerDiedContainer: any = null;
+    public playerDiedScrollView: any = null;
+    public playerDiedLayout: any = null;
+    public leftContainer: any = null;
+    public leftView: any = null;
+    public leftLayout: any = null;
+    public rightView: any = null;
+    public rightLayout: any = null;
+    public sideContainer: any = null;
+    public sideView: any = null;
+    public sideLayout: any = null;
+    public btnSideShow: any = null;
+    public btnSideHide: any = null;
 
 
     private mAdItemList = [];
@@ -170,7 +68,7 @@ export default class AdForm extends BaseForm {
      * @param positionTag 
      * @param entityName 
      */
-    public initView(container: cc.Node, scrollView: cc.ScrollView, layout: cc.Layout, position: AD_POSITION, entityName: string | cc.Prefab) {
+    public initView(container: any, scrollView: any, layout: any, position: AD_POSITION, entityName: string | cc.Prefab) {
         if (!entityName) {
             console.warn('entityName is null 无法初始化 ')
             return;

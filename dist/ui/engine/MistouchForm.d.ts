@@ -1,32 +1,28 @@
 import BaseForm from "../engine/BaseForm";
+import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 export default class MistouchForm extends BaseForm {
     clickProgress: any;
     btnBanner: any;
     logo: any;
     mBeginPos: any;
     mEndPos: any;
-    private mMaxNum;
-    private mCurrentNum;
-    private mNavigateIndex;
-    private mBannerShow;
-    private mShowTime;
-    private mBannerClickType;
-    private LogicData;
+    mMaxNum: number;
+    mCurrentNum: number;
+    mNavigateIndex: number;
+    mBannerShow: boolean;
+    mShowTime: number;
+    mBannerClickType: MISTOUCH_BANNER_TYPE;
     initPos(): void;
     willShow(data: any): void;
     willHide(): void;
-    private subProgress;
+    subProgress(): void;
     addEvent(): void;
     removeEvent(): void;
-    private bannerClickCallback;
+    bannerClickCallback(isOpend: any): void;
     onLogoUp(): void;
     onLogoDown(): void;
     onBannerClick(): void;
-    /**
-     * 点击完成回调
-     */
-    onCompleted(): void;
-    private resetProgress;
-    private onHideBanner;
+    resetProgress(): void;
+    onHideBanner(): void;
     update(): void;
 }

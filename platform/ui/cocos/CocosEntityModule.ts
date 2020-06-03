@@ -1,5 +1,4 @@
 
-const { ccclass, property } = cc._decorator;
 
 import BaseEntityModule from '../engine/BaseEntityModule';
 import { ENGINE_TYPE } from '../../enum/ENGINE_TYPE';

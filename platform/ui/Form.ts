@@ -87,9 +87,12 @@ export default class Form {
 
     /**
      * 显示狂点页面
+     * @param callback 点击完成回调
+     * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
-    public showMistouch(callback) {
+    public showMistouch(callback: Function, type: number = 1) {
         moosnow.ui.pushUIForm(UIForms.MistouchForm, {
+            mistouchType: type == 2 ? 4 : 1,
             onCompleted: () => {
                 if (callback)
                     callback();

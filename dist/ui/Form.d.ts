@@ -29,6 +29,8 @@ export default class Form {
     }, callback: Function): void;
     /**
      * 显示狂点页面
+     * @param callback 点击完成回调
+     * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
-    showMistouch(callback: any): void;
+    showMistouch(callback: Function, type?: number): void;
 }

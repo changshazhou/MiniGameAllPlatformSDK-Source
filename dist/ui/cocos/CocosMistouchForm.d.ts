@@ -1,8 +1,8 @@
 import MistouchForm from "../engine/MistouchForm";
 export default class CocosMistouchForm extends MistouchForm {
-    clickProgress: cc.ProgressBar;
-    btnBanner: cc.Node;
-    logo: cc.Node;
+    clickProgress: any;
+    btnBanner: any;
+    logo: any;
     mBeginPos: cc.Vec2;
     mEndPos: cc.Vec2;
     addEvent(): void;

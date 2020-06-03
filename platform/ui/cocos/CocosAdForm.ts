@@ -3,8 +3,7 @@ import { AD_POSITION } from "../../enum/AD_POSITION";
 import BaseForm from "../engine/BaseForm";
 import AdForm from "../engine/AdForm";
 
-const { ccclass, property } = cc._decorator;
-@ccclass
+
 export default class CocosAdForm extends AdForm {
 
     public addEvent() {

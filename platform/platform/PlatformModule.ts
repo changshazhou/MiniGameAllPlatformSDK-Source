@@ -312,15 +312,13 @@ export default class PlatformModule extends BaseModule {
     }
 
     public vibrateShort() {
-        if (!window[this.platformName] || !this.vibrateOn) {
-            return;
-        }
+        if (!window[this.platformName]) return;
+        if (window[this.platformName] && !window[this.platformName].vibrateShort) return;
         window[this.platformName].vibrateShort();
     }
     public vibrateLong() {
-        if (!window[this.platformName] || !this.vibrateOn) {
-            return;
-        }
+        if (!window[this.platformName]) return;
+        if (window[this.platformName] && !window[this.platformName].vibrateLong) return;
         window[this.platformName].vibrateLong();
     }
 
