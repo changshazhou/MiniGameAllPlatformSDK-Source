@@ -32,7 +32,7 @@ export default class BaseModule {
 
     public initProperty(form) {
         for (let v in form) {
-            if (v.indexOf("m") != 0 && (form[v] instanceof cc.Node || form[v] instanceof cc.Component)) {
+            if (this.hasOwnProperty(v)) {
                 this[v] = form[v];
             }
         }

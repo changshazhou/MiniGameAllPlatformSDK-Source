@@ -24,7 +24,6 @@ export default class MistouchFormQQ extends MistouchForm {
     willShow(data) {
         super.willShow(data);
 
-        this.btnBanner.active = true;
         this.mCurrentNum = 0;
         this.mNavigateIndex = Common.randomNumBoth(3, this.mMaxNum - 2);
         this.addEvent();
@@ -37,8 +36,11 @@ export default class MistouchFormQQ extends MistouchForm {
 
         if (this.mistouchAppBox()) {
             this.hand.active = true;
-            let anim = this.hand.getComponent(cc.Animation);
-            anim.play();
+            this.btnBanner.active = false;
+        }
+        else {
+            this.hand.active = false;
+            this.btnBanner.active = true;
         }
         moosnow.platform.hideBanner();
     }
@@ -52,26 +54,8 @@ export default class MistouchFormQQ extends MistouchForm {
             this.mCurrentNum -= 0.02
     }
 
-    public addEvent() {
-        this.btnBanner.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnBanner.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-    }
-    public removeEvent() {
-        this.btnBanner.off(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-        moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
-    }
-
-    public onLogoUp() {
-        this.logo.position = this.mEndPos;
-    }
-    public onLogoDown() {
-        this.logo.position = this.mBeginPos;
-    }
-
     public initPos() {
-        this.mBeginPos = this.logo.position.clone();
-        this.mEndPos = this.mBeginPos.add(new cc.Vec2(0, 50));
+
     }
 
     public onHideBanner() {
@@ -83,9 +67,9 @@ export default class MistouchFormQQ extends MistouchForm {
     }
 
     public onBannerClick() {
-        this.onLogoDown();
-        this.hand.active = false;
+        
         this.mCurrentNum += 1;
+        this.onLogoDown();
 
         if (this.mCurrentNum >= this.mNavigateIndex) {
             if (!this.mBannerShow) {

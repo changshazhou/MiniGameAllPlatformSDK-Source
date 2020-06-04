@@ -36,4 +36,5 @@ export default class CocosMistouchFormTT extends MistouchFormTT {
         this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
         this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.openBox, this)
     }
+
 }

@@ -12,4 +12,8 @@ export default class CocosMistouchFormQQ extends MistouchFormQQ {
     pinch6: any;
     mBeginPos: any;
     mEndPos: any;
+    onLogoUp(): void;
+    onLogoDown(): void;
+    addEvent(): void;
+    removeEvent(): void;
 }

@@ -19,5 +19,39 @@ export default class CocosMistouchFormQQ extends MistouchFormQQ {
     public mBeginPos: any;
     public mEndPos: any;
 
+    public onLogoUp() {
 
+    }
+
+    public onLogoDown() {
+        let logoSprite = this.logo.getComponent(cc.Sprite)
+        if (this.mCurrentNum < this.mMaxNum)
+            logoSprite.spriteFrame = this[`pinch${(parseInt("" + this.mCurrentNum) % 4) + 1}`];
+        else
+            logoSprite.spriteFrame = this.pinch6;
+
+    }
+
+    public addEvent() {
+        //误触appbox 广告
+        if (this.mistouchAppBox()) {
+            this.btnBanner.active = false;
+            this.logo.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this);
+            this.logo.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this);
+        }
+        else {
+            //误触banner
+            this.btnBanner.active = true;
+            this.btnBanner.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this);
+            this.btnBanner.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this);
+        }
+        moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, () => {
+            if (this.mBannerShow)
+                this.bannerClickCallback(true);
+        })
+    }
+    public removeEvent() {
+        this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
+        moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
+    }
 }

@@ -75,6 +75,8 @@ export default class AdForm extends BaseForm {
         }
         moosnow.entity.preload(entityName, () => {
             moosnow.ad.getAd((res) => {
+                if (res.indexLeft.length == 0)
+                    return;
                 let source = this.setPosition(res.indexLeft, "");
 
                 source.forEach((item, idx) => {
@@ -264,7 +266,11 @@ export default class AdForm extends BaseForm {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
             moosnow.ad.getAd((res: moosnowResult) => {
                 this.mAdData = res;
+
+                if (res.indexLeft.length == 0)
+                    return;
                 let source = [...res.indexLeft];
+
 
                 prefabs.forEach((prefabName, idx) => {
                     let showIndex = idx

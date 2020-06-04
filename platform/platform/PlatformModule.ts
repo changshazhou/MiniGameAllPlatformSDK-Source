@@ -837,6 +837,7 @@ export default class PlatformModule extends BaseModule {
         console.warn('banner___error:', err.errCode, err.errMsg);
         this.banner = null;
         this.isBannerShow = false;
+        moosnow.event.sendEventImmediately(EventType.ON_BANNER_HIDE, null);
     }
     public _bottomCenterBanner(size) {
 

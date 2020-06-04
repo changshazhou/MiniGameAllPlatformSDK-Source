@@ -93,15 +93,16 @@ export default class WXModule extends PlatformModule {
     private getUserToken(code, user_id, callback?) {
 
         let options = this.getLaunchOption();
+        let scene = options.scene;
         let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
         let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
 
         moosnow.data.setChannelAppId(channel_appid);
         moosnow.data.setChannelId(channel_id);
-
+        let fromApp = options.referrerInfo ? options.referrerInfo.appId : '未知'
         if (window[this.platformName] && window[this.platformName].aldSendEvent) {
             window[this.platformName].aldSendEvent("来源", {
-                origin: options.referrerInfo ? options.referrerInfo.appId : '未知',
+                origin: fromApp,
                 path: options.query.from || 0
             })
         }
@@ -111,7 +112,8 @@ export default class WXModule extends PlatformModule {
             code: code,
             user_id: user_id,
             channel_id: channel_id,
-            channel_appid: channel_appid
+            channel_appid: channel_appid,
+            scene, fromApp
         }, "POST", (respone) => {
             if (respone.code == 0 && respone.data && respone.data.user_id) {
                 moosnow.data.setToken(respone.data.user_id);

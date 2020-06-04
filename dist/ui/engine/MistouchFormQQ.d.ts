@@ -15,10 +15,6 @@ export default class MistouchFormQQ extends MistouchForm {
     willShow(data: any): void;
     mistouchAppBox(): boolean;
     subProgress(): void;
-    addEvent(): void;
-    removeEvent(): void;
-    onLogoUp(): void;
-    onLogoDown(): void;
     initPos(): void;
     onHideBanner(): void;
     onBannerClick(): void;

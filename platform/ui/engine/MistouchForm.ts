@@ -79,13 +79,14 @@ export default class MistouchForm extends BaseForm {
         }
     }
 
-
-
     public onLogoUp() {
+        this.logo.position = this.mEndPos;
     }
     public onLogoDown() {
+        this.logo.position = this.mBeginPos;
     }
 
+ 
     public onBannerClick() {
         this.onLogoDown();
 
