@@ -67,7 +67,7 @@ export default class MistouchFormQQ extends MistouchForm {
     }
 
     public onBannerClick() {
-        
+
         this.mCurrentNum += 1;
         this.onLogoDown();
 
@@ -103,9 +103,12 @@ export default class MistouchFormQQ extends MistouchForm {
         if (this.mCurrentNum >= this.mMaxNum) {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
-            if (this.FormData && this.FormData.onCompleted)
-                this.FormData.onCompleted();
+            this.scheduleOnce(() => {
+                moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
+                if (this.FormData && this.FormData.onCompleted)
+                    this.FormData.onCompleted();
+            }, 0.2)
+
         }
     }
 }

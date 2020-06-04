@@ -6635,9 +6635,11 @@ var mx = (function () {
             if (this.mCurrentNum >= this.mMaxNum) {
                 moosnow.platform.hideBanner();
                 this.mBannerShow = false;
-                moosnow.ui.destroyUIForm(UIForms.MistouchForm, null);
-                if (this.FormData && this.FormData.onCompleted)
-                    this.FormData.onCompleted();
+                this.scheduleOnce(function () {
+                    moosnow.ui.destroyUIForm(UIForms.MistouchForm, null);
+                    if (_this.FormData && _this.FormData.onCompleted)
+                        _this.FormData.onCompleted();
+                }, 0.2);
             }
         };
         return MistouchFormQQ;
