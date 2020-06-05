@@ -1,7 +1,13 @@
+import coinAnimStyle from "../../dist/model/coinAnimStyle";
 /**
  * 广告结果
  */
 export default class Form {
+    /**
+     * Toast消息
+     * @param msg  消息内容
+     */
+    showToast(msg: string): void;
     /**
      * 预加载广告
      */
@@ -12,25 +18,24 @@ export default class Form {
      * @param callback  有返回按钮时的回调
      * @param zIndex  层级
      */
-    showAd(adType: AD_POSITION, callback: Function, zIndex?: number): void;
+    showAd(adType: number, callback: Function, zIndex?: number): void;
     /**
      * 金币动画
-     * @param imgNum 动画图片数量
-     * @param starVec 开始位置
-     * @param endVec 结束位置
-     * @param callback 结束回调
+     * @param style
+     * @param callback
      */
-    showCoin(imgNum: number, starVec: {
-        x: 0;
-        y: 0;
-    }, endVec: {
-        x: 0;
-        y: 0;
-    }, callback: Function): void;
+    showCoin(style: coinAnimStyle, callback: Function): void;
     /**
      * 显示狂点页面
      * @param callback 点击完成回调
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
     showMistouch(callback: Function, type?: number): void;
+    /**
+     * 显示奖励
+     * @param style
+     * @param base
+     * @param callback
+     */
+    showPrize(style: coinAnimStyle, baseNum: number, callback: Function): void;
 }

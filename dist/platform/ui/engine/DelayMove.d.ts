@@ -1,14 +1,20 @@
 import BaseModule from "../../framework/BaseModule";
-export default class MistouchPos extends BaseModule {
-    posButton: cc.Node;
-    moveDis: number;
+export default class DelayMove extends BaseModule {
+    moveNode: cc.Node;
+    distince: number;
     showBanner: boolean;
     pos1: cc.Vec2;
     pos2: cc.Vec2;
     mMistouchPosNum: number;
     mMistouchPosSecond: number;
     initPos(): void;
-    move(): void;
+    /**
+     *
+     * @param moveNode
+     * @param distince
+     * @param showBanner
+     */
+    move(moveNode: any, distince: any, showBanner: any): void;
     movePosition(): void;
     copyNode(): void;
     onPosCallback(tempButtom: any): void;

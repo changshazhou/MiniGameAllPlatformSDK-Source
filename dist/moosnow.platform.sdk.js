@@ -1,19 +1,19 @@
-var mx = (function () {
+(function () {
     'use strict';
 
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
     /* global Reflect, Promise */
 
@@ -618,6 +618,7 @@ var mx = (function () {
         EventType.ON_AD_SHOW = "ON_AD_SHOW";
         EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
         EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
+        EventType.COIN_CHANGED = "COIN_CHANGED";
         return EventType;
     }());
 
@@ -3240,12 +3241,42 @@ var mx = (function () {
         function GameDataCenter() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.TOKEN = "token";
+            _this.COIN = "COIN";
             _this.mUserToken = "";
+            _this.mCoin = 0;
             _this.mCurrentMisTouchCount = 0;
             _this.mChannel_id = "0";
             _this.mChannel_appid = "0";
             return _this;
         }
+        /***********
+         * 金币
+         */
+        GameDataCenter.prototype.initCoin = function (num) {
+            if (moosnow.setting._getValue(this.COIN, null) == null)
+                moosnow.setting.setValue(this.COIN, num);
+        };
+        GameDataCenter.prototype.getCoin = function () {
+            if (this.mCoin == 0)
+                this.mCoin = moosnow.setting.getInt(this.COIN, 0);
+            return this.mCoin;
+        };
+        GameDataCenter.prototype.subCoin = function (v) {
+            this.mCoin -= v;
+            moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        };
+        GameDataCenter.prototype.addCoin = function (v) {
+            this.mCoin += v;
+            moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        };
+        GameDataCenter.prototype.setCoin = function (v) {
+            this.mCoin = v;
+            moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        };
+        GameDataCenter.prototype.saveCoin = function () {
+            moosnow.setting.setValue(this.COIN, this.mCoin);
+            // Lite.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        };
         GameDataCenter.prototype.getToken = function () {
             if (Common.isEmpty(this.mUserToken))
                 this.mUserToken = moosnow.setting.getString(this.TOKEN, "");
@@ -5242,48 +5273,56 @@ var mx = (function () {
         return VIVOModule;
     }(PlatformModule));
 
-    var AD_POSITION$1;
-    (function (AD_POSITION) {
+    var AD_POSITION = {
         /**
          * 不显示
          */
-        AD_POSITION[AD_POSITION["NONE"] = 0] = "NONE";
-        AD_POSITION[AD_POSITION["BANNER"] = 1] = "BANNER";
-        AD_POSITION[AD_POSITION["FLOAT"] = 2] = "FLOAT";
+        NONE: 0,
+        BANNER: 1,
+        FLOAT: 2,
         /**
          * 侧拉广告
          */
-        AD_POSITION[AD_POSITION["SIDE"] = 4] = "SIDE";
-        AD_POSITION[AD_POSITION["CENTER"] = 8] = "CENTER";
-        AD_POSITION[AD_POSITION["EXPORT"] = 16] = "EXPORT";
+        SIDE: 4,
+        CENTER: 8,
+        EXPORT: 16,
         /**
          * 返回按钮
          */
-        AD_POSITION[AD_POSITION["BACK"] = 32] = "BACK";
+        BACK: 32,
         /**
          * 黑色半透明遮挡
          */
-        AD_POSITION[AD_POSITION["MASK"] = 64] = "MASK";
+        MASK: 64,
         /**
          * 延迟显示
          */
-        AD_POSITION[AD_POSITION["WAIT"] = 128] = "WAIT";
+        WAIT: 128,
         /**
          * 左右两侧
          */
-        AD_POSITION[AD_POSITION["LEFTRIGHT"] = 256] = "LEFTRIGHT";
+        LEFTRIGHT: 256,
         /**
-        * 左右两侧
+        * 扩展1
         */
-        AD_POSITION[AD_POSITION["extend1"] = 512] = "extend1";
+        EXTEND1: 512,
         /**
-        * 左右两侧
+        * 扩展2
         */
-        AD_POSITION[AD_POSITION["extend2"] = 1024] = "extend2";
-        AD_POSITION[AD_POSITION["extend3"] = 2048] = "extend3";
-        AD_POSITION[AD_POSITION["extend4"] = 4096] = "extend4";
-        AD_POSITION[AD_POSITION["extend5"] = 8192] = "extend5";
-    })(AD_POSITION$1 || (AD_POSITION$1 = {}));
+        EXTEND2: 1024,
+        /**
+        * 扩展3
+        */
+        EXTEND3: 2048,
+        /**
+        * 扩展4
+        */
+        EXTEND4: 4096,
+        /**
+        * 扩展5
+        */
+        EXTEND5: 8192,
+    };
 
     var BaseEntityModule = /** @class */ (function (_super) {
         __extends(BaseEntityModule, _super);
@@ -5572,7 +5611,7 @@ var mx = (function () {
          * @param {any} data 携带的自定义数据
          */
         BaseUIModule.prototype.hideUIForm = function (name, data, cb) {
-            if (name instanceof String) {
+            if (typeof name == "string") {
                 for (var i = 0; i < this.UIFormStack.length; i++) {
                     var formModel = this.UIFormStack[i];
                     if (formModel.name == name) {
@@ -5771,6 +5810,12 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
+        /**
+         * 初始化
+         * @param logic
+         */
+        BaseForm.prototype.initForm = function (logic) {
+        };
         BaseForm.prototype.willShow = function (data) {
             this.mFormData = data;
         };
@@ -5852,7 +5897,7 @@ var mx = (function () {
          *
          * @param scrollView
          * @param layout
-         * @param positionTag
+         * @param positionTag AD_POSITION
          * @param entityName
          */
         AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
@@ -5926,7 +5971,7 @@ var mx = (function () {
             if (data)
                 this.displayChange(data.showAd, data.callback);
             else
-                this.displayChange(AD_POSITION$1.NONE, null);
+                this.displayChange(AD_POSITION.NONE, null);
         };
         AdForm.prototype.displayChange = function (data, callback) {
             if (callback === void 0) { callback = null; }
@@ -6026,8 +6071,12 @@ var mx = (function () {
                     var source = __spreadArrays(res.indexLeft);
                     prefabs.forEach(function (prefabName, idx) {
                         var showIndex = idx;
+                        var floatData = source[0];
+                        if (showIndex > source.length - 1)
+                            showIndex = 0;
+                        floatData = source[showIndex];
                         var point = points[idx];
-                        var adRow = __assign(__assign({}, source[showIndex]), { position: "首页浮动", x: point.x, y: point.y });
+                        var adRow = __assign(__assign({}, floatData), { position: "首页浮动", x: point.x, y: point.y });
                         var logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                         _this.mFloatCache[idx] = {
                             index: showIndex,
@@ -6074,17 +6123,17 @@ var mx = (function () {
         };
         AdForm.prototype.displayAd = function (visible) {
             var _this = this;
-            this.floatContainer.active = visible && this.hasAd(AD_POSITION$1.FLOAT);
-            this.bannerContainer.active = visible && this.hasAd(AD_POSITION$1.BANNER);
-            this.centerContainer.active = visible && this.hasAd(AD_POSITION$1.CENTER);
-            this.leftContainer.active = visible && this.hasAd(AD_POSITION$1.LEFTRIGHT);
-            this.exportMask.active = visible && this.hasAd(AD_POSITION$1.MASK);
-            this.sideContainer.active = visible && this.hasAd(AD_POSITION$1.SIDE);
+            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+            this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+            this.centerContainer.active = visible && this.hasAd(AD_POSITION.CENTER);
+            this.leftContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
+            this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
+            this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
             this.exportClose.active = false;
             this.exportCloseTxt.active = false;
             this.unschedule(this.showExportClose);
-            if (this.hasAd(AD_POSITION$1.BACK)) {
-                if (this.hasAd(AD_POSITION$1.WAIT)) {
+            if (this.hasAd(AD_POSITION.BACK)) {
+                if (this.hasAd(AD_POSITION.WAIT)) {
                     this.mSecond = 3;
                     this.showExportClose();
                     this.schedule(this.showExportClose, 1);
@@ -6098,8 +6147,8 @@ var mx = (function () {
                 this.exportClose.active = false;
                 this.exportCloseTxt.active = false;
             }
-            this.exportContainer.active = visible && this.hasAd(AD_POSITION$1.EXPORT);
-            if (visible && this.hasAd(AD_POSITION$1.EXPORT)) {
+            this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            if (visible && this.hasAd(AD_POSITION.EXPORT)) {
                 moosnow.http.getAllConfig(function (res) {
                     if (res.exportAutoNavigate == 1) {
                         moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
@@ -6579,14 +6628,17 @@ var mx = (function () {
             moosnow.form.showAd(moosnow.AD_POSITION.NONE, null);
             this.mBannerShow = false;
             if (this.mistouchAppBox()) {
-                this.hand.active = true;
-                this.btnBanner.active = false;
+                this.showHand(true);
+                this.showButton(false);
+                this.playHandAnim();
             }
             else {
-                this.hand.active = false;
-                this.btnBanner.active = true;
+                this.showHand(false);
+                this.showButton(true);
             }
             moosnow.platform.hideBanner();
+        };
+        MistouchFormQQ.prototype.playHandAnim = function () {
         };
         MistouchFormQQ.prototype.mistouchAppBox = function () {
             return this.FormData && this.FormData.mistouchType == 4;
@@ -6603,10 +6655,15 @@ var mx = (function () {
             else
                 moosnow.platform.hideBanner();
         };
+        MistouchFormQQ.prototype.showButton = function (isShow) {
+        };
+        MistouchFormQQ.prototype.showHand = function (isShow) {
+        };
         MistouchFormQQ.prototype.onBannerClick = function () {
             var _this = this;
             this.mCurrentNum += 1;
             this.onLogoDown();
+            this.showHand(false);
             if (this.mCurrentNum >= this.mNavigateIndex) {
                 if (!this.mBannerShow) {
                     this.mShowTime = Date.now();
@@ -6692,6 +6749,16 @@ var mx = (function () {
         CocosMistouchFormQQ.prototype.removeEvent = function () {
             this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this);
             moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
+        };
+        CocosMistouchFormQQ.prototype.playHandAnim = function () {
+            var anim = this.hand.getComponent(cc.Animation);
+            anim.play();
+        };
+        CocosMistouchFormQQ.prototype.showButton = function (isShow) {
+            this.btnBanner.active = isShow;
+        };
+        CocosMistouchFormQQ.prototype.showHand = function (isShow) {
+            this.hand.active = isShow;
         };
         return CocosMistouchFormQQ;
     }(MistouchFormQQ));
@@ -6839,6 +6906,299 @@ var mx = (function () {
         return CocosAdViewItem;
     }(AdViewItem));
 
+    var PrizeForm = /** @class */ (function (_super) {
+        __extends(PrizeForm, _super);
+        function PrizeForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.coinNum = null;
+            _this.btnConfirm = null;
+            return _this;
+        }
+        PrizeForm.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+            // this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        };
+        PrizeForm.prototype.willHide = function () {
+            // this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        };
+        PrizeForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.coinNum.string = "" + Common.formatMoney(data.coinNum);
+            moosnow.platform.hideBanner();
+        };
+        PrizeForm.prototype.closeForm = function () {
+            var _this = this;
+            moosnow.ui.destroyUIForm(UIForms.PrizeForm, null);
+            moosnow.ui.destroyUIForm(UIForms.MistouchForm, null);
+            if (this.FormData.showCoinAnim == true) {
+                moosnow.ui.pushUIForm(UIForms.CoinForm, __assign(__assign({}, Common.deepCopy(this.FormData)), { callback: function () {
+                        if (_this.FormData.onCompleted)
+                            _this.FormData.onCompleted();
+                    } }));
+            }
+            else {
+                if (this.FormData.onCompleted)
+                    this.FormData.onCompleted();
+            }
+        };
+        return PrizeForm;
+    }(BaseForm));
+
+    var CocosPrizeForm = /** @class */ (function (_super) {
+        __extends(CocosPrizeForm, _super);
+        function CocosPrizeForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.coinNum = null;
+            _this.btnConfirm = null;
+            return _this;
+        }
+        CocosPrizeForm.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+            this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+        };
+        CocosPrizeForm.prototype.willHide = function () {
+            this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+        };
+        return CocosPrizeForm;
+    }(PrizeForm));
+
+    var PrizeFormTT = /** @class */ (function (_super) {
+        __extends(PrizeFormTT, _super);
+        function PrizeFormTT() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.prizeBg1 = null;
+            _this.prizeBg2 = null;
+            _this.btnCancel = null;
+            _this.txtCoutdown = null;
+            _this.btnVideo = null;
+            _this.btnShare = null;
+            _this.btnReceive = null;
+            _this.checked = null;
+            _this.unchecked = null;
+            _this.isMask = true;
+            _this.mChecked = false;
+            _this.mTotalSecond = 10;
+            _this.mCurrentSecond = 0;
+            return _this;
+        }
+        PrizeFormTT.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+            // this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        };
+        PrizeFormTT.prototype.willShow = function (data) {
+            var _this = this;
+            _super.prototype.willShow.call(this, data);
+            this.addListener();
+            this.mChecked = false;
+            this.onChecked();
+            this.prizeBg1.active = false;
+            this.prizeBg2.active = false;
+            moosnow.http.getAllConfig(function (res) {
+                if (res) {
+                    if (res.prizeFormVideo == 1) {
+                        _this.showVideo();
+                    }
+                    else if (res.prizeFormVideo == 2) {
+                        _this.showShare();
+                    }
+                    else {
+                        var precent = res && res.prizeFormVideosPrecent ? parseFloat(res.prizeFormVideosPrecent) : 0.5;
+                        if (Common.randomNumBoth(0, 100) / 100.0 < precent) {
+                            _this.showVideo();
+                        }
+                        else
+                            _this.showShare();
+                    }
+                }
+                else {
+                    _this.showShare();
+                }
+            });
+            this.mTotalSecond = 10;
+            this.mCurrentSecond = 0;
+            this.resumeCountdown();
+            moosnow.platform.showBanner();
+        };
+        PrizeFormTT.prototype.onHide = function () {
+            this.removeListener();
+        };
+        PrizeFormTT.prototype.showVideo = function () {
+            this.prizeBg1.active = true;
+            this.prizeBg2.active = false;
+        };
+        PrizeFormTT.prototype.showShare = function () {
+            this.prizeBg1.active = false;
+            this.prizeBg2.active = true;
+        };
+        PrizeFormTT.prototype.onCountdown = function () {
+            this.mCurrentSecond += 1;
+            var num = this.mTotalSecond - this.mCurrentSecond;
+            if (num < 0) {
+                this.unschedule(this.onCountdown);
+                moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                return;
+            }
+            this.txtCoutdown.string = num + "\u79D2";
+        };
+        PrizeFormTT.prototype.stopCountdown = function () {
+            this.unschedule(this.onCountdown);
+        };
+        PrizeFormTT.prototype.resumeCountdown = function () {
+            this.schedule(this.onCountdown, 1);
+        };
+        PrizeFormTT.prototype.addListener = function () {
+            this.btnCancel.on(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+            this.btnVideo.on(cc.Node.EventType.TOUCH_END, this.onVideo, this);
+            this.btnReceive.on(cc.Node.EventType.TOUCH_END, this.onReceive, this);
+            this.btnShare.on(cc.Node.EventType.TOUCH_END, this.onShare, this);
+            this.unchecked.on(cc.Node.EventType.TOUCH_END, this.onChecked, this);
+        };
+        PrizeFormTT.prototype.removeListener = function () {
+            this.btnCancel.off(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+            this.btnVideo.off(cc.Node.EventType.TOUCH_END, this.onVideo, this);
+            this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onReceive, this);
+            this.btnShare.off(cc.Node.EventType.TOUCH_END, this.onShare, this);
+            this.unchecked.off(cc.Node.EventType.TOUCH_END, this.onChecked, this);
+        };
+        PrizeFormTT.prototype.closeForm = function () {
+            moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+        };
+        PrizeFormTT.prototype.onChecked = function () {
+            this.mChecked = !this.mChecked;
+            this.checked.active = this.mChecked;
+        };
+        PrizeFormTT.prototype.onShare = function () {
+            var _this = this;
+            this.stopCountdown();
+            moosnow.platform.share({
+                channel: ""
+            }, function (shared) {
+                _this.resumeCountdown();
+                if (shared) {
+                    _this.addCoin(_this.getCoinNum() * 2, function () {
+                        moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                    });
+                }
+            });
+        };
+        PrizeFormTT.prototype.onReceive = function () {
+            if (this.mChecked)
+                this.onVideo();
+            else
+                this.addCoin(this.getCoinNum(), function () {
+                    moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                });
+        };
+        PrizeFormTT.prototype.onVideo = function () {
+            var _this = this;
+            this.stopCountdown();
+            moosnow.platform.showVideo(function (res) {
+                if (res == moosnow.VIDEO_STATUS.END) {
+                    _this.addCoin(_this.getCoinNum() * (_this.FormData && _this.FormData.baseNum ? parseFloat(_this.FormData.baseNum) : 2), function () {
+                        moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                    });
+                    return;
+                }
+                else if (res == moosnow.VIDEO_STATUS.ERR)
+                    moosnow.ui.showToast(moosnow.VIDEO_MSG.ERR);
+                else {
+                    moosnow.ui.showToast(moosnow.VIDEO_MSG.NOTEND);
+                }
+                _this.resumeCountdown();
+            });
+        };
+        PrizeFormTT.prototype.getCoinNum = function () {
+            var coinNum = Common.randomNumBoth(500, 600);
+            return coinNum;
+        };
+        PrizeFormTT.prototype.addCoin = function (coinNum, callback) {
+            moosnow.ui.hideUIForm(UIForms.MistouchForm, null);
+            moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, null);
+            moosnow.ui.pushUIForm(UIForms.CoinForm, __assign(__assign({}, Common.deepCopy(this.FormData)), { coinNum: coinNum, callback: function () {
+                    if (callback)
+                        callback();
+                } }));
+        };
+        return PrizeFormTT;
+    }(BaseForm));
+
+    var CocosPrizeFormTT = /** @class */ (function (_super) {
+        __extends(CocosPrizeFormTT, _super);
+        function CocosPrizeFormTT() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.coinNum = null;
+            _this.btnConfirm = null;
+            return _this;
+        }
+        CocosPrizeFormTT.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+            this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+        };
+        CocosPrizeFormTT.prototype.willHide = function () {
+            this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.closeForm, this);
+        };
+        return CocosPrizeFormTT;
+    }(PrizeFormTT));
+
+    var CoinForm = /** @class */ (function (_super) {
+        __extends(CoinForm, _super);
+        function CoinForm() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(CoinForm.prototype, "rootNode", {
+            get: function () {
+                return {};
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CoinForm.prototype.flyAnim = function (logic, endVec, callback) {
+        };
+        CoinForm.prototype.onShow = function (data) {
+            var _this = this;
+            var imgNum = data.imgNum, coinNum = data.coinNum, starVec = data.starVec, endVec = data.endVec, callback = data.callback;
+            console.log('showCoin', data);
+            cc.loader.loadRes(moosnow.entity.prefabPath + 'coin', cc.Prefab, function () {
+                for (var i = 0; i < imgNum; i++) {
+                    var logic = moosnow.entity.showEntity("coin", _this.rootNode, {
+                        x: Common.randomNumBoth(starVec.x - data.randomX, starVec.x + data.randomX),
+                        y: Common.randomNumBoth(starVec.y - data.randomY, starVec.y + data.randomY)
+                    });
+                    _this.flyAnim(logic, endVec, callback);
+                }
+                _this.scheduleOnce(function () {
+                    moosnow.ui.hideUIForm(UIForms.CoinForm, null);
+                    if (Common.isFunction(callback))
+                        callback();
+                }, 2.1);
+            });
+        };
+        return CoinForm;
+    }(BaseForm));
+
+    var CocosCoinForm = /** @class */ (function (_super) {
+        __extends(CocosCoinForm, _super);
+        function CocosCoinForm() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(CocosCoinForm.prototype, "rootNode", {
+            get: function () {
+                return cc.Canvas.instance.node;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosCoinForm.prototype.flyAnim = function (logic, endVec, callback) {
+            var coinNode = logic.node;
+            var delayTime = Common.randomNumBoth(0, 100) / 200.0;
+            coinNode.active = true;
+            coinNode.runAction(cc.sequence(cc.delayTime(delayTime), cc.spawn(cc.moveTo(1, endVec.x, endVec.y), cc.fadeOut(1.0), cc.sequence(cc.scaleTo(0.8, 1.2, 1.2), cc.scaleTo(0.8, 0.8, 9.8))), cc.callFunc(function () {
+                moosnow.entity.hideEntity(logic, null, true);
+            })));
+        };
+        return CocosCoinForm;
+    }(CoinForm));
+
     /**
      * 页面逻辑控制
      */
@@ -6899,19 +7259,56 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(LogicControl.prototype, "prizeForm", {
+            get: function () {
+                if (!this.mPrizeForm)
+                    this.mPrizeForm = new CocosPrizeForm();
+                return this.mPrizeForm;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LogicControl.prototype, "prizeFormTT", {
+            get: function () {
+                if (!this.mPrizeFormTT)
+                    this.mPrizeFormTT = new CocosPrizeFormTT();
+                return this.mPrizeFormTT;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LogicControl.prototype, "coinForm", {
+            /**
+            * 金币
+            */
+            get: function () {
+                if (!this.mCoinForm)
+                    this.mCoinForm = new CocosCoinForm();
+                return this.mCoinForm;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return LogicControl;
     }());
 
     /**
      * 广告结果
      */
-    var Form = /** @class */ (function () {
-        function Form() {
+    var UIForm = /** @class */ (function () {
+        function UIForm() {
         }
+        /**
+         * Toast消息
+         * @param msg  消息内容
+         */
+        UIForm.prototype.showToast = function (msg) {
+            moosnow.ui.showToast(msg);
+        };
         /**
          * 预加载广告
          */
-        Form.prototype.preloadAd = function () {
+        UIForm.prototype.preloadAd = function () {
             moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null);
         };
         /**
@@ -6920,7 +7317,7 @@ var mx = (function () {
          * @param callback  有返回按钮时的回调
          * @param zIndex  层级
          */
-        Form.prototype.showAd = function (adType, callback, zIndex) {
+        UIForm.prototype.showAd = function (adType, callback, zIndex) {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = 999; }
             var adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
@@ -6938,33 +7335,15 @@ var mx = (function () {
         };
         /**
          * 金币动画
-         * @param imgNum 动画图片数量
-         * @param starVec 开始位置
-         * @param endVec 结束位置
-         * @param callback 结束回调
+         * @param style
+         * @param callback
          */
-        Form.prototype.showCoin = function (imgNum, starVec, endVec, callback) {
-            if (imgNum === void 0) { imgNum = 20; }
-            console.log('showCoin');
-            cc.loader.loadRes(moosnow.entity.prefabPath + 'coin', cc.Prefab, function () {
-                var _loop_1 = function (i) {
-                    var delayTime = Common.randomNumBoth(0, 100) / 200.0;
-                    var logic = moosnow.entity.showEntity("coin", cc.Canvas.instance.node, {
-                        x: Common.randomNumBoth(starVec.x - 100, starVec.x + 100),
-                        y: Common.randomNumBoth(starVec.y - 100, starVec.y + 100)
-                    });
-                    logic.node.runAction(cc.sequence(cc.delayTime(delayTime), cc.spawn(cc.moveTo(1, endVec.x, endVec.y), cc.fadeOut(1.0), cc.sequence(cc.scaleTo(0.8, 1.2, 1.2), cc.scaleTo(0.8, 0.8, 9.8))), cc.callFunc(function () {
-                        moosnow.entity.hideEntity(logic, null, true);
-                    })));
-                };
-                for (var i = 0; i < imgNum; i++) {
-                    _loop_1(i);
-                }
-                var t = setTimeout(function () {
-                    clearTimeout(t);
-                    if (Common.isFunction(callback))
+        UIForm.prototype.showCoin = function (style, callback) {
+            moosnow.ui.pushUIForm(UIForms.CoinForm, __assign(__assign({}, style), { callback: function () {
+                    console.log('showCoin callback ');
+                    if (callback)
                         callback();
-                }, 2100);
+                } }), function () {
             });
         };
         /**
@@ -6972,7 +7351,7 @@ var mx = (function () {
          * @param callback 点击完成回调
          * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
          */
-        Form.prototype.showMistouch = function (callback, type) {
+        UIForm.prototype.showMistouch = function (callback, type) {
             if (type === void 0) { type = 1; }
             moosnow.ui.pushUIForm(UIForms.MistouchForm, {
                 mistouchType: type == 2 ? 4 : 1,
@@ -6983,7 +7362,23 @@ var mx = (function () {
             }, function () {
             });
         };
-        return Form;
+        /**
+         * 显示奖励
+         * @param style 金币动画
+         * @param baseNum 视频奖励领取的倍数
+         * @param showCoinAnim 显示金币动画
+         * @param callback
+         */
+        UIForm.prototype.showPrize = function (style, baseNum, showCoinAnim, callback) {
+            if (showCoinAnim === void 0) { showCoinAnim = true; }
+            moosnow.ui.pushUIForm(UIForms.PrizeForm, __assign(__assign({}, style), { baseNum: baseNum,
+                showCoinAnim: showCoinAnim, onCompleted: function () {
+                    if (callback)
+                        callback();
+                } }), function () {
+            });
+        };
+        return UIForm;
     }());
 
     var DelayMove = /** @class */ (function (_super) {
@@ -7152,8 +7547,8 @@ var mx = (function () {
         return Delay;
     }(BaseModule));
 
-    var Main = /** @class */ (function () {
-        function Main() {
+    var moosnowEntry = /** @class */ (function () {
+        function moosnowEntry() {
             this.VIDEO_STATUS = VIDEO_STATUS;
             this.VIDEO_MSG = VIDEO_MSG;
             this.SHARE_MSG = SHARE_MSG;
@@ -7162,13 +7557,17 @@ var mx = (function () {
             this.APP_PLATFORM = PlatformType;
             this.PLATFORM_EVENT = EventType;
             this.Common = Common;
-            this.AD_POSITION = AD_POSITION$1;
+            this.AD_POSITION = AD_POSITION;
             this.mData = new GameDataCenter();
+            // private mResource: ireso;
+            // public get resource() {
+            //     return this.mResource;
+            // }
             this.mSetting = new SettingModule();
             /**
              * form UI 操作
              */
-            this.mForm = new Form();
+            this.mForm = new UIForm();
             /**
              * form表单控制
              */
@@ -7188,16 +7587,16 @@ var mx = (function () {
         /**
          * 获取当前的游戏平台
          */
-        Main.prototype.getAppPlatform = function () {
+        moosnowEntry.prototype.getAppPlatform = function () {
             return Common.platform;
         };
-        Main.prototype.initUI = function () {
+        moosnowEntry.prototype.initUI = function () {
             this.mUi = new CocosUIModule();
         };
-        Main.prototype.initEntity = function () {
+        moosnowEntry.prototype.initEntity = function () {
             this.mEntity = new CocosEntityModule();
         };
-        Main.prototype.initHttp = function () {
+        moosnowEntry.prototype.initHttp = function () {
             if (Common.platform == PlatformType.WX)
                 this.mHttp = new HttpModule();
             else if (Common.platform == PlatformType.OPPO_ZS) {
@@ -7206,7 +7605,7 @@ var mx = (function () {
             else
                 this.mHttp = new HttpModule();
         };
-        Main.prototype.initPlatform = function () {
+        moosnowEntry.prototype.initPlatform = function () {
             // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
             if (Common.platform == PlatformType.WX)
                 this.mPlatform = new WXModule();
@@ -7228,7 +7627,7 @@ var mx = (function () {
             }
             // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
         };
-        Main.prototype.initAd = function () {
+        moosnowEntry.prototype.initAd = function () {
             if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
                 this.mAd = new WXAdModule();
             else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.VIVO) {
@@ -7240,14 +7639,14 @@ var mx = (function () {
             else
                 this.mAd = new AdModule();
         };
-        Object.defineProperty(Main.prototype, "platform", {
+        Object.defineProperty(moosnowEntry.prototype, "platform", {
             get: function () {
                 return this.mPlatform;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "ad", {
+        Object.defineProperty(moosnowEntry.prototype, "ad", {
             /**
              * 墨雪广告
              */
@@ -7257,14 +7656,14 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "http", {
+        Object.defineProperty(moosnowEntry.prototype, "http", {
             get: function () {
                 return this.mHttp;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "data", {
+        Object.defineProperty(moosnowEntry.prototype, "data", {
             /**
              * 本地内存
              */
@@ -7274,14 +7673,7 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "resource", {
-            get: function () {
-                return this.mResource;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Main.prototype, "setting", {
+        Object.defineProperty(moosnowEntry.prototype, "setting", {
             /**
              * 本地持久化缓存
              */
@@ -7291,52 +7683,50 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "event", {
+        Object.defineProperty(moosnowEntry.prototype, "event", {
             get: function () {
                 return this.mEvent;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "ui", {
+        Object.defineProperty(moosnowEntry.prototype, "ui", {
             get: function () {
                 return this.mUi;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "form", {
+        Object.defineProperty(moosnowEntry.prototype, "form", {
             get: function () {
                 return this.mForm;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "control", {
+        Object.defineProperty(moosnowEntry.prototype, "control", {
             get: function () {
                 return this.mControl;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "entity", {
+        Object.defineProperty(moosnowEntry.prototype, "entity", {
             get: function () {
                 return this.mEntity;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Main.prototype, "delay", {
+        Object.defineProperty(moosnowEntry.prototype, "delay", {
             get: function () {
                 return this.mDelay;
             },
             enumerable: true,
             configurable: true
         });
-        return Main;
+        return moosnowEntry;
     }());
-    new Main();
-
-    return Main;
+    new moosnowEntry();
 
 }());

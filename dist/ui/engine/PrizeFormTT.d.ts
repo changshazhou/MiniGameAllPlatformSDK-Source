@@ -1,0 +1,33 @@
+import BaseForm from "./BaseForm";
+export default class PrizeFormTT extends BaseForm {
+    prizeBg1: cc.Node;
+    prizeBg2: cc.Node;
+    btnCancel: cc.Node;
+    txtCoutdown: cc.Label;
+    btnVideo: cc.Node;
+    btnShare: cc.Node;
+    btnReceive: cc.Node;
+    checked: cc.Node;
+    unchecked: cc.Node;
+    isMask: boolean;
+    private mChecked;
+    initForm(logic: any): void;
+    willShow(data: any): void;
+    onHide(): void;
+    private showVideo;
+    private showShare;
+    private mTotalSecond;
+    private mCurrentSecond;
+    private onCountdown;
+    private stopCountdown;
+    private resumeCountdown;
+    addListener(): void;
+    removeListener(): void;
+    closeForm(): void;
+    private onChecked;
+    private onShare;
+    private onReceive;
+    private onVideo;
+    private getCoinNum;
+    private addCoin;
+}

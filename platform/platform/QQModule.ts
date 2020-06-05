@@ -1,6 +1,7 @@
 import PlatformModule from './PlatformModule';
 import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
+import bannerStyle from '../model/bannerStyle';
 
 
 export default class QQModule extends PlatformModule {

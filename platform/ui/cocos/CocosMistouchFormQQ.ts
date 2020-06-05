@@ -54,4 +54,16 @@ export default class CocosMistouchFormQQ extends MistouchFormQQ {
         this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
         moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
     }
+
+    public playHandAnim() {
+        let anim = this.hand.getComponent(cc.Animation);
+        anim.play();
+    }
+
+    public showButton(isShow) {
+        this.btnBanner.active = isShow;
+    }
+    public showHand(isShow) {
+        this.hand.active = isShow;
+    }
 }

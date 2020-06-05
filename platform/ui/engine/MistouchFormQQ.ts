@@ -35,14 +35,18 @@ export default class MistouchFormQQ extends MistouchForm {
 
 
         if (this.mistouchAppBox()) {
-            this.hand.active = true;
-            this.btnBanner.active = false;
+            this.showHand(true);
+            this.showButton(false);
+            this.playHandAnim();
         }
         else {
-            this.hand.active = false;
-            this.btnBanner.active = true;
+            this.showHand(false);
+            this.showButton(true);
         }
         moosnow.platform.hideBanner();
+    }
+
+    public playHandAnim() {
     }
 
     public mistouchAppBox() {
@@ -65,12 +69,14 @@ export default class MistouchFormQQ extends MistouchForm {
             moosnow.platform.hideBanner();
 
     }
-
+    public showButton(isShow) {
+    }
+    public showHand(isShow) {
+    }
     public onBannerClick() {
-
         this.mCurrentNum += 1;
         this.onLogoDown();
-
+        this.showHand(false);
         if (this.mCurrentNum >= this.mNavigateIndex) {
             if (!this.mBannerShow) {
                 this.mShowTime = Date.now();

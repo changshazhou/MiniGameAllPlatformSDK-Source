@@ -1,0 +1,1 @@
+xcopy /s/e "D:\develop\SDK\moosnowSdk\dist" "D:\develop\cocos\qq-demo\assets\moosnowSdk\"

@@ -1,11 +1,45 @@
 import BaseModule from "./BaseModule";
 import Common from "../utils/Common";
+import EventType from "../utils/EventType";
 
 export default class GameDataCenter extends BaseModule {
 
     private TOKEN: string = "token";
+    private COIN: string = "COIN";
 
     private mUserToken: string = "";
+
+    private mCoin: number = 0;
+    /***********
+     * 金币
+     */
+
+    public initCoin(num: number) {
+        if (moosnow.setting._getValue(this.COIN, null) == null)
+            moosnow.setting.setValue(this.COIN, num);
+    }
+
+    public getCoin() {
+        if (this.mCoin == 0)
+            this.mCoin = moosnow.setting.getInt(this.COIN, 0);
+        return this.mCoin;
+    }
+    public subCoin(v: number) {
+        this.mCoin -= v;
+        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+    }
+    public addCoin(v: number) {
+        this.mCoin += v
+        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+    }
+    public setCoin(v: number) {
+        this.mCoin = v;
+        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+    }
+    public saveCoin() {
+        moosnow.setting.setValue(this.COIN, this.mCoin);
+        // Lite.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+    }
 
     getToken() {
         if (Common.isEmpty(this.mUserToken))

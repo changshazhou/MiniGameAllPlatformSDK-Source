@@ -1,5 +1,6 @@
 import BaseLogic from "./BaseLogic";
 import EventType from "../../utils/EventType";
+import moosnowAdRow from "../../model/moosnowAdRow";
 
 export default class AdViewItem extends BaseLogic {
 

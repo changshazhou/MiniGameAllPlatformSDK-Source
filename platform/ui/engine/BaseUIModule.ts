@@ -125,7 +125,7 @@ export class BaseUIModule extends BaseModule {
      */
     hideUIForm(name: string | cc.Component | Laya.Script, data: any, cb?: any) {
 
-        if (name instanceof String) {
+        if (typeof name == "string") {
             for (let i = 0; i < this.UIFormStack.length; i++) {
                 const formModel = this.UIFormStack[i];
                 if (formModel.name == name) {

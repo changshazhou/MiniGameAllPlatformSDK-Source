@@ -2,6 +2,8 @@ import EventType from "../../utils/EventType";
 import { AD_POSITION } from "../../enum/AD_POSITION";
 import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
+import moosnowAdRow from "../../model/moosnowAdRow";
+import moosnowResult from "../../model/moosnowResult";
 
 
 export default class AdForm extends BaseForm {
@@ -65,10 +67,10 @@ export default class AdForm extends BaseForm {
      * 
      * @param scrollView 
      * @param layout 
-     * @param positionTag 
+     * @param positionTag AD_POSITION
      * @param entityName 
      */
-    public initView(container: any, scrollView: any, layout: any, position: AD_POSITION, entityName: string | cc.Prefab) {
+    public initView(container: any, scrollView: any, layout: any, position: number, entityName: string | cc.Prefab) {
         if (!entityName) {
             console.warn('entityName is null 无法初始化 ')
             return;
@@ -262,7 +264,7 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    public initFloatAd(parentNode, prefabs: [], points: []) {
+    public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>) {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
             moosnow.ad.getAd((res: moosnowResult) => {
                 this.mAdData = res;
@@ -273,16 +275,21 @@ export default class AdForm extends BaseForm {
 
 
                 prefabs.forEach((prefabName, idx) => {
-                    let showIndex = idx
+                    let showIndex = idx;
+                    let floatData = source[0];
+                    if (showIndex > source.length - 1)
+                        showIndex = 0;
+
+                    floatData = source[showIndex];
                     let point = points[idx] as any;
-                    let adRow = { ...source[showIndex], position: "首页浮动", x: point.x, y: point.y }
+                    let adRow = { ...floatData, position: "首页浮动", x: point.x, y: point.y }
                     let logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                     this.mFloatCache[idx] = {
                         index: showIndex,
                         logic: logic,
                         onCancel: adRow.onCancel
                     };
-                    this.floatAnim(logic.node);
+                    this.floatAnim((logic as any).node);
                 })
                 this.updateFloat(Common.deepCopy(res));
                 setInterval(() => {

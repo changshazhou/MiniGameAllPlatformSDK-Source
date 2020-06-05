@@ -5,6 +5,8 @@ import MathUtils from "../utils/MathUtils";
 import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import appLaunchOption from "../model/appLaunchOption";
+import bannerStyle from "../model/bannerStyle";
+import moosnowAdRow from "../model/moosnowAdRow";
 
 export default class TTModule extends PlatformModule {
 

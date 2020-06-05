@@ -11,6 +11,12 @@ import CocosAdFormQQ from "./cocos/CocosAdFormQQ";
 import AdFormQQ from "./engine/AdFormQQ";
 import AdViewItem from "./engine/AdViewItem";
 import CocosAdViewItem from "./cocos/CocosAdViewItem";
+import PrizeForm from "./engine/prizeForm";
+import CocosPrizeForm from "./cocos/CocosPrizeForm";
+import PrizeFormTT from "./engine/PrizeFormTT";
+import CocosPrizeFormTT from "./cocos/CocosPrizeFormTT";
+import CoinForm from "./engine/CoinForm";
+import CocosCoinForm from "./cocos/CocosCoinForm";
 
 /**
  * 页面逻辑控制
@@ -42,24 +48,50 @@ export default class LogicControl {
 
 
 
-    private mMistouchForm: MistouchForm
+    private mMistouchForm: MistouchForm;
     public get mistouchForm(): MistouchForm {
         if (!this.mMistouchForm)
             this.mMistouchForm = new CocosMistouchForm();
         return this.mMistouchForm;
     }
 
-    private mMistouchFormTT: MistouchFormTT
+    private mMistouchFormTT: MistouchFormTT;
     public get mistouchFormTT(): CocosMistouchFormTT {
         if (!this.mMistouchFormTT)
             this.mMistouchFormTT = new CocosMistouchFormTT();
         return this.mMistouchFormTT;
     }
 
-    private mMistouchFormQQ: MistouchFormQQ
+    private mMistouchFormQQ: MistouchFormQQ;
     public get mistouchFormQQ(): CocosMistouchFormQQ {
         if (!this.mMistouchFormQQ)
             this.mMistouchFormQQ = new CocosMistouchFormQQ();
         return this.mMistouchFormQQ;
+    }
+
+
+    private mPrizeForm: PrizeForm;
+    public get prizeForm(): PrizeForm {
+        if (!this.mPrizeForm)
+            this.mPrizeForm = new CocosPrizeForm();
+        return this.mPrizeForm;
+    }
+
+    private mPrizeFormTT: PrizeFormTT;
+    public get prizeFormTT(): PrizeFormTT {
+        if (!this.mPrizeFormTT)
+            this.mPrizeFormTT = new CocosPrizeFormTT();
+        return this.mPrizeFormTT;
+    }
+
+
+    private mCoinForm: CoinForm
+    /**
+    * 金币
+    */
+    public get coinForm(): CoinForm {
+        if (!this.mCoinForm)
+            this.mCoinForm = new CocosCoinForm();
+        return this.mCoinForm;
     }
 }

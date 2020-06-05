@@ -30,10 +30,10 @@ import BaseEntityModule from "./ui/engine/BaseEntityModule";
 import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
 import { CocosUIModule } from "./ui/cocos/CocosUIModule";
 import LogicControl from "./ui/LogicControl";
-import Form from "./ui/Form";
+import UIForm from "./ui/UIForm";
 import Delay from "./framework/Delay";
 
-export default class Main {
+class moosnowEntry {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
@@ -145,10 +145,10 @@ export default class Main {
         return this.mData;
     }
 
-    private mResource: IResourceModule;
-    public get resource() {
-        return this.mResource;
-    }
+    // private mResource: ireso;
+    // public get resource() {
+    //     return this.mResource;
+    // }
 
     private mSetting: SettingModule = new SettingModule();
     /**
@@ -175,7 +175,7 @@ export default class Main {
     /**
      * form UI 操作
      */
-    private mForm: Form = new Form();
+    private mForm: UIForm = new UIForm();
     public get form() {
         return this.mForm;
     }
@@ -203,4 +203,4 @@ export default class Main {
     }
 
 }
-new Main();
+new moosnowEntry();
