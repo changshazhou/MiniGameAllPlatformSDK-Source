@@ -875,31 +875,32 @@
             }
             var appid = row.appid, path = row.path, extraData = row.extraData;
             extraData = extraData || {};
-            window[this.platformName].navigateToMiniProgram({
-                appId: appid,
-                path: path,
-                extraData: extraData,
-                success: function () {
-                    if (window[_this.platformName] && window[_this.platformName].aldSendEvent) {
-                        window[_this.platformName].aldSendEvent('跳转', {
+            moosnow.http.navigate(appid, function (res) {
+                window[_this.platformName].navigateToMiniProgram({
+                    appId: appid,
+                    path: path,
+                    extraData: extraData,
+                    success: function () {
+                        moosnow.http.point("跳转", {
                             position: row.position,
                             appid: appid,
                             img: row.atlas || row.img
                         });
+                        moosnow.http.navigateEnd(res.code);
+                        moosnow.http.exportUser();
+                        if (success)
+                            success();
+                    },
+                    fail: function (err) {
+                        console.log('navigateToMini fail ', err, ' fail callback ', !!fail);
+                        if (fail)
+                            fail();
+                    },
+                    complete: function () {
+                        if (complete)
+                            complete();
                     }
-                    moosnow.http.exportUser();
-                    if (success)
-                        success();
-                },
-                fail: function (err) {
-                    console.log('navigateToMini fail ', err, ' fail callback ', !!fail);
-                    if (fail)
-                        fail();
-                },
-                complete: function () {
-                    if (complete)
-                        complete();
-                }
+                });
             });
         };
         /**
@@ -2301,6 +2302,34 @@
             this.postData('api/channel/exportUser.html');
         };
         /**
+         * 跳转记录
+         * @param jump_appid
+         * @param callback
+         */
+        HttpModule.prototype.navigate = function (jump_appid, callback) {
+            var userToken = moosnow.data.getToken();
+            this.request(this.baseUrl + "api/jump/record", {
+                appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                uid: userToken,
+                jump_appid: jump_appid,
+            }, "POST", function (respone) {
+                console.log('navigate', respone);
+                if (callback)
+                    callback(respone.data);
+            });
+        };
+        /**
+         * 跳转完成
+         * @param code
+         */
+        HttpModule.prototype.navigateEnd = function (code) {
+            this.request(this.baseUrl + "api/jump/status", {
+                code: code
+            }, "POST", function (respone) {
+                console.log('navigateEnd code ', code, respone);
+            });
+        };
+        /**
          *
          * @param url
          */
@@ -3463,13 +3492,33 @@
             _this.recordCb = null;
             _this.recordNumber = 0;
             _this.bannerWidth = 208;
+            _this.moreGameCb = null;
             _this.mBannerLoaded = false;
             _this._regisiterWXCallback();
+            _this._registerTTCallback();
             _this.initBanner();
             _this.initRecord();
             _this.initInter();
             return _this;
         }
+        TTModule.prototype._registerTTCallback = function () {
+            var _this = this;
+            if (!window[this.platformName])
+                return;
+            // 监听弹窗关闭
+            if (window[this.platformName].onMoreGamesModalClose)
+                window[this.platformName].onMoreGamesModalClose(function (res) {
+                    console.log("modal closed", res);
+                    if (_this.moreGameCb)
+                        _this.moreGameCb(res);
+                });
+            // 监听小游戏跳转
+            if (window[this.platformName].onNavigateToMiniProgram)
+                window[this.platformName].onNavigateToMiniProgram(function (res) {
+                    console.log(res.errCode);
+                    console.log(res.errMsg);
+                });
+        };
         TTModule.prototype.prepareInter = function () {
             if (!window[this.platformName])
                 return;
@@ -3745,11 +3794,31 @@
                 });
             }
         };
-        TTModule.prototype.showAppBox = function () {
+        /**
+        * 盒子广告
+        * @param callback 关闭回调
+        * @param remoteOn 被后台开关控制
+        */
+        TTModule.prototype.showAppBox = function (callback, remoteOn) {
+            var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
+            this.moreGameCb = callback;
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].showMoreGamesModal)
                 return;
+            moosnow.http.getAllConfig(function (res) {
+                if (remoteOn) {
+                    if (res && res.showAppBox == 1) {
+                        _this._showMoreGamesModal();
+                    }
+                }
+                else {
+                    _this._showMoreGamesModal();
+                }
+            });
+        };
+        TTModule.prototype._showMoreGamesModal = function () {
             var systemInfo = this.getSystemInfoSync();
             if (systemInfo.platform == "ios")
                 return;
@@ -3758,34 +3827,29 @@
                 // 打开互跳弹窗
                 var appLaunchOptions_1 = [];
                 moosnow.ad.getAd(function (res) {
-                    var opt = new appLaunchOption();
-                    opt.appId = res.appid;
-                    opt.query = res.path;
-                    opt.extraData = res.extraData;
-                    appLaunchOptions_1.push(opt);
+                    if (res.indexLeft.length == 0)
+                        return;
+                    res.indexLeft.forEach(function (item) {
+                        var opt = new appLaunchOption();
+                        opt.appId = item.appid;
+                        opt.query = item.path || "1=1";
+                        opt.extraData = item.extraData || {};
+                        appLaunchOptions_1.push(opt);
+                    });
                 });
+                console.log('appLaunchOption', appLaunchOptions_1);
                 var banner = window[this.platformName].showMoreGamesModal({
-                    style: {
-                        left: 20,
-                        top: 40,
-                        width: 150,
-                        height: 40
-                    },
                     appLaunchOptions: appLaunchOptions_1,
                     success: function (res) {
-                        console.log("show app box success", res.errMsg);
+                        console.log("show app box success", res);
                     },
                     fail: function (res) {
-                        console.log("show app box fail", res.errMsg);
+                        console.log("show app box fail", res);
                     }
                 });
-                // banner.show();
-                // banner.onTap(() => {
-                //     console.log("点击跳转游戏盒子");
-                // });
             }
         };
-        TTModule.prototype.showAppBox2 = function () {
+        TTModule.prototype.showMoreGameBanner = function () {
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].createMoreGamesBanner)
@@ -3798,16 +3862,20 @@
                 // 打开互跳弹窗
                 var appLaunchOptions_2 = [];
                 moosnow.ad.getAd(function (res) {
-                    var opt = new appLaunchOption();
-                    opt.appId = res.appid;
-                    opt.query = res.path;
-                    opt.extraData = res.extraData;
-                    appLaunchOptions_2.push(opt);
+                    if (res.indexLeft.length == 0)
+                        return;
+                    res.indexLeft.forEach(function (item) {
+                        var opt = new appLaunchOption();
+                        opt.appId = item.appid;
+                        opt.query = item.path || "1=1";
+                        opt.extraData = item.extraData || {};
+                        appLaunchOptions_2.push(opt);
+                    });
                 });
                 var banner = window[this.platformName].createMoreGamesBanner({
                     style: {
                         left: 20,
-                        top: 40,
+                        top: 0,
                         width: 150,
                         height: 40
                     },
@@ -7549,9 +7617,9 @@
             // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
         };
         moosnowEntry.prototype.initAd = function () {
-            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
+            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
                 this.mAd = new WXAdModule();
-            else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.VIVO) {
+            else if (Common.platform == PlatformType.OPPO) {
                 this.mAd = new OPPOAdModule();
             }
             else if (Common.platform == PlatformType.OPPO_ZS) {

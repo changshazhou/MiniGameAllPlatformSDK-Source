@@ -303,32 +303,34 @@ export default class PlatformModule extends BaseModule {
         }
         let { appid, path, extraData } = row;
         extraData = extraData || {};
-        window[this.platformName].navigateToMiniProgram({
-            appId: appid,
-            path: path,
-            extraData: extraData,
-            success: () => {
-                if (window[this.platformName] && window[this.platformName].aldSendEvent) {
-                    window[this.platformName].aldSendEvent('跳转', {
+        moosnow.http.navigate(appid, (res) => {
+            window[this.platformName].navigateToMiniProgram({
+                appId: appid,
+                path: path,
+                extraData: extraData,
+                success: () => {
+                    moosnow.http.point("跳转", {
                         position: row.position,
                         appid,
                         img: row.atlas || row.img
                     })
+                    moosnow.http.navigateEnd(res.code)
+                    moosnow.http.exportUser();
+                    if (success)
+                        success();
+                },
+                fail: (err) => {
+                    console.log('navigateToMini fail ', err, ' fail callback ', !!fail)
+                    if (fail)
+                        fail();
+                },
+                complete: () => {
+                    if (complete)
+                        complete();
                 }
-                moosnow.http.exportUser();
-                if (success)
-                    success();
-            },
-            fail: (err) => {
-                console.log('navigateToMini fail ', err, ' fail callback ', !!fail)
-                if (fail)
-                    fail();
-            },
-            complete: () => {
-                if (complete)
-                    complete();
-            }
-        })
+            })
+        });
+
     }
     /**
      * 更新版本

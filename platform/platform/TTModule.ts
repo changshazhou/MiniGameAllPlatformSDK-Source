@@ -7,6 +7,7 @@ import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import appLaunchOption from "../model/appLaunchOption";
 import bannerStyle from "../model/bannerStyle";
 import moosnowAdRow from "../model/moosnowAdRow";
+import moosnowResult from "../model/moosnowResult";
 
 export default class TTModule extends PlatformModule {
 
@@ -16,12 +17,33 @@ export default class TTModule extends PlatformModule {
     public recordNumber: number = 0;
     public bannerWidth: number = 208;
 
+
+    public moreGameCb: Function = null;
+
     constructor() {
         super();
         this._regisiterWXCallback();
+        this._registerTTCallback();
         this.initBanner();
         this.initRecord();
         this.initInter();
+    }
+
+    private _registerTTCallback() {
+        if (!window[this.platformName]) return;
+        // 监听弹窗关闭
+        if (window[this.platformName].onMoreGamesModalClose)
+            window[this.platformName].onMoreGamesModalClose((res) => {
+                console.log("modal closed", res);
+                if (this.moreGameCb)
+                    this.moreGameCb(res);
+            });
+        // 监听小游戏跳转
+        if (window[this.platformName].onNavigateToMiniProgram)
+            window[this.platformName].onNavigateToMiniProgram((res) => {
+                console.log(res.errCode);
+                console.log(res.errMsg);
+            })
     }
 
     public prepareInter() {
@@ -306,45 +328,61 @@ export default class TTModule extends PlatformModule {
             })
         }
     }
-    public showAppBox() {
+    /**
+    * 盒子广告
+    * @param callback 关闭回调
+    * @param remoteOn 被后台开关控制
+    */
+    public showAppBox(callback?: Function, remoteOn: boolean = true) {
+        this.moreGameCb = callback;
         if (!window[this.platformName]) return;
         if (!window[this.platformName].showMoreGamesModal) return;
+        moosnow.http.getAllConfig(res => {
+            if (remoteOn) {
+                if (res && res.showAppBox == 1) {
+                    this._showMoreGamesModal();
+                }
+            }
+            else {
+                this._showMoreGamesModal();
+            }
+        })
+
+    }
+
+    private _showMoreGamesModal() {
         const systemInfo = this.getSystemInfoSync();
         if (systemInfo.platform == "ios") return;
         // iOS 不支持，建议先检测再使用
         if (systemInfo.platform !== "ios") {
             // 打开互跳弹窗
             let appLaunchOptions: Array<appLaunchOption> = [];
-            moosnow.ad.getAd((res: moosnowAdRow) => {
-                let opt = new appLaunchOption();
-                opt.appId = res.appid;
-                opt.query = res.path
-                opt.extraData = res.extraData;
-                appLaunchOptions.push(opt)
+            moosnow.ad.getAd((res: moosnowResult) => {
+                if (res.indexLeft.length == 0)
+                    return;
+                res.indexLeft.forEach(item => {
+                    let opt = new appLaunchOption();
+                    opt.appId = item.appid;
+                    opt.query = item.path || "1=1"
+                    opt.extraData = item.extraData || {};
+                    appLaunchOptions.push(opt)
+                })
+
             })
+            console.log('appLaunchOption', appLaunchOptions)
             const banner = window[this.platformName].showMoreGamesModal({
-                style: {
-                    left: 20,
-                    top: 40,
-                    width: 150,
-                    height: 40
-                },
                 appLaunchOptions: appLaunchOptions,
-                success(res) {
-                    console.log("show app box success", res.errMsg);
+                success: (res) => {
+                    console.log("show app box success", res);
                 },
-                fail(res) {
-                    console.log("show app box fail", res.errMsg);
+                fail: (res) => {
+                    console.log("show app box fail", res);
                 }
             });
-            // banner.show();
-            // banner.onTap(() => {
-            //     console.log("点击跳转游戏盒子");
-            // });
         }
     }
 
-    public showAppBox2() {
+    public showMoreGameBanner() {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createMoreGamesBanner) return;
         const systemInfo = this.getSystemInfoSync();
@@ -353,17 +391,22 @@ export default class TTModule extends PlatformModule {
         if (systemInfo.platform !== "ios") {
             // 打开互跳弹窗
             let appLaunchOptions: Array<appLaunchOption> = [];
-            moosnow.ad.getAd((res: moosnowAdRow) => {
-                let opt = new appLaunchOption();
-                opt.appId = res.appid;
-                opt.query = res.path
-                opt.extraData = res.extraData;
-                appLaunchOptions.push(opt)
+            moosnow.ad.getAd((res: moosnowResult) => {
+                if (res.indexLeft.length == 0)
+                    return;
+                res.indexLeft.forEach(item => {
+                    let opt = new appLaunchOption();
+                    opt.appId = item.appid;
+                    opt.query = item.path || "1=1";
+                    opt.extraData = item.extraData || {};
+                    appLaunchOptions.push(opt)
+                })
+
             })
             const banner = window[this.platformName].createMoreGamesBanner({
                 style: {
                     left: 20,
-                    top: 40,
+                    top: 0,
                     width: 150,
                     height: 40
                 },

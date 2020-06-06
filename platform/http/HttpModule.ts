@@ -146,7 +146,36 @@ export class HttpModule extends BaseModule {
         this.postData('api/channel/exportUser.html')
     }
 
+    /**
+     * 跳转记录
+     * @param jump_appid 
+     * @param callback 
+     */
+    public navigate(jump_appid: string, callback: Function) {
+        let userToken = moosnow.data.getToken();
+        this.request(`${this.baseUrl}api/jump/record`, {
+            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+            uid: userToken,
+            jump_appid,
+        }, "POST", (respone) => {
+            console.log('navigate', respone)
+            if (callback)
+                callback(respone.data)
+        });
+    }
 
+
+    /**
+     * 跳转完成
+     * @param code 
+     */
+    public navigateEnd(code: string) {
+        this.request(`${this.baseUrl}api/jump/status`, {
+            code
+        }, "POST", (respone) => {
+            console.log('navigateEnd code ', code, respone)
+        });
+    }
 
 
     /**

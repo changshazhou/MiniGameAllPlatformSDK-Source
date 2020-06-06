@@ -106,9 +106,9 @@ class moosnowEntry {
     }
 
     private initAd() {
-        if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC)
+        if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
             this.mAd = new WXAdModule();
-        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.VIVO) {
+        else if (Common.platform == PlatformType.OPPO) {
             this.mAd = new OPPOAdModule();
         }
         else if (Common.platform == PlatformType.OPPO_ZS) {

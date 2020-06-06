@@ -36,6 +36,17 @@ export declare class HttpModule extends BaseModule {
      */
     exportUser(): void;
     /**
+     * 跳转记录
+     * @param jump_appid
+     * @param callback
+     */
+    navigate(jump_appid: string, callback: Function): void;
+    /**
+     * 跳转完成
+     * @param code
+     */
+    navigateEnd(code: string): void;
+    /**
      *
      * @param url
      */
