@@ -62,8 +62,8 @@ export class ZSHttpModule extends HttpModule {
                         showNative: enabled,
                         showInter: enabled,
                         showExportAd: enabled,
-                        lureNative: res.zs_native_click_switch == 1,
-                        lureExportAd: res.zs_jump_switch == 1,
+                        mx_native_click_switch: res.zs_native_click_switch == 1,
+                        mx_jump_switch: res.zs_jump_switch == 1,
                         bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit
                     }
                     if (moosnow.platform) {

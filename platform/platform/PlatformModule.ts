@@ -191,15 +191,61 @@ export default class PlatformModule extends BaseModule {
         return (this.compareVersion(sdkVersion, version) >= 0);
     }
 
+    private versionRet: boolean = null;
     /**
      * 检查当前版本的导出广告是否开启
      * @param {string} version 版本号 为了兼容旧版本SDK的参数，目前已无作用，SDK会取moosnowConfig 中的version 来判断
      * @param {*} callback 
      * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
      */
-    public checkVersion(version: string, callback) {
-        callback(true)
+    public checkVersion(version: string, callback: Function) {
+        if (this.versionRet != null) {
+            callback(this.versionRet);
+            return;
+        } else {
+            this._checkConfigVersion(callback)
+        }
     }
+    private _checkRemoteVersion(callback: Function) {
+        var url = this.baseUrl + 'admin/wx_list/getAppConfig';
+        var signParams = {
+            appid: this.moosnowConfig.moosnowAppId,
+        };
+        let data = signParams;
+        moosnow.http.request(url, data, 'POST',
+            (res) => {
+                this.versionRet = this.checkLog(res.data.version)
+                callback(this.versionRet);
+
+            },
+            () => {
+                console.log('checkVersion fail');
+            },
+            () => {
+                console.log('checkVersion complete');
+            }
+        );
+    }
+    private _checkConfigVersion(callback) {
+        moosnow.http.getAllConfig(res => {
+            if (res && res.version) {
+                this.versionRet = this.checkLog(res.version);
+                callback(this.versionRet)
+            }
+            else {
+                this._checkRemoteVersion(callback);
+            }
+        })
+    }
+
+    public checkLog(remoteVersion) {
+        let configVersion = moosnow.platform.moosnowConfig.version
+        let versionRet = remoteVersion == configVersion;
+        console.log(`版本检查 后台版本${remoteVersion} 配置文件版本${configVersion}`)
+        console.log("获取广告开关：", versionRet);
+        return versionRet;
+    }
+
 
     public isSmallWidth() {
         if (!window[this.platformName]) return;
@@ -539,9 +585,8 @@ export default class PlatformModule extends BaseModule {
      * wifiSignal	number	wifi 信号强度，范围 0 - 4	                        >= 1.9.0
      */
     public getSystemInfoSync() {
-        if (!window[this.platformName]) return;
         if (this.systemInfo == null) {
-            if (window[this.platformName].getSystemInfoSync)
+            if (window[this.platformName] && window[this.platformName].getSystemInfoSync)
                 this.systemInfo = window[this.platformName].getSystemInfoSync();
             else
                 this.systemInfo = {}

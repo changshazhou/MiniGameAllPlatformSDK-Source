@@ -11,48 +11,15 @@ export default class VIVOModule extends PlatformModule {
     public platformName: string = "qg";
     public appSid: string = "";
     public baseUrl = "https://api.liteplay.com.cn/";
-    private versionRet: boolean = null;
-    public bannerWidth: number = 760;
-    public bannerHeight: number = 96;
+    
+    public bannerWidth: number = 720;
+    public bannerHeight: number = 113;
 
     private interLoadedShow: boolean = false;
     constructor() {
         super();
         this._regisiterWXCallback();
         this.initAdService();
-    }
-
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version 
-    * @param {*} callback 
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    public checkVersion(version: string, callback) {
-        if (this.versionRet != null) {
-            callback(this.versionRet);
-            return;
-        } else {
-            var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-            var signParams = {
-                appid: this.moosnowConfig.moosnowAppId,
-            };
-            let data = signParams;
-            moosnow.http.request(url, data, 'POST',
-                (res) => {
-                    this.versionRet = res.data.version == moosnow.platform.moosnowConfig.version;
-                    console.log(`版本检查 后台版本${res.data.version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
-                    console.log("获取广告开关：", this.versionRet);
-                    callback(this.versionRet);
-                },
-                () => {
-                    console.log('checkVersion fail');
-                },
-                () => {
-                    console.log('checkVersion complete');
-                }
-            );
-        }
     }
     private initAdService() {
         // this.initBanner();
@@ -226,20 +193,21 @@ export default class VIVOModule extends PlatformModule {
         this.destroyBanner();
     }
 
+    public getSystemInfoSync() {
+        if (this.systemInfo == null) {
+            if (window[this.platformName] && window[this.platformName].getSystemInfoSync)
+                this.systemInfo = window[this.platformName].getSystemInfoSync();
+            else
+                this.systemInfo = {}
+            console.log('设备信息', this.systemInfo)
+        }
+
+
+        return this.systemInfo;
+    }
+
     public _prepareBanner() {
         if (!window[this.platformName].createBannerAd) return;
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        //横屏模式 
-        if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth)) {
-            if (windowWidth < this.bannerWidth) {
-                this.bannerWidth = windowWidth;
-            }
-        }
-        else {
-            //竖屏
-            this.bannerWidth = windowWidth;
-        }
         if (this.banner) {
             this.banner.offSize(this._bottomCenterBanner);
             this.banner.offError(this._onBannerError);
@@ -272,84 +240,59 @@ export default class VIVOModule extends PlatformModule {
 
 
         let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let left = (windowWidth - this.bannerWidth) / 2;
+        let screenWidth = wxsys.screenWidth;
+        let screenHeight = wxsys.screenHeight;
+        let statusBarHeight = wxsys.statusBarHeight;
+        let pixelRatio = wxsys.pixelRatio;
+        let notchHeight = this.getNotchHeight();
+
+        let left = (screenWidth - this.bannerWidth) / pixelRatio / 2;
         if (Common.isEmpty(this.bannerId)) {
             console.warn('banner id is null')
             return;
         }
 
-        let styleTop = windowHeight - this.bannerHeigth;
+        let styleTop = 0;
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            styleTop = (screenHeight - this.bannerHeight) / pixelRatio;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.CENTER)
+            styleTop = (screenHeight - this.bannerHeight) / pixelRatio / 2;
+        else if (this.bannerPosition == BANNER_POSITION.TOP) {
+            if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
+                styleTop = 0
+            else
+                styleTop = statusBarHeight + notchHeight
+        }
+        else
+            styleTop = this.bannerStyle.top;
+
+        let style = {
+            top: styleTop,
+            left: left,
+            width: this.bannerWidth,
+            height: this.bannerHeight
+        }
+        console.log('_createBannerAd style', style, 'screenHeight', screenHeight, 'bannerHeigth', this.bannerHeigth)
         let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
-            style: {
-                top: styleTop,
-                left: left,
-                width: this.bannerWidth
-            }
+            posId: this.bannerId,
+            style
         });
         return banner;
     }
+
+    private getNotchHeight() {
+        let retVal = 0;
+        if (window[this.platformName].getNotchHeightSync)
+            retVal = window[this.platformName].getNotchHeightSync().height;
+        return retVal;
+    }
+
     public _bottomCenterBanner(size) {
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let statusBarHeight = wxsys.statusBarHeight;
-        let notchHeight = wxsys.notchHeight || 0
-        this.bannerWidth = size.width;
-        this.bannerHeigth = size.height;
 
-        this.banner.style.left = (windowWidth - size.width) / 2;
-        let styleTop = windowHeight - this.bannerHeigth;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP) {
-            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                styleTop = 0
-            else
-                styleTop = statusBarHeight + notchHeight
-        }
-        else
-            styleTop = this.bannerStyle.top;
-        this.banner.style.top = styleTop;
-        console.log('_bottomCenterBanner  ', this.banner.style)
+        console.log('onSize callback  ', size)
     }
 
-    public _resetBanenrStyle(size) {
-
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let statusBarHeight = wxsys.statusBarHeight;
-        let notchHeight = wxsys.notchHeight || 0
-
-        if (!isNaN(this.bannerWidth))
-            this.banner.style.width = this.bannerWidth;
-        if (!isNaN(this.bannerHeight))
-            this.banner.style.height = this.bannerHeight;
-
-        let styleTop = windowHeight - this.bannerHeigth;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP) {
-            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                styleTop = 0
-            else
-                styleTop = statusBarHeight + notchHeight
-        }
-        else
-            styleTop = this.bannerStyle.top;
-
-        this.banner.style.top = styleTop;
-        console.log('_resetBanenrStyle ', this.banner.style, 'set styleTop ', styleTop)
-    }
 
     public _onBannerClose() {
         console.log('banner 已关闭 ')
@@ -378,36 +321,39 @@ export default class VIVOModule extends PlatformModule {
      */
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
 
-        console.log('显示banner')
+
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) return;
-        if (this.banner) {
-            let adshow = this.banner.show();
-            adshow && adshow.then(() => {
-                console.log("banner广告展示成功");
-            }).catch((err) => {
-                switch (err.code) {
-                    case 30003:
-                        console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入")
-                        break;
-                    case 30009:
-                        console.log("10秒内调用广告次数超过1次，10秒后再调用")
-                        break;
-                    case 30002:
-                        console.log("加载广告失败，重新加载广告")
-                        break;
-                    default:
-                        // 参考 https://minigame.vivo.com.cn/documents/#/lesson/open-ability/ad?id=广告错误码信息 对错误码做分类处理
-                        console.log("banner广告展示失败")
-                        console.log(JSON.stringify(err))
-                        break;
-                }
-            });
-        }
-        else {
+        this.bannerPosition = position;
+        this.bannerStyle = style;
+
+
+        if (!this.banner) {
             this.initBanner();
         }
+        let adshow = this.banner.show();
+        console.log('显示banner style ', this.banner)
+        adshow && adshow.then(() => {
+            console.log("banner广告展示成功");
+        }).catch((err) => {
+            switch (err.code) {
+                case 30003:
+                    console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入")
+                    break;
+                case 30009:
+                    console.log("10秒内调用广告次数超过1次，10秒后再调用")
+                    break;
+                case 30002:
+                    console.log("加载广告失败，重新加载广告")
+                    break;
+                default:
+                    // 参考 https://minigame.vivo.com.cn/documents/#/lesson/open-ability/ad?id=广告错误码信息 对错误码做分类处理
+                    console.log("banner广告展示失败")
+                    console.log(JSON.stringify(err))
+                    break;
+            }
+        });
     }
     public hideBanner() {
         console.log('隐藏banner')
@@ -451,7 +397,7 @@ export default class VIVOModule extends PlatformModule {
                 return;
             }
             this.video = window[this.platformName].createRewardedVideoAd({
-                adUnitId: this.videoId
+                posId: this.videoId
             });
         }
         this.video.onError(this._onVideoError.bind(this));
@@ -524,27 +470,26 @@ export default class VIVOModule extends PlatformModule {
     }
 
     public showAutoBanner() {
-        console.log(' oppo 不支持自动')
+        console.log(' vivo 不支持自动')
     }
 
     public reportMonitor(name: string, value: string) {
-        if (!window[this.platformName])
-            return;
-        if (!window[this.platformName].reportMonitor)
-            return;
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].reportMonitor) return;
         window[this.platformName].reportMonitor('game_scene', 0)
     }
 
-    public _prepareNative() {
+    public _prepareNative(isLoad: boolean = false) {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createNativeAd != "function") return;
         this.native = window[this.platformName].createNativeAd({
-            adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
+            posId: this.nativeId[this.nativeIdIndex]
         })
         this.native.onLoad(this._onNativeLoad.bind(this));
         this.native.onError(this._onNativeError.bind(this));
         this.nativeLoading = true;
-        // this.native.load()
+        if (isLoad)
+            this.native.load()
     }
 
     public _onNativeLoad(res) {
@@ -607,7 +552,7 @@ export default class VIVOModule extends PlatformModule {
     }
 
     /**
-    * 目前只有OPPO平台有此功能
+    * 目前只有OPPO VIVO 平台有此功能
     * 返回原生广告数据，开发者根据返回的数据来展现
     * 没有广告返回null
     * 
@@ -630,9 +575,9 @@ export default class VIVOModule extends PlatformModule {
         if (this.native)
             this.native.load();
         else {
-            this._prepareNative();
-            if (this.native)
-                this.native.load();
+            this._prepareNative(true);
+            // if (this.native)
+            //     this.native.load();
         }
         // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
         //     let nativeData = Common.deepCopy(this.nativeAdResult)

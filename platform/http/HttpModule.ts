@@ -277,8 +277,8 @@ export class HttpModule extends BaseModule {
                 (res) => {
                     this.cfgData = {
                         ...Common.deepCopy(res),
-                        zs_native_click_switch: res && res.lureNative ? res.lureNative : 0,
-                        zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0,
+                        zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
+                        zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
                     };
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);

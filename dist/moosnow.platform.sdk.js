@@ -666,6 +666,7 @@
             _this.nativeLoading = false;
             _this.record = null;
             _this.shareInfoArr = [];
+            _this.versionRet = null;
             _this.prevNavigate = Date.now();
             _this.initAppConfig();
             // this._regisiterWXCallback();
@@ -778,7 +779,48 @@
          * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
          */
         PlatformModule.prototype.checkVersion = function (version, callback) {
-            callback(true);
+            if (this.versionRet != null) {
+                callback(this.versionRet);
+                return;
+            }
+            else {
+                this._checkConfigVersion(callback);
+            }
+        };
+        PlatformModule.prototype._checkRemoteVersion = function (callback) {
+            var _this = this;
+            var url = this.baseUrl + 'admin/wx_list/getAppConfig';
+            var signParams = {
+                appid: this.moosnowConfig.moosnowAppId,
+            };
+            var data = signParams;
+            moosnow.http.request(url, data, 'POST', function (res) {
+                _this.versionRet = _this.checkLog(res.data.version);
+                callback(_this.versionRet);
+            }, function () {
+                console.log('checkVersion fail');
+            }, function () {
+                console.log('checkVersion complete');
+            });
+        };
+        PlatformModule.prototype._checkConfigVersion = function (callback) {
+            var _this = this;
+            moosnow.http.getAllConfig(function (res) {
+                if (res && res.version) {
+                    _this.versionRet = _this.checkLog(res.version);
+                    callback(_this.versionRet);
+                }
+                else {
+                    _this._checkRemoteVersion(callback);
+                }
+            });
+        };
+        PlatformModule.prototype.checkLog = function (remoteVersion) {
+            var configVersion = moosnow.platform.moosnowConfig.version;
+            var versionRet = remoteVersion == configVersion;
+            console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + remoteVersion + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + configVersion);
+            console.log("获取广告开关：", versionRet);
+            return versionRet;
         };
         PlatformModule.prototype.isSmallWidth = function () {
             if (!window[this.platformName])
@@ -1106,10 +1148,8 @@
          * wifiSignal	number	wifi 信号强度，范围 0 - 4	                        >= 1.9.0
          */
         PlatformModule.prototype.getSystemInfoSync = function () {
-            if (!window[this.platformName])
-                return;
             if (this.systemInfo == null) {
-                if (window[this.platformName].getSystemInfoSync)
+                if (window[this.platformName] && window[this.platformName].getSystemInfoSync)
                     this.systemInfo = window[this.platformName].getSystemInfoSync();
                 else
                     this.systemInfo = {};
@@ -1787,42 +1827,11 @@
             var _this = _super.call(this) || this;
             _this.platformName = "wx";
             _this.baseUrl = "https://api.liteplay.com.cn/";
-            _this.versionRet = null;
             _this._regisiterWXCallback();
             _this.initBanner();
             _this.initInter();
             return _this;
         }
-        /**
-        * 检查当前版本的导出广告是否开启
-        * @param {string} version
-        * @param {*} callback
-        * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-        */
-        WXModule.prototype.checkVersion = function (version, callback) {
-            var _this = this;
-            if (this.versionRet != null) {
-                callback(this.versionRet);
-                return;
-            }
-            else {
-                var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-                var signParams = {
-                    appid: this.moosnowConfig.moosnowAppId,
-                };
-                var data = signParams;
-                moosnow.http.request(url, data, 'POST', function (res) {
-                    _this.versionRet = res.data.version != moosnow.platform.moosnowConfig.version;
-                    console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + res.data.verson + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + moosnow.platform.moosnowConfig.version);
-                    console.log("获取广告开关：", _this.versionRet);
-                    callback(_this.versionRet);
-                }, function () {
-                    console.log('checkVersion fail');
-                }, function () {
-                    console.log('checkVersion complete');
-                });
-            }
-        };
         /**
          * 游戏登录
          * @param callback
@@ -2403,7 +2412,7 @@
             else {
                 var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.lureNative ? res.lureNative : 0, zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0 });
+                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0 });
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
@@ -2581,7 +2590,6 @@
             _this.platformName = "qg";
             _this.appSid = "";
             _this.baseUrl = "https://api.liteplay.com.cn/";
-            _this.versionRet = null;
             _this.bannerWidth = 760;
             _this.bannerHeight = 96;
             _this.interLoadedShow = false;
@@ -2591,36 +2599,6 @@
             _this.initAdService();
             return _this;
         }
-        /**
-        * 检查当前版本的导出广告是否开启
-        * @param {string} version
-        * @param {*} callback
-        * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-        */
-        OPPOModule.prototype.checkVersion = function (version, callback) {
-            var _this = this;
-            if (this.versionRet != null) {
-                callback(this.versionRet);
-                return;
-            }
-            else {
-                var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-                var signParams = {
-                    appid: this.moosnowConfig.moosnowAppId,
-                };
-                var data = signParams;
-                moosnow.http.request(url, data, 'POST', function (res) {
-                    _this.versionRet = res.data.version == moosnow.platform.moosnowConfig.version;
-                    console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + res.data.version + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + moosnow.platform.moosnowConfig.version);
-                    console.log("获取广告开关：", _this.versionRet);
-                    callback(_this.versionRet);
-                }, function () {
-                    console.log('checkVersion fail');
-                }, function () {
-                    console.log('checkVersion complete');
-                });
-            }
-        };
         OPPOModule.prototype.initAdService = function () {
             if (!window[this.platformName])
                 return;
@@ -3515,7 +3493,7 @@
                 var windowHeight = wxsys.windowHeight;
                 this.bannerWidth = size.width;
                 this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
-                var top_1 = windowHeight - this.bannerHeigth - 10;
+                var top_1 = windowHeight - this.bannerHeigth - 30;
                 console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top_1);
                 if (this.banner) {
                     this.banner.style.top = top_1;
@@ -3709,7 +3687,7 @@
             var windowHeight = wxsys.windowHeight;
             var top = 0;
             if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                top = windowHeight - this.bannerHeigth - 10;
+                top = windowHeight - this.bannerHeigth - 30;
             }
             else if (this.bannerPosition == BANNER_POSITION.CENTER)
                 top = (windowHeight - this.bannerHeigth) / 2;
@@ -4096,10 +4074,9 @@
         * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
         */
         ZSOPPOModule.prototype.checkVersion = function (version, callback) {
+            var _this = this;
             moosnow.http.loadCfg(function (res) {
-                var openAd = (res.zs_version == moosnow.platform.moosnowConfig.version);
-                console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + res.zs_version + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + moosnow.platform.moosnowConfig.version);
-                console.log("获取广告开关：", openAd);
+                var openAd = _super.prototype.checkLog.call(_this, res.zs_version);
                 callback(openAd);
             });
         };
@@ -4354,7 +4331,7 @@
                     apk_id: moosnow.platform.moosnowConfig.moosnowAppId
                 }, 'POST', function (res) {
                     var enabled = res.data.zs_version == moosnow.platform.moosnowConfig.version;
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res.data)), { mistouchNum: res.data.zs_switch, mistouchPosNum: res.data.zs_switch, showNative: enabled, showInter: enabled, showExportAd: enabled, lureNative: res.zs_native_click_switch == 1, lureExportAd: res.zs_jump_switch == 1, bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit });
+                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res.data)), { mistouchNum: res.data.zs_switch, mistouchPosNum: res.data.zs_switch, showNative: enabled, showInter: enabled, showExportAd: enabled, mx_native_click_switch: res.zs_native_click_switch == 1, mx_jump_switch: res.zs_jump_switch == 1, bannerShowCountLimit: isNaN(res.data.bannerShowCountLimit) ? 1 : res.data.bannerShowCountLimit });
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.data.bannerShowCountLimit);
                     }
@@ -4664,9 +4641,8 @@
             _this.platformName = "qg";
             _this.appSid = "";
             _this.baseUrl = "https://api.liteplay.com.cn/";
-            _this.versionRet = null;
-            _this.bannerWidth = 760;
-            _this.bannerHeight = 96;
+            _this.bannerWidth = 720;
+            _this.bannerHeight = 113;
             _this.interLoadedShow = false;
             _this.prevNavigate = Date.now();
             _this.mMinInterval = 10;
@@ -4675,36 +4651,6 @@
             _this.initAdService();
             return _this;
         }
-        /**
-        * 检查当前版本的导出广告是否开启
-        * @param {string} version
-        * @param {*} callback
-        * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-        */
-        VIVOModule.prototype.checkVersion = function (version, callback) {
-            var _this = this;
-            if (this.versionRet != null) {
-                callback(this.versionRet);
-                return;
-            }
-            else {
-                var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-                var signParams = {
-                    appid: this.moosnowConfig.moosnowAppId,
-                };
-                var data = signParams;
-                moosnow.http.request(url, data, 'POST', function (res) {
-                    _this.versionRet = res.data.version == moosnow.platform.moosnowConfig.version;
-                    console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + res.data.version + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + moosnow.platform.moosnowConfig.version);
-                    console.log("获取广告开关：", _this.versionRet);
-                    callback(_this.versionRet);
-                }, function () {
-                    console.log('checkVersion fail');
-                }, function () {
-                    console.log('checkVersion complete');
-                });
-            }
-        };
         VIVOModule.prototype.initAdService = function () {
             // this.initBanner();
             // this.initInter();
@@ -4851,21 +4797,19 @@
             console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
             this.destroyBanner();
         };
+        VIVOModule.prototype.getSystemInfoSync = function () {
+            if (this.systemInfo == null) {
+                if (window[this.platformName] && window[this.platformName].getSystemInfoSync)
+                    this.systemInfo = window[this.platformName].getSystemInfoSync();
+                else
+                    this.systemInfo = {};
+                console.log('设备信息', this.systemInfo);
+            }
+            return this.systemInfo;
+        };
         VIVOModule.prototype._prepareBanner = function () {
             if (!window[this.platformName].createBannerAd)
                 return;
-            var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            //横屏模式 
-            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth)) {
-                if (windowWidth < this.bannerWidth) {
-                    this.bannerWidth = windowWidth;
-                }
-            }
-            else {
-                //竖屏
-                this.bannerWidth = windowWidth;
-            }
             if (this.banner) {
                 this.banner.offSize(this._bottomCenterBanner);
                 this.banner.offError(this._onBannerError);
@@ -4894,76 +4838,51 @@
                 }
             }
             var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            var windowHeight = wxsys.windowHeight;
-            var left = (windowWidth - this.bannerWidth) / 2;
+            var screenWidth = wxsys.screenWidth;
+            var screenHeight = wxsys.screenHeight;
+            var statusBarHeight = wxsys.statusBarHeight;
+            var pixelRatio = wxsys.pixelRatio;
+            var notchHeight = this.getNotchHeight();
+            var left = (screenWidth - this.bannerWidth) / pixelRatio / 2;
             if (Common.isEmpty(this.bannerId)) {
                 console.warn('banner id is null');
                 return;
             }
-            var styleTop = windowHeight - this.bannerHeigth;
+            var styleTop = 0;
+            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+                styleTop = (screenHeight - this.bannerHeight) / pixelRatio;
+            }
+            else if (this.bannerPosition == BANNER_POSITION.CENTER)
+                styleTop = (screenHeight - this.bannerHeight) / pixelRatio / 2;
+            else if (this.bannerPosition == BANNER_POSITION.TOP) {
+                if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
+                    styleTop = 0;
+                else
+                    styleTop = statusBarHeight + notchHeight;
+            }
+            else
+                styleTop = this.bannerStyle.top;
+            var style = {
+                top: styleTop,
+                left: left,
+                width: this.bannerWidth,
+                height: this.bannerHeight
+            };
+            console.log('_createBannerAd style', style, 'screenHeight', screenHeight, 'bannerHeigth', this.bannerHeigth);
             var banner = window[this.platformName].createBannerAd({
-                adUnitId: this.bannerId,
-                style: {
-                    top: styleTop,
-                    left: left,
-                    width: this.bannerWidth
-                }
+                posId: this.bannerId,
+                style: style
             });
             return banner;
         };
-        VIVOModule.prototype._bottomCenterBanner = function (size) {
-            var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            var windowHeight = wxsys.windowHeight;
-            var statusBarHeight = wxsys.statusBarHeight;
-            var notchHeight = wxsys.notchHeight || 0;
-            this.bannerWidth = size.width;
-            this.bannerHeigth = size.height;
-            this.banner.style.left = (windowWidth - size.width) / 2;
-            var styleTop = windowHeight - this.bannerHeigth;
-            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                styleTop = windowHeight - this.bannerHeigth;
-            }
-            else if (this.bannerPosition == BANNER_POSITION.CENTER)
-                styleTop = (windowHeight - this.bannerHeigth) / 2;
-            else if (this.bannerPosition == BANNER_POSITION.TOP) {
-                if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                    styleTop = 0;
-                else
-                    styleTop = statusBarHeight + notchHeight;
-            }
-            else
-                styleTop = this.bannerStyle.top;
-            this.banner.style.top = styleTop;
-            console.log('_bottomCenterBanner  ', this.banner.style);
+        VIVOModule.prototype.getNotchHeight = function () {
+            var retVal = 0;
+            if (window[this.platformName].getNotchHeightSync)
+                retVal = window[this.platformName].getNotchHeightSync().height;
+            return retVal;
         };
-        VIVOModule.prototype._resetBanenrStyle = function (size) {
-            var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            var windowHeight = wxsys.windowHeight;
-            var statusBarHeight = wxsys.statusBarHeight;
-            var notchHeight = wxsys.notchHeight || 0;
-            if (!isNaN(this.bannerWidth))
-                this.banner.style.width = this.bannerWidth;
-            if (!isNaN(this.bannerHeight))
-                this.banner.style.height = this.bannerHeight;
-            var styleTop = windowHeight - this.bannerHeigth;
-            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                styleTop = windowHeight - this.bannerHeigth;
-            }
-            else if (this.bannerPosition == BANNER_POSITION.CENTER)
-                styleTop = (windowHeight - this.bannerHeigth) / 2;
-            else if (this.bannerPosition == BANNER_POSITION.TOP) {
-                if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                    styleTop = 0;
-                else
-                    styleTop = statusBarHeight + notchHeight;
-            }
-            else
-                styleTop = this.bannerStyle.top;
-            this.banner.style.top = styleTop;
-            console.log('_resetBanenrStyle ', this.banner.style, 'set styleTop ', styleTop);
+        VIVOModule.prototype._bottomCenterBanner = function (size) {
+            console.log('onSize callback  ', size);
         };
         VIVOModule.prototype._onBannerClose = function () {
             console.log('banner 已关闭 ');
@@ -4989,37 +4908,37 @@
          */
         VIVOModule.prototype.showBanner = function (callback, position, style) {
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
-            console.log('显示banner');
             this.bannerCb = callback;
             this.isBannerShow = true;
             if (!window[this.platformName])
                 return;
-            if (this.banner) {
-                var adshow = this.banner.show();
-                adshow && adshow.then(function () {
-                    console.log("banner广告展示成功");
-                }).catch(function (err) {
-                    switch (err.code) {
-                        case 30003:
-                            console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入");
-                            break;
-                        case 30009:
-                            console.log("10秒内调用广告次数超过1次，10秒后再调用");
-                            break;
-                        case 30002:
-                            console.log("加载广告失败，重新加载广告");
-                            break;
-                        default:
-                            // 参考 https://minigame.vivo.com.cn/documents/#/lesson/open-ability/ad?id=广告错误码信息 对错误码做分类处理
-                            console.log("banner广告展示失败");
-                            console.log(JSON.stringify(err));
-                            break;
-                    }
-                });
-            }
-            else {
+            this.bannerPosition = position;
+            this.bannerStyle = style;
+            if (!this.banner) {
                 this.initBanner();
             }
+            var adshow = this.banner.show();
+            console.log('显示banner style ', this.banner);
+            adshow && adshow.then(function () {
+                console.log("banner广告展示成功");
+            }).catch(function (err) {
+                switch (err.code) {
+                    case 30003:
+                        console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入");
+                        break;
+                    case 30009:
+                        console.log("10秒内调用广告次数超过1次，10秒后再调用");
+                        break;
+                    case 30002:
+                        console.log("加载广告失败，重新加载广告");
+                        break;
+                    default:
+                        // 参考 https://minigame.vivo.com.cn/documents/#/lesson/open-ability/ad?id=广告错误码信息 对错误码做分类处理
+                        console.log("banner广告展示失败");
+                        console.log(JSON.stringify(err));
+                        break;
+                }
+            });
         };
         VIVOModule.prototype.hideBanner = function () {
             console.log('隐藏banner');
@@ -5064,7 +4983,7 @@
                     return;
                 }
                 this.video = window[this.platformName].createRewardedVideoAd({
-                    adUnitId: this.videoId
+                    posId: this.videoId
                 });
             }
             this.video.onError(this._onVideoError.bind(this));
@@ -5129,7 +5048,7 @@
                 this.inter.load();
         };
         VIVOModule.prototype.showAutoBanner = function () {
-            console.log(' oppo 不支持自动');
+            console.log(' vivo 不支持自动');
         };
         VIVOModule.prototype.reportMonitor = function (name, value) {
             if (!window[this.platformName])
@@ -5138,18 +5057,20 @@
                 return;
             window[this.platformName].reportMonitor('game_scene', 0);
         };
-        VIVOModule.prototype._prepareNative = function () {
+        VIVOModule.prototype._prepareNative = function (isLoad) {
+            if (isLoad === void 0) { isLoad = false; }
             if (!window[this.platformName])
                 return;
             if (typeof window[this.platformName].createNativeAd != "function")
                 return;
             this.native = window[this.platformName].createNativeAd({
-                adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
+                posId: this.nativeId[this.nativeIdIndex]
             });
             this.native.onLoad(this._onNativeLoad.bind(this));
             this.native.onError(this._onNativeError.bind(this));
             this.nativeLoading = true;
-            // this.native.load()
+            if (isLoad)
+                this.native.load();
         };
         VIVOModule.prototype._onNativeLoad = function (res) {
             this.nativeLoading = false;
@@ -5206,7 +5127,7 @@
             console.log('原生广告销毁');
         };
         /**
-        * 目前只有OPPO平台有此功能
+        * 目前只有OPPO VIVO 平台有此功能
         * 返回原生广告数据，开发者根据返回的数据来展现
         * 没有广告返回null
         *
@@ -5229,9 +5150,9 @@
             if (this.native)
                 this.native.load();
             else {
-                this._prepareNative();
-                if (this.native)
-                    this.native.load();
+                this._prepareNative(true);
+                // if (this.native)
+                //     this.native.load();
             }
             // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
             //     let nativeData = Common.deepCopy(this.nativeAdResult)

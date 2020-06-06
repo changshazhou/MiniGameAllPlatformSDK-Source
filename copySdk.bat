@@ -1,0 +1,1 @@
+copy /y "D:\develop\SDK\moosnowSdk\dist\moosnow.platform.sdk.js" "D:\develop\cocos\loadCar\assets\moosnowSdk\moosnow.platform.sdk.js"

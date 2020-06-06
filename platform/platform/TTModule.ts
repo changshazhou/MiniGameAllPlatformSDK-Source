@@ -48,7 +48,7 @@ export default class TTModule extends PlatformModule {
             let windowHeight = wxsys.windowHeight;
             this.bannerWidth = size.width;
             this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
-            let top = windowHeight - this.bannerHeigth - 10
+            let top = windowHeight - this.bannerHeigth - 30
             console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
             if (this.banner) {
                 this.banner.style.top = top;
@@ -244,7 +244,7 @@ export default class TTModule extends PlatformModule {
         let windowHeight = wxsys.windowHeight;
         let top = 0;
         if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - this.bannerHeigth - 10
+            top = windowHeight - this.bannerHeigth - 30
         }
         else if (this.bannerPosition == BANNER_POSITION.CENTER)
             top = (windowHeight - this.bannerHeigth) / 2;

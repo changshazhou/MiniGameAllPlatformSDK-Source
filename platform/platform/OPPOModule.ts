@@ -11,7 +11,6 @@ export default class OPPOModule extends PlatformModule {
     public platformName: string = "qg";
     public appSid: string = "";
     public baseUrl = "https://api.liteplay.com.cn/";
-    private versionRet: boolean = null;
     public bannerWidth: number = 760;
     public bannerHeight: number = 96;
 
@@ -22,38 +21,7 @@ export default class OPPOModule extends PlatformModule {
         this.initAdService();
     }
 
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version 
-    * @param {*} callback 
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    public checkVersion(version: string, callback) {
-        if (this.versionRet != null) {
-            callback(this.versionRet);
-            return;
-        } else {
-            var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-            var signParams = {
-                appid: this.moosnowConfig.moosnowAppId,
-            };
-            let data = signParams;
-            moosnow.http.request(url, data, 'POST',
-                (res) => {
-                    this.versionRet = res.data.version == moosnow.platform.moosnowConfig.version;
-                    console.log(`版本检查 后台版本${res.data.version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
-                    console.log("获取广告开关：", this.versionRet);
-                    callback(this.versionRet);
-                },
-                () => {
-                    console.log('checkVersion fail');
-                },
-                () => {
-                    console.log('checkVersion complete');
-                }
-            );
-        }
-    }
+    
     private initAdService() {
         if (!window[this.platformName])
             return;

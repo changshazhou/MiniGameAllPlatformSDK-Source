@@ -5,18 +5,10 @@ export default class OPPOModule extends PlatformModule {
     platformName: string;
     appSid: string;
     baseUrl: string;
-    private versionRet;
     bannerWidth: number;
     bannerHeight: number;
     private interLoadedShow;
     constructor();
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version
-    * @param {*} callback
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    checkVersion(version: string, callback: any): void;
     private initAdService;
     prevNavigate: number;
     /**

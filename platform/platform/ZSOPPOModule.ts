@@ -4,7 +4,7 @@ import OPPOModule from "./OPPOModule";
 
 export default class ZSOPPOModule extends OPPOModule {
 
-    
+
 
     /**
     * 检查当前版本的导出广告是否开启
@@ -14,9 +14,7 @@ export default class ZSOPPOModule extends OPPOModule {
     */
     checkVersion(version, callback) {
         moosnow.http.loadCfg(res => {
-            let openAd = (res.zs_version == moosnow.platform.moosnowConfig.version)
-            console.log(`版本检查 后台版本${res.zs_version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
-            console.log("获取广告开关：", openAd);
+            let openAd = super.checkLog(res.zs_version)
             callback(openAd)
         })
     }

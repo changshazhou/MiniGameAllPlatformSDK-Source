@@ -59,13 +59,17 @@ export default class PlatformModule extends BaseModule {
     * @param version 需要检查的版本号
     */
     supportVersion(version: string): boolean;
+    private versionRet;
     /**
      * 检查当前版本的导出广告是否开启
      * @param {string} version 版本号 为了兼容旧版本SDK的参数，目前已无作用，SDK会取moosnowConfig 中的version 来判断
      * @param {*} callback
      * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
      */
-    checkVersion(version: string, callback: any): void;
+    checkVersion(version: string, callback: Function): void;
+    private _checkRemoteVersion;
+    private _checkConfigVersion;
+    checkLog(remoteVersion: any): boolean;
     isSmallWidth(): boolean;
     login(success?: Function, fail?: Function): void;
     postMessage(data: {
