@@ -350,26 +350,30 @@ export default class TTModule extends PlatformModule {
 
     }
 
+    private _getAppLaunchOptions(callback: Function) {
+        let appLaunchOptions: Array<appLaunchOption> = [];
+        moosnow.ad.getAd((res: moosnowResult) => {
+            if (res.indexLeft.length == 0)
+                return;
+            res.indexLeft.forEach(item => {
+                let opt = new appLaunchOption();
+                opt.appId = item.appid;
+                opt.query = item.path || "1=1"
+                opt.extraData = item.extraData || {};
+                appLaunchOptions.push(opt)
+            })
+            console.log('appLaunchOptions', appLaunchOptions)
+            callback(appLaunchOptions)
+        })
+    }
+
     private _showMoreGamesModal() {
         const systemInfo = this.getSystemInfoSync();
-        if (systemInfo.platform == "ios") return;
         // iOS 不支持，建议先检测再使用
-        if (systemInfo.platform !== "ios") {
-            // 打开互跳弹窗
-            let appLaunchOptions: Array<appLaunchOption> = [];
-            moosnow.ad.getAd((res: moosnowResult) => {
-                if (res.indexLeft.length == 0)
-                    return;
-                res.indexLeft.forEach(item => {
-                    let opt = new appLaunchOption();
-                    opt.appId = item.appid;
-                    opt.query = item.path || "1=1"
-                    opt.extraData = item.extraData || {};
-                    appLaunchOptions.push(opt)
-                })
-
-            })
-            console.log('appLaunchOption', appLaunchOptions)
+        if (systemInfo.platform == "ios") return;
+        // 打开互跳弹窗
+        this._getAppLaunchOptions((appLaunchOptions) => {
+            console.log('_showMoreGamesModal appLaunchOption', appLaunchOptions)
             const banner = window[this.platformName].showMoreGamesModal({
                 appLaunchOptions: appLaunchOptions,
                 success: (res) => {
@@ -379,7 +383,7 @@ export default class TTModule extends PlatformModule {
                     console.log("show app box fail", res);
                 }
             });
-        }
+        });
     }
 
     public showMoreGameBanner() {
@@ -423,5 +427,77 @@ export default class TTModule extends PlatformModule {
                 console.log("点击跳转游戏盒子");
             });
         }
+    }
+
+    private _moreGameBotton: any;
+    public showMoreGameButton(url: string, callback?: Function, style = null) {
+
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createMoreGamesButton) return;
+        let ttsys = this.getSystemInfoSync();
+        let defaultStyle = {
+            left: ttsys.windowWidth - 80 - 30,
+            top: 40,
+            width: 80,
+            height: 80,
+            lineHeight: 80,
+            backgroundColor: "#ff0000",
+            textColor: "#ffffff",
+            textAlign: "center",
+            fontSize: 16,
+            borderRadius: 0,
+            borderWidth: 1,
+            borderColor: "#ff0000"
+        }
+        let buttonStyle = {
+            ...defaultStyle,
+            ...style
+        }
+
+        if (!this._moreGameBotton)
+            this._getAppLaunchOptions(appLaunchOptions => {
+                cc.loader.loadRes('texture/game/more.png', cc.Texture2D, (error: Error, tex: cc.Texture2D) => {
+                    if (error)
+                        return;
+                    this._moreGameBotton = window[this.platformName].createMoreGamesButton({
+                        type: "image",
+                        image: tex.url,
+                        actionType: "box",
+                        style: buttonStyle,
+                        appLaunchOptions: appLaunchOptions,
+                        onNavigateToMiniGame(res) {
+                            console.log("跳转其他小游戏", res);
+                            if (callback)
+                                callback(1, res)
+                        }
+                    });
+                    this._moreGameBotton.show();
+
+                    this._moreGameBotton.onTap(() => {
+                        console.log("点击更多游戏");
+                        if (callback)
+                            callback(2, null)
+                    });
+                })
+
+            })
+        else
+            this._moreGameBotton.show();
+
+    }
+
+    public hideMoreGameButton() {
+        if (this._moreGameBotton) {
+            this._moreGameBotton.hide();
+            // this._moreGameBotton.destory();
+        }
+
+    }
+
+    public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
+        console.log('tt navigate2Mini ')
+        this.showAppBox(() => {
+            console.log('tt showAppBox close ')
+        }, false)
     }
 }

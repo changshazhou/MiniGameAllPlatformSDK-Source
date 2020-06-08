@@ -21,7 +21,7 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "1.2.4";
+    public version: string = "1.2.5";
     public baseUrl: string = "https://api.liteplay.com.cn/";
 
     private mLaunchOptions: any
@@ -30,16 +30,24 @@ export class HttpModule extends BaseModule {
 
 
 
+        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
         if (Common.platform == PlatformType.PC) {
-            let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
                     console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]  下载地址：${res.download}`)
                     if (!Common.isEmpty(res.memo))
                         console.warn(`${res.memo}`)
                 }
+
             })
         }
+        else if (Common.platform == PlatformType.WX && window["wx"]) {
+            this.request(versionUrl, {}, 'GET', (res) => {
+                if (!window["ald-version"] || (window["ald-version"] && window["ald-version"] < res.aldVersion))
+                    console.error(`阿拉丁文件错误，请重新下载${res.aldUrl}`)
+            })
+        }
+
         this.mLaunchOptions = moosnow.platform.getLaunchOption();
 
     }

@@ -51,7 +51,6 @@ class moosnowEntry {
     }
     constructor() {
         (window["moosnow"]) = this;
-
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();

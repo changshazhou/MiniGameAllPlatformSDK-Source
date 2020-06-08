@@ -1,5 +1,6 @@
 import PlatformModule from "./PlatformModule";
 import bannerStyle from "../model/bannerStyle";
+import moosnowAdRow from "../model/moosnowAdRow";
 export default class TTModule extends PlatformModule {
     platformName: string;
     recordRes: any;
@@ -62,6 +63,11 @@ export default class TTModule extends PlatformModule {
     * @param remoteOn 被后台开关控制
     */
     showAppBox(callback?: Function, remoteOn?: boolean): void;
+    private _getAppLaunchOptions;
     private _showMoreGamesModal;
     showMoreGameBanner(): void;
+    private _moreGameBotton;
+    showMoreGameButton(url: string, callback?: Function, style?: any): void;
+    hideMoreGameButton(): void;
+    navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function): void;
 }

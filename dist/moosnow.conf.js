@@ -1,5 +1,5 @@
 window.moosnowConfig = {
-    debug: "vivo",
+    debug: "oppo",
     /**
      * 微信平台
      */
@@ -19,7 +19,7 @@ window.moosnowConfig = {
         nativeId: ["168779", "168780"],
         moosnowAppId: "30251588",
         version: "1.1.0",
-        url: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/config/tp_hzyx_config_wx.json",
+        url: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/config/tp_truckloader_config_oppo.json",
     },
     vivo: {
         bannerId: "aa9a8f1e5403435fa51ec680dbbf0da2",

@@ -1249,6 +1249,16 @@ export default class PlatformModule extends BaseModule {
 
     }
 
+    /**
+     * 更多游戏按钮
+     * @param url 
+     * @param callback 
+     * @param style 
+     */
+    public showMoreGameButton(url: string, callback?: Function, style = null) {
+        if (callback)
+            callback();
+    }
 
     //----自定义--
     public initRank() {

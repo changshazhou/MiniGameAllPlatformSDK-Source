@@ -267,6 +267,13 @@ export default class PlatformModule extends BaseModule {
      * @param value
      */
     reportMonitor(name?: string, value?: string): void;
+    /**
+     * 更多游戏按钮
+     * @param url
+     * @param callback
+     * @param style
+     */
+    showMoreGameButton(url: string, callback?: Function, style?: any): void;
     initRank(): void;
     showRank(): void;
     updateUserScore(score: any): void;
