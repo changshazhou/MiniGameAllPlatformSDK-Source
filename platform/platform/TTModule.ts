@@ -39,10 +39,14 @@ export default class TTModule extends PlatformModule {
                     this.moreGameCb(res);
             });
         // 监听小游戏跳转
-        if (window[this.platformName].onNavigateToMiniProgram)
+        if (window[this.platformName].onNavigateToMiniGameBox) {
+            window[this.platformName].onNavigateToMiniGameBox((res) => {
+                console.log('onNavigateToMiniGameBox', res);
+            })
+        }
+        else if (window[this.platformName].onNavigateToMiniProgram)
             window[this.platformName].onNavigateToMiniProgram((res) => {
-                console.log(res.errCode);
-                console.log(res.errMsg);
+                console.log('onNavigateToMiniProgram', res);
             })
     }
 

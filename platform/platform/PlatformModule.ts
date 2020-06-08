@@ -191,6 +191,16 @@ export default class PlatformModule extends BaseModule {
         return (this.compareVersion(sdkVersion, version) >= 0);
     }
 
+    /**
+     * 是否支持函数
+     * @param name 
+     */
+    public supportFunction(name: string) {
+        if (!window[this.platformName]) return false;
+        if (!window[this.platformName][name]) return false;
+        return true;
+    }
+
     private versionRet: boolean = null;
     /**
      * 检查当前版本的导出广告是否开启
