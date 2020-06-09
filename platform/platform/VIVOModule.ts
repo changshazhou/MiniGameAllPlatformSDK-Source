@@ -11,7 +11,7 @@ export default class VIVOModule extends PlatformModule {
     public platformName: string = "qg";
     public appSid: string = "";
     public baseUrl = "https://api.liteplay.com.cn/";
-    
+
     public bannerWidth: number = 720;
     public bannerHeight: number = 113;
 
@@ -209,10 +209,12 @@ export default class VIVOModule extends PlatformModule {
     public _prepareBanner() {
         if (!window[this.platformName].createBannerAd) return;
         if (this.banner) {
-            this.banner.offSize(this._bottomCenterBanner);
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.offClose(this._onBannerClose)
+            this.banner.offSize();
+            this.banner.offError();
+            this.banner.offLoad();
+            this.banner.offClose()
+            this.banner.destroy()
+            this.banner = null;
         }
         this.banner = this._createBannerAd();
         if (this.banner) {
@@ -229,14 +231,14 @@ export default class VIVOModule extends PlatformModule {
     public _createBannerAd() {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
+        let nowTime = Date.now();
         if (!this.mShowTime)
-            this.mShowTime = Date.now();
-        else {
-            if (Date.now() - this.mShowTime <= this.mMinInterval * 1000) {
-                console.log(`banner创建太频繁了 ${this.mMinInterval}秒内只能显示一次`)
-                return;
-            }
+            this.mShowTime = nowTime;
+        if (!!!this.mShowTime || ((!!this.mShowTime) && nowTime - this.mShowTime <= this.mMinInterval * 1000)) {
+            console.log(`banner创建太频繁了 ${this.mMinInterval}秒内只能显示一次`);
+            return;
         }
+        this.mShowTime = Date.now();
 
 
         let wxsys = this.getSystemInfoSync();
@@ -332,6 +334,8 @@ export default class VIVOModule extends PlatformModule {
         if (!this.banner) {
             this.initBanner();
         }
+        if (!this.banner)
+            return;
         let adshow = this.banner.show();
         console.log('显示banner style ', this.banner)
         adshow && adshow.then(() => {
@@ -364,14 +368,8 @@ export default class VIVOModule extends PlatformModule {
         }
         this.bannerShowCount++;
         if (this.banner) {
-            if (this.bannerShowCount >= this.bannerShowCountLimit) {
-                this.destroyBanner();
-            } else {
-                this.banner.hide();
-            }
-        }
-        else {
-            this._prepareBanner();
+            this.banner.hide();
+            this.destroyBanner();
         }
         this.isBannerShow = false;
     }
@@ -411,10 +409,29 @@ export default class VIVOModule extends PlatformModule {
         console.log('加载video成功回调')
         moosnow.platform.videoLoading = false;
         if (this.video) {
-            this.video.show();
+            this.video.show()
+                .then(() => {
+                    moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, {})
+                    console.log('激励视频广告展示完成');
+                }).catch((err) => {
+                    console.log('激励视频广告展示失败', JSON.stringify(err));
+                })
         }
     }
-
+    public _onVideoClose(isEnd) {
+        console.log('video结束回调', isEnd.isEnded)
+        moosnow.platform.videoLoading = false;
+        if (!!isEnd.isEnded) {
+            moosnow.http.clickVideo();
+        }
+        moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, {})
+        if (moosnow.platform.videoCb) {
+            let ret = (!!isEnd.isEnded) ? VIDEO_STATUS.END : VIDEO_STATUS.NOTEND;
+            setTimeout(() => {
+                moosnow.platform.videoCb(ret);
+            }, 50);
+        }
+    }
     public prepareInter() {
         if (Common.isEmpty(this.interId)) {
             console.warn('插屏广告ID为空，系统不加载');
@@ -620,4 +637,6 @@ export default class VIVOModule extends PlatformModule {
                 this.mClickedNativeCallback();
         }
     }
+
+
 }

@@ -59,6 +59,11 @@ export default class PlatformModule extends BaseModule {
     * @param version 需要检查的版本号
     */
     supportVersion(version: string): boolean;
+    /**
+     * 是否支持函数
+     * @param name
+     */
+    supportFunction(name: string): boolean;
     private versionRet;
     /**
      * 检查当前版本的导出广告是否开启

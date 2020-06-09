@@ -52,6 +52,7 @@ export default class VIVOModule extends PlatformModule {
     hideBanner(): void;
     createRewardAD(show: any): void;
     _onVideoLoad(): void;
+    _onVideoClose(isEnd: any): void;
     prepareInter(): void;
     showInter(): void;
     _onInterLoad(): void;

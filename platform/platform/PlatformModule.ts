@@ -787,14 +787,12 @@ export default class PlatformModule extends BaseModule {
      * 注册微信各种回调
      */
     public _regisiterWXCallback() {
-        console.log('register callback ', this.platformName, !!window[this.platformName])
         if (!window[this.platformName]) return;
         this._regisiterOnShow();
         this._regisiterOnHide();
     }
 
     private _regisiterOnShow() {
-        console.log('register app on show ', !!window[this.platformName].onShow)
         if (!window[this.platformName].onShow) return;
         let self = this;
         window[this.platformName].onShow((res) => {
@@ -805,20 +803,20 @@ export default class PlatformModule extends BaseModule {
     private _onShowCallback(res) {
         this._onShareback();
         console.log('on show ', res)
-        //Lite.log.log('WX_show:', res);
         moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, res);
     }
 
     private _regisiterOnHide() {
-
-        console.log('register app on hide ', !!window[this.platformName].onShow)
         if (!window[this.platformName].onHide) return;
         let self = this;
-        window[this.platformName].onHide(self._onHideCallback.bind(this));
+        window[this.platformName].onHide((res) => {
+            self._onHideCallback(res)
+        });
     }
 
     private _onHideCallback(res) {
         //Lite.log.log('WX_hide');
+        console.log('on show ', res)
         moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, res);
         console.log('on hide ', res)
         let isOpend = res && ((res.targetAction == 8 || res.targetAction == 9 || res.targetAction == 10) && res.targetPagePath.length > 50)
