@@ -45,15 +45,16 @@ export default class AdForm extends BaseForm {
     btnSideHide: any;
     private mAdItemList;
     setPosition(source: Array<moosnowAdRow>, position?: string): Array<moosnowAdRow>;
+    loadAd(entityName: string | cc.Prefab, callback: Function): void;
     private mScrollVec;
     /**
      *
      * @param scrollView
      * @param layout
-     * @param positionTag AD_POSITION
+     * @param positionTag string
      * @param entityName
      */
-    initView(container: any, scrollView: any, layout: any, position: number, entityName: string | cc.Prefab): void;
+    initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab): void;
     addEvent(): void;
     removeEvent(): void;
     onAdChange(data: any): void;
@@ -76,6 +77,8 @@ export default class AdForm extends BaseForm {
     onFwUpdate(dt: any): void;
     sideOut(): void;
     sideIn(): void;
+    private mEndLogic;
+    initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab): void;
     willHide(): void;
     private mFloatIndex;
     private mFloatRefresh;
@@ -87,7 +90,7 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>): void;
+    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position?: string): void;
     floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;

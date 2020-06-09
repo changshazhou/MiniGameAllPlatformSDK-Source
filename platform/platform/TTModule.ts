@@ -497,7 +497,16 @@ export default class TTModule extends PlatformModule {
         }
 
     }
-
+    /***
+     * 检测Iphone
+     */
+    public isIphone() {
+        if (!window[this.platformName]) return false;
+        let systemInfo = this.getSystemInfoSync();
+        if (systemInfo.platform == "ios") return true;
+        return false;
+    }
+    
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
         console.log('tt navigate2Mini ')
         this.showAppBox(() => {

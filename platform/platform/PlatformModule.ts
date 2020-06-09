@@ -128,7 +128,9 @@ export default class PlatformModule extends BaseModule {
 
         console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig))
     }
-
+    /***
+     * 检测IphoneX
+     */
     public isIphoneXModel() {
         if (!window[this.platformName]) return;
         let sysInfo = this.getSystemInfoSync();
@@ -138,6 +140,19 @@ export default class PlatformModule extends BaseModule {
             return false;
         }
     }
+    /***
+     * 检测Iphone
+     */
+    public isIphone() {
+        if (!window[this.platformName]) return;
+        let sysInfo = this.getSystemInfoSync();
+        if (/iphone/.test(sysInfo.model.toLowerCase())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public isIphoneX() {
         if (!window[this.platformName]) return;
         let sysInfo = this.getSystemInfoSync();
@@ -1267,6 +1282,9 @@ export default class PlatformModule extends BaseModule {
         if (callback)
             callback();
     }
+
+
+
 
     //----自定义--
     public initRank() {

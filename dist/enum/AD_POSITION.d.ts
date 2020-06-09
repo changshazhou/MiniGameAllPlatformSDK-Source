@@ -28,9 +28,9 @@ export declare const AD_POSITION: {
      */
     LEFTRIGHT: number;
     /**
-    * 扩展1
+    * 固定的六个
     */
-    EXTEND1: number;
+    EXPORT_FIXED: number;
     /**
     * 扩展2
     */

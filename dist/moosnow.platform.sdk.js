@@ -711,11 +711,28 @@
             this.nativeId = this.moosnowConfig["nativeId"];
             console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig));
         };
+        /***
+         * 检测IphoneX
+         */
         PlatformModule.prototype.isIphoneXModel = function () {
             if (!window[this.platformName])
                 return;
             var sysInfo = this.getSystemInfoSync();
             if (/iphone x/.test(sysInfo.model.toLowerCase())) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        /***
+         * 检测Iphone
+         */
+        PlatformModule.prototype.isIphone = function () {
+            if (!window[this.platformName])
+                return;
+            var sysInfo = this.getSystemInfoSync();
+            if (/iphone/.test(sysInfo.model.toLowerCase())) {
                 return true;
             }
             else {
@@ -2231,7 +2248,7 @@
             }
             else if (Common.platform == PlatformType.WX && window["wx"]) {
                 _this.request(versionUrl, {}, 'GET', function (res) {
-                    if (!window["ald-version"] || (window["ald-version"] && window["ald-version"] < res.aldVersion))
+                    if (!window["aldVersion"] || (window["aldVersion"] && window["aldVersion"] < res.aldVersion))
                         console.error("\u963F\u62C9\u4E01\u6587\u4EF6\u9519\u8BEF\uFF0C\u8BF7\u91CD\u65B0\u4E0B\u8F7D" + res.aldUrl);
                 });
             }
@@ -3986,6 +4003,17 @@
                 // this._moreGameBotton.destory();
             }
         };
+        /***
+         * 检测Iphone
+         */
+        TTModule.prototype.isIphone = function () {
+            if (!window[this.platformName])
+                return false;
+            var systemInfo = this.getSystemInfoSync();
+            if (systemInfo.platform == "ios")
+                return true;
+            return false;
+        };
         TTModule.prototype.navigate2Mini = function (row, success, fail, complete) {
             console.log('tt navigate2Mini ');
             this.showAppBox(function () {
@@ -5408,9 +5436,9 @@
          */
         LEFTRIGHT: 256,
         /**
-        * 扩展1
+        * 固定的六个
         */
-        EXTEND1: 512,
+        EXPORT_FIXED: 512,
         /**
         * 扩展2
         */
@@ -5984,6 +6012,7 @@
             _this.mIndex = 999;
             _this.mShowAd = moosnow.AD_POSITION.NONE;
             _this.mMoveSpeed = 2;
+            _this.mEndLogic = [];
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
             _this.mFloatCache = {};
@@ -5998,11 +6027,23 @@
             });
             return retValue;
         };
+        AdForm.prototype.loadAd = function (entityName, callback) {
+            var _this = this;
+            moosnow.entity.preload(entityName, function () {
+                moosnow.ad.getAd(function (res) {
+                    _this.mAdData = res;
+                    if (res.indexLeft.length == 0)
+                        return;
+                    if (callback)
+                        callback(res);
+                });
+            });
+        };
         /**
          *
          * @param scrollView
          * @param layout
-         * @param positionTag AD_POSITION
+         * @param positionTag string
          * @param entityName
          */
         AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
@@ -6011,42 +6052,38 @@
                 console.warn('entityName is null 无法初始化 ');
                 return;
             }
-            moosnow.entity.preload(entityName, function () {
-                moosnow.ad.getAd(function (res) {
-                    if (res.indexLeft.length == 0)
-                        return;
-                    var source = _this.setPosition(res.indexLeft, "");
-                    source.forEach(function (item, idx) {
-                        var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
-                        _this.mAdItemList.push(adItemCtl);
-                    });
-                    if (layout.type == cc.Layout.Type.GRID) {
-                        if (scrollView.vertical) {
-                            _this.mScrollVec.push({
-                                scrollView: scrollView,
-                                move2Up: false
-                            });
-                        }
-                        else {
-                            _this.mScrollVec.push({
-                                scrollView: scrollView,
-                                move2Left: false
-                            });
-                        }
-                    }
-                    else if (layout.type == cc.Layout.Type.HORIZONTAL) {
-                        _this.mScrollVec.push({
-                            scrollView: scrollView,
-                            move2Left: false
-                        });
-                    }
-                    else if (layout.type == cc.Layout.Type.VERTICAL) {
+            this.loadAd(entityName, function (res) {
+                var source = _this.setPosition(res.indexLeft, position);
+                source.forEach(function (item, idx) {
+                    var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
+                    _this.mAdItemList.push(adItemCtl);
+                });
+                if (layout.type == cc.Layout.Type.GRID) {
+                    if (scrollView.vertical) {
                         _this.mScrollVec.push({
                             scrollView: scrollView,
                             move2Up: false
                         });
                     }
-                });
+                    else {
+                        _this.mScrollVec.push({
+                            scrollView: scrollView,
+                            move2Left: false
+                        });
+                    }
+                }
+                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+                    _this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Left: false
+                    });
+                }
+                else if (layout.type == cc.Layout.Type.VERTICAL) {
+                    _this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Up: false
+                    });
+                }
             });
         };
         AdForm.prototype.addEvent = function () {
@@ -6152,6 +6189,31 @@
                 _this.btnSideHide.active = false;
             })));
         };
+        AdForm.prototype.initFiexdView = function (container, layout, position, entityName) {
+            var _this = this;
+            this.loadAd(entityName, function (res) {
+                if (_this.mEndLogic) {
+                    for (var i = 0; i < _this.mEndLogic.length; i++) {
+                        moosnow.entity.hideEntity(_this.mEndLogic[i], {});
+                    }
+                    _this.mEndLogic = [];
+                }
+                var banner = _this.setPosition(res.indexLeft, position);
+                var endAd = [];
+                var showAppId = [];
+                for (var i = 0; i < 6; i++) {
+                    var item = banner.length > i ? banner[i] : banner[0];
+                    showAppId.push(item.appid);
+                    endAd.push(item);
+                }
+                endAd.forEach(function (item) {
+                    var adRow = __assign(__assign({}, Common.deepCopy(item)), { showAppId: Common.deepCopy(showAppId), source: Common.deepCopy(banner) });
+                    var logic = moosnow.entity.showEntity(entityName, layout, adRow);
+                    _this.mEndLogic.push(logic);
+                    return false;
+                });
+            });
+        };
         AdForm.prototype.willHide = function () {
             this.removeEvent();
             this.mAdItemList.forEach(function (item) {
@@ -6166,8 +6228,9 @@
          * @param prefabs 匹配的预制体
          * @param points 需要显示的坐标点
          */
-        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points) {
+        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points, position) {
             var _this = this;
+            if (position === void 0) { position = ""; }
             cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, function () {
                 moosnow.ad.getAd(function (res) {
                     _this.mAdData = res;
@@ -6181,7 +6244,7 @@
                             showIndex = 0;
                         floatData = source[showIndex];
                         var point = points[idx];
-                        var adRow = __assign(__assign({}, floatData), { position: "首页浮动", x: point.x, y: point.y });
+                        var adRow = __assign(__assign({}, floatData), { position: position, x: point.x, y: point.y });
                         var logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                         _this.mFloatCache[idx] = {
                             index: showIndex,
@@ -6234,6 +6297,7 @@
             this.leftContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
             this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
             this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
+            this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
             this.exportClose.active = false;
             this.exportCloseTxt.active = false;
             this.unschedule(this.showExportClose);

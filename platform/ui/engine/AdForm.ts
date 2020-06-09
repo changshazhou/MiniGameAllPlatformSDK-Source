@@ -4,6 +4,7 @@ import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
 import moosnowAdRow from "../../model/moosnowAdRow";
 import moosnowResult from "../../model/moosnowResult";
+import AdViewItem from "./AdViewItem";
 
 
 export default class AdForm extends BaseForm {
@@ -62,57 +63,66 @@ export default class AdForm extends BaseForm {
         return retValue;
     }
 
+
+
+    public loadAd(entityName: string | cc.Prefab, callback: Function) {
+        moosnow.entity.preload(entityName, () => {
+            moosnow.ad.getAd((res) => {
+                this.mAdData = res;
+                if (res.indexLeft.length == 0)
+                    return;
+                if (callback)
+                    callback(res);
+            })
+        })
+    }
+
     private mScrollVec = [];
     /**
      * 
      * @param scrollView 
      * @param layout 
-     * @param positionTag AD_POSITION
+     * @param positionTag string
      * @param entityName 
      */
-    public initView(container: any, scrollView: any, layout: any, position: number, entityName: string | cc.Prefab) {
+    public initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab) {
         if (!entityName) {
             console.warn('entityName is null 无法初始化 ')
             return;
         }
-        moosnow.entity.preload(entityName, () => {
-            moosnow.ad.getAd((res) => {
-                if (res.indexLeft.length == 0)
-                    return;
-                let source = this.setPosition(res.indexLeft, "");
+        this.loadAd(entityName, (res) => {
 
-                source.forEach((item, idx) => {
-                    let adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
-                    this.mAdItemList.push(adItemCtl);
-                })
-                if (layout.type == cc.Layout.Type.GRID) {
-                    if (scrollView.vertical) {
-                        this.mScrollVec.push({
-                            scrollView,
-                            move2Up: false
-                        })
-                    }
-                    else {
-                        this.mScrollVec.push({
-                            scrollView,
-                            move2Left: false
-                        })
-                    }
-                }
-                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
-                    this.mScrollVec.push({
-                        scrollView,
-                        move2Left: false
-                    })
-                }
-                else if (layout.type == cc.Layout.Type.VERTICAL) {
+            let source = this.setPosition(res.indexLeft, position);
+            source.forEach((item, idx) => {
+                let adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
+                this.mAdItemList.push(adItemCtl);
+            })
+            if (layout.type == cc.Layout.Type.GRID) {
+                if (scrollView.vertical) {
                     this.mScrollVec.push({
                         scrollView,
                         move2Up: false
                     })
                 }
-            })
-
+                else {
+                    this.mScrollVec.push({
+                        scrollView,
+                        move2Left: false
+                    })
+                }
+            }
+            else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+                this.mScrollVec.push({
+                    scrollView,
+                    move2Left: false
+                })
+            }
+            else if (layout.type == cc.Layout.Type.VERTICAL) {
+                this.mScrollVec.push({
+                    scrollView,
+                    move2Up: false
+                })
+            }
         })
     }
 
@@ -246,6 +256,37 @@ export default class AdForm extends BaseForm {
             })
         ))
     }
+
+    private mEndLogic = [];
+    public initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab) {
+
+        this.loadAd(entityName, (res) => {
+            if (this.mEndLogic) {
+                for (let i = 0; i < this.mEndLogic.length; i++) {
+                    moosnow.entity.hideEntity(this.mEndLogic[i], {});
+                }
+                this.mEndLogic = [];
+            }
+
+            let banner = this.setPosition(res.indexLeft, position);
+            let endAd: Array<moosnowAdRow> = [];
+            let showAppId = []
+            for (let i = 0; i < 6; i++) {
+                let item = banner.length > i ? banner[i] : banner[0];
+                showAppId.push(item.appid)
+                endAd.push(item);
+            }
+            endAd.forEach(item => {
+                let adRow = { ...Common.deepCopy(item), showAppId: Common.deepCopy(showAppId), source: Common.deepCopy(banner) }
+                let logic = moosnow.entity.showEntity(entityName, layout, adRow)
+                this.mEndLogic.push(logic);
+                return false;
+            })
+        })
+    }
+
+
+
     public willHide() {
         this.removeEvent();
         this.mAdItemList.forEach(item => {
@@ -264,7 +305,7 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>) {
+    public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>, position: string = "") {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
             moosnow.ad.getAd((res: moosnowResult) => {
                 this.mAdData = res;
@@ -282,7 +323,7 @@ export default class AdForm extends BaseForm {
 
                     floatData = source[showIndex];
                     let point = points[idx] as any;
-                    let adRow = { ...floatData, position: "首页浮动", x: point.x, y: point.y }
+                    let adRow = { ...floatData, position, x: point.x, y: point.y }
                     let logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                     this.mFloatCache[idx] = {
                         index: showIndex,
@@ -358,6 +399,7 @@ export default class AdForm extends BaseForm {
 
         this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
 
+        this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
 
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;

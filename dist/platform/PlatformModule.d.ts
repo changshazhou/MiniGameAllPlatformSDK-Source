@@ -51,7 +51,14 @@ export default class PlatformModule extends BaseModule {
     onEnable(): void;
     private vibrateSwitch;
     initAppConfig(): void;
+    /***
+     * 检测IphoneX
+     */
     isIphoneXModel(): boolean;
+    /***
+     * 检测Iphone
+     */
+    isIphone(): boolean;
     isIphoneX(): boolean;
     private compareVersion;
     /**

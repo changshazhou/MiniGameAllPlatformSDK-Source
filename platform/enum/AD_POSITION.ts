@@ -31,10 +31,9 @@ export const AD_POSITION = {
     LEFTRIGHT: 256,
 
     /**
-    * 扩展1
+    * 固定的六个
     */
-
-    EXTEND1: 512,
+    EXPORT_FIXED: 512,
 
     /**
     * 扩展2

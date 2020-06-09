@@ -16,7 +16,7 @@ export default class BaseEntityModule extends BaseModule {
     pause(): void;
     resume(): void;
     getAllEntity(name: any): any[];
-    showEntity(name: any, parentNode: any, data: any): void;
+    showEntity(name: any, parentNode: any, data: any): any;
     hideEntity(logic: any, data: any, isDestory?: boolean): void;
     hideAllEntity(name: any, isDestory?: boolean): void;
 }

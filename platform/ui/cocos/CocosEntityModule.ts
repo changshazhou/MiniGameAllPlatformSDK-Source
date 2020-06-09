@@ -16,7 +16,7 @@ export class CocosEntityModule extends BaseEntityModule {
         })
     }
 
-    public showEntity(name, parentNode, data) {
+    public showEntity(name, parentNode, data): any {
         let logic = this._showEntity(name);
         logic.id = this._serializeId--;
         logic.node.parent = parentNode;

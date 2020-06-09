@@ -69,5 +69,9 @@ export default class TTModule extends PlatformModule {
     private _moreGameBotton;
     showMoreGameButton(url: string, callback?: Function, style?: any): void;
     hideMoreGameButton(): void;
+    /***
+     * 检测Iphone
+     */
+    isIphone(): boolean;
     navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function): void;
 }

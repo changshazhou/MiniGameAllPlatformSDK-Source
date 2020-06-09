@@ -45,7 +45,8 @@ export default class BaseEntityModule extends BaseModule {
     public getAllEntity(name: any) {
         return this.entityLogics.filter(item => item.poolName == name);
     }
-    public showEntity(name, parentNode, data) {
+    
+    public showEntity(name, parentNode, data): any {
 
     }
 
