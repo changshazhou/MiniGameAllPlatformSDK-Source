@@ -385,24 +385,21 @@ export default class VIVOModule extends PlatformModule {
         if (!window[this.platformName].createRewardedVideoAd) {
             return;
         }
-        if (this.video) {
-            this.video.offClose(this._onVideoClose);
-            this.video.offError(this._onVideoError);
-            this.video.offLoad(this._onVideoLoad);
-        } else {
-            if (Common.isEmpty(this.videoId)) {
-                console.warn(' video id is null')
-                return;
-            }
+        if (Common.isEmpty(this.videoId)) {
+            console.warn(' video id is null')
+            return;
+        }
+        if (!this.video) {
+            moosnow.platform.videoLoading = true;
             this.video = window[this.platformName].createRewardedVideoAd({
                 posId: this.videoId
             });
+            this.video.onError(this._onVideoError.bind(this));
+            this.video.onClose(this._onVideoClose.bind(this));
+            this.video.onLoad(this._onVideoLoad.bind(this));
         }
-        this.video.onError(this._onVideoError.bind(this));
-        this.video.onClose(this._onVideoClose.bind(this));
-        this.video.onLoad(this._onVideoLoad.bind(this));
-        moosnow.platform.videoLoading = true;
-        this.video.load();
+        else
+            this.video.load();
 
     }
     public _onVideoLoad() {
@@ -411,6 +408,7 @@ export default class VIVOModule extends PlatformModule {
         if (this.video) {
             this.video.show()
                 .then(() => {
+                    this.videoPlaying = true;
                     moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, {})
                     console.log('激励视频广告展示完成');
                 }).catch((err) => {
@@ -421,6 +419,7 @@ export default class VIVOModule extends PlatformModule {
     public _onVideoClose(isEnd) {
         console.log('video结束回调', isEnd.isEnded)
         moosnow.platform.videoLoading = false;
+        this.videoPlaying = false;
         if (!!isEnd.isEnded) {
             moosnow.http.clickVideo();
         }

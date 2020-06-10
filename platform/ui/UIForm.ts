@@ -30,6 +30,11 @@ export default class UIForm {
      * @param zIndex  层级
      */
     public showAd(adType: number = AD_POSITION.NONE, callback: Function, zIndex: number = 999) {
+        //
+        if (moosnow.getAppPlatform() == moosnow.APP_PLATFORM.BYTEDANCE && moosnow.platform.isIphone()) {
+            console.log('头条iphone 不显示广告')
+            return;
+        }
         let adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
         if (adForm) {
             adForm.node.zIndex = zIndex;

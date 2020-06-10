@@ -37,6 +37,7 @@ export default class PlatformModule extends BaseModule {
     isBannerShow: boolean;
     videoCb: Function;
     videoLoading: boolean;
+    videoPlaying: boolean;
     interShowCount: number;
     interShowCountLimit: number;
     isInterLoaded: boolean;
@@ -209,12 +210,27 @@ export default class PlatformModule extends BaseModule {
      *
      */
     showAutoBanner(): void;
+    /**
+     * 连续不断的显示和隐藏 banner
+     */
+    showIntervalBanner(): void;
+    /**
+     * 取消banner
+     */
+    clearIntervalBanner(): void;
+    /**
+     * 隐藏banner
+     */
     hideBanner(): void;
     initVideo(): void;
     createRewardAD(show: any): void;
     _onVideoError(msg: any, code: any): void;
     _onVideoClose(isEnd: any): void;
     _onVideoLoad(): void;
+    /**
+     * 唤起视频
+     * @param completeCallback
+     */
     showVideo(completeCallback?: any): void;
     initInter(): void;
     prepareInter(): void;

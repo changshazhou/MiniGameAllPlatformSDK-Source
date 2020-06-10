@@ -68,6 +68,7 @@ export default class PlatformModule extends BaseModule {
 
     public videoCb: Function = null;
     public videoLoading: boolean = false;
+    public videoPlaying: boolean = false;
 
     public interShowCount: number = 0;
     public interShowCountLimit: number = 3;
@@ -1033,6 +1034,30 @@ export default class PlatformModule extends BaseModule {
         })
     }
 
+
+    /**
+     * 连续不断的显示和隐藏 banner
+     */
+    public showIntervalBanner() {
+        console.log('执行 showIntervalBanner')
+        moosnow.http.getAllConfig(res => {
+            let gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
+            let gameBanner = res && res.gameBanner == 1 ? true : false;
+            this.schedule(this.showAutoBanner, gameBannerInterval)
+        })
+    }
+    /**
+     * 取消banner
+     */
+    public clearIntervalBanner() {
+        console.log('执行 clearIntervalBanner')
+        this.unschedule(this.showAutoBanner)
+    }
+
+
+    /**
+     * 隐藏banner
+     */
     public hideBanner() {
         console.log('隐藏banner')
         if (!this.isBannerShow)
@@ -1099,6 +1124,7 @@ export default class PlatformModule extends BaseModule {
         this.video.onClose(this._onVideoClose);
         this.video.onLoad(this._onVideoLoad);
         moosnow.platform.videoLoading = true;
+        this.videoPlaying = false;
         this.video.load()
             .then(() => {
                 if (show) {
@@ -1116,6 +1142,7 @@ export default class PlatformModule extends BaseModule {
     public _onVideoError(msg, code) {
         console.log('加载video失败回调', msg, code)
         moosnow.platform.videoLoading = false;
+        this.videoPlaying = false;
         if (moosnow.platform.videoCb) {
             moosnow.platform.videoCb(VIDEO_STATUS.ERR);
             moosnow.platform.videoCb = null;
@@ -1125,6 +1152,7 @@ export default class PlatformModule extends BaseModule {
     public _onVideoClose(isEnd) {
         console.log('video结束回调', isEnd.isEnded)
         moosnow.platform.videoLoading = false;
+        this.videoPlaying = false;
         if (!!isEnd.isEnded) {
             moosnow.http.clickVideo();
         }
@@ -1140,7 +1168,10 @@ export default class PlatformModule extends BaseModule {
         console.log('加载video成功回调')
         moosnow.platform.videoLoading = false;
     }
-
+    /**
+     * 唤起视频
+     * @param completeCallback 
+     */
     public showVideo(completeCallback = null) {
 
         console.log('显示video')

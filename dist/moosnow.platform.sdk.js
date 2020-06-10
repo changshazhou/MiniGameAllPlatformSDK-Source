@@ -658,6 +658,7 @@
             _this.isBannerShow = false;
             _this.videoCb = null;
             _this.videoLoading = false;
+            _this.videoPlaying = false;
             _this.interShowCount = 0;
             _this.interShowCountLimit = 3;
             _this.isInterLoaded = false;
@@ -1589,6 +1590,28 @@
                 }
             });
         };
+        /**
+         * 连续不断的显示和隐藏 banner
+         */
+        PlatformModule.prototype.showIntervalBanner = function () {
+            var _this = this;
+            console.log('执行 showIntervalBanner');
+            moosnow.http.getAllConfig(function (res) {
+                var gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
+                var gameBanner = res && res.gameBanner == 1 ? true : false;
+                _this.schedule(_this.showAutoBanner, gameBannerInterval);
+            });
+        };
+        /**
+         * 取消banner
+         */
+        PlatformModule.prototype.clearIntervalBanner = function () {
+            console.log('执行 clearIntervalBanner');
+            this.unschedule(this.showAutoBanner);
+        };
+        /**
+         * 隐藏banner
+         */
         PlatformModule.prototype.hideBanner = function () {
             console.log('隐藏banner');
             if (!this.isBannerShow)
@@ -1655,6 +1678,7 @@
             this.video.onClose(this._onVideoClose);
             this.video.onLoad(this._onVideoLoad);
             moosnow.platform.videoLoading = true;
+            this.videoPlaying = false;
             this.video.load()
                 .then(function () {
                 if (show) {
@@ -1671,6 +1695,7 @@
         PlatformModule.prototype._onVideoError = function (msg, code) {
             console.log('加载video失败回调', msg, code);
             moosnow.platform.videoLoading = false;
+            this.videoPlaying = false;
             if (moosnow.platform.videoCb) {
                 moosnow.platform.videoCb(VIDEO_STATUS.ERR);
                 moosnow.platform.videoCb = null;
@@ -1679,6 +1704,7 @@
         PlatformModule.prototype._onVideoClose = function (isEnd) {
             console.log('video结束回调', isEnd.isEnded);
             moosnow.platform.videoLoading = false;
+            this.videoPlaying = false;
             if (!!isEnd.isEnded) {
                 moosnow.http.clickVideo();
             }
@@ -1693,6 +1719,10 @@
             console.log('加载video成功回调');
             moosnow.platform.videoLoading = false;
         };
+        /**
+         * 唤起视频
+         * @param completeCallback
+         */
         PlatformModule.prototype.showVideo = function (completeCallback) {
             if (completeCallback === void 0) { completeCallback = null; }
             console.log('显示video');
@@ -5164,32 +5194,30 @@
             if (!window[this.platformName].createRewardedVideoAd) {
                 return;
             }
-            if (this.video) {
-                this.video.offClose(this._onVideoClose);
-                this.video.offError(this._onVideoError);
-                this.video.offLoad(this._onVideoLoad);
+            if (Common.isEmpty(this.videoId)) {
+                console.warn(' video id is null');
+                return;
             }
-            else {
-                if (Common.isEmpty(this.videoId)) {
-                    console.warn(' video id is null');
-                    return;
-                }
+            if (!this.video) {
+                moosnow.platform.videoLoading = true;
                 this.video = window[this.platformName].createRewardedVideoAd({
                     posId: this.videoId
                 });
+                this.video.onError(this._onVideoError.bind(this));
+                this.video.onClose(this._onVideoClose.bind(this));
+                this.video.onLoad(this._onVideoLoad.bind(this));
             }
-            this.video.onError(this._onVideoError.bind(this));
-            this.video.onClose(this._onVideoClose.bind(this));
-            this.video.onLoad(this._onVideoLoad.bind(this));
-            moosnow.platform.videoLoading = true;
-            this.video.load();
+            else
+                this.video.load();
         };
         VIVOModule.prototype._onVideoLoad = function () {
+            var _this = this;
             console.log('加载video成功回调');
             moosnow.platform.videoLoading = false;
             if (this.video) {
                 this.video.show()
                     .then(function () {
+                    _this.videoPlaying = true;
                     moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_HIDE, {});
                     console.log('激励视频广告展示完成');
                 }).catch(function (err) {
@@ -5200,6 +5228,7 @@
         VIVOModule.prototype._onVideoClose = function (isEnd) {
             console.log('video结束回调', isEnd.isEnded);
             moosnow.platform.videoLoading = false;
+            this.videoPlaying = false;
             if (!!isEnd.isEnded) {
                 moosnow.http.clickVideo();
             }
@@ -7489,6 +7518,11 @@
         UIForm.prototype.showAd = function (adType, callback, zIndex) {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = 999; }
+            //
+            if (moosnow.getAppPlatform() == moosnow.APP_PLATFORM.BYTEDANCE && moosnow.platform.isIphone()) {
+                console.log('头条iphone 不显示广告');
+                return;
+            }
             var adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
             if (adForm) {
                 adForm.node.zIndex = zIndex;
