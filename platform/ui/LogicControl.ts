@@ -17,6 +17,8 @@ import PrizeFormTT from "./engine/PrizeFormTT";
 import CocosPrizeFormTT from "./cocos/CocosPrizeFormTT";
 import CoinForm from "./engine/CoinForm";
 import CocosCoinForm from "./cocos/CocosCoinForm";
+import TotalForm from "./engine/TotalForm";
+import CocosTotalForm from "./cocos/CocosTotalForm";
 
 /**
  * 页面逻辑控制
@@ -93,5 +95,16 @@ export default class LogicControl {
         if (!this.mCoinForm)
             this.mCoinForm = new CocosCoinForm();
         return this.mCoinForm;
+    }
+
+
+    private mTotalForm: TotalForm
+    /**
+    * 金币
+    */
+    public get totalForm(): TotalForm {
+        if (!this.mTotalForm)
+            this.mTotalForm = new CocosTotalForm();
+        return this.mTotalForm;
     }
 }

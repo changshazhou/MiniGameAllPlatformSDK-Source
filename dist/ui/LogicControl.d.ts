@@ -7,6 +7,7 @@ import AdViewItem from "./engine/AdViewItem";
 import PrizeForm from "./engine/prizeForm";
 import PrizeFormTT from "./engine/PrizeFormTT";
 import CoinForm from "./engine/CoinForm";
+import TotalForm from "./engine/TotalForm";
 /**
  * 页面逻辑控制
  */
@@ -35,4 +36,9 @@ export default class LogicControl {
     * 金币
     */
     get coinForm(): CoinForm;
+    private mTotalForm;
+    /**
+    * 金币
+    */
+    get totalForm(): TotalForm;
 }

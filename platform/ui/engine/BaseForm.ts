@@ -18,7 +18,7 @@ export default class BaseForm extends BaseModule {
      * @param logic 
      */
     initForm(logic) {
-
+        this.initProperty(logic);
     }
 
     willShow(data?) {

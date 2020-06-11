@@ -39,4 +39,16 @@ export default class UIForm {
      * @param callback
      */
     showPrize(style: coinAnimStyle, baseNum: number, showCoinAnim: boolean, callback: Function): void;
+    /**
+     * 显示结算统计页
+     * @param coinNum
+     * @param callback
+     */
+    showTotal(coinNum: number, callback: Function): void;
+    /**
+    * 显示结算统计页
+    * @param coinNum
+    * @param callback
+    */
+    showEnd(coinNum: number, callback: Function): void;
 }

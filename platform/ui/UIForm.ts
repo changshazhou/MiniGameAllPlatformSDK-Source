@@ -106,4 +106,36 @@ export default class UIForm {
 
         })
     }
+
+
+    /**
+     * 显示结算统计页
+     * @param coinNum 
+     * @param callback 
+     */
+    public showTotal(coinNum: number, callback: Function) {
+        moosnow.ui.pushUIForm(UIForms.TotalForm, {
+            coinNum: coinNum,
+            onReceive: () => {
+                if (callback)
+                    callback();
+            }
+        })
+    }
+
+
+    /**
+    * 显示结算统计页
+    * @param coinNum 
+    * @param callback 
+    */
+    public showEnd(coinNum: number, callback: Function) {
+        moosnow.ui.pushUIForm(UIForms.EndForm, {
+            coinNum: coinNum,
+            onReceive: () => {
+                if (callback)
+                    callback();
+            }
+        })
+    }
 }
