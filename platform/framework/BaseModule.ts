@@ -59,7 +59,7 @@ export default class BaseModule {
         let retValue = null;
         for (let i = 0; i < node._components.length; i++) {
             let logic = node._components[i];
-            if (this._findComponentByName(logic.constructor, classname)) {
+            if (logic.willHide && logic.willShow) {
                 retValue = logic;
                 break;
             }
