@@ -2,6 +2,9 @@ import EventType from "../utils/EventType";
 import UIForms from "../config/UIForms";
 import { AD_POSITION } from "../enum/AD_POSITION";
 import coinAnimStyle from "../model/coinAnimStyle";
+import showTotalOptions from "../model/showTotalOptions";
+import showEndOptions from "../model/showEndOptions";
+import showTouchOptions from "../model/showTouchOptions";
 
 /**
  * 广告结果
@@ -37,14 +40,14 @@ export default class UIForm {
         }
         let adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
         if (adForm) {
+            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
             adForm.node.zIndex = zIndex;
-            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback })
         }
         else {
             moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, () => {
                 let adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
                 adForm.node.zIndex = zIndex;
-                moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback })
+                moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
             });
 
         }
@@ -75,13 +78,10 @@ export default class UIForm {
      * @param callback 点击完成回调
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
-    public showMistouch(callback: Function, type: number = 1) {
+    public showMistouch(options: showTouchOptions) {
         moosnow.ui.pushUIForm(UIForms.MistouchForm, {
-            mistouchType: type == 2 ? 4 : 1,
-            onCompleted: () => {
-                if (callback)
-                    callback();
-            }
+            mistouchType: options.type == 2 ? 4 : 1,
+            onCompleted: options.onCompleted
         }, () => {
 
         })
@@ -113,14 +113,8 @@ export default class UIForm {
      * @param coinNum 
      * @param callback 
      */
-    public showTotal(coinNum: number, callback: Function) {
-        moosnow.ui.pushUIForm(UIForms.TotalForm, {
-            coinNum: coinNum,
-            onReceive: () => {
-                if (callback)
-                    callback();
-            }
-        })
+    public showTotal(options: showTotalOptions) {
+        moosnow.ui.pushUIForm(UIForms.TotalForm, options)
     }
 
 
@@ -129,13 +123,7 @@ export default class UIForm {
     * @param coinNum 
     * @param callback 
     */
-    public showEnd(coinNum: number, callback: Function) {
-        moosnow.ui.pushUIForm(UIForms.EndForm, {
-            coinNum: coinNum,
-            onReceive: () => {
-                if (callback)
-                    callback();
-            }
-        })
+    public showEnd(options: showEndOptions) {
+        moosnow.ui.pushUIForm(UIForms.EndForm, options)
     }
 }

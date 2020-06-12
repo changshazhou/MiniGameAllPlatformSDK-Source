@@ -1,4 +1,7 @@
 import coinAnimStyle from "../model/coinAnimStyle";
+import showTotalOptions from "../model/showTotalOptions";
+import showEndOptions from "../model/showEndOptions";
+import showTouchOptions from "../model/showTouchOptions";
 /**
  * 广告结果
  */
@@ -30,7 +33,7 @@ export default class UIForm {
      * @param callback 点击完成回调
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
-    showMistouch(callback: Function, type?: number): void;
+    showMistouch(options: showTouchOptions): void;
     /**
      * 显示奖励
      * @param style 金币动画
@@ -44,11 +47,11 @@ export default class UIForm {
      * @param coinNum
      * @param callback
      */
-    showTotal(coinNum: number, callback: Function): void;
+    showTotal(options: showTotalOptions): void;
     /**
     * 显示结算统计页
     * @param coinNum
     * @param callback
     */
-    showEnd(coinNum: number, callback: Function): void;
+    showEnd(options: showEndOptions): void;
 }

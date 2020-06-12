@@ -3,7 +3,7 @@ import BaseModule from "../../framework/BaseModule";
 
 export default class BaseForm extends BaseModule {
 
-    private mFormData: any;
+    public mFormData: any;
 
 
     /**

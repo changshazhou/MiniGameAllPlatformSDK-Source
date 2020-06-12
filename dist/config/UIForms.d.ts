@@ -1,6 +1,6 @@
 export default class UIForms {
     private static get mapping();
-    private static convertUIName;
+    static convertUIName(mappingForm: any): any;
     static get AdForm(): any;
     static HomeForm: string;
     static SkinForm: string;

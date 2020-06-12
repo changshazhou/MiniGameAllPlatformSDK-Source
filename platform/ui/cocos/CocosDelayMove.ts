@@ -8,14 +8,14 @@ export default class CocosDelayMove extends DelayMove {
     public distince: number = -100;
     public showBanner: boolean = true;
 
-    public pos1: cc.Vec2;
-    public pos2: cc.Vec2;
+    public pos1: cc.Vec2 = cc.Vec2.ZERO;
+    public pos2: cc.Vec2 = cc.Vec2.ZERO;
 
     public initPos() {
-        if (!this.pos1)
+        if (this.pos1.x == 0 && this.pos1.y == 0) {
             this.pos1 = this.moveNode.position.clone();
-        if (!this.pos2)
             this.pos2 = this.pos1.add(new cc.Vec2(0, this.distince))
+        }
     }
 
 
@@ -25,6 +25,7 @@ export default class CocosDelayMove extends DelayMove {
         this.moveNode.parent.addChild(tempButtom)
         tempButtom.x = this.pos2.x;
         tempButtom.y = this.pos2.y;
+        return tempButtom;
     }
 
     public removeTemp(tempButtom) {

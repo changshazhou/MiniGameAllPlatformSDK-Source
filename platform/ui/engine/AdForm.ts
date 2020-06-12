@@ -53,6 +53,22 @@ export default class AdForm extends BaseForm {
     public btnSideShow: any = null;
     public btnSideHide: any = null;
 
+    public extend1Container: any = null;
+    public extend1View: any = null;
+    public extend1Layout: any = null;
+
+    public extend2Container: any = null;
+    public extend2View: any = null;
+    public extend2Layout: any = null;
+
+    public extend3Container: any = null;
+    public extend3View: any = null;
+    public extend3Layout: any = null;
+
+    public extend4Container: any = null;
+    public extend4View: any = null;
+    public extend4Layout: any = null;
+
 
     private mAdItemList = [];
     public setPosition(source: Array<moosnowAdRow>, position: string = ""): Array<moosnowAdRow> {
@@ -401,12 +417,21 @@ export default class AdForm extends BaseForm {
 
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
 
+
+
+        this.extend1Container.active = visible && this.hasAd(AD_POSITION.EXTEND1);
+        this.extend2Container.active = visible && this.hasAd(AD_POSITION.EXTEND2);
+        this.extend3Container.active = visible && this.hasAd(AD_POSITION.EXTEND3);
+        this.extend4Container.active = visible && this.hasAd(AD_POSITION.EXTEND4);
+
+
+
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;
 
         this.unschedule(this.showExportClose)
 
-        if (this.hasAd(AD_POSITION.BACK)) {
+        if (visible && this.hasAd(AD_POSITION.BACK)) {
             if (this.hasAd(AD_POSITION.WAIT)) {
                 this.mSecond = 3;
                 this.showExportClose();

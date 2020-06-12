@@ -43,6 +43,18 @@ export default class AdForm extends BaseForm {
     sideLayout: any;
     btnSideShow: any;
     btnSideHide: any;
+    extend1Container: any;
+    extend1View: any;
+    extend1Layout: any;
+    extend2Container: any;
+    extend2View: any;
+    extend2Layout: any;
+    extend3Container: any;
+    extend3View: any;
+    extend3Layout: any;
+    extend4Container: any;
+    extend4View: any;
+    extend4Layout: any;
     private mAdItemList;
     setPosition(source: Array<moosnowAdRow>, position?: string): Array<moosnowAdRow>;
     loadAd(entityName: string | cc.Prefab, callback: Function): void;

@@ -29,10 +29,11 @@ import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
 import { CocosEntityModule } from "./ui/cocos/CocosEntityModule";
 import { CocosUIModule } from "./ui/cocos/CocosUIModule";
-// import LogicControl from "./ui/LogicControl";
+import LogicControl from "./ui/LogicControl";
 import UIForm from "./ui/UIForm";
 import Delay from "./framework/Delay";
 import ResourceModule from "./framework/ResourceModule";
+import AudioModule from "./framework/AudioModule";
 
 class moosnowEntry {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -180,13 +181,13 @@ class moosnowEntry {
         return this.mForm;
     }
 
-    // /**
-    //  * form表单控制
-    //  */
-    // private mControl: LogicControl = new LogicControl();
-    // public get control() {
-    //     return this.mControl;
-    // }
+    /**
+     * form表单控制
+     */
+    private mControl: LogicControl = new LogicControl();
+    public get control() {
+        return this.mControl;
+    }
 
 
 
@@ -195,6 +196,13 @@ class moosnowEntry {
         return this.mEntity;
     }
 
+    private mAudio: AudioModule = null;
+    public get audio() {
+        return this.mAudio;
+    }
+    public set audio(value: AudioModule) {
+        this.mAudio = value;
+    }
 
 
     private mDelay: Delay = new Delay();

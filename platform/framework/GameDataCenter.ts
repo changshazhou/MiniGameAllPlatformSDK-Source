@@ -8,6 +8,7 @@ export default class GameDataCenter extends BaseModule {
     private COIN: string = "COIN";
 
     private mUserToken: string = "";
+    private VIBRATE_SWITCH: string = "VIBRATE_SWITCH";
 
     private mCoin: number = 0;
     /***********
@@ -75,4 +76,14 @@ export default class GameDataCenter extends BaseModule {
     setChannelAppId(value) {
         this.mChannel_appid = value
     }
+    
+    //振动
+    getVibrateSetting(): boolean {
+        return moosnow.setting.getBool(this.VIBRATE_SWITCH, true);
+    }
+    setVibrateSetting(on: boolean) {
+        moosnow.setting.setBool(this.VIBRATE_SWITCH, on);
+        moosnow.event.sendEventImmediately(EventType.VIBRATESWITCH_CHANGED, on);
+    }
+
 }

@@ -3,6 +3,7 @@ export default class GameDataCenter extends BaseModule {
     private TOKEN;
     private COIN;
     private mUserToken;
+    private VIBRATE_SWITCH;
     private mCoin;
     /***********
      * 金币
@@ -24,4 +25,6 @@ export default class GameDataCenter extends BaseModule {
     private mChannel_appid;
     getChannelAppId(): string;
     setChannelAppId(value: any): void;
+    getVibrateSetting(): boolean;
+    setVibrateSetting(on: boolean): void;
 }

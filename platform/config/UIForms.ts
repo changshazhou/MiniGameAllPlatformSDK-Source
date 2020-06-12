@@ -48,7 +48,7 @@ export default class UIForms {
     }
 
 
-    private static convertUIName(mappingForm) {
+    public static convertUIName(mappingForm) {
         if (!mappingForm) {
             console.warn(`convertUIName fail  mappingForm is null `)
             return null;

@@ -60,8 +60,10 @@ export default class DelayMove extends BaseModule {
         else {
             let count = moosnow.data.getCurrentMisTouchCount()
             if (count % this.mMistouchPosNum == 0) {
-                this.copyNode();
-                this.schedule(this.onPosCallback, this.mMistouchPosSecond)
+                let tempButtom = this.copyNode();
+                this.scheduleOnce(() => {
+                    this.onPosCallback(tempButtom)
+                }, this.mMistouchPosSecond)
             }
         }
     }
@@ -79,7 +81,7 @@ export default class DelayMove extends BaseModule {
         this.moveNode.x = this.pos1.x;
         this.moveNode.y = this.pos1.y;
 
-        this.unschedule(this.onPosCallback)
+        this.unscheduleOnce(this.onPosCallback)
     }
 
     public removeTemp(tempButtom) {

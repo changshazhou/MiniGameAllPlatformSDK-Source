@@ -29,12 +29,6 @@ export default class Common {
         }
         return newObj;//返回排好序的新对象
     }
-    static isWeChat() {
-        return !!window["wx"];
-    }
-    static isQQPlay() {
-        return false
-    }
     static isObject(x) {
         var type = typeof x;
         return x !== null && (type === 'object' || type === 'function');
@@ -206,11 +200,11 @@ export default class Common {
         return objClone;
     }
 
-    static getEngine(instance) {
-        if (window[ENGINE_TYPE.COCOS] && typeof instance != "string") {
+    static getEngine() {
+        if (window[ENGINE_TYPE.COCOS]) {
             return ENGINE_TYPE.COCOS
         }
-        else if (window[ENGINE_TYPE.LAYA] && typeof instance != "string") {
+        else if (window[ENGINE_TYPE.LAYA]) {
             return ENGINE_TYPE.LAYA
         }
         else
@@ -219,7 +213,7 @@ export default class Common {
 
 
     static popOpenAnim(node: cc.Node, callback?: Function) {
-        if (this.getEngine(node) == ENGINE_TYPE.COCOS) {
+        if (this.getEngine() == ENGINE_TYPE.COCOS) {
             node.scale = 0.8;
             node.runAction(
                 cc.sequence(
@@ -238,7 +232,7 @@ export default class Common {
     }
 
     static popCloseAnim(node: cc.Node, callback?: Function) {
-        if (this.getEngine(node) == ENGINE_TYPE.COCOS) {
+        if (this.getEngine() == ENGINE_TYPE.COCOS) {
             node.scale = 1;
             node.runAction(cc.sequence(
                 cc.scaleTo(0.1, 0, 0),

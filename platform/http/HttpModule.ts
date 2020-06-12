@@ -43,7 +43,7 @@ export class HttpModule extends BaseModule {
         }
         else if (Common.platform == PlatformType.WX && window["wx"]) {
             this.request(versionUrl, {}, 'GET', (res) => {
-                if (!window["aldVersion"] || (window["aldVersion"] && window["aldVersion"] < res.aldVersion))
+                if (!window["wx"]["aldVersion"] || (window["wx"]["aldVersion"] && window["wx"]["aldVersion"] < res.aldVersion))
                     console.error(`阿拉丁文件错误，请重新下载${res.aldUrl}`)
             })
         }

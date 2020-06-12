@@ -13,6 +13,8 @@ import BaseEntityModule from "./ui/engine/BaseEntityModule";
 import LogicControl from "./ui/LogicControl";
 import UIForm from "./ui/UIForm";
 import Delay from "./framework/Delay";
+import AudioModule from "./framework/AudioModule";
+import ResourceModule from "./framework/ResourceModule";
 declare global {
     class moosnow {
         static VIDEO_STATUS: {
@@ -40,7 +42,7 @@ declare global {
             LINK: string;
         };
         static Common: typeof Common;
-        static EVENT_TYPE: typeof EventType;
+        static PLATFORM_EVENT: typeof EventType;
         static APP_PLATFORM: typeof PlatformType;
         static AD_POSITION: typeof AD_POSITION;
         static getAppPlatform(): PlatformType
@@ -55,5 +57,7 @@ declare global {
         static form: UIForm
         static control: LogicControl
         static delay: Delay
+        static audio: AudioModule
+        static resource: ResourceModule
     }
 }

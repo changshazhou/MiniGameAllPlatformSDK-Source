@@ -31,7 +31,7 @@ export class CocosEntityModule extends BaseEntityModule {
 
     public _createEntity(name) {
         let prefab
-        if (Common.getEngine(name) == ENGINE_TYPE.NONE)
+        if (Common.isString(name))
             prefab = this._getPrefabByName(name);
         else
             prefab = name;
@@ -67,11 +67,11 @@ export class CocosEntityModule extends BaseEntityModule {
 
     private _getPoolName(name) {
         let poolName = "";
-        let engine = Common.getEngine(name);
-        if (engine == ENGINE_TYPE.COCOS) {
+        let engine = Common.getEngine();
+        if (engine == ENGINE_TYPE.COCOS && Common.isObject(name)) {
             poolName = (name as any).name
         }
-        else if (engine == ENGINE_TYPE.LAYA) {
+        else if (engine == ENGINE_TYPE.LAYA && Common.isObject(name)) {
             poolName = (name as any).json.name
         }
         else

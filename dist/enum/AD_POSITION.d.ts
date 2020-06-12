@@ -32,6 +32,10 @@ export declare const AD_POSITION: {
     */
     EXPORT_FIXED: number;
     /**
+    * 扩展1
+    */
+    EXTEND1: number;
+    /**
     * 扩展2
     */
     EXTEND2: number;
@@ -43,8 +47,4 @@ export declare const AD_POSITION: {
     * 扩展4
     */
     EXTEND4: number;
-    /**
-    * 扩展5
-    */
-    EXTEND5: number;
 };

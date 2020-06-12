@@ -1,5 +1,5 @@
 ! function () {
-    window["aldVersion"] = "1.0.0";
+    wx["aldVersion"] = "1.0.0";
     var isShow = null;
     function e() {
         this.request = [], this.push = function (e) {

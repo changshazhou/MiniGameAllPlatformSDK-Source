@@ -10,7 +10,7 @@ export default class AudioModule extends BaseModule {
     private _musicLoops;
     private _musicComplete;
     /**
-     * 播放背景音乐
+     * 播放背景音乐 仅支持Laya cocos
      * @param audioClip cocos cc.AudioClip  laya 文件路径
      * @param loops
      * @param complete

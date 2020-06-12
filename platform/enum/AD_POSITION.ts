@@ -36,20 +36,20 @@ export const AD_POSITION = {
     EXPORT_FIXED: 512,
 
     /**
+    * 扩展1
+    */
+    EXTEND1: 1024,
+    /**
     * 扩展2
     */
-    EXTEND2: 1024,
+    EXTEND2: 2048,
     /**
     * 扩展3
     */
-    EXTEND3: 2048,
+    EXTEND3: 4096,
     /**
     * 扩展4
     */
-    EXTEND4: 4096,
-    /**
-    * 扩展5
-    */
-    EXTEND5: 8192,
+    EXTEND4: 8192,
 
 }

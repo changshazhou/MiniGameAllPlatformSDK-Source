@@ -4,6 +4,7 @@ export default class BaseModule {
     protected moduleName: string = "";
 
     private mIntervalArr: Object = {};
+    private mTimeoutArr: Object = {};
     public schedule(callback: Function, time: number) {
         let self = this;
         let id = setInterval(() => {
@@ -28,6 +29,14 @@ export default class BaseModule {
                 callback.apply(self)
 
         }, time * 1000)
+        this.mTimeoutArr[id] = callback;
+    }
+    public unscheduleOnce(callback) {
+        for (let key in this.mTimeoutArr) {
+            if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
+                clearTimeout(parseInt(key))
+            }
+        }
     }
 
     public initProperty(form) {

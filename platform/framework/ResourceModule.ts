@@ -22,7 +22,7 @@ export default class ResourceModule extends BaseModule {
      */
     loadAsset(url, assetType, callback) {
 
-        if (Common.getEngine("") == ENGINE_TYPE.COCOS) {
+        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
             let res = cc.loader.getRes(url, assetType);
             if (res) {
                 if (callback) {
@@ -36,7 +36,7 @@ export default class ResourceModule extends BaseModule {
                 }
             });
         }
-        else if (Common.getEngine("") == ENGINE_TYPE.LAYA) {
+        else if (Common.getEngine() == ENGINE_TYPE.LAYA) {
             let res = Laya.loader.getRes(url);
             if (res) {
                 if (callback) {
@@ -59,7 +59,7 @@ export default class ResourceModule extends BaseModule {
     * @param {Function} completeCallback (err:Error,reses:Asset[])
     */
     loadAssetDir(dir, type, progressCallback, completeCallback) {
-        if (Common.getEngine("") == ENGINE_TYPE.COCOS) {
+        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
             cc.loader.loadResDir(dir, type, (completedCount, totalCount, item) => {
                 let precent = completedCount / totalCount * 100;
                 precent = Math.ceil(precent);

@@ -1,5 +1,5 @@
 window.moosnowConfig = {
-    debug: "oppo",
+    debug: "wx",
     /**
      * 微信平台
      */

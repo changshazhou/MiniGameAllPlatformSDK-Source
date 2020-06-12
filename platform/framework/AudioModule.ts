@@ -67,7 +67,7 @@ export default class AudioModule extends BaseModule {
         this._musicLoops = loops;
         this._musicComplete = complete;
 
-        if (Common.getEngine("") == ENGINE_TYPE.COCOS) {
+        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
             let soundId = cc.audioEngine.playMusic(audioClip as cc.AudioClip, loops);
             cc.audioEngine.setFinishCallback(soundId, (res) => {
                 if (complete) {
@@ -76,7 +76,7 @@ export default class AudioModule extends BaseModule {
             })
             return soundId
         }
-        else if (Common.getEngine("") == ENGINE_TYPE.LAYA) {
+        else if (Common.getEngine() == ENGINE_TYPE.LAYA) {
             Laya.SoundManager.playMusic("" + audioClip, 1, new Laya.Handler(this, (res) => {
                 if (complete) {
                     complete(res);
@@ -90,9 +90,9 @@ export default class AudioModule extends BaseModule {
     public stopMusic() {
         // if (this.mMusicId)
         //     cc.audioEngine.stop(this.mMusicId)
-        if (Common.getEngine("") == ENGINE_TYPE.COCOS)
+        if (Common.getEngine() == ENGINE_TYPE.COCOS)
             cc.audioEngine.stopMusic()
-        else if (Common.getEngine("") == ENGINE_TYPE.LAYA)
+        else if (Common.getEngine() == ENGINE_TYPE.LAYA)
             Laya.SoundManager.stopMusic();
 
     }

@@ -1,4 +1,7 @@
 export default class EventType {
+    static readonly VIBRATESWITCH_CHANGED: string;
+    static readonly SOUNDSWITCH_CHANGED: string;
+    static readonly MUSICSWITCH_CHANGED: string;
     static readonly ON_PLATFORM_SHOW: string;
     static readonly ON_PLATFORM_HIDE: string;
     static readonly ON_BANNER_HIDE: string;
