@@ -1,4 +1,5 @@
 import BaseForm from "./BaseForm";
+import showPrizeOptions from "../../model/showPrizeOptions";
 export default class PrizeFormTT extends BaseForm {
     prizeBg1: cc.Node;
     prizeBg2: cc.Node;
@@ -10,7 +11,8 @@ export default class PrizeFormTT extends BaseForm {
     checked: cc.Node;
     unchecked: cc.Node;
     isMask: boolean;
-    private mChecked;
+    mChecked: boolean;
+    get FormData(): showPrizeOptions;
     initForm(logic: any): void;
     willShow(data: any): void;
     onHide(): void;
@@ -24,10 +26,8 @@ export default class PrizeFormTT extends BaseForm {
     addListener(): void;
     removeListener(): void;
     closeForm(): void;
-    private onChecked;
-    private onShare;
-    private onReceive;
-    private onVideo;
-    private getCoinNum;
-    private addCoin;
+    onChecked(): void;
+    onShare(): void;
+    onReceive(): void;
+    onVideo(): void;
 }

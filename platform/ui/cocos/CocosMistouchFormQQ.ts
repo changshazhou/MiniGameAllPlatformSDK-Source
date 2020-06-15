@@ -4,6 +4,7 @@ import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIForms from "../../config/UIForms";
 import MistouchFormQQ from "../engine/MistouchFormQQ";
+import CocosNodeEvent from "./CocosNodeEvent";
 
 export default class CocosMistouchFormQQ extends MistouchFormQQ {
     clickProgress: any = null;
@@ -36,14 +37,14 @@ export default class CocosMistouchFormQQ extends MistouchFormQQ {
         //误触appbox 广告
         if (this.mistouchAppBox()) {
             this.btnBanner.active = false;
-            this.logo.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this);
-            this.logo.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this);
+            this.logo.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this);
+            this.logo.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this);
         }
         else {
             //误触banner
             this.btnBanner.active = true;
-            this.btnBanner.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this);
-            this.btnBanner.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this);
+            this.btnBanner.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this);
+            this.btnBanner.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this);
         }
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, () => {
             if (this.mBannerShow)
@@ -51,7 +52,7 @@ export default class CocosMistouchFormQQ extends MistouchFormQQ {
         })
     }
     public removeEvent() {
-        this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
+        this.btnBanner.off(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
         moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
     }
 

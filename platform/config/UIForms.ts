@@ -2,7 +2,6 @@ export default class UIForms {
 
 
     private static get mapping() {
-
         return {
             adForm: {
                 [moosnow.APP_PLATFORM.WX]: "adForm"
@@ -42,13 +41,31 @@ export default class UIForms {
             },
             mistouchForm: {
                 [moosnow.APP_PLATFORM.WX]: "mistouchForm",
-                [moosnow.APP_PLATFORM.QQ]: "mistouchFormQQ"
+                [moosnow.APP_PLATFORM.QQ]: "mistouchFormQQ",
+                [moosnow.APP_PLATFORM.BYTEDANCE]: "mistouchFormTT"
             },
+            prizeForm: {
+                [moosnow.APP_PLATFORM.BYTEDANCE]: "prizeFormTT",
+                [moosnow.APP_PLATFORM.QQ]: "prizeForm"
+            },
+            shareForm: {
+                [moosnow.APP_PLATFORM.WX]: "shareFormTT",
+                [moosnow.APP_PLATFORM.BYTEDANCE]: "shareFormTT"
+            },
+            setForm: {
+                [moosnow.APP_PLATFORM.WX]: "setForm",
+            },
+            toastForm: {
+                [moosnow.APP_PLATFORM.WX]: "toastForm",
+            },
+            coinForm: {
+                [moosnow.APP_PLATFORM.WX]: "coinForm",
+            }
         }
     }
 
 
-    public static convertUIName(mappingForm) {
+    private static convertUIName(mappingForm) {
         if (!mappingForm) {
             console.warn(`convertUIName fail  mappingForm is null `)
             return null;
@@ -68,14 +85,15 @@ export default class UIForms {
     public static get AdForm() {
         return this.convertUIName(this.mapping.adForm)
     }
-    public static HomeForm = "homeForm";
-    public static SkinForm = "skinForm";
-    public static GameForm = "gameForm";
-    public static CoinForm = "coinForm";
-    public static PrevHomeForm = "prevHomeForm";
-    /**
-     * 结算页
-     */
+
+    public static get CoinForm() {
+        return this.convertUIName(this.mapping.coinForm)
+    }
+
+    public static get ShareForm() {
+        return this.convertUIName(this.mapping.shareForm)
+    };
+
     public static get TotalForm() {
         return this.convertUIName(this.mapping.totalForm)
     };
@@ -85,16 +103,21 @@ export default class UIForms {
     public static get EndForm() {
         return this.convertUIName(this.mapping.endForm)
     }
-    public static ToastForm = "toastForm";
-
+    public static get ToastForm() {
+        return this.convertUIName(this.mapping.toastForm)
+    }
     public static get PauseForm() {
         return this.convertUIName(this.mapping.pauseForm)
     }
     public static get RespawnForm() {
         return this.convertUIName(this.mapping.respawnForm)
     }
-    public static SetForm = "setForm";
-    public static PrizeForm = "prizeForm";
+    public static get SetForm() {
+        return this.convertUIName(this.mapping.setForm)
+    };
+    public static get PrizeForm() {
+        return this.convertUIName(this.mapping.prizeForm)
+    };
 
 
     public static get MistouchForm() {

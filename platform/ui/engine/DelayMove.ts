@@ -12,16 +12,16 @@ export default class DelayMove extends BaseModule {
     public pos2: cc.Vec2 = cc.Vec2.ZERO;
 
     public mMistouchPosNum: number = 0;
-    public mMistouchPosSecond: number = 4;
+    public mMistouchPosSecond: number = 2;
 
     public initPos() {
 
     }
     /**
-     * 
-     * @param moveNode 
-     * @param distince 
-     * @param showBanner 
+     * 延迟移动
+     * @param moveNode  需要移动的节点
+     * @param distince 移动的距离
+     * @param showBanner 移动后是否显示 banner
      */
     public move(moveNode, distince, showBanner) {
 
@@ -33,9 +33,6 @@ export default class DelayMove extends BaseModule {
 
         let count = moosnow.data.getCurrentMisTouchCount();
         moosnow.data.setCurrentMisTouchCount(count + 1);
-
-        this.moveNode.active = false;
-
 
         moosnow.http.getAllConfig(res => {
             if (!isNaN(res.mistouchPosSecond))
@@ -49,11 +46,13 @@ export default class DelayMove extends BaseModule {
     }
 
 
+    public setPosition(node, visible, x, y) {
+
+    }
+
     public movePosition() {
         if (this.mMistouchPosNum == 0) {
-            this.moveNode.active = true;
-            this.moveNode.x = this.pos1.x;
-            this.moveNode.y = this.pos1.y;
+            this.setPosition(this.moveNode, true, this.pos1.x, this.pos1.y);
             if (this.showBanner)
                 moosnow.platform.showBanner();
         }
@@ -77,16 +76,12 @@ export default class DelayMove extends BaseModule {
             moosnow.platform.showBanner();
         this.removeTemp(tempButtom);
 
-        this.moveNode.active = true;
-        this.moveNode.x = this.pos1.x;
-        this.moveNode.y = this.pos1.y;
+        this.setPosition(this.moveNode, true, this.pos1.x, this.pos1.y);
 
         this.unscheduleOnce(this.onPosCallback)
     }
 
     public removeTemp(tempButtom) {
-        tempButtom.active = false;
-        tempButtom.removeFromParent();
-        tempButtom.destroy();
+
     }
 }

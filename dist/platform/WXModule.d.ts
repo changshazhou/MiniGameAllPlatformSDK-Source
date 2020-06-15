@@ -4,7 +4,6 @@ import PlatformModule from './PlatformModule';
  */
 export default class WXModule extends PlatformModule {
     platformName: string;
-    baseUrl: string;
     constructor();
     /**
      * 游戏登录

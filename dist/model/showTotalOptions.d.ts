@@ -1,8 +1,9 @@
 import showEndOptions from "./showEndOptions";
+import showOptions from "./showOptions";
 /**
  * 唤起结算页参数
  */
-export default class showTotalOptions {
+export default class showTotalOptions extends showOptions {
     /**
      * 金币数量
      */
@@ -28,19 +29,11 @@ export default class showTotalOptions {
      */
     onMore: Function;
     /**
-     * 扩展数据
-     */
-    extraData: Object;
-    /**
-     * 用户点击领取后是否隐藏当前页
-     */
-    hideTotal: boolean;
-    /**
      * 用户点击领取后是否打开结束页
      */
     showEnd: boolean;
     /**
      * 打开结束也时的参数 showEnd=true 时 必填
      */
-    endOptions: showEndOptions;
+    endOptions?: showEndOptions;
 }

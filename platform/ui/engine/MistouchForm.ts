@@ -2,6 +2,8 @@ import BaseForm from "../engine/BaseForm";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIForms from "../../config/UIForms";
 import Common from "../../utils/Common";
+import showTouchOptions from "../../model/showTouchOptions";
+import BaseModule from "../../framework/BaseModule";
 
 
 export default class MistouchForm extends BaseForm {
@@ -23,6 +25,10 @@ export default class MistouchForm extends BaseForm {
 
 
     public mBannerClickType: MISTOUCH_BANNER_TYPE = MISTOUCH_BANNER_TYPE.AUTO_HIDE;
+
+    public get FormData(): showTouchOptions {
+        return this.mFormData;
+    }
 
 
     public initPos() {
@@ -74,8 +80,8 @@ export default class MistouchForm extends BaseForm {
             this.unschedule(this.resetProgress)
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            if (this.FormData && this.FormData.onCompleted)
-                this.FormData.onCompleted();
+            if (this.FormData && this.FormData.callback)
+                this.FormData.callback();
         }
     }
 
@@ -86,7 +92,7 @@ export default class MistouchForm extends BaseForm {
         this.logo.position = this.mBeginPos;
     }
 
- 
+
     public onBannerClick() {
         this.onLogoDown();
 
@@ -115,8 +121,8 @@ export default class MistouchForm extends BaseForm {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
             moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
-            if (this.FormData && this.FormData.onCompleted)
-                this.FormData.onCompleted(true);
+            if (this.FormData && this.FormData.callback)
+                this.FormData.callback(true);
         }
     }
 

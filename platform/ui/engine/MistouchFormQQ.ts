@@ -4,6 +4,7 @@ import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIForms from "../../config/UIForms";
 import Common from "../../utils/Common";
+import BaseModule from "../../framework/BaseModule";
 
 export default class MistouchFormQQ extends MistouchForm {
     clickProgress: any = null;
@@ -50,7 +51,7 @@ export default class MistouchFormQQ extends MistouchForm {
     }
 
     public mistouchAppBox() {
-        return this.FormData && this.FormData.mistouchType == 4
+        return this.FormData && this.FormData.type == 2
     }
 
     public subProgress() {
@@ -111,8 +112,8 @@ export default class MistouchFormQQ extends MistouchForm {
             this.mBannerShow = false;
             this.scheduleOnce(() => {
                 moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
-                if (this.FormData && this.FormData.onCompleted)
-                    this.FormData.onCompleted();
+                if (this.FormData && this.FormData.callback)
+                    this.FormData.callback();
             }, 0.2)
 
         }

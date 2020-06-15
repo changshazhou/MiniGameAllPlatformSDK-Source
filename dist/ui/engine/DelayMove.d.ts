@@ -9,12 +9,13 @@ export default class DelayMove extends BaseModule {
     mMistouchPosSecond: number;
     initPos(): void;
     /**
-     *
-     * @param moveNode
-     * @param distince
-     * @param showBanner
+     * 延迟移动
+     * @param moveNode  需要移动的节点
+     * @param distince 移动的距离
+     * @param showBanner 移动后是否显示 banner
      */
     move(moveNode: any, distince: any, showBanner: any): void;
+    setPosition(node: any, visible: any, x: any, y: any): void;
     movePosition(): void;
     copyNode(): void;
     onPosCallback(tempButtom: any): void;

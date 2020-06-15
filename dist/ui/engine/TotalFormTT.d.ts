@@ -7,13 +7,12 @@ export default class totalFormTT extends BaseForm {
     levelCoin: cc.Label;
     txtMemo: cc.Label;
     isMask: boolean;
-    private mIsChecked;
+    mIsChecked: boolean;
     private mOpenVideo;
     addEvent(): void;
     removeEvent(): void;
-    private onHome;
-    private onShareChange;
-    private changeUI;
+    onShareChange(): void;
+    changeUI(): void;
     mLevelCoinNum: number;
     mLevelShareCoinNum: number;
     onShow(data: any): void;

@@ -959,12 +959,12 @@ export default class PlatformModule extends BaseModule {
 
 
     /**
-     * 
-     * @param callback 点击回调
-     * @param position banner的位置，默认底部
-     * @param style 自定义样式
-     */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+      * 
+      * @param callback 点击回调
+      * @param position banner的位置，默认底部
+      * @param style 自定义样式
+      */
+    public showBanner(callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log('显示banner')

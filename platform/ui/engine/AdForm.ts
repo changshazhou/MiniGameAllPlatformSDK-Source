@@ -5,6 +5,7 @@ import Common from "../../utils/Common";
 import moosnowAdRow from "../../model/moosnowAdRow";
 import moosnowResult from "../../model/moosnowResult";
 import AdViewItem from "./AdViewItem";
+import BaseModule from "../../framework/BaseModule";
 
 
 export default class AdForm extends BaseForm {

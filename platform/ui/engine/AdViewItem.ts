@@ -13,10 +13,10 @@ export default class AdViewItem extends BaseLogic {
 
     public mAdItem: moosnowAdRow;
     public initItem() {
-        this.logo.node.on(cc.Node.EventType.TOUCH_END, this.onClickAd, this)
+
     }
 
-    private onClickAd() {
+    public onClickAd() {
         let openAd = { ...this.mAdItem }
         if (this.changeView) {
             let nextAd = this.findNextAd();

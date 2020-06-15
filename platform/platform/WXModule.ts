@@ -6,7 +6,6 @@ import Common from '../utils/Common';
 export default class WXModule extends PlatformModule {
 
     public platformName: string = "wx";
-    public baseUrl = "https://api.liteplay.com.cn/";
     constructor() {
         super();
         this._regisiterWXCallback();

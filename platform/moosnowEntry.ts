@@ -34,8 +34,14 @@ import UIForm from "./ui/UIForm";
 import Delay from "./framework/Delay";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
+import showEndOptions from "./model/showEndOptions";
+import showPrizeOptions from "./model/showPrizeOptions";
+import showShareOptions from "./model/showShareOptions";
+import showTotalOptions from "./model/showTotalOptions";
+import showTouchOptions from "./model/showTouchOptions";
+import showCoinOptions from "./model/showCoinOptions";
 
-class moosnowEntry {
+class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
@@ -45,6 +51,14 @@ class moosnowEntry {
     public PLATFORM_EVENT = EventType;
     public Common = Common
     public AD_POSITION = AD_POSITION;
+    public showOptions = {
+        endOptions: showEndOptions,
+        prizeOptions: showPrizeOptions,
+        shareOptions: showShareOptions,
+        totalOptions: showTotalOptions,
+        touchOptions: showTouchOptions,
+        coinOptions: showCoinOptions
+    };
     /**
      * 获取当前的游戏平台
      */
@@ -80,6 +94,7 @@ class moosnowEntry {
         }
         else
             this.mHttp = new HttpModule();
+
     }
 
     private initPlatform() {
@@ -211,4 +226,4 @@ class moosnowEntry {
     }
 
 }
-new moosnowEntry();
+new moosnow();

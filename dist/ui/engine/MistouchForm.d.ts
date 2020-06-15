@@ -1,5 +1,6 @@
 import BaseForm from "../engine/BaseForm";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
+import showTouchOptions from "../../model/showTouchOptions";
 export default class MistouchForm extends BaseForm {
     clickProgress: any;
     btnBanner: any;
@@ -12,6 +13,7 @@ export default class MistouchForm extends BaseForm {
     mBannerShow: boolean;
     mShowTime: number;
     mBannerClickType: MISTOUCH_BANNER_TYPE;
+    get FormData(): showTouchOptions;
     initPos(): void;
     willShow(data: any): void;
     willHide(): void;

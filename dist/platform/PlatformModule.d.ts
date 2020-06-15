@@ -197,12 +197,12 @@ export default class PlatformModule extends BaseModule {
     _bottomCenterBanner(size: any): void;
     _resetBanenrStyle(size: any): void;
     /**
-     *
-     * @param callback 点击回调
-     * @param position banner的位置，默认底部
-     * @param style 自定义样式
-     */
-    showBanner(callback?: Function, position?: string, style?: bannerStyle): void;
+      *
+      * @param callback 点击回调
+      * @param position banner的位置，默认底部
+      * @param style 自定义样式
+      */
+    showBanner(callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
     private mTimeoutId;
     /**
      * 会自动隐藏的banner

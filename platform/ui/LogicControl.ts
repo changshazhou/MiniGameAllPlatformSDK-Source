@@ -19,6 +19,8 @@ import CoinForm from "./engine/CoinForm";
 import CocosCoinForm from "./cocos/CocosCoinForm";
 import TotalForm from "./engine/TotalForm";
 import CocosTotalForm from "./cocos/CocosTotalForm";
+import ShareFormTT from "./engine/ShareFormTT";
+import CocosShareFormTT from "./cocos/CocosShareFormTT";
 
 /**
  * 页面逻辑控制
@@ -107,4 +109,17 @@ export default class LogicControl {
             this.mTotalForm = new CocosTotalForm();
         return this.mTotalForm;
     }
+
+
+    private mShareForm: ShareFormTT
+    /**
+     * 分享
+     */
+    public get shareFormTT(): ShareFormTT {
+        if (!this.mShareForm)
+            this.mShareForm = new CocosShareFormTT();
+        return this.mShareForm;
+    }
+
+
 }

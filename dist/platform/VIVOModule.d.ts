@@ -4,7 +4,6 @@ import bannerStyle from "../model/bannerStyle";
 export default class VIVOModule extends PlatformModule {
     platformName: string;
     appSid: string;
-    baseUrl: string;
     bannerWidth: number;
     bannerHeight: number;
     private interLoadedShow;
@@ -87,7 +86,7 @@ export default class VIVOModule extends PlatformModule {
      * 目前只有OPPO平台有此功能
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
-     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     * this.node.on(CocosNodeEvent.TOUCH_END, () => {
      *     moosnow.platform.clickNative();
      * }, this)
      *

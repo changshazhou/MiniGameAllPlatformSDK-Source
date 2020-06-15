@@ -16,8 +16,15 @@ export default class CocosDelayMove extends DelayMove {
             this.pos1 = this.moveNode.position.clone();
             this.pos2 = this.pos1.add(new cc.Vec2(0, this.distince))
         }
+        this.moveNode.active = false;
     }
 
+
+    public setPosition(node, visible, x, y) {
+        node.active = visible;
+        node.x = x;
+        node.y = y;
+    }
 
     public copyNode() {
         let tempButtom = cc.instantiate(this.moveNode);

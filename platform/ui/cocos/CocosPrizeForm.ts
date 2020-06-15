@@ -2,6 +2,7 @@
 import Common from "../../utils/Common";
 import UIForms from "../../config/UIForms";
 import PrizeForm from "../engine/PrizeForm";
+import CocosNodeEvent from "./CocosNodeEvent";
 
 export default class CocosPrizeForm extends PrizeForm {
 
@@ -11,10 +12,10 @@ export default class CocosPrizeForm extends PrizeForm {
 
     initForm(logic) {
         this.initProperty(logic);
-        this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.closeForm, this)
     }
 
     willHide() {
-        this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        this.btnConfirm.off(CocosNodeEvent.TOUCH_END, this.closeForm, this)
     }
 }

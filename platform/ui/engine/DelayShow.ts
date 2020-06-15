@@ -9,12 +9,12 @@ export default class DelayShow extends BaseModule {
             return;
         this.mNode = node;
         this.hideNode();
-        this.schedule(this.showNode, delayTime * 1000)
+        this.schedule(this.showNode, delayTime)
     }
 
     public hide(node, delayTime = 3) {
         this.mNode = node;
-        this.schedule(this.hideNode, delayTime * 1000)
+        this.schedule(this.hideNode, delayTime)
     }
 
     public clear() {

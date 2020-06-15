@@ -1,6 +1,7 @@
 
 import MistouchForm from "../engine/MistouchForm";
 import EventType from "../../utils/EventType";
+import CocosNodeEvent from "./CocosNodeEvent";
 
 export default class CocosMistouchForm extends MistouchForm {
 
@@ -13,12 +14,12 @@ export default class CocosMistouchForm extends MistouchForm {
 
 
     public addEvent() {
-        this.btnBanner.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnBanner.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
+        this.btnBanner.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnBanner.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
     }
     public removeEvent() {
-        this.btnBanner.off(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnBanner.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
+        this.btnBanner.off(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnBanner.off(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
         moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
     }
 

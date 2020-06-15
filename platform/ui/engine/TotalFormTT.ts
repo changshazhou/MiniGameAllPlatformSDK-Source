@@ -2,6 +2,7 @@ import Common from "../../utils/Common";
 import UIForms from "../../config/UIForms";
 import EventType from "../../utils/EventType";
 import BaseForm from "./BaseForm";
+import BaseModule from "../../framework/BaseModule";
 
 
 const { ccclass, property } = cc._decorator;
@@ -28,45 +29,25 @@ export default class totalFormTT extends BaseForm {
     txtMemo: cc.Label = null;
 
     public isMask: boolean = true;
-    private mIsChecked: boolean = true;
+    public mIsChecked: boolean = true;
     private mOpenVideo: boolean = true;
 
 
     public addEvent() {
-        this.unchecked.node.on(cc.Node.EventType.TOUCH_END, this.onShareChange, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_END, this.onReceive, this)
-        this.btnVideo.on(cc.Node.EventType.TOUCH_END, this.onReceive, this)
 
     }
     public removeEvent() {
-        this.unchecked.node.off(cc.Node.EventType.TOUCH_END, this.onShareChange, this);
-        this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onReceive, this);
-        this.btnVideo.off(cc.Node.EventType.TOUCH_END, this.onReceive, this);
     }
 
 
-    private onHome() {
-        Common.addCoin(this.node, this.mLevelCoinNum, () => {
-            moosnow.ui.hideUIForm(UIForms.TotalForm, null);
-            moosnow.http.getMisTouchNum(misNum => {
-                if (misNum == 0) {
-                    moosnow.ui.pushUIForm(UIForms.HomeForm)
-                }
-                else {
-                    moosnow.ui.pushUIForm(UIForms.MistouchForm)
-                }
-            })
-        })
-    }
-
-    private onShareChange() {
+    public onShareChange() {
         this.mIsChecked = !this.mIsChecked;
         this.mOpenVideo = !this.mOpenVideo;
         this.changeUI();
 
     }
 
-    private changeUI() {
+    public changeUI() {
         let lblReceive = this.btnReceive.getComponent(cc.Label)
         if (this.mIsChecked) {
             this.checked.node.active = true;
@@ -138,9 +119,7 @@ export default class totalFormTT extends BaseForm {
     public onVideo() {
         moosnow.platform.showVideo(res => {
             if (res == moosnow.VIDEO_STATUS.END) {
-                
-                Common.addCoin(this.node, this.mLevelCoinNum * 5, () => {
-                })
+
                 this.scheduleOnce(() => {
                     moosnow.ui.hideUIForm(UIForms.TotalForm, null);
                     moosnow.http.getMisTouchNum(misNum => {
@@ -173,8 +152,6 @@ export default class totalFormTT extends BaseForm {
             moosnow.platform.showVideo(res => {
                 this.mIsReceive = false;
                 if (res == moosnow.VIDEO_STATUS.END) {
-                    Common.addCoin(this.node, this.mLevelCoinNum * 5, () => {
-                    })
                     this.scheduleOnce(() => {
                         moosnow.ui.hideUIForm(UIForms.TotalForm, null);
                         moosnow.http.getMisTouchNum(misNum => {
@@ -197,10 +174,6 @@ export default class totalFormTT extends BaseForm {
             })
         }
         else {
-            Common.addCoin(this.node, this.mLevelCoinNum, () => {
-                moosnow.ui.hideUIForm(UIForms.TotalForm, null);
-                moosnow.ui.pushUIForm(UIForms.EndForm, this.FormData)
-            })
 
         }
 
@@ -208,7 +181,6 @@ export default class totalFormTT extends BaseForm {
 
     onHide() {
         moosnow.platform.hideBanner();
-        moosnow.event.sendEventImmediately(EventType.ADFORM_CHANGE, {})
     }
 
 

@@ -6,6 +6,7 @@ export default class CocosDelayMove extends DelayMove {
     pos1: cc.Vec2;
     pos2: cc.Vec2;
     initPos(): void;
+    setPosition(node: any, visible: any, x: any, y: any): void;
     copyNode(): cc.Node;
     removeTemp(tempButtom: any): void;
 }

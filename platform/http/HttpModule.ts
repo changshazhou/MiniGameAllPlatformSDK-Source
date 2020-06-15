@@ -23,6 +23,7 @@ export class HttpModule extends BaseModule {
     private versionNumber: string = "";
     public version: string = "2.0.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
+    private _cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
 
     private mLaunchOptions: any
     constructor() {
@@ -30,7 +31,7 @@ export class HttpModule extends BaseModule {
 
 
 
-        let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
+        let versionUrl = `${this._cdnUrl}/SDK/version.json?t=` + Date.now();
         if (Common.platform == PlatformType.PC) {
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
@@ -49,6 +50,10 @@ export class HttpModule extends BaseModule {
         }
 
         this.mLaunchOptions = moosnow.platform.getLaunchOption();
+
+        this.getShareInfo((data) => {
+            moosnow.platform.initShare(data);
+        });
 
     }
 
@@ -309,7 +314,12 @@ export class HttpModule extends BaseModule {
             callback(this.cfgData);
         }
         else {
-            var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
+            var url = "";
+            if (moosnow.platform.moosnowConfig.url)
+                url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
+            else
+                url = `${this._cdnUrl}/config/${moosnow.platform.moosnowConfig.moosnowAppId}.json`;
+
             this.request(url, {}, 'GET',
                 (res) => {
                     this.cfgData = {
@@ -340,7 +350,7 @@ export class HttpModule extends BaseModule {
             callback(this.areaData)
         }
         else {
-            let ipUrl = 'https://api.liteplay.com.cn/admin/wx_config/getLocation';
+            let ipUrl = `${this.baseUrl}admin/wx_config/getLocation`;
             this.request(ipUrl, {}, 'GET', (res2) => {
                 this.areaData = res2;
                 callback(this.areaData)

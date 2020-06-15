@@ -6,11 +6,13 @@ export default class BaseModule {
     private mIntervalArr: Object = {};
     private mTimeoutArr: Object = {};
     public schedule(callback: Function, time: number) {
+
         let self = this;
         let id = setInterval(() => {
             if (callback)
                 callback.apply(self)
         }, time * 1000)
+        console.log('BaseModule schedule ', id)
         this.mIntervalArr[id] = callback;
     }
     public unschedule(callback) {

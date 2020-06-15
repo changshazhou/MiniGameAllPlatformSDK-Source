@@ -1,6 +1,7 @@
 import BaseForm from "./BaseForm";
 import UIForms from "../../config/UIForms";
 import MistouchForm from "./MistouchForm";
+import BaseModule from "../../framework/BaseModule";
 
 export default class MistouchFormTT extends MistouchForm {
 
@@ -58,8 +59,8 @@ export default class MistouchFormTT extends MistouchForm {
             this.btnConfirm.active = false;
             moosnow.platform.showVideo(res => {
                 if (res == moosnow.VIDEO_STATUS.END) {
-                    if (this.FormData && this.FormData.onCompleted)
-                        this.FormData.onCompleted(true)
+                    if (this.FormData && this.FormData.callback)
+                        this.FormData.callback(true)
                     return;
                 }
                 else if (res == moosnow.VIDEO_STATUS.NOTEND) {

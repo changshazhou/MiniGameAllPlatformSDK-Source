@@ -2,6 +2,7 @@ import BaseForm from "../engine/BaseForm";
 import UIForms from "../../config/UIForms";
 import MistouchForm from "../engine/MistouchForm";
 import MistouchFormTT from "../engine/MistouchFormTT";
+import CocosNodeEvent from "./CocosNodeEvent";
 
 export default class CocosMistouchFormTT extends MistouchFormTT {
 
@@ -23,18 +24,18 @@ export default class CocosMistouchFormTT extends MistouchFormTT {
 
     public addEvent() {
 
-        this.unchecked.node.on(cc.Node.EventType.TOUCH_END, this.checkboxChange, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-        this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.openBox, this)
+        this.unchecked.node.on(CocosNodeEvent.TOUCH_END, this.checkboxChange, this)
+        this.btnReceive.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnReceive.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
+        this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.openBox, this)
 
     }
 
     public removeEvent() {
-        this.unchecked.node.off(cc.Node.EventType.TOUCH_END, this.checkboxChange, this)
-        this.btnReceive.off(cc.Node.EventType.TOUCH_START, this.onLogoUp, this)
-        this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onBannerClick, this)
-        this.btnConfirm.off(cc.Node.EventType.TOUCH_END, this.openBox, this)
+        this.unchecked.node.off(CocosNodeEvent.TOUCH_END, this.checkboxChange, this)
+        this.btnReceive.off(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnReceive.off(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
+        this.btnConfirm.off(CocosNodeEvent.TOUCH_END, this.openBox, this)
     }
 
 }

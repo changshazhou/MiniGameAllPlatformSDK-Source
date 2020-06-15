@@ -1,8 +1,9 @@
 import showTouchOptions from "./showTouchOptions";
+import showOptions from "./showOptions";
 /**
  * 唤起结算页参数
  */
-export default class showEndOptions {
+export default class showEndOptions extends showOptions {
     /**
      * 金币数量
      */
@@ -23,14 +24,6 @@ export default class showEndOptions {
      * 视频领取回调
      */
     onVideoReceive: Function;
-    /**
-     * 扩展数据
-     */
-    extraData: Object;
-    /**
-     * 用户点击领取后是否隐藏当前页
-     */
-    hideEnd: boolean;
     /**
     * 通关成功 or 通关失败
     */

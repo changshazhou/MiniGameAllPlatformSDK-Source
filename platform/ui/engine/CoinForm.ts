@@ -1,6 +1,8 @@
 import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
 import UIForms from "../../config/UIForms";
+import showCoinOptions from "../../model/showCoinOptions";
+import BaseModule from "../../framework/BaseModule";
 
 
 export default class CoinForm extends BaseForm {
@@ -9,14 +11,17 @@ export default class CoinForm extends BaseForm {
     public get rootNode() {
         return {}
     }
+    public get FormData(): showCoinOptions {
 
+        return this.mFormData;
+    }
     public flyAnim(logic, endVec, callback) {
 
     }
 
     onShow(data) {
 
-        let { imgNum, coinNum, starVec, endVec, callback } = data;
+        let { imgNum, coinNum, starVec, endVec, callback } = this.FormData;
 
         console.log('showCoin', data);
         cc.loader.loadRes(moosnow.entity.prefabPath + 'coin', cc.Prefab, () => {
@@ -29,7 +34,8 @@ export default class CoinForm extends BaseForm {
 
             }
             this.scheduleOnce(() => {
-                moosnow.ui.hideUIForm(UIForms.CoinForm, null);
+                if (this.FormData.hideForm)
+                    moosnow.ui.hideUIForm(UIForms.CoinForm, null);
                 if (Common.isFunction(callback))
                     callback();
             }, 2.1)

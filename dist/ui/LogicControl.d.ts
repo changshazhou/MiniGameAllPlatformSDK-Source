@@ -8,6 +8,7 @@ import PrizeForm from "./engine/prizeForm";
 import PrizeFormTT from "./engine/PrizeFormTT";
 import CoinForm from "./engine/CoinForm";
 import TotalForm from "./engine/TotalForm";
+import ShareFormTT from "./engine/ShareFormTT";
 /**
  * 页面逻辑控制
  */
@@ -41,4 +42,9 @@ export default class LogicControl {
     * 金币
     */
     get totalForm(): TotalForm;
+    private mShareForm;
+    /**
+     * 分享
+     */
+    get shareFormTT(): ShareFormTT;
 }

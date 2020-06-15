@@ -1,15 +1,33 @@
 import EventType from "../utils/EventType";
 import UIForms from "../config/UIForms";
 import { AD_POSITION } from "../enum/AD_POSITION";
-import coinAnimStyle from "../model/coinAnimStyle";
+import showCoinOptions from "../model/showCoinOptions";
+import showOptions from "../model/showOptions";
 import showTotalOptions from "../model/showTotalOptions";
 import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
+import showPrizeOptions from "../model/showPrizeOptions";
+import showShareOptions from "../model/showShareOptions";
 
 /**
  * 广告结果
  */
 export default class UIForm {
+
+
+    constructor() {
+
+        // showOptions.create(showTotalOptions)
+        // console.log('showTotalOptions', showOptions.create(showTotalOptions))
+
+        // showOptions.create(showEndOptions)
+        // showOptions.create(showTouchOptions)
+        // showOptions.create(showPrizeOptions)
+        // showOptions.create(showShareOptions)
+    }
+
+
+    public optionsFactory: typeof showOptions
 
     /**
      * Toast消息
@@ -56,20 +74,10 @@ export default class UIForm {
 
     /**
      * 金币动画
-     * @param style 
-     * @param callback 
+     * @param options 
      */
-    public showCoin(style: coinAnimStyle, callback: Function) {
-        moosnow.ui.pushUIForm(UIForms.CoinForm, {
-            ...style,
-            callback: () => {
-                console.log('showCoin callback ')
-                if (callback)
-                    callback();
-            },
-        }, () => {
-
-        })
+    public showCoin(options: showCoinOptions) {
+        moosnow.ui.pushUIForm(UIForms.CoinForm, options)
     }
 
 
@@ -79,10 +87,7 @@ export default class UIForm {
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
     public showMistouch(options: showTouchOptions) {
-        moosnow.ui.pushUIForm(UIForms.MistouchForm, {
-            mistouchType: options.type == 2 ? 4 : 1,
-            onCompleted: options.onCompleted
-        }, () => {
+        moosnow.ui.pushUIForm(UIForms.MistouchForm, options, () => {
 
         })
     }
@@ -93,16 +98,8 @@ export default class UIForm {
      * @param showCoinAnim 显示金币动画
      * @param callback 
      */
-    public showPrize(style: coinAnimStyle, baseNum: number, showCoinAnim: boolean = true, callback: Function) {
-        moosnow.ui.pushUIForm(UIForms.PrizeForm, {
-            ...style,
-            baseNum,
-            showCoinAnim,
-            onCompleted: () => {
-                if (callback)
-                    callback();
-            }
-        }, () => {
+    public showPrize(options: showPrizeOptions) {
+        moosnow.ui.pushUIForm(UIForms.PrizeForm, options, () => {
 
         })
     }
@@ -125,5 +122,14 @@ export default class UIForm {
     */
     public showEnd(options: showEndOptions) {
         moosnow.ui.pushUIForm(UIForms.EndForm, options)
+    }
+
+
+
+    /**
+     *  showShare
+     */
+    public showShare(options: showShareOptions) {
+        moosnow.ui.pushUIForm(UIForms.ShareForm, options)
     }
 }

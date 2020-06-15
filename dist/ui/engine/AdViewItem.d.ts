@@ -8,7 +8,7 @@ export default class AdViewItem extends BaseLogic {
     changeView: boolean;
     mAdItem: moosnowAdRow;
     initItem(): void;
-    private onClickAd;
+    onClickAd(): void;
     private findNextAd;
     private onAdViewChange;
     onShow(): void;

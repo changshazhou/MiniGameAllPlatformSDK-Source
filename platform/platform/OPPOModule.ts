@@ -10,7 +10,6 @@ export default class OPPOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
-    public baseUrl = "https://api.liteplay.com.cn/";
     public bannerWidth: number = 760;
     public bannerHeight: number = 96;
 
@@ -660,7 +659,7 @@ export default class OPPOModule extends PlatformModule {
      * 目前只有OPPO平台有此功能 
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
-     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     * this.node.on(CocosNodeEvent.TOUCH_END, () => {
      *     moosnow.platform.clickNative();
      * }, this)
      * 

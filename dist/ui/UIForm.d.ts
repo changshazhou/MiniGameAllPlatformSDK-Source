@@ -1,11 +1,16 @@
-import coinAnimStyle from "../model/coinAnimStyle";
+import showCoinOptions from "../model/showCoinOptions";
+import showOptions from "../model/showOptions";
 import showTotalOptions from "../model/showTotalOptions";
 import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
+import showPrizeOptions from "../model/showPrizeOptions";
+import showShareOptions from "../model/showShareOptions";
 /**
  * 广告结果
  */
 export default class UIForm {
+    constructor();
+    optionsFactory: typeof showOptions;
     /**
      * Toast消息
      * @param msg  消息内容
@@ -24,10 +29,9 @@ export default class UIForm {
     showAd(adType: number, callback: Function, zIndex?: number): void;
     /**
      * 金币动画
-     * @param style
-     * @param callback
+     * @param options
      */
-    showCoin(style: coinAnimStyle, callback: Function): void;
+    showCoin(options: showCoinOptions): void;
     /**
      * 显示狂点页面
      * @param callback 点击完成回调
@@ -41,7 +45,7 @@ export default class UIForm {
      * @param showCoinAnim 显示金币动画
      * @param callback
      */
-    showPrize(style: coinAnimStyle, baseNum: number, showCoinAnim: boolean, callback: Function): void;
+    showPrize(options: showPrizeOptions): void;
     /**
      * 显示结算统计页
      * @param coinNum
@@ -54,4 +58,8 @@ export default class UIForm {
     * @param callback
     */
     showEnd(options: showEndOptions): void;
+    /**
+     *  showShare
+     */
+    showShare(options: showShareOptions): void;
 }

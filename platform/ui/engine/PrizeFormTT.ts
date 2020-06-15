@@ -2,6 +2,8 @@ import Common from "../../utils/Common";
 import UIForms from "../../config/UIForms";
 import EventType from "../../utils/EventType";
 import BaseForm from "./BaseForm";
+import showPrizeOptions from "../../model/showPrizeOptions";
+import BaseModule from "../../framework/BaseModule";
 
 export default class PrizeFormTT extends BaseForm {
 
@@ -16,11 +18,17 @@ export default class PrizeFormTT extends BaseForm {
     checked: cc.Node = null;
     unchecked: cc.Node = null;
     public isMask: boolean = true;
-    private mChecked: boolean = false;
+    public mChecked: boolean = false;
+
+
+    public get FormData(): showPrizeOptions {
+
+        return this.mFormData;
+    }
 
     initForm(logic) {
         this.initProperty(logic);
-        // this.btnConfirm.on(cc.Node.EventType.TOUCH_END, this.closeForm, this)
+        // this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.closeForm, this)
     }
 
     willShow(data) {
@@ -96,60 +104,65 @@ export default class PrizeFormTT extends BaseForm {
     }
 
     public addListener() {
-        this.btnCancel.on(cc.Node.EventType.TOUCH_END, this.closeForm, this)
-        this.btnVideo.on(cc.Node.EventType.TOUCH_END, this.onVideo, this)
-        this.btnReceive.on(cc.Node.EventType.TOUCH_END, this.onReceive, this)
-        this.btnShare.on(cc.Node.EventType.TOUCH_END, this.onShare, this)
-        this.unchecked.on(cc.Node.EventType.TOUCH_END, this.onChecked, this)
+        // this.btnCancel.on(CocosNodeEvent.TOUCH_END, this.closeForm, this)
+        // this.btnVideo.on(CocosNodeEvent.TOUCH_END, this.onVideo, this)
+        // this.btnReceive.on(CocosNodeEvent.TOUCH_END, this.onReceive, this)
+        // this.btnShare.on(CocosNodeEvent.TOUCH_END, this.onShare, this)
+        // this.unchecked.on(CocosNodeEvent.TOUCH_END, this.onChecked, this)
     }
 
     public removeListener() {
-        this.btnCancel.off(cc.Node.EventType.TOUCH_END, this.closeForm, this)
-        this.btnVideo.off(cc.Node.EventType.TOUCH_END, this.onVideo, this)
-        this.btnReceive.off(cc.Node.EventType.TOUCH_END, this.onReceive, this)
-        this.btnShare.off(cc.Node.EventType.TOUCH_END, this.onShare, this)
-        this.unchecked.off(cc.Node.EventType.TOUCH_END, this.onChecked, this)
+        // this.btnCancel.off(CocosNodeEvent.TOUCH_END, this.closeForm, this)
+        // this.btnVideo.off(CocosNodeEvent.TOUCH_END, this.onVideo, this)
+        // this.btnReceive.off(CocosNodeEvent.TOUCH_END, this.onReceive, this)
+        // this.btnShare.off(CocosNodeEvent.TOUCH_END, this.onShare, this)
+        // this.unchecked.off(CocosNodeEvent.TOUCH_END, this.onChecked, this)
     }
 
     closeForm() {
         moosnow.ui.hideUIForm(UIForms.PrizeForm, null)
     }
 
-    private onChecked() {
-        this.mChecked = !this.mChecked;
-        this.checked.active = this.mChecked;
+    public onChecked() {
     }
 
-    private onShare() {
+    public onShare() {
         this.stopCountdown();
         moosnow.platform.share({
             channel: ""
         }, (shared) => {
             this.resumeCountdown();
-            if (shared) {
-                this.addCoin(this.getCoinNum() * 2, () => {
+            if (this.FormData) {
+                if (this.FormData.hideForm)
                     moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
-                });
+                if (this.FormData.shareCallback)
+                    this.FormData.shareCallback(shared)
             }
         })
     }
 
-    private onReceive() {
+    public onReceive() {
         if (this.mChecked)
             this.onVideo();
         else
-            this.addCoin(this.getCoinNum(), () => {
-                moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
-            });
+            if (this.FormData) {
+                if (this.FormData.hideForm)
+                    moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                if (this.FormData.callback)
+                    this.FormData.callback()
+            }
     }
 
-    private onVideo() {
+    public onVideo() {
         this.stopCountdown();
         moosnow.platform.showVideo(res => {
             if (res == moosnow.VIDEO_STATUS.END) {
-                this.addCoin(this.getCoinNum() * (this.FormData && this.FormData.baseNum ? parseFloat(this.FormData.baseNum) : 2), () => {
-                    moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
-                });
+                if (this.FormData) {
+                    if (this.FormData.hideForm)
+                        moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                    if (this.FormData.videoCallback)
+                        this.FormData.videoCallback()
+                }
                 return;
             }
             else if (res == moosnow.VIDEO_STATUS.ERR)
@@ -160,26 +173,5 @@ export default class PrizeFormTT extends BaseForm {
             this.resumeCountdown();
         })
     }
-    private getCoinNum() {
-        let coinNum = Common.randomNumBoth(500, 600);
-        return coinNum;
-    }
-
-    private addCoin(coinNum, callback: Function) {
-
-        moosnow.ui.hideUIForm(UIForms.MistouchForm, null);
-        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, null);
-        moosnow.ui.pushUIForm(UIForms.CoinForm, {
-            ...Common.deepCopy(this.FormData),
-            coinNum,
-            callback: () => {
-                if (callback)
-                    callback();
-            }
-        })
-
-
-    }
-
 
 }

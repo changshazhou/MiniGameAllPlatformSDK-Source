@@ -8,13 +8,21 @@ import { PlatformType } from "./enum/PlatformType";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
 import { AD_POSITION } from "./enum/AD_POSITION";
-import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
-import LogicControl from "./ui/LogicControl";
-import UIForm from "./ui/UIForm";
-import Delay from "./framework/Delay";
-import AudioModule from "./framework/AudioModule";
-import ResourceModule from "./framework/ResourceModule";
+import { BaseUIModule } from "../platform/ui/engine/BaseUIModule";
+import UIForm from "../platform/ui/UIForm";
+import LogicControl from "../platform/ui/LogicControl";
+import Delay from "../platform/framework/Delay";
+import AudioModule from "../platform/framework/AudioModule";
+import ResourceModule from "../platform/framework/ResourceModule";
+
+import showEndOptions from "./model/showEndOptions";
+import showPrizeOptions from "./model/showPrizeOptions";
+import showShareOptions from "./model/showShareOptions";
+import showTotalOptions from "./model/showTotalOptions";
+import showTouchOptions from "./model/showTouchOptions";
+import showCoinOptions from "./model/showCoinOptions";
+
 declare global {
     class moosnow {
         static VIDEO_STATUS: {
@@ -40,6 +48,14 @@ declare global {
             VIDEO: string;
             TOKEN: string;
             LINK: string;
+        };
+        static showOptions: {
+            endOptions: typeof showEndOptions,
+            prizeOptions: typeof showPrizeOptions,
+            shareOptions: typeof showShareOptions,
+            totalOptions: typeof showTotalOptions,
+            touchOptions: typeof showTouchOptions,
+            coinOptions: typeof showCoinOptions
         };
         static Common: typeof Common;
         static PLATFORM_EVENT: typeof EventType;
