@@ -1,5 +1,6 @@
 import showTouchOptions from "./showTouchOptions";
 import showOptions from "./showOptions";
+import showCoinOptions from "./showCoinOptions";
 /**
  * 唤起结算页参数
  */
@@ -36,4 +37,8 @@ export default class showEndOptions extends showOptions {
      * 唤起误触时的参数
      */
     touchOptions: showTouchOptions;
+    /**
+     * 唤起误触时的参数
+     */
+    coinOptions: showCoinOptions;
 }

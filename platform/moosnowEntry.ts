@@ -41,7 +41,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 
-class moosnow {
+export default class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;

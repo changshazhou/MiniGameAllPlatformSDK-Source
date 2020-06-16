@@ -1,4 +1,4 @@
-(function () {
+var mx = (function () {
     'use strict';
 
     /*! *****************************************************************************
@@ -8415,10 +8415,6 @@
             * 分享得到金币数量
             */
             _this.shareCoinNum = 0;
-            /**
-             * 用户点击领取后是否打开结束页
-             */
-            _this.showEnd = true;
             return _this;
         }
         return showTotalOptions;
@@ -8692,5 +8688,7 @@
         return moosnow;
     }());
     new moosnow$1();
+
+    return moosnow$1;
 
 }());

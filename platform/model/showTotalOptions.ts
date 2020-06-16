@@ -1,5 +1,7 @@
 import showEndOptions from "./showEndOptions";
 import showOptions from "./showOptions";
+import showCoinOptions from "./showCoinOptions";
+import showTouchOptions from "./showTouchOptions";
 
 
 /**
@@ -38,14 +40,19 @@ export default class showTotalOptions extends showOptions {
      */
     public onMore: Function;
 
-
     /**
-     * 用户点击领取后是否打开结束页
-     */
-    public showEnd: boolean = true;
-
-    /**
-     * 打开结束也时的参数 showEnd=true 时 必填
+     * 打开结束页时的参数 ，=null 时将不展示
      */
     public endOptions?: showEndOptions
+
+    /**
+     * 金币动画参数
+     */
+    public coinOptions?: showCoinOptions
+
+
+    /**
+     * 金币动画参数
+     */
+    public touchOptions?: showTouchOptions
 }

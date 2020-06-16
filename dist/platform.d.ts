@@ -7,14 +7,13 @@ import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
-import { AD_POSITION } from "./enum/AD_POSITION";
+import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import BaseEntityModule from "./ui/engine/BaseEntityModule";
-import { BaseUIModule } from "../platform/ui/engine/BaseUIModule";
-import UIForm from "../platform/ui/UIForm";
-import LogicControl from "../platform/ui/LogicControl";
-import Delay from "../platform/framework/Delay";
-import AudioModule from "../platform/framework/AudioModule";
-import ResourceModule from "../platform/framework/ResourceModule";
+import LogicControl from "./ui/LogicControl";
+import UIForm from "./ui/UIForm";
+import Delay from "./framework/Delay";
+import ResourceModule from "./framework/ResourceModule";
+import AudioModule from "./framework/AudioModule";
 
 import showEndOptions from "./model/showEndOptions";
 import showPrizeOptions from "./model/showPrizeOptions";
@@ -60,7 +59,23 @@ declare global {
         static Common: typeof Common;
         static PLATFORM_EVENT: typeof EventType;
         static APP_PLATFORM: typeof PlatformType;
-        static AD_POSITION: typeof AD_POSITION;
+        static AD_POSITION: {
+            NONE: number;
+            BANNER: number;
+            FLOAT: number;
+            SIDE: number;
+            CENTER: number;
+            EXPORT: number;
+            BACK: number;
+            MASK: number;
+            WAIT: number;
+            LEFTRIGHT: number;
+            EXPORT_FIXED: number;
+            EXTEND1: number;
+            EXTEND2: number;
+            EXTEND3: number;
+            EXTEND4: number;
+        };
         static getAppPlatform(): PlatformType
         static http: HttpModule
         static platform: PlatformModule
