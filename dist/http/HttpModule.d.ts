@@ -82,7 +82,9 @@ export declare class HttpModule extends BaseModule {
     getAllConfig(callback: Function): void;
     cfgData: any;
     areaData: any;
+    _cfgQuene: any[];
     loadCfg(callback: any): void;
+    private _localQuene;
     loadArea(callback: any): void;
     getForceExport(callback: any): void;
     disabledForceExport(res: any, res2: any, callback: any): void;

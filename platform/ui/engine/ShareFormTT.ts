@@ -3,19 +3,10 @@ import Common from "../../utils/Common";
 import BaseForm from "./BaseForm";
 import showShareOptions from "../../model/showShareOptions";
 
-const { ccclass, property } = cc._decorator;
-
-@ccclass
 export default class ShareFormTT extends BaseForm {
 
-    @property(cc.Node)
     btnShare: cc.Node = null;
-
-    @property(cc.Node)
     btnBack: cc.Node = null;
-
-
-    @property(cc.Label)
     txtCoinNum: cc.Label = null;
 
     public isMask: boolean = true;

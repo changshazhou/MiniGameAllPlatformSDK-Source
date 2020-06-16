@@ -55,6 +55,10 @@ export class HttpModule extends BaseModule {
             moosnow.platform.initShare(data);
         });
 
+        this.loadCfg((res) => {
+            console.log('remote config ', res)
+        })
+
     }
 
 
@@ -309,11 +313,18 @@ export class HttpModule extends BaseModule {
 
     public cfgData = null;
     public areaData = null;
+    public _cfgQuene = [];
     public loadCfg(callback) {
         if (!Common.isEmpty(this.cfgData)) {
             callback(this.cfgData);
         }
         else {
+
+
+            this._cfgQuene.push(callback);
+            if (this._cfgQuene.length > 1)
+                return
+
             var url = "";
             if (moosnow.platform.moosnowConfig.url)
                 url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
@@ -330,33 +341,49 @@ export class HttpModule extends BaseModule {
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
-                    callback(this.cfgData);
+                    this._cfgQuene.forEach(item => {
+                        item(this.cfgData);
+                    })
+                    this._cfgQuene = [];
                 },
                 () => {
-                    callback({
-                        mistouchNum: 0,
-                        mistouchPosNum: 0,
-                        bannerShowCountLimit: 1
-                    });
+                    this._cfgQuene.forEach(item => {
+                        item({
+                            mistouchNum: 0,
+                            mistouchPosNum: 0,
+                            bannerShowCountLimit: 1
+                        });
+                    })
+                    this._cfgQuene = [];
                     console.log('load config json fail');
                 }
             );
         }
 
     }
-
+    private _localQuene = [];
     public loadArea(callback) {
         if (this.areaData) {
             callback(this.areaData)
         }
         else {
+
+            this._localQuene.push(callback);
+            if (this._localQuene.length > 1)
+                return;
+
             let ipUrl = `${this.baseUrl}admin/wx_config/getLocation`;
             this.request(ipUrl, {}, 'GET', (res2) => {
                 this.areaData = res2;
-                callback(this.areaData)
-
+                this._localQuene.forEach(item => {
+                    item(this.areaData)
+                })
+                this._localQuene = [];
             }, () => {
-                callback(null);
+                this._localQuene.forEach(item => {
+                    item(this.areaData)
+                })
+                this._localQuene = [];
             })
         }
 

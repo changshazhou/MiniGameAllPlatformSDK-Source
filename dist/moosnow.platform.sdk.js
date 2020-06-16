@@ -2273,6 +2273,8 @@ var mx = (function () {
             _this._cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
             _this.cfgData = null;
             _this.areaData = null;
+            _this._cfgQuene = [];
+            _this._localQuene = [];
             var versionUrl = _this._cdnUrl + "/SDK/version.json?t=" + Date.now();
             if (Common.platform == PlatformType.PC) {
                 _this.request(versionUrl, {}, 'GET', function (res) {
@@ -2292,6 +2294,9 @@ var mx = (function () {
             _this.mLaunchOptions = moosnow.platform.getLaunchOption();
             _this.getShareInfo(function (data) {
                 moosnow.platform.initShare(data);
+            });
+            _this.loadCfg(function (res) {
+                console.log('remote config ', res);
             });
             return _this;
         }
@@ -2523,6 +2528,9 @@ var mx = (function () {
                 callback(this.cfgData);
             }
             else {
+                this._cfgQuene.push(callback);
+                if (this._cfgQuene.length > 1)
+                    return;
                 var url = "";
                 if (moosnow.platform.moosnowConfig.url)
                     url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
@@ -2533,13 +2541,19 @@ var mx = (function () {
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
-                    callback(_this.cfgData);
-                }, function () {
-                    callback({
-                        mistouchNum: 0,
-                        mistouchPosNum: 0,
-                        bannerShowCountLimit: 1
+                    _this._cfgQuene.forEach(function (item) {
+                        item(_this.cfgData);
                     });
+                    _this._cfgQuene = [];
+                }, function () {
+                    _this._cfgQuene.forEach(function (item) {
+                        item({
+                            mistouchNum: 0,
+                            mistouchPosNum: 0,
+                            bannerShowCountLimit: 1
+                        });
+                    });
+                    _this._cfgQuene = [];
                     console.log('load config json fail');
                 });
             }
@@ -2550,12 +2564,21 @@ var mx = (function () {
                 callback(this.areaData);
             }
             else {
+                this._localQuene.push(callback);
+                if (this._localQuene.length > 1)
+                    return;
                 var ipUrl = this.baseUrl + "admin/wx_config/getLocation";
                 this.request(ipUrl, {}, 'GET', function (res2) {
                     _this.areaData = res2;
-                    callback(_this.areaData);
+                    _this._localQuene.forEach(function (item) {
+                        item(_this.areaData);
+                    });
+                    _this._localQuene = [];
                 }, function () {
-                    callback(null);
+                    _this._localQuene.forEach(function (item) {
+                        item(_this.areaData);
+                    });
+                    _this._localQuene = [];
                 });
             }
         };
@@ -7657,7 +7680,6 @@ var mx = (function () {
         return CocosTotalForm;
     }(TotalForm));
 
-    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
     var ShareFormTT = /** @class */ (function (_super) {
         __extends(ShareFormTT, _super);
         function ShareFormTT() {
@@ -7760,18 +7782,6 @@ var mx = (function () {
                 console.log('分享结束', res);
             });
         };
-        __decorate([
-            property(cc.Node)
-        ], ShareFormTT.prototype, "btnShare", void 0);
-        __decorate([
-            property(cc.Node)
-        ], ShareFormTT.prototype, "btnBack", void 0);
-        __decorate([
-            property(cc.Label)
-        ], ShareFormTT.prototype, "txtCoinNum", void 0);
-        ShareFormTT = __decorate([
-            ccclass
-        ], ShareFormTT);
         return ShareFormTT;
     }(BaseForm));
 

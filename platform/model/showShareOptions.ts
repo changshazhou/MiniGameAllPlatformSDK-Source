@@ -25,7 +25,7 @@ export default class showShareOptions extends showOptions {
 
 
     /**
-     * 普通按钮回调
+     * 普通按钮回调 
      */
     callback?: Function
 
