@@ -47,4 +47,8 @@ export declare const AD_POSITION: {
     * 扩展4
     */
     EXTEND4: number;
+    /**
+     * 恢复到上一个状态
+     */
+    RECOVER: number;
 };

@@ -5545,6 +5545,10 @@ var mx = (function () {
         * 扩展4
         */
         EXTEND4: 8192,
+        /**
+         * 恢复到上一个状态
+         */
+        RECOVER: 16384,
     };
 
     var BaseEntityModule = /** @class */ (function (_super) {
@@ -6112,8 +6116,10 @@ var mx = (function () {
             _this.extend4Layout = null;
             _this.mAdItemList = [];
             _this.mScrollVec = [];
+            _this.mChangeLen = 0;
             _this.mIndex = 999;
             _this.mShowAd = moosnow.AD_POSITION.NONE;
+            _this.mPrevShowAd = moosnow.AD_POSITION.NONE;
             _this.mEndLogic = [];
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
@@ -6176,6 +6182,13 @@ var mx = (function () {
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
         };
         AdForm.prototype.onAdChange = function (data) {
+            this.mChangeLen++;
+            if (this.mChangeLen > 1 && data.showAd != AD_POSITION.RECOVER) {
+                this.mPrevShowAd = this.mShowAd;
+            }
+            if (data.showAd == AD_POSITION.RECOVER) {
+                data.showAd = this.mPrevShowAd;
+            }
             this.displayChange(data.showAd, data.callback);
             this.onAfterShow(this.mIndex);
         };
@@ -6202,7 +6215,9 @@ var mx = (function () {
         AdForm.prototype.displayChange = function (data, callback) {
             if (callback === void 0) { callback = null; }
             var curApp = moosnow.getAppPlatform();
-            if (moosnow.APP_PLATFORM.WX == curApp || curApp == moosnow.APP_PLATFORM.OPPO) {
+            if (moosnow.APP_PLATFORM.WX == curApp
+                || curApp == moosnow.APP_PLATFORM.OPPO
+                || curApp == moosnow.APP_PLATFORM.BYTEDANCE) {
                 this.mShowAd = data;
                 this.displayAd(true);
                 this.mBackCall = callback;
@@ -6290,21 +6305,28 @@ var mx = (function () {
          */
         AdForm.prototype.initFloatAd = function (parentNode, prefabs, points, position, callback) {
             var _this = this;
-            if (position === void 0) { position = ""; }
             cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, function () {
                 moosnow.ad.getAd(function (res) {
                     _this.mAdData = res;
                     if (res.indexLeft.length == 0)
                         return;
-                    var source = _this.setPosition(res.indexLeft, position, callback);
+                    var source = _this.setPosition(res.indexLeft, position, callback, true);
+                    var showIds = [];
                     prefabs.forEach(function (prefabName, idx) {
                         var showIndex = idx;
-                        var floatData = source[0];
                         if (showIndex > source.length - 1)
                             showIndex = 0;
-                        floatData = source[showIndex];
+                        var adRow = source[showIndex];
+                        showIds.push({
+                            appid: adRow.appid,
+                            position: adRow.position,
+                            index: idx
+                        });
                         var point = points[idx];
-                        var adRow = __assign(__assign({}, floatData), { position: position, x: point.x, y: point.y });
+                        adRow.x = point.x;
+                        adRow.y = point.y;
+                        adRow.source = source;
+                        adRow.showIds = showIds;
                         var logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                         _this.mFloatCache[idx] = {
                             index: showIndex,
@@ -6330,7 +6352,7 @@ var mx = (function () {
                 else
                     showIndex = 0;
                 this.mFloatCache[key].index = showIndex;
-                logic.refreshImg(__assign({}, source[showIndex]));
+                logic.refreshImg(source[showIndex]);
             }
         };
         AdForm.prototype.hasAd = function (ad) {

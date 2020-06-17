@@ -134,8 +134,15 @@ export default class AdForm extends BaseForm {
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
     }
 
+    private mChangeLen: number = 0;
     public onAdChange(data) {
-
+        this.mChangeLen++;
+        if (this.mChangeLen > 1 && data.showAd != AD_POSITION.RECOVER) {
+            this.mPrevShowAd = this.mShowAd;
+        }
+        if (data.showAd == AD_POSITION.RECOVER) {
+            data.showAd = this.mPrevShowAd;
+        }
         this.displayChange(data.showAd, data.callback)
 
         this.onAfterShow(this.mIndex);
@@ -169,10 +176,14 @@ export default class AdForm extends BaseForm {
     }
 
     private mShowAd = moosnow.AD_POSITION.NONE;
+    private mPrevShowAd = moosnow.AD_POSITION.NONE;
     private mBackCall: Function
     public displayChange(data, callback = null) {
         let curApp = moosnow.getAppPlatform()
-        if (moosnow.APP_PLATFORM.WX == curApp || curApp == moosnow.APP_PLATFORM.OPPO) {
+        if (moosnow.APP_PLATFORM.WX == curApp
+            || curApp == moosnow.APP_PLATFORM.OPPO
+            || curApp == moosnow.APP_PLATFORM.BYTEDANCE) {
+
             this.mShowAd = data;
             this.displayAd(true)
             this.mBackCall = callback;
@@ -277,25 +288,32 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>, position: string = "", callback?: Function) {
+    public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>, position: string, callback?: Function) {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
             moosnow.ad.getAd((res: moosnowResult) => {
                 this.mAdData = res;
 
                 if (res.indexLeft.length == 0)
                     return;
-                let source = this.setPosition(res.indexLeft, position, callback);
+                let source = this.setPosition(res.indexLeft, position, callback, true);
 
+                let showIds = [];
 
                 prefabs.forEach((prefabName, idx) => {
                     let showIndex = idx;
-                    let floatData = source[0];
                     if (showIndex > source.length - 1)
                         showIndex = 0;
-
-                    floatData = source[showIndex];
+                    let adRow = source[showIndex] as any;
+                    showIds.push({
+                        appid: adRow.appid,
+                        position: adRow.position,
+                        index: idx
+                    })
                     let point = points[idx] as any;
-                    let adRow = { ...floatData, position, x: point.x, y: point.y }
+                    adRow.x = point.x;
+                    adRow.y = point.y;
+                    adRow.source = source;
+                    adRow.showIds = showIds;
                     let logic = moosnow.entity.showEntity(prefabName, parentNode, adRow);
                     this.mFloatCache[idx] = {
                         index: showIndex,
@@ -330,7 +348,7 @@ export default class AdForm extends BaseForm {
                 showIndex = 0;
             this.mFloatCache[key].index = showIndex;
 
-            logic.refreshImg({ ...source[showIndex] });
+            logic.refreshImg(source[showIndex]);
 
         }
 

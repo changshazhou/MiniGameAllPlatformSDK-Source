@@ -52,4 +52,9 @@ export const AD_POSITION = {
     */
     EXTEND4: 8192,
 
+
+    /**
+     * 恢复到上一个状态
+     */
+    RECOVER: 16384,
 }

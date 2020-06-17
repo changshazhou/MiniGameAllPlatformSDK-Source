@@ -71,6 +71,7 @@ export default class AdForm extends BaseForm {
     pushScroll(scrollView: any, layout: any): void;
     addEvent(): void;
     removeEvent(): void;
+    private mChangeLen;
     onAdChange(data: any): void;
     private mIndex;
     /**
@@ -84,6 +85,7 @@ export default class AdForm extends BaseForm {
       */
     willShow(data: any): void;
     private mShowAd;
+    private mPrevShowAd;
     private mBackCall;
     displayChange(data: any, callback?: any): void;
     onBack(): void;
@@ -110,7 +112,7 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position?: string, callback?: Function): void;
+    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position: string, callback?: Function): void;
     floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;
