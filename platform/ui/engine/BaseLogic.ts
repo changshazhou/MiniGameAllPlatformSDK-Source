@@ -3,7 +3,16 @@ import BaseModule from "../../framework/BaseModule";
 
 export default class BaseLogic extends BaseModule {
 
-    private mLogicData: any;
+
+    /**
+     * 初始化
+     * @param logic 
+     */
+    initForm(logic) {
+        this.initProperty(logic);
+    }
+
+    public mLogicData: any;
 
 
     /**
@@ -14,6 +23,12 @@ export default class BaseLogic extends BaseModule {
     }
     willShow(data?) {
         this.mLogicData = data;
+        this.initPosition(data);
+    }
+
+
+    public initPosition(data) {
+
     }
 
     onShow(data) {

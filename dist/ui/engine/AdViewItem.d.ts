@@ -7,12 +7,13 @@ export default class AdViewItem extends BaseLogic {
     nameBg: cc.Sprite;
     changeView: boolean;
     mAdItem: moosnowAdRow;
-    initItem(): void;
     onClickAd(): void;
     private findNextAd;
     private onAdViewChange;
     onShow(): void;
     onHide(): void;
+    addListener(): void;
+    removeListener(): void;
     willShow(cell: moosnowAdRow): void;
     refreshImg(cell: moosnowAdRow): void;
 }

@@ -629,6 +629,10 @@ var mx = (function () {
         return EventType;
     }());
 
+    var MSG = {
+        HIDE_BANNER: "隐藏banner"
+    };
+
     // var videoLoading: boolean = false;
     // var videoCb = null;
     var PlatformModule = /** @class */ (function (_super) {
@@ -905,8 +909,10 @@ var mx = (function () {
             }
             this.prevNavigate = Date.now();
             if (!window[this.platformName]) {
-                if (success)
-                    success();
+                if (fail)
+                    fail();
+                // if (success)
+                //     success();
                 return;
             }
             var appid = row.appid, path = row.path, extraData = row.extraData;
@@ -1620,7 +1626,7 @@ var mx = (function () {
          * 隐藏banner
          */
         PlatformModule.prototype.hideBanner = function () {
-            console.log('隐藏banner');
+            console.log(MSG.HIDE_BANNER);
             if (!this.isBannerShow)
                 return;
             this.isBannerShow = false;
@@ -3098,7 +3104,7 @@ var mx = (function () {
             }
         };
         OPPOModule.prototype.hideBanner = function () {
-            console.log('隐藏banner');
+            console.log(MSG.HIDE_BANNER);
             if (!this.isBannerShow)
                 return;
             if (!window[this.platformName]) {
@@ -4287,7 +4293,18 @@ var mx = (function () {
              * 位置描述
              */
             this.position = "";
+            /**
+             * 取消时的回调
+             */
             this.onCancel = null;
+            /**
+             * 显示的顺序
+             */
+            this.index = 0;
+            /**
+            * 点击后是否刷新
+            */
+            this.refresh = false;
         }
         return moosnowAdRow;
     }());
@@ -5214,7 +5231,7 @@ var mx = (function () {
             });
         };
         VIVOModule.prototype.hideBanner = function () {
-            console.log('隐藏banner');
+            console.log(MSG.HIDE_BANNER);
             if (!this.isBannerShow)
                 return;
             if (!window[this.platformName]) {
@@ -6097,7 +6114,6 @@ var mx = (function () {
             _this.mScrollVec = [];
             _this.mIndex = 999;
             _this.mShowAd = moosnow.AD_POSITION.NONE;
-            _this.mMoveSpeed = 2;
             _this.mEndLogic = [];
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
@@ -6105,11 +6121,14 @@ var mx = (function () {
             _this.mSecond = 3;
             return _this;
         }
-        AdForm.prototype.setPosition = function (source, position) {
+        AdForm.prototype.setPosition = function (source, position, callback, refresh) {
             if (position === void 0) { position = ""; }
+            if (refresh === void 0) { refresh = false; }
             var retValue = Common.deepCopy(source);
             retValue.forEach(function (item) {
                 item.position = position;
+                item.onCancel = callback;
+                item.refresh = refresh;
             });
             return retValue;
         };
@@ -6126,51 +6145,29 @@ var mx = (function () {
             });
         };
         /**
-         *
+         * 绑定导出数据-
          * @param scrollView
          * @param layout
          * @param positionTag string
          * @param entityName
+         * @param callback
          */
-        AdForm.prototype.initView = function (container, scrollView, layout, position, entityName) {
+        AdForm.prototype.initView = function (container, scrollView, layout, position, entityName, callback) {
             var _this = this;
             if (!entityName) {
                 console.warn('entityName is null 无法初始化 ');
                 return;
             }
             this.loadAd(entityName, function (res) {
-                var source = _this.setPosition(res.indexLeft, position);
+                var source = _this.setPosition(res.indexLeft, position, callback);
                 source.forEach(function (item, idx) {
                     var adItemCtl = moosnow.entity.showEntity(entityName, layout.node, item);
                     _this.mAdItemList.push(adItemCtl);
                 });
-                if (layout.type == cc.Layout.Type.GRID) {
-                    if (scrollView.vertical) {
-                        _this.mScrollVec.push({
-                            scrollView: scrollView,
-                            move2Up: false
-                        });
-                    }
-                    else {
-                        _this.mScrollVec.push({
-                            scrollView: scrollView,
-                            move2Left: false
-                        });
-                    }
-                }
-                else if (layout.type == cc.Layout.Type.HORIZONTAL) {
-                    _this.mScrollVec.push({
-                        scrollView: scrollView,
-                        move2Left: false
-                    });
-                }
-                else if (layout.type == cc.Layout.Type.VERTICAL) {
-                    _this.mScrollVec.push({
-                        scrollView: scrollView,
-                        move2Up: false
-                    });
-                }
+                _this.pushScroll(scrollView, layout);
             });
+        };
+        AdForm.prototype.pushScroll = function (scrollView, layout) {
         };
         AdForm.prototype.addEvent = function () {
             moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
@@ -6193,6 +6190,7 @@ var mx = (function () {
           * @param data
           */
         AdForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
             this.mAdItemList = [];
             this.mScrollVec = [];
             this.addEvent();
@@ -6218,42 +6216,6 @@ var mx = (function () {
                 this.mBackCall();
             }
         };
-        AdForm.prototype.onFwUpdate = function (dt) {
-            for (var i = 0; i < this.mScrollVec.length; i++) {
-                var item = this.mScrollVec[i];
-                var scrollView = item.scrollView;
-                if (scrollView.isScrolling())
-                    continue;
-                var scrollOffset = scrollView.getMaxScrollOffset();
-                var maxH = scrollOffset.y / 2 + 20;
-                var maxW = scrollOffset.x / 2 + 20;
-                var contentPos = scrollView.getContentPosition();
-                if (item.move2Up == true) {
-                    if (contentPos.y > maxH) {
-                        item.move2Up = false;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed));
-                }
-                else if (item.move2Up == false) {
-                    if (contentPos.y < -maxH) {
-                        item.move2Up = true;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed));
-                }
-                if (item.move2Left == true) {
-                    if (contentPos.x > maxW) {
-                        item.move2Left = false;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y));
-                }
-                else if (item.move2Left == false) {
-                    if (contentPos.x < -maxW) {
-                        item.move2Left = true;
-                    }
-                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y));
-                }
-            }
-        };
         AdForm.prototype.sideOut = function () {
             var _this = this;
             var wxsys = moosnow.platform.getSystemInfoSync();
@@ -6275,7 +6237,15 @@ var mx = (function () {
                 _this.btnSideHide.active = false;
             })));
         };
-        AdForm.prototype.initFiexdView = function (container, layout, position, entityName) {
+        /**
+         * 绑定广告数据-固定显示6个导出
+         * @param container
+         * @param layout
+         * @param position
+         * @param entityName
+         * @param callback
+         */
+        AdForm.prototype.initFiexdView = function (container, layout, position, entityName, callback) {
             var _this = this;
             this.loadAd(entityName, function (res) {
                 if (_this.mEndLogic) {
@@ -6284,16 +6254,20 @@ var mx = (function () {
                     }
                     _this.mEndLogic = [];
                 }
-                var banner = _this.setPosition(res.indexLeft, position);
+                var banner = _this.setPosition(res.indexLeft, position, callback, true);
                 var endAd = [];
-                var showAppId = [];
+                var showIds = [];
                 for (var i = 0; i < 6; i++) {
                     var item = banner.length > i ? banner[i] : banner[0];
-                    showAppId.push(item.appid);
+                    showIds.push({
+                        appid: item.appid,
+                        position: item.position,
+                        index: i
+                    });
                     endAd.push(item);
                 }
                 endAd.forEach(function (item) {
-                    var adRow = __assign(__assign({}, Common.deepCopy(item)), { showAppId: Common.deepCopy(showAppId), source: Common.deepCopy(banner) });
+                    var adRow = __assign(__assign({}, item), { showIds: showIds, source: banner });
                     var logic = moosnow.entity.showEntity(entityName, layout, adRow);
                     _this.mEndLogic.push(logic);
                     return false;
@@ -6314,7 +6288,7 @@ var mx = (function () {
          * @param prefabs 匹配的预制体
          * @param points 需要显示的坐标点
          */
-        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points, position) {
+        AdForm.prototype.initFloatAd = function (parentNode, prefabs, points, position, callback) {
             var _this = this;
             if (position === void 0) { position = ""; }
             cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, function () {
@@ -6322,7 +6296,7 @@ var mx = (function () {
                     _this.mAdData = res;
                     if (res.indexLeft.length == 0)
                         return;
-                    var source = __spreadArrays(res.indexLeft);
+                    var source = _this.setPosition(res.indexLeft, position, callback);
                     prefabs.forEach(function (prefabName, idx) {
                         var showIndex = idx;
                         var floatData = source[0];
@@ -6335,14 +6309,13 @@ var mx = (function () {
                         _this.mFloatCache[idx] = {
                             index: showIndex,
                             logic: logic,
-                            onCancel: adRow.onCancel
                         };
                         _this.floatAnim(logic.node);
                     });
-                    _this.updateFloat(Common.deepCopy(res));
-                    setInterval(function () {
-                        _this.updateFloat(Common.deepCopy(res));
-                    }, _this.mFloatRefresh * 1000);
+                    _this.updateFloat(source);
+                    _this.schedule(function () {
+                        _this.updateFloat(source);
+                    }, _this.mFloatRefresh);
                 });
             });
         };
@@ -6352,12 +6325,12 @@ var mx = (function () {
             for (var key in this.mFloatCache) {
                 var showIndex = this.mFloatCache[key].index;
                 var logic = this.mFloatCache[key].logic;
-                if (showIndex < source.indexLeft.length - 1)
+                if (showIndex < source.length - 1)
                     showIndex++;
                 else
                     showIndex = 0;
                 this.mFloatCache[key].index = showIndex;
-                logic.refreshImg(__assign(__assign({}, source.indexLeft[showIndex]), { onCancel: this.mFloatCache[key].onCancel }));
+                logic.refreshImg(__assign({}, source[showIndex]));
             }
         };
         AdForm.prototype.hasAd = function (ad) {
@@ -6409,11 +6382,13 @@ var mx = (function () {
             this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
             if (visible && this.hasAd(AD_POSITION.EXPORT)) {
                 moosnow.http.getAllConfig(function (res) {
-                    if (res.exportAutoNavigate == 1) {
+                    if (res && res.exportAutoNavigate == 1) {
                         moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
                     }
                 });
             }
+        };
+        AdForm.prototype.onFwUpdate = function () {
         };
         return AdForm;
     }(BaseForm));
@@ -6465,7 +6440,9 @@ var mx = (function () {
     var CocosAdForm = /** @class */ (function (_super) {
         __extends(CocosAdForm, _super);
         function CocosAdForm() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mMoveSpeed = 2;
+            return _this;
         }
         CocosAdForm.prototype.addEvent = function () {
             if (this.exportClose)
@@ -6487,6 +6464,70 @@ var mx = (function () {
         };
         CocosAdForm.prototype.floatAnim = function (floatNode) {
             floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
+        };
+        CocosAdForm.prototype.pushScroll = function (scrollView, layout) {
+            if (layout.type == cc.Layout.Type.GRID) {
+                if (scrollView.vertical) {
+                    this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Up: false
+                    });
+                }
+                else {
+                    this.mScrollVec.push({
+                        scrollView: scrollView,
+                        move2Left: false
+                    });
+                }
+            }
+            else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+                this.mScrollVec.push({
+                    scrollView: scrollView,
+                    move2Left: false
+                });
+            }
+            else if (layout.type == cc.Layout.Type.VERTICAL) {
+                this.mScrollVec.push({
+                    scrollView: scrollView,
+                    move2Up: false
+                });
+            }
+        };
+        CocosAdForm.prototype.onFwUpdate = function () {
+            for (var i = 0; i < this.mScrollVec.length; i++) {
+                var item = this.mScrollVec[i];
+                var scrollView = item.scrollView;
+                if (scrollView.isScrolling())
+                    continue;
+                var scrollOffset = scrollView.getMaxScrollOffset();
+                var maxH = scrollOffset.y / 2 + 20;
+                var maxW = scrollOffset.x / 2 + 20;
+                var contentPos = scrollView.getContentPosition();
+                if (item.move2Up == true) {
+                    if (contentPos.y > maxH) {
+                        item.move2Up = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed));
+                }
+                else if (item.move2Up == false) {
+                    if (contentPos.y < -maxH) {
+                        item.move2Up = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed));
+                }
+                if (item.move2Left == true) {
+                    if (contentPos.x > maxW) {
+                        item.move2Left = false;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y));
+                }
+                else if (item.move2Left == false) {
+                    if (contentPos.x < -maxW) {
+                        item.move2Left = true;
+                    }
+                    item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y));
+                }
+            }
         };
         return CocosAdForm;
     }(AdForm));
@@ -7123,6 +7164,13 @@ var mx = (function () {
         function BaseLogic() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        /**
+         * 初始化
+         * @param logic
+         */
+        BaseLogic.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+        };
         Object.defineProperty(BaseLogic.prototype, "LogicData", {
             /**
             * 父类缓存willShow，onShow传递到实体的逻辑数据
@@ -7135,6 +7183,9 @@ var mx = (function () {
         });
         BaseLogic.prototype.willShow = function (data) {
             this.mLogicData = data;
+            this.initPosition(data);
+        };
+        BaseLogic.prototype.initPosition = function (data) {
         };
         BaseLogic.prototype.onShow = function (data) {
         };
@@ -7157,35 +7208,36 @@ var mx = (function () {
             return _this;
             // update (dt) {}
         }
-        AdViewItem.prototype.initItem = function () {
-        };
+        // public get LogicData(): moosnowAdRow {
+        //     return this.mLogicData;
+        // }
         AdViewItem.prototype.onClickAd = function () {
             var _this = this;
-            var openAd = __assign({}, this.mAdItem);
-            if (this.changeView) {
+            var openAd = this.mAdItem;
+            if (this.LogicData.refresh) {
                 var nextAd = this.findNextAd();
-                moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
-                    current: openAd,
-                    next: nextAd
-                });
-                var callback = this.mAdItem.onCancel;
-                console.log('回调函数', !!callback);
-                this.refreshImg(__assign(__assign({}, nextAd), { onCancel: callback }));
+                if (nextAd.refresh)
+                    moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
+                        current: openAd,
+                        next: nextAd
+                    });
+                this.refreshImg(nextAd);
             }
             moosnow.platform.navigate2Mini(openAd, function () { }, function () {
                 if (_this.mAdItem.onCancel)
-                    _this.mAdItem.onCancel();
+                    _this.mAdItem.onCancel(openAd);
             });
         };
         AdViewItem.prototype.findNextAd = function () {
             if (!this.LogicData.source)
                 return null;
-            if (!this.LogicData.showAppId)
+            if (!this.LogicData.showIds)
                 return null;
             for (var i = 0; i < this.LogicData.source.length; i++) {
                 var isShow = false;
-                for (var j = 0; j < this.LogicData.showAppId.length; j++) {
-                    if (this.LogicData.showAppId[j].appid == this.LogicData.source[i].appid) {
+                for (var j = 0; j < this.LogicData.showIds.length; j++) {
+                    if (this.LogicData.showIds[j].appid == this.LogicData.source[i].appid
+                        && this.LogicData.showIds[j].position == this.LogicData.source[i].position) {
                         isShow = true;
                     }
                 }
@@ -7196,14 +7248,20 @@ var mx = (function () {
             return null;
         };
         AdViewItem.prototype.onAdViewChange = function (e) {
+            if (!this.LogicData.showIds)
+                return;
+            if (!this.LogicData.source)
+                return;
             var current = e.current, next = e.next;
-            for (var i = 0; i < this.LogicData.showAppId.length; i++) {
-                if (current.appid == this.LogicData.showAppId[i]) {
-                    this.LogicData.showAppId[i] = next.appid;
+            var showApps = this.LogicData.showIds;
+            var sourceApps = this.LogicData.source;
+            for (var i = 0; i < showApps.length; i++) {
+                if (current.appid == showApps[i].appid && current.position == showApps[i].position) {
+                    this.LogicData.showIds[i] = next.appid;
                 }
             }
-            for (var i = 0; i < this.LogicData.source.length; i++) {
-                if (next.appid == this.LogicData.source[i].appid) {
+            for (var i = 0; i < sourceApps.length; i++) {
+                if (next.appid == sourceApps[i].appid) {
                     this.LogicData.source.splice(i, 1);
                     this.LogicData.source.push(current);
                     break;
@@ -7211,20 +7269,22 @@ var mx = (function () {
             }
         };
         AdViewItem.prototype.onShow = function () {
-            if (this.LogicData.onCancel) {
-                console.log('ad view item ', this.LogicData);
-            }
-            if (this.changeView) {
+            if (this.LogicData && this.LogicData.refresh)
                 moosnow.event.addListener(EventType.AD_VIEW_REFRESH, this, this.onAdViewChange);
-            }
         };
         AdViewItem.prototype.onHide = function () {
             if (this.mAdItem)
                 this.mAdItem.onCancel = null;
+            this.removeListener();
             moosnow.event.removeListener(EventType.AD_VIEW_REFRESH, this);
+        };
+        AdViewItem.prototype.addListener = function () {
+        };
+        AdViewItem.prototype.removeListener = function () {
         };
         AdViewItem.prototype.willShow = function (cell) {
             _super.prototype.willShow.call(this, cell);
+            this.addListener();
         };
         AdViewItem.prototype.refreshImg = function (cell) {
         };
@@ -7236,8 +7296,19 @@ var mx = (function () {
         function CocosAdViewItem() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        CocosAdViewItem.prototype.initItem = function () {
+        CocosAdViewItem.prototype.addListener = function () {
             this.logo.node.on(CocosNodeEvent.TOUCH_END, this.onClickAd, this);
+        };
+        CocosAdViewItem.prototype.removeListener = function () {
+            this.logo.node.off(CocosNodeEvent.TOUCH_END, this.onClickAd, this);
+        };
+        CocosAdViewItem.prototype.initPosition = function (data) {
+            if (data) {
+                // if (data.x)
+                //     this.mLogic.node.x = data.x
+                // if (data.y)
+                //     this.mLogic.node.y = data.y
+            }
         };
         CocosAdViewItem.prototype.willShow = function (cell) {
             var _this = this;

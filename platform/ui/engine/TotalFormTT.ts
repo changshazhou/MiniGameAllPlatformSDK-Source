@@ -5,27 +5,13 @@ import BaseForm from "./BaseForm";
 import BaseModule from "../../framework/BaseModule";
 
 
-const { ccclass, property } = cc._decorator;
-
-@ccclass
 export default class totalFormTT extends BaseForm {
 
-    @property(cc.Sprite)
     checked: cc.Sprite = null;
-
-    @property(cc.Sprite)
     unchecked: cc.Sprite = null;
-
-    @property(cc.Node)
     btnVideo: cc.Node = null;
-
-    @property(cc.Node)
     btnReceive: cc.Node = null;
-
-    @property(cc.Label)
     levelCoin: cc.Label = null;
-
-    @property(cc.Label)
     txtMemo: cc.Label = null;
 
     public isMask: boolean = true;

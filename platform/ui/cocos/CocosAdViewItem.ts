@@ -4,8 +4,23 @@ import CocosNodeEvent from "./CocosNodeEvent";
 
 export default class CocosAdViewItem extends AdViewItem {
 
-    public initItem() {
+
+    public addListener() {
         this.logo.node.on(CocosNodeEvent.TOUCH_END, this.onClickAd, this)
+    }
+
+    public removeListener() {
+        this.logo.node.off(CocosNodeEvent.TOUCH_END, this.onClickAd, this)
+    }
+
+
+    public initPosition(data) {
+        if (data) {
+            // if (data.x)
+            //     this.mLogic.node.x = data.x
+            // if (data.y)
+            //     this.mLogic.node.y = data.y
+        }
     }
 
     public willShow(cell: moosnowAdRow) {

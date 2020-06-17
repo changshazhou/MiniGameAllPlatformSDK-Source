@@ -5,6 +5,7 @@ import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
+import { MSG } from "../config/MSG";
 
 export default class OPPOModule extends PlatformModule {
 
@@ -20,7 +21,7 @@ export default class OPPOModule extends PlatformModule {
         this.initAdService();
     }
 
-    
+
     private initAdService() {
         if (!window[this.platformName])
             return;
@@ -421,7 +422,7 @@ export default class OPPOModule extends PlatformModule {
         }
     }
     public hideBanner() {
-        console.log('隐藏banner')
+        console.log(MSG.HIDE_BANNER)
         if (!this.isBannerShow)
             return;
         if (!window[this.platformName]) {

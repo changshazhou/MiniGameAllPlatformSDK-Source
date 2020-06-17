@@ -21,6 +21,20 @@ export default class moosnowAdRow {
      * 位置描述
      */
     public position: string = "";
+    /**
+     * 取消时的回调
+     */
     public onCancel: Function = null;
+
+    /**
+     * 显示的顺序
+     */
+    public index: number = 0
+
+    /**
+    * 点击后是否刷新
+    */
+    public refresh: boolean = false
+
 
 }

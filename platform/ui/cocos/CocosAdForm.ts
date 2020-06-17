@@ -36,4 +36,73 @@ export default class CocosAdForm extends AdForm {
             ).repeatForever()
         )
     }
+
+    public pushScroll(scrollView: any, layout: any) {
+        if (layout.type == cc.Layout.Type.GRID) {
+            if (scrollView.vertical) {
+                this.mScrollVec.push({
+                    scrollView,
+                    move2Up: false
+                })
+            }
+            else {
+                this.mScrollVec.push({
+                    scrollView,
+                    move2Left: false
+                })
+            }
+        }
+        else if (layout.type == cc.Layout.Type.HORIZONTAL) {
+            this.mScrollVec.push({
+                scrollView,
+                move2Left: false
+            })
+        }
+        else if (layout.type == cc.Layout.Type.VERTICAL) {
+            this.mScrollVec.push({
+                scrollView,
+                move2Up: false
+            })
+        }
+    }
+    
+    private mMoveSpeed: number = 2;
+    public onFwUpdate() {
+        for (let i = 0; i < this.mScrollVec.length; i++) {
+            let item = this.mScrollVec[i];
+            let scrollView = item.scrollView as cc.ScrollView;
+            if (scrollView.isScrolling())
+                continue;
+
+            let scrollOffset = scrollView.getMaxScrollOffset();
+            let maxH = scrollOffset.y / 2 + 20;
+            let maxW = scrollOffset.x / 2 + 20;
+            let contentPos = scrollView.getContentPosition()
+            if (item.move2Up == true) {
+                if (contentPos.y > maxH) {
+                    item.move2Up = false;
+                }
+                item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y + this.mMoveSpeed))
+            }
+            else if (item.move2Up == false) {
+                if (contentPos.y < -maxH) {
+                    item.move2Up = true;
+                }
+                item.scrollView.setContentPosition(new cc.Vec2(contentPos.x, contentPos.y - this.mMoveSpeed))
+            }
+            if (item.move2Left == true) {
+                if (contentPos.x > maxW) {
+                    item.move2Left = false;
+                }
+                item.scrollView.setContentPosition(new cc.Vec2(contentPos.x + this.mMoveSpeed, contentPos.y))
+            }
+            else if (item.move2Left == false) {
+                if (contentPos.x < -maxW) {
+                    item.move2Left = true;
+                }
+                item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y))
+            }
+        }
+
+    }
 }

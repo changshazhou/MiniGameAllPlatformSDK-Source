@@ -9,6 +9,7 @@ import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
+import { MSG } from "../config/MSG";
 
 
 
@@ -323,8 +324,10 @@ export default class PlatformModule extends BaseModule {
         this.prevNavigate = Date.now();
 
         if (!window[this.platformName]) {
-            if (success)
-                success();
+            if (fail)
+                fail();
+            // if (success)
+            //     success();
             return;
         }
         let { appid, path, extraData } = row;
@@ -1059,7 +1062,7 @@ export default class PlatformModule extends BaseModule {
      * 隐藏banner
      */
     public hideBanner() {
-        console.log('隐藏banner')
+        console.log(MSG.HIDE_BANNER)
         if (!this.isBannerShow)
             return;
         this.isBannerShow = false;

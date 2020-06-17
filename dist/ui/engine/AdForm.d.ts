@@ -56,17 +56,19 @@ export default class AdForm extends BaseForm {
     extend4View: any;
     extend4Layout: any;
     private mAdItemList;
-    setPosition(source: Array<moosnowAdRow>, position?: string): Array<moosnowAdRow>;
+    setPosition(source: Array<moosnowAdRow>, position?: string, callback?: Function, refresh?: boolean): Array<moosnowAdRow>;
     loadAd(entityName: string | cc.Prefab, callback: Function): void;
-    private mScrollVec;
+    mScrollVec: any[];
     /**
-     *
+     * 绑定导出数据-
      * @param scrollView
      * @param layout
      * @param positionTag string
      * @param entityName
+     * @param callback
      */
-    initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab): void;
+    initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function): void;
+    pushScroll(scrollView: any, layout: any): void;
     addEvent(): void;
     removeEvent(): void;
     onAdChange(data: any): void;
@@ -85,12 +87,18 @@ export default class AdForm extends BaseForm {
     private mBackCall;
     displayChange(data: any, callback?: any): void;
     onBack(): void;
-    private mMoveSpeed;
-    onFwUpdate(dt: any): void;
     sideOut(): void;
     sideIn(): void;
     private mEndLogic;
-    initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab): void;
+    /**
+     * 绑定广告数据-固定显示6个导出
+     * @param container
+     * @param layout
+     * @param position
+     * @param entityName
+     * @param callback
+     */
+    initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function): void;
     willHide(): void;
     private mFloatIndex;
     private mFloatRefresh;
@@ -102,11 +110,12 @@ export default class AdForm extends BaseForm {
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
      */
-    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position?: string): void;
+    initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position?: string, callback?: Function): void;
     floatAnim(floatNode: any): void;
     private updateFloat;
     private hasAd;
     private mSecond;
     private showExportClose;
     private displayAd;
+    onFwUpdate(): void;
 }
