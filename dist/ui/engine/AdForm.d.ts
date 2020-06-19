@@ -55,17 +55,21 @@ export default class AdForm extends BaseForm {
     extend4Container: any;
     extend4View: any;
     extend4Layout: any;
+    topContainer: any;
+    topView: any;
+    topLayout: any;
     private mAdItemList;
     setPosition(source: Array<moosnowAdRow>, position?: string, callback?: Function, refresh?: boolean): Array<moosnowAdRow>;
     loadAd(entityName: string | cc.Prefab, callback: Function): void;
     mScrollVec: any[];
     /**
-     * 绑定导出数据-
+     * 绑定导出数据
+     * @param container 列表容器节点，显示/隐藏  的核心节点
      * @param scrollView
-     * @param layout
-     * @param positionTag string
-     * @param entityName
-     * @param callback
+     * @param layout cc.Layout
+     * @param position 位置信息，将提交到统计后台用于分析
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
      */
     initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function): void;
     pushScroll(scrollView: any, layout: any): void;
@@ -94,11 +98,11 @@ export default class AdForm extends BaseForm {
     private mEndLogic;
     /**
      * 绑定广告数据-固定显示6个导出
-     * @param container
-     * @param layout
-     * @param position
-     * @param entityName
-     * @param callback
+     * @param container 列表容器节点，显示/隐藏  的核心节点
+     * @param layout cc.Layout
+     * @param position 位置信息，将提交到统计后台用于分析
+     * @param entityName 需要绑定的预制体
+     * @param callback 跳转取消时的回调函数
      */
     initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function): void;
     willHide(): void;
@@ -111,6 +115,8 @@ export default class AdForm extends BaseForm {
      * @param parentNode 父节点
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
      */
     initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position: string, callback?: Function): void;
     floatAnim(floatNode: any): void;

@@ -9,7 +9,13 @@ export declare const AD_POSITION: {
      * 侧拉广告
      */
     SIDE: number;
+    /**
+     * 中部大导出
+     */
     CENTER: number;
+    /**
+     * 导出
+     */
     EXPORT: number;
     /**
      * 返回按钮
@@ -47,6 +53,10 @@ export declare const AD_POSITION: {
     * 扩展4
     */
     EXTEND4: number;
+    /**
+     * 恢复到上一个状态
+     */
+    TOP: number;
     /**
      * 恢复到上一个状态
      */

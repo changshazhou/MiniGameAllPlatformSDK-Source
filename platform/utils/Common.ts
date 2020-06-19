@@ -1,5 +1,7 @@
 import { PlatformType } from "../enum/PlatformType";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
+import { moosnowConfig } from "../../window";
+import moosnowAppConfig from "../model/moosnowAppConfig";
 
 export default class Common {
     //
@@ -146,6 +148,11 @@ export default class Common {
                 if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
                     this.mPlatform = PlatformType.VIVO;
                 }
+                else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                    this.mPlatform = PlatformType.OPPO_ZS
+                else {
+                    this.mPlatform = PlatformType.OPPO
+                }
             }
             else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                 this.mPlatform = PlatformType.OPPO_ZS
@@ -182,6 +189,27 @@ export default class Common {
         return this.mPlatform;
 
     }
+
+    static get config(): moosnowAppConfig {
+        let winCfg = window["moosnowConfig"];
+        let config;
+        if (Common.platform == PlatformType.WX)
+            config = winCfg.wx;
+        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
+            config = winCfg.oppo;
+        else if (Common.platform == PlatformType.VIVO)
+            config = winCfg.vivo;
+        else if (Common.platform == PlatformType.QQ)
+            config = winCfg.qq;
+        else if (Common.platform == PlatformType.BAIDU)
+            config = winCfg.bd;
+        else if (Common.platform == PlatformType.BYTEDANCE)
+            config = winCfg.byte;
+        else
+            config = winCfg.wx;
+        return config;
+    }
+
     static deepCopy(obj): object | [] {
         //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝
         var objClone = Array.isArray(obj) ? [] : {};

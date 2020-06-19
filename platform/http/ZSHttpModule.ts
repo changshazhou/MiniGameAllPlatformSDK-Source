@@ -49,7 +49,7 @@ export class ZSHttpModule extends HttpModule {
         else {
             var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
             console.log('appid ', moosnow.platform.moosnowConfig.moosnowAppId)
-            moosnow.http.request(url, {
+            this.request(url, {
                 apk_id: moosnow.platform.moosnowConfig.moosnowAppId
             }, 'POST',
                 (res) => {

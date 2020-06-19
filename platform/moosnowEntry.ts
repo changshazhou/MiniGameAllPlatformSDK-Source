@@ -70,6 +70,7 @@ export default class moosnow {
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();
+        
         this.initPlatform();
         this.initHttp();
         this.initAd();

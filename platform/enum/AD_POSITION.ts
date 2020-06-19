@@ -9,7 +9,13 @@ export const AD_POSITION = {
      * 侧拉广告
      */
     SIDE: 4,
+    /**
+     * 中部大导出
+     */
     CENTER: 8,
+    /**
+     * 导出
+     */
     EXPORT: 16,
 
     /**
@@ -52,7 +58,10 @@ export const AD_POSITION = {
     */
     EXTEND4: 8192,
 
-
+    /**
+     * 恢复到上一个状态
+     */
+    TOP: 32768,
     /**
      * 恢复到上一个状态
      */

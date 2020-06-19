@@ -64,6 +64,7 @@ export default class moosnow {
         EXTEND2: number;
         EXTEND3: number;
         EXTEND4: number;
+        RECOVER: number;
     };
     showOptions: {
         endOptions: typeof showEndOptions;

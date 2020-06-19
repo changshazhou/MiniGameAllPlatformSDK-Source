@@ -71,6 +71,12 @@ export default class AdForm extends BaseForm {
     public extend4Layout: any = null;
 
 
+
+    public topContainer: any = null;
+    public topView: any = null;
+    public topLayout: any = null;
+
+
     private mAdItemList = [];
     public setPosition(source: Array<moosnowAdRow>, position: string = "", callback?: Function, refresh: boolean = false): Array<moosnowAdRow> {
         let retValue = Common.deepCopy(source) as [];
@@ -98,12 +104,13 @@ export default class AdForm extends BaseForm {
 
     public mScrollVec = [];
     /**
-     * 绑定导出数据-
+     * 绑定导出数据
+     * @param container 列表容器节点，显示/隐藏  的核心节点
      * @param scrollView 
-     * @param layout 
-     * @param positionTag string
-     * @param entityName 
-     * @param callback 
+     * @param layout cc.Layout
+     * @param position 位置信息，将提交到统计后台用于分析
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
      */
     public initView(container: any, scrollView: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function) {
         if (!entityName) {
@@ -231,11 +238,11 @@ export default class AdForm extends BaseForm {
     private mEndLogic = [];
     /**
      * 绑定广告数据-固定显示6个导出
-     * @param container 
-     * @param layout 
-     * @param position 
-     * @param entityName 
-     * @param callback 
+     * @param container 列表容器节点，显示/隐藏  的核心节点
+     * @param layout cc.Layout
+     * @param position 位置信息，将提交到统计后台用于分析
+     * @param entityName 需要绑定的预制体
+     * @param callback 跳转取消时的回调函数
      */
     public initFiexdView(container: any, layout: any, position: string, entityName: string | cc.Prefab, callback?: Function) {
 
@@ -287,6 +294,8 @@ export default class AdForm extends BaseForm {
      * @param parentNode 父节点
      * @param prefabs 匹配的预制体
      * @param points 需要显示的坐标点
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
      */
     public initFloatAd(parentNode, prefabs: Array<string>, points: Array<object>, position: string, callback?: Function) {
         cc.loader.loadResDir(moosnow.entity.prefabPath, cc.Prefab, () => {
@@ -391,6 +400,8 @@ export default class AdForm extends BaseForm {
         this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
 
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
+
+        this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
 
 
 

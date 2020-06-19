@@ -25,7 +25,6 @@ export class HttpModule extends BaseModule {
     public baseUrl: string = "https://api.liteplay.com.cn/";
     private _cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
 
-    private mLaunchOptions: any
     constructor() {
         super();
 
@@ -49,7 +48,7 @@ export class HttpModule extends BaseModule {
             })
         }
 
-        this.mLaunchOptions = moosnow.platform.getLaunchOption();
+
 
         this.getShareInfo((data) => {
             moosnow.platform.initShare(data);
@@ -62,6 +61,15 @@ export class HttpModule extends BaseModule {
     }
 
 
+    private mLaunchOptions: any = {};
+    private get appLaunchOptions() {
+        if (!this.mLaunchOptions) {
+            if (moosnow.platform && moosnow.platform.getLaunchOption)
+                this.mLaunchOptions = moosnow.platform.getLaunchOption();
+        }
+
+        return this.mLaunchOptions;
+    }
 
 
 
@@ -171,7 +179,7 @@ export class HttpModule extends BaseModule {
     public navigate(jump_appid: string, callback: Function) {
         let userToken = moosnow.data.getToken();
         this.request(`${this.baseUrl}api/jump/record`, {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+            appid: Common.config.moosnowAppId,
             uid: userToken,
             jump_appid,
         }, "POST", (respone) => {
@@ -205,7 +213,7 @@ export class HttpModule extends BaseModule {
         if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
             try {
                 this.request(`${this.baseUrl}${url}`, {
-                    appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                    appid: Common.config.moosnowAppId,
                     user_id: userToken,
                     channel_id: moosnow.data.getChannelId(),
                     channel_appid: moosnow.data.getChannelAppId()
@@ -326,10 +334,10 @@ export class HttpModule extends BaseModule {
                 return
 
             var url = "";
-            if (moosnow.platform.moosnowConfig.url)
-                url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
+            if (Common.config.url)
+                url = Common.config.url + "?t=" + Date.now();
             else
-                url = `${this._cdnUrl}/config/${moosnow.platform.moosnowConfig.moosnowAppId}.json`;
+                url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json`;
 
             this.request(url, {}, 'GET',
                 (res) => {
@@ -502,10 +510,10 @@ export class HttpModule extends BaseModule {
                 }
             }
         }
-        if (this.mLaunchOptions) {
-            if ([1005, 1007, 1008, 1044].indexOf(this.mLaunchOptions.scene) != -1) {
+        if (this.appLaunchOptions) {
+            if ([1005, 1007, 1008, 1044].indexOf(this.appLaunchOptions.scene) != -1) {
                 callback(true)
-                console.log('mLaunchOptions', this.mLaunchOptions);
+                console.log('appLaunchOptions', this.appLaunchOptions);
                 return;
             }
         }
@@ -531,7 +539,7 @@ export class HttpModule extends BaseModule {
 
     public getShareInfo(cb) {
         this.request(`${this.baseUrl}admin/wx_share/getShare`, {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId
+            appid: Common.config.moosnowAppId
         }, "POST", (res) => {
             console.log('分享数据', res.data)
             cb(res.data);

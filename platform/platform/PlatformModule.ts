@@ -105,22 +105,7 @@ export default class PlatformModule extends BaseModule {
     // }
 
     public initAppConfig() {
-        let winCfg = window["moosnowConfig"];
-
-        if (Common.platform == PlatformType.WX)
-            this.moosnowConfig = winCfg.wx;
-        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
-            this.moosnowConfig = winCfg.oppo;
-        else if (Common.platform == PlatformType.VIVO)
-            this.moosnowConfig = winCfg.vivo;
-        else if (Common.platform == PlatformType.QQ)
-            this.moosnowConfig = winCfg.qq;
-        else if (Common.platform == PlatformType.BAIDU)
-            this.moosnowConfig = winCfg.bd;
-        else if (Common.platform == PlatformType.BYTEDANCE)
-            this.moosnowConfig = winCfg.byte;
-        else
-            this.moosnowConfig = winCfg.wx;
+        this.moosnowConfig = Common.config;
 
         this.bannerId = this.moosnowConfig["bannerId"];
         this.videoId = this.moosnowConfig["videoId"];

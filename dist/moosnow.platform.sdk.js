@@ -408,6 +408,11 @@ var mx = (function () {
                         if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
                             this.mPlatform = PlatformType.VIVO;
                         }
+                        else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                            this.mPlatform = PlatformType.OPPO_ZS;
+                        else {
+                            this.mPlatform = PlatformType.OPPO;
+                        }
                     }
                     else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                         this.mPlatform = PlatformType.OPPO_ZS;
@@ -441,6 +446,29 @@ var mx = (function () {
                         this.mPlatform = PlatformType.PC;
                 }
                 return this.mPlatform;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Common, "config", {
+            get: function () {
+                var winCfg = window["moosnowConfig"];
+                var config;
+                if (Common.platform == PlatformType.WX)
+                    config = winCfg.wx;
+                else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
+                    config = winCfg.oppo;
+                else if (Common.platform == PlatformType.VIVO)
+                    config = winCfg.vivo;
+                else if (Common.platform == PlatformType.QQ)
+                    config = winCfg.qq;
+                else if (Common.platform == PlatformType.BAIDU)
+                    config = winCfg.bd;
+                else if (Common.platform == PlatformType.BYTEDANCE)
+                    config = winCfg.byte;
+                else
+                    config = winCfg.wx;
+                return config;
             },
             enumerable: true,
             configurable: true
@@ -701,21 +729,7 @@ var mx = (function () {
         //     Lite.event.sendEventImmediately('OnWXShow', this.getLaunchOption());
         // }
         PlatformModule.prototype.initAppConfig = function () {
-            var winCfg = window["moosnowConfig"];
-            if (Common.platform == PlatformType.WX)
-                this.moosnowConfig = winCfg.wx;
-            else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
-                this.moosnowConfig = winCfg.oppo;
-            else if (Common.platform == PlatformType.VIVO)
-                this.moosnowConfig = winCfg.vivo;
-            else if (Common.platform == PlatformType.QQ)
-                this.moosnowConfig = winCfg.qq;
-            else if (Common.platform == PlatformType.BAIDU)
-                this.moosnowConfig = winCfg.bd;
-            else if (Common.platform == PlatformType.BYTEDANCE)
-                this.moosnowConfig = winCfg.byte;
-            else
-                this.moosnowConfig = winCfg.wx;
+            this.moosnowConfig = Common.config;
             this.bannerId = this.moosnowConfig["bannerId"];
             this.videoId = this.moosnowConfig["videoId"];
             this.interId = this.moosnowConfig["interId"];
@@ -2277,6 +2291,7 @@ var mx = (function () {
             _this.version = "2.0.0";
             _this.baseUrl = "https://api.liteplay.com.cn/";
             _this._cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
+            _this.mLaunchOptions = {};
             _this.cfgData = null;
             _this.areaData = null;
             _this._cfgQuene = [];
@@ -2297,7 +2312,6 @@ var mx = (function () {
                         console.error("\u963F\u62C9\u4E01\u6587\u4EF6\u9519\u8BEF\uFF0C\u8BF7\u91CD\u65B0\u4E0B\u8F7D" + res.aldUrl);
                 });
             }
-            _this.mLaunchOptions = moosnow.platform.getLaunchOption();
             _this.getShareInfo(function (data) {
                 moosnow.platform.initShare(data);
             });
@@ -2306,6 +2320,17 @@ var mx = (function () {
             });
             return _this;
         }
+        Object.defineProperty(HttpModule.prototype, "appLaunchOptions", {
+            get: function () {
+                if (!this.mLaunchOptions) {
+                    if (moosnow.platform && moosnow.platform.getLaunchOption)
+                        this.mLaunchOptions = moosnow.platform.getLaunchOption();
+                }
+                return this.mLaunchOptions;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 请求服务
          * @param {*} url
@@ -2404,7 +2429,7 @@ var mx = (function () {
         HttpModule.prototype.navigate = function (jump_appid, callback) {
             var userToken = moosnow.data.getToken();
             this.request(this.baseUrl + "api/jump/record", {
-                appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                appid: Common.config.moosnowAppId,
                 uid: userToken,
                 jump_appid: jump_appid,
             }, "POST", function (respone) {
@@ -2433,7 +2458,7 @@ var mx = (function () {
             if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
                 try {
                     this.request("" + this.baseUrl + url, {
-                        appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                        appid: Common.config.moosnowAppId,
                         user_id: userToken,
                         channel_id: moosnow.data.getChannelId(),
                         channel_appid: moosnow.data.getChannelAppId()
@@ -2538,10 +2563,10 @@ var mx = (function () {
                 if (this._cfgQuene.length > 1)
                     return;
                 var url = "";
-                if (moosnow.platform.moosnowConfig.url)
-                    url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
+                if (Common.config.url)
+                    url = Common.config.url + "?t=" + Date.now();
                 else
-                    url = this._cdnUrl + "/config/" + moosnow.platform.moosnowConfig.moosnowAppId + ".json";
+                    url = this._cdnUrl + "/config/" + Common.config.moosnowAppId + ".json";
                 this.request(url, {}, 'GET', function (res) {
                     _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0 });
                     if (moosnow.platform) {
@@ -2693,10 +2718,10 @@ var mx = (function () {
                     }
                 }
             }
-            if (this.mLaunchOptions) {
-                if ([1005, 1007, 1008, 1044].indexOf(this.mLaunchOptions.scene) != -1) {
+            if (this.appLaunchOptions) {
+                if ([1005, 1007, 1008, 1044].indexOf(this.appLaunchOptions.scene) != -1) {
                     callback(true);
-                    console.log('mLaunchOptions', this.mLaunchOptions);
+                    console.log('appLaunchOptions', this.appLaunchOptions);
                     return;
                 }
             }
@@ -2719,7 +2744,7 @@ var mx = (function () {
         };
         HttpModule.prototype.getShareInfo = function (cb) {
             this.request(this.baseUrl + "admin/wx_share/getShare", {
-                appid: moosnow.platform.moosnowConfig.moosnowAppId
+                appid: Common.config.moosnowAppId
             }, "POST", function (res) {
                 console.log('分享数据', res.data);
                 cb(res.data);
@@ -4614,7 +4639,7 @@ var mx = (function () {
             else {
                 var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
                 console.log('appid ', moosnow.platform.moosnowConfig.moosnowAppId);
-                moosnow.http.request(url, {
+                this.request(url, {
                     apk_id: moosnow.platform.moosnowConfig.moosnowAppId
                 }, 'POST', function (res) {
                     var enabled = res.data.zs_version == moosnow.platform.moosnowConfig.version;
@@ -5507,7 +5532,13 @@ var mx = (function () {
          * 侧拉广告
          */
         SIDE: 4,
+        /**
+         * 中部大导出
+         */
         CENTER: 8,
+        /**
+         * 导出
+         */
         EXPORT: 16,
         /**
          * 返回按钮
@@ -5545,6 +5576,10 @@ var mx = (function () {
         * 扩展4
         */
         EXTEND4: 8192,
+        /**
+         * 恢复到上一个状态
+         */
+        TOP: 32768,
         /**
          * 恢复到上一个状态
          */
@@ -6114,6 +6149,9 @@ var mx = (function () {
             _this.extend4Container = null;
             _this.extend4View = null;
             _this.extend4Layout = null;
+            _this.topContainer = null;
+            _this.topView = null;
+            _this.topLayout = null;
             _this.mAdItemList = [];
             _this.mScrollVec = [];
             _this.mChangeLen = 0;
@@ -6151,12 +6189,13 @@ var mx = (function () {
             });
         };
         /**
-         * 绑定导出数据-
+         * 绑定导出数据
+         * @param container 列表容器节点，显示/隐藏  的核心节点
          * @param scrollView
-         * @param layout
-         * @param positionTag string
-         * @param entityName
-         * @param callback
+         * @param layout cc.Layout
+         * @param position 位置信息，将提交到统计后台用于分析
+         * @param entityName  需要绑定的预制体
+         * @param callback  跳转取消时的回调函数
          */
         AdForm.prototype.initView = function (container, scrollView, layout, position, entityName, callback) {
             var _this = this;
@@ -6254,11 +6293,11 @@ var mx = (function () {
         };
         /**
          * 绑定广告数据-固定显示6个导出
-         * @param container
-         * @param layout
-         * @param position
-         * @param entityName
-         * @param callback
+         * @param container 列表容器节点，显示/隐藏  的核心节点
+         * @param layout cc.Layout
+         * @param position 位置信息，将提交到统计后台用于分析
+         * @param entityName 需要绑定的预制体
+         * @param callback 跳转取消时的回调函数
          */
         AdForm.prototype.initFiexdView = function (container, layout, position, entityName, callback) {
             var _this = this;
@@ -6302,6 +6341,8 @@ var mx = (function () {
          * @param parentNode 父节点
          * @param prefabs 匹配的预制体
          * @param points 需要显示的坐标点
+         * @param entityName  需要绑定的预制体
+         * @param callback  跳转取消时的回调函数
          */
         AdForm.prototype.initFloatAd = function (parentNode, prefabs, points, position, callback) {
             var _this = this;
@@ -6379,6 +6420,7 @@ var mx = (function () {
             this.exportMask.active = visible && this.hasAd(AD_POSITION.MASK);
             this.sideContainer.active = visible && this.hasAd(AD_POSITION.SIDE);
             this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
+            this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.extend1Container.active = visible && this.hasAd(AD_POSITION.EXTEND1);
             this.extend2Container.active = visible && this.hasAd(AD_POSITION.EXTEND2);
             this.extend3Container.active = visible && this.hasAd(AD_POSITION.EXTEND3);

@@ -1,4 +1,5 @@
 import { PlatformType } from "../enum/PlatformType";
+import moosnowAppConfig from "../model/moosnowAppConfig";
 export default class Common {
     static titleCase(s: any): any;
     static numFixed(num: any, len: any): number;
@@ -30,6 +31,7 @@ export default class Common {
      * debug没有时 默认返回微信平台
      */
     static get platform(): PlatformType;
+    static get config(): moosnowAppConfig;
     static deepCopy(obj: any): object | [];
     static getEngine(): string;
     static popOpenAnim(node: cc.Node, callback?: Function): void;

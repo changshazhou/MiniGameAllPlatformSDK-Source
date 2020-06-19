@@ -6,8 +6,9 @@ export declare class HttpModule extends BaseModule {
     version: string;
     baseUrl: string;
     private _cdnUrl;
-    private mLaunchOptions;
     constructor();
+    private mLaunchOptions;
+    private get appLaunchOptions();
     /**
      * 请求服务
      * @param {*} url
