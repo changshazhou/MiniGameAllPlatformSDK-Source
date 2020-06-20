@@ -1,6 +1,7 @@
 import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
 import { PlatformType } from "../enum/PlatformType";
+import { MSG } from "../config/MSG";
 
 
 let ErrorType = {
@@ -255,7 +256,7 @@ export class HttpModule extends BaseModule {
                     userId: moosnow.data.getToken() //用户ID
                 });
             else
-                console.warn('阿拉丁文件未引入')
+                console.warn(MSG.ALD_FILE_NO_IMPORT)
     }
     /**
      * 统计结束游戏
@@ -278,7 +279,7 @@ export class HttpModule extends BaseModule {
                 }
             });
         else
-            console.warn('阿拉丁文件未引入')
+            console.warn(MSG.ALD_FILE_NO_IMPORT)
     }
     /**
      * 视频统计
@@ -292,7 +293,8 @@ export class HttpModule extends BaseModule {
         if (window['wx'] && window['wx'].aldSendEvent)
             window['wx'].aldSendEvent(name, { info, level: level + "" });
         else
-            console.warn('阿拉丁文件未引入')
+            console.warn(MSG.ALD_FILE_NO_IMPORT)
+
     }
 
     /**

@@ -83,7 +83,7 @@ export default class OPPOModule extends PlatformModule {
         extraData = extraData || {};
         // 跳转小游戏按钮，支持最低平台版本号'1044' (minPlatformVersion>='1044')
         if (!this.supportVersion(1044)) {
-            console.log('版本过低 平台不支持跳转')
+            console.log(MSG.PLATFORM_UNSUPPORT)
             return
         }
         window[this.platformName].navigateToMiniGame({
@@ -612,7 +612,7 @@ export default class OPPOModule extends PlatformModule {
 
         }
         else {
-            console.log(`原生广告加载出错，本次没有广告`, err)
+            console.log(MSG.NATIVE_ERROR2, err)
             if (Common.isFunction(this.nativeCb)) {
                 this.nativeCb(null)
             }
@@ -624,7 +624,7 @@ export default class OPPOModule extends PlatformModule {
         this.native.offLoad() // 移除原生广告加载成功回调
         this.native.offError() // 移除失败回调
         this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
-        console.log('原生广告销毁')
+        console.log(MSG.NATIVE_DESTROY)
     }
 
     /**
