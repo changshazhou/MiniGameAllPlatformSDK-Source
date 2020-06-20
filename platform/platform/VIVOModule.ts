@@ -433,7 +433,7 @@ export default class VIVOModule extends PlatformModule {
     }
     public prepareInter() {
         if (Common.isEmpty(this.interId)) {
-            console.warn('插屏广告ID为空，系统不加载');
+            console.warn(MSG.INTER_KEY_IS_NULL);
             return;
         }
         if (!window[this.platformName])
@@ -510,11 +510,11 @@ export default class VIVOModule extends PlatformModule {
 
     public _onNativeLoad(res) {
         this.nativeLoading = false;
-        console.log(`加载原生广告成功`, res)
+        console.log(MSG.NATIVE_LOAD_COMPLETED, res)
         if (res && res.adList && res.adList.length > 0) {
             this.nativeAdResult = res.adList[0];
             if (!Common.isEmpty(this.nativeAdResult.adId)) {
-                console.log(`上报原生广告`)
+                console.log(MSG.NATIVE_REPORT)
                 this.native.reportAdShow({
                     adId: this.nativeAdResult.adId
                 });
@@ -524,7 +524,7 @@ export default class VIVOModule extends PlatformModule {
             }
         }
         else {
-            console.log(`原生广告数据没有，回调Null`)
+            console.log(MSG.NATIVE_LIST_NULL)
             if (Common.isFunction(this.nativeCb)) {
                 this.nativeCb(null)
             }
@@ -536,13 +536,13 @@ export default class VIVOModule extends PlatformModule {
         this.nativeAdResult = null;
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
-                console.log(`原生广告加载出错 `, err, '使用新ID加载原生广告')
+                console.log(MSG.NATIVE_ERROR, err,)
                 this.nativeIdIndex += 1;
                 this._destroyNative();
                 this._prepareNative();
             }
             else {
-                console.log(`原生广告ID已经用完，本次没有广告`)
+                console.log(MSG.NATIVE_NOT_ID_USE)
                 this.nativeIdIndex = 0;
                 if (Common.isFunction(this.nativeCb)) {
                     this.nativeCb(null)
@@ -621,7 +621,7 @@ export default class VIVOModule extends PlatformModule {
         if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
             this.mClickedNativeCallback = callback;
             this.mIsClickedNative = true;
-            console.log('点击了原生广告', this.nativeAdResult.adId)
+            console.log(MSG.NATIVE_CLICK, this.nativeAdResult.adId)
             this.native.reportAdClick({
                 adId: this.nativeAdResult.adId
             })

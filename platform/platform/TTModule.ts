@@ -37,7 +37,7 @@ export default class TTModule extends PlatformModule {
             window[this.platformName].onMoreGamesModalClose((res) => {
                 console.log("modal closed", res);
                 if (this.moreGameCb)
-                    this.moreGameCb(res);
+                    this.moreGameCb(0);
             });
         // 监听小游戏跳转
         if (window[this.platformName].onNavigateToMiniGameBox) {
@@ -56,7 +56,7 @@ export default class TTModule extends PlatformModule {
         if (typeof window[this.platformName].createInterstitialAd != "function") return;
 
         if (Common.isEmpty(this.interId)) {
-            console.warn('插屏广告ID为空，系统不加载')
+            console.warn(MSG.INTER_KEY_IS_NULL);
             return;
         }
         this.inter = window[this.platformName].createInterstitialAd({
@@ -283,7 +283,7 @@ export default class TTModule extends PlatformModule {
         }
         else {
             this.banner.style.top = top;
-            console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+            console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
         }
     }
     /**

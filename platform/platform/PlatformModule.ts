@@ -938,7 +938,7 @@ export default class PlatformModule extends BaseModule {
         }
         else {
             this.banner.style.top = top;
-            console.log('banner位置或大小被重新设置 ', this.banner.style, 'set top ', top)
+            console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
         }
 
 
@@ -1128,7 +1128,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _onVideoError(msg, code) {
-        console.log('加载video失败回调', msg, code)
+        console.log(MSG.VIDEO_ERROR_COMPLETED, msg, code)
         moosnow.platform.videoLoading = false;
         this.videoPlaying = false;
         if (moosnow.platform.videoCb) {
@@ -1176,7 +1176,7 @@ export default class PlatformModule extends BaseModule {
         if (typeof window[this.platformName].createInterstitialAd != "function") return;
         if (!this.supportVersion('2.8.0')) return;
         if (Common.isEmpty(this.interId)) {
-            console.warn('插屏广告ID为空，系统不加载')
+            console.warn(MSG.INTER_KEY_IS_NULL);
             return;
         }
         this.inter = window[this.platformName].createInterstitialAd({
