@@ -301,9 +301,9 @@ export default class PlatformModule extends BaseModule {
      */
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
-        console.log('跳转数据：', row)
+        console.log(MSG.NAVIGATE_DATA, row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
+            console.log(MSG.NAVIGATE_FAST)
             return;
         }
         this.prevNavigate = Date.now();
@@ -606,7 +606,7 @@ export default class PlatformModule extends BaseModule {
                 this.systemInfo = window[this.platformName].getSystemInfoSync();
             else
                 this.systemInfo = {}
-            console.log('设备信息', this.systemInfo)
+            console.log(MSG.SYSTEM_INFO, this.systemInfo)
         }
         return this.systemInfo;
     }
@@ -876,7 +876,7 @@ export default class PlatformModule extends BaseModule {
         let windowWidth = wxsys.windowWidth;
         let left = (windowWidth - this.bannerWidth) / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         let banner = window[this.platformName].createBannerAd({
@@ -955,7 +955,7 @@ export default class PlatformModule extends BaseModule {
     public showBanner(callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
-        console.log('显示banner')
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
@@ -1089,7 +1089,7 @@ export default class PlatformModule extends BaseModule {
             return;
         }
         if (Common.isEmpty(this.videoId)) {
-            console.warn(' video id is null')
+            console.warn(MSG.VIDEO_KEY_IS_NULL)
             moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
@@ -1138,7 +1138,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _onVideoClose(isEnd) {
-        console.log('video结束回调', isEnd.isEnded)
+        console.log(MSG.VIDEO_CLOSE_COMPLETED, isEnd.isEnded)
         moosnow.platform.videoLoading = false;
         this.videoPlaying = false;
         if (!!isEnd.isEnded) {
@@ -1153,7 +1153,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _onVideoLoad() {
-        console.log('加载video成功回调')
+        console.log(MSG.VIDEO_LOAD_COMPLETED)
         moosnow.platform.videoLoading = false;
     }
     /**

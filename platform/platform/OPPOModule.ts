@@ -67,9 +67,9 @@ export default class OPPOModule extends PlatformModule {
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
-        console.log('跳转数据：', row)
+        console.log(MSG.NAVIGATE_DATA, row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
+            console.log(MSG.NAVIGATE_FAST)
             return;
         }
         this.prevNavigate = Date.now();
@@ -264,7 +264,7 @@ export default class OPPOModule extends PlatformModule {
         let windowHeight = wxsys.windowHeight;
         let left = (windowWidth - this.bannerWidth) / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
 
@@ -362,7 +362,7 @@ export default class OPPOModule extends PlatformModule {
      * @param style 自定义样式
      */
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
-        console.log('显示banner')
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
@@ -468,7 +468,7 @@ export default class OPPOModule extends PlatformModule {
             this.video.offLoad(this._onVideoLoad);
         } else {
             if (Common.isEmpty(this.videoId)) {
-                console.warn(' video id is null')
+                console.warn(MSG.VIDEO_KEY_IS_NULL)
                 return;
             }
             this.video = window[this.platformName].createRewardedVideoAd({
@@ -483,7 +483,7 @@ export default class OPPOModule extends PlatformModule {
 
     }
     public _onVideoLoad() {
-        console.log('加载video成功回调')
+        console.log(MSG.VIDEO_LOAD_COMPLETED)
         moosnow.platform.videoLoading = false;
         if (this.video) {
             this.video.show();

@@ -8,6 +8,7 @@ import appLaunchOption from "../model/appLaunchOption";
 import bannerStyle from "../model/bannerStyle";
 import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowResult from "../model/moosnowResult";
+import { MSG } from "../config/MSG";
 
 export default class TTModule extends PlatformModule {
 
@@ -294,7 +295,7 @@ export default class TTModule extends PlatformModule {
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
-        console.log('显示banner')
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
 
         this.isBannerShow = true;
@@ -506,7 +507,7 @@ export default class TTModule extends PlatformModule {
         if (systemInfo.platform == "ios") return true;
         return false;
     }
-    
+
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
         console.log('tt navigate2Mini ')
         this.showAppBox(() => {

@@ -39,9 +39,9 @@ export default class VIVOModule extends PlatformModule {
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
-        console.log('跳转数据：', row)
+        console.log(MSG.NAVIGATE_DATA, row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
+            console.log(MSG.NAVIGATE_FAST)
             return;
         }
         this.prevNavigate = Date.now();
@@ -199,7 +199,7 @@ export default class VIVOModule extends PlatformModule {
                 this.systemInfo = window[this.platformName].getSystemInfoSync();
             else
                 this.systemInfo = {}
-            console.log('设备信息', this.systemInfo)
+            console.log(MSG.SYSTEM_INFO, this.systemInfo)
         }
 
 
@@ -250,7 +250,7 @@ export default class VIVOModule extends PlatformModule {
 
         let left = (screenWidth - this.bannerWidth) / pixelRatio / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
 
@@ -386,7 +386,7 @@ export default class VIVOModule extends PlatformModule {
             return;
         }
         if (Common.isEmpty(this.videoId)) {
-            console.warn(' video id is null')
+            console.warn(MSG.VIDEO_KEY_IS_NULL)
             return;
         }
         if (!this.video) {
@@ -403,7 +403,7 @@ export default class VIVOModule extends PlatformModule {
 
     }
     public _onVideoLoad() {
-        console.log('加载video成功回调')
+        console.log(MSG.VIDEO_LOAD_COMPLETED)
         moosnow.platform.videoLoading = false;
         if (this.video) {
             this.video.show()
@@ -417,7 +417,7 @@ export default class VIVOModule extends PlatformModule {
         }
     }
     public _onVideoClose(isEnd) {
-        console.log('video结束回调', isEnd.isEnded)
+        console.log(MSG.VIDEO_CLOSE_COMPLETED, isEnd.isEnded)
         moosnow.platform.videoLoading = false;
         this.videoPlaying = false;
         if (!!isEnd.isEnded) {

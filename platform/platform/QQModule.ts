@@ -2,6 +2,7 @@ import PlatformModule from './PlatformModule';
 import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
 import bannerStyle from '../model/bannerStyle';
+import { MSG } from '../config/MSG';
 
 
 export default class QQModule extends PlatformModule {
@@ -23,7 +24,7 @@ export default class QQModule extends PlatformModule {
         let centerPos = (windowWidth - this.bannerWidth) / 2;
         let top = windowHeight - height / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         console.log('create banner by banner id ', this.bannerId)
@@ -48,7 +49,7 @@ export default class QQModule extends PlatformModule {
        * @param style 自定义样式
        */
     public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
-        console.log('显示banner')
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
