@@ -273,7 +273,15 @@ export default class Common {
         }
         callback();
     }
-
+    /*格式化字符，类似于C# String.Format */
+    static format(str: string, ...rep: string[]) {
+        if (typeof (str) == "undefined" || str == null || str == '' || str == 'undefined') return str;
+        for (var i = 0; i < rep.length; i++) {
+            var re = new RegExp('\\{' + (i) + '\\}', 'gm');
+            str = str.replace(re, rep[i]);
+        }
+        return str;
+    }
     static formatMoney(value: number) {
         let retValue: any = "0";
         if (isNaN(value))

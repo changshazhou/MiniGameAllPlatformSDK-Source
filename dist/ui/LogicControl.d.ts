@@ -9,6 +9,7 @@ import PrizeFormTT from "./engine/PrizeFormTT";
 import CoinForm from "./engine/CoinForm";
 import TotalForm from "./engine/TotalForm";
 import ShareFormTT from "./engine/ShareFormTT";
+import AdInviteBox from "./engine/AdInviteBox";
 /**
  * 页面逻辑控制
  */
@@ -18,6 +19,8 @@ export default class LogicControl {
      * 返回一个AdViewItem实例
      */
     newViewItem(): AdViewItem;
+    private mAdInviteBox;
+    get inviteBox(): AdInviteBox;
     private mAdForm;
     get adForm(): AdForm;
     private mAdFormQQ;

@@ -41,7 +41,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 
-export default class moosnow {
+class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
@@ -70,7 +70,7 @@ export default class moosnow {
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
         this.mEvent = new EventModule();
-        
+
         this.initPlatform();
         this.initHttp();
         this.initAd();

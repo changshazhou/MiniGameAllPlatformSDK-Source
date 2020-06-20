@@ -404,13 +404,18 @@ export default class AdForm extends BaseForm {
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
 
 
-
         this.extend1Container.active = visible && this.hasAd(AD_POSITION.EXTEND1);
         this.extend2Container.active = visible && this.hasAd(AD_POSITION.EXTEND2);
         this.extend3Container.active = visible && this.hasAd(AD_POSITION.EXTEND3);
         this.extend4Container.active = visible && this.hasAd(AD_POSITION.EXTEND4);
+        this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
 
+        this.showClose(visible);
 
+        this.showInviteBox(visible)
+    }
+
+    private showClose(visible) {
 
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;
@@ -432,15 +437,53 @@ export default class AdForm extends BaseForm {
             this.exportClose.active = false;
             this.exportCloseTxt.active = false;
         }
+    }
 
-        this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
+    private showInviteBox(visible) {
         if (visible && this.hasAd(AD_POSITION.EXPORT)) {
             moosnow.http.getAllConfig(res => {
-                if (res && res.exportAutoNavigate == 1) {
-                    moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
+                if (res) {
+                    if (res.exportAutoNavigate == 1)
+                        moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
+                    if (res.exportAutoInvite)
+                        this._createInviteBox();
                 }
             })
         }
+        if (visible && this.hasAd(AD_POSITION.BANNER)) {
+            moosnow.http.getAllConfig(res => {
+                this._createInviteBox();
+                if (res) {
+                    if (res.bannerAutoInvite)
+                        this._createInviteBox();
+                }
+            })
+        }
+        if (visible && this.hasAd(AD_POSITION.SIDE)) {
+            moosnow.http.getAllConfig(res => {
+                if (res) {
+                    if (res.sideAutoInvite)
+                        this._createInviteBox();
+                }
+            })
+        }
+    }
+
+    private _createInviteBox() {
+
+        moosnow.http.getAllConfig(res => {
+            if (res) {
+                let inviteDelay = isNaN(res.inviteDelay) ? 0 : parseFloat(res.inviteDelay)
+                if (inviteDelay > 0)
+                    this.scheduleOnce(() => {
+                        moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
+                    }, inviteDelay)
+                else
+                    moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
+            }
+            else
+                moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
+        })
 
     }
 

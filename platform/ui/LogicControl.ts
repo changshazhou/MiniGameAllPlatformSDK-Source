@@ -21,6 +21,8 @@ import TotalForm from "./engine/TotalForm";
 import CocosTotalForm from "./cocos/CocosTotalForm";
 import ShareFormTT from "./engine/ShareFormTT";
 import CocosShareFormTT from "./cocos/CocosShareFormTT";
+import AdInviteBox from "./engine/AdInviteBox";
+import CocosAdInviteBox from "./cocos/CocosAdInviteBox";
 
 /**
  * 页面逻辑控制
@@ -35,6 +37,13 @@ export default class LogicControl {
         return new CocosAdViewItem();
     };
 
+
+    private mAdInviteBox: AdInviteBox
+    public get inviteBox(): AdInviteBox {
+        if (!this.mAdInviteBox)
+            this.mAdInviteBox = new CocosAdInviteBox();
+        return this.mAdInviteBox;
+    };
 
     private mAdForm: AdForm;
     public get adForm(): AdForm {

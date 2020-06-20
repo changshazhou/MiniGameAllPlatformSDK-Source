@@ -125,5 +125,8 @@ export default class AdForm extends BaseForm {
     private mSecond;
     private showExportClose;
     private displayAd;
+    private showClose;
+    private showInviteBox;
+    private _createInviteBox;
     onFwUpdate(): void;
 }

@@ -54,7 +54,7 @@ export declare const AD_POSITION: {
     */
     EXTEND4: number;
     /**
-     * 恢复到上一个状态
+     * 顶部
      */
     TOP: number;
     /**

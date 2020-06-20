@@ -36,5 +36,6 @@ export default class Common {
     static getEngine(): string;
     static popOpenAnim(node: cc.Node, callback?: Function): void;
     static popCloseAnim(node: cc.Node, callback?: Function): void;
+    static format(str: string, ...rep: string[]): string;
     static formatMoney(value: number): any;
 }

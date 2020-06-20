@@ -34,7 +34,7 @@ gulp.task('tsc', () => {
 				compress: false
 			}),
 			// terser.terser(),
-			// uglify.uglify(),
+			uglify.uglify(),
 			/*terser({
 				output: {
 				},

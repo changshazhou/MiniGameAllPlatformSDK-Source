@@ -75,6 +75,7 @@ declare global {
             EXTEND2: number;
             EXTEND3: number;
             EXTEND4: number;
+            TOP: number,
             /**
             * 恢复到上一个状态
             */
