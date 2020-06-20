@@ -9,12 +9,12 @@ export default class CocosAdInviteBox extends AdInviteBox {
 
 
     public addListener() {
-        this.confirm.on(CocosNodeEvent.TOUCH_END, this, this.onConfirm)
-        this.cancel.on(CocosNodeEvent.TOUCH_END, this, this.onCancel)
+        this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.onConfirm, this)
+        this.btnCancel.on(CocosNodeEvent.TOUCH_END, this.onCancel, this)
     }
     public removeListener() {
-        this.confirm.off(CocosNodeEvent.TOUCH_END, this, this.onConfirm)
-        this.cancel.on(CocosNodeEvent.TOUCH_END, this, this.onCancel)
+        this.btnConfirm.off(CocosNodeEvent.TOUCH_END, this.onConfirm, this);
+        this.btnCancel.off(CocosNodeEvent.TOUCH_END, this.onCancel, this);
     }
 
     public initBox(userName, logo, gameName) {

@@ -3,8 +3,8 @@ export default class AdInviteBox extends BaseLogic {
     logo: any;
     gameName: any;
     userName: any;
-    confirm: any;
-    cancel: any;
+    btnConfirm: any;
+    btnCancel: any;
     private url;
     private mCurrentAdRow;
     willShow(data: any): void;
