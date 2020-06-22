@@ -372,12 +372,17 @@ export default class PlatformModule extends BaseModule {
             })
         }
     }
-
+    /**
+     * 短震动
+     */
     public vibrateShort() {
         if (!window[this.platformName]) return;
         if (window[this.platformName] && !window[this.platformName].vibrateShort) return;
         window[this.platformName].vibrateShort();
     }
+    /**
+     * 长震动
+     */
     public vibrateLong() {
         if (!window[this.platformName]) return;
         if (window[this.platformName] && !window[this.platformName].vibrateLong) return;

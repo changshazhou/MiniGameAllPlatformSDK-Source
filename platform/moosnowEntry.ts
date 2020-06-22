@@ -74,17 +74,7 @@ class moosnow {
         this.initPlatform();
         this.initHttp();
         this.initAd();
-        this.initUI();
-        this.initEntity();
 
-    }
-
-    private initUI() {
-        this.mUi = new CocosUIModule();
-    }
-
-    private initEntity() {
-        this.mEntity = new CocosEntityModule();
     }
 
     private initHttp() {
@@ -181,36 +171,7 @@ class moosnow {
     public get event() {
         return this.mEvent;
     }
-    /**
-     * UI控制
-     */
-    private mUi: BaseUIModule;
-    public get ui() {
-        return this.mUi;
-    }
 
-    /**
-     * form UI 操作
-     */
-    private mForm: UIForm = new UIForm();
-    public get form() {
-        return this.mForm;
-    }
-
-    /**
-     * form表单控制
-     */
-    private mControl: LogicControl = new LogicControl();
-    public get control() {
-        return this.mControl;
-    }
-
-
-
-    private mEntity: BaseEntityModule = new BaseEntityModule();
-    public get entity() {
-        return this.mEntity;
-    }
 
     private mAudio: AudioModule = null;
     public get audio() {
@@ -221,10 +182,6 @@ class moosnow {
     }
 
 
-    private mDelay: Delay = new Delay();
-    public get delay() {
-        return this.mDelay;
-    }
 
 }
 new moosnow();

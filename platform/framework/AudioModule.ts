@@ -22,89 +22,14 @@ export default class AudioModule extends BaseModule {
                 this._replayMusic();
         })
     }
-
     /**
-      * 播放音效
-      */
-    public playSound(audioClip: cc.AudioClip, loops: boolean = false, complete = null, soundClass = null, startTime = 0) {
-        if (this.isMute)
-            return
-        let soundId = cc.audioEngine.playEffect(audioClip, loops);
-        cc.audioEngine.setFinishCallback(soundId, (res) => {
-            if (complete) {
-                complete(res);
-            }
-            if (!loops) {
-                //cc.audioEngine.getState(soundId)==cc.audioEngine.AudioState.PLAYING
-                cc.audioEngine.stop(soundId);
-            }
-        })
-
-        return soundId
-    }
-
-
-    private _replayMusic() {
-        this.playMusic(this._musicClip, this._musicLoops, this._musicComplete);
-    }
-
-
-    private _musicClip: cc.AudioClip | string
-    private _musicLoops: boolean
-    private _musicComplete: Function
-    /**
-     * 播放背景音乐 仅支持Laya cocos
-     * @param audioClip cocos cc.AudioClip  laya 文件路径
-     * @param loops 
-     * @param complete 
-     * @param startTime 
-     */
-    public playMusic(audioClip: cc.AudioClip | string, loops: boolean = true, complete = null) {
-        if (this.isMute)
-            return;
-
-        this._musicClip = audioClip;
-        this._musicLoops = loops;
-        this._musicComplete = complete;
-
-        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
-            let soundId = cc.audioEngine.playMusic(audioClip as cc.AudioClip, loops);
-            cc.audioEngine.setFinishCallback(soundId, (res) => {
-                if (complete) {
-                    complete(res);
-                }
-            })
-            return soundId
-        }
-        else if (Common.getEngine() == ENGINE_TYPE.LAYA) {
-            Laya.SoundManager.playMusic("" + audioClip, 1, new Laya.Handler(this, (res) => {
-                if (complete) {
-                    complete(res);
-                }
-            }));
-        }
-    }
-    /**
-     * 关闭所有背景音效
-     */
-    public stopMusic() {
-        // if (this.mMusicId)
-        //     cc.audioEngine.stop(this.mMusicId)
-        if (Common.getEngine() == ENGINE_TYPE.COCOS)
-            cc.audioEngine.stopMusic()
-        else if (Common.getEngine() == ENGINE_TYPE.LAYA)
-            Laya.SoundManager.stopMusic();
-
-    }
-
-    /**
-     * 存储在本地声音有关的设置key（字段字符串）
-     * IS_MUTE 是否所有都静音{boolean}
-     * IS_MUTE_MUSIC 是否背景音乐静音{boolean}
-     * IS_MUTE_SOUND 是否音效静音{boolean}
-     * VOLUME_MUSIC 背景音乐音量大小{number}
-     * VOLUME_SOUND 音效音量大小{number}
-    */
+        * 存储在本地声音有关的设置key（字段字符串）
+        * IS_MUTE 是否所有都静音{boolean}
+        * IS_MUTE_MUSIC 是否背景音乐静音{boolean}
+        * IS_MUTE_SOUND 是否音效静音{boolean}
+        * VOLUME_MUSIC 背景音乐音量大小{number}
+        * VOLUME_SOUND 音效音量大小{number}
+       */
     private IS_MUTE: string = "isMute"
     private IS_MUTE_MUSIC: string = "isMuteMusic"
     private IS_MUTE_SOUND: string = "isMuteSound"
@@ -164,6 +89,82 @@ export default class AudioModule extends BaseModule {
         //Laya.SoundManager.setSoundVolume(value);
         this.save();
     }
+
+
+    /**
+      * 播放音效
+      */
+    public playSound(audioClip: cc.AudioClip, loops: boolean = false, complete = null, soundClass = null, startTime = 0) {
+        if (this.isMute)
+            return
+        let soundId = cc.audioEngine.playEffect(audioClip, loops);
+        cc.audioEngine.setFinishCallback(soundId, (res) => {
+            if (complete) {
+                complete(res);
+            }
+            if (!loops) {
+                //cc.audioEngine.getState(soundId)==cc.audioEngine.AudioState.PLAYING
+                cc.audioEngine.stop(soundId);
+            }
+        })
+
+        return soundId
+    }
+
+
+    private _replayMusic() {
+        this.playMusic(this._musicClip, this._musicLoops, this._musicComplete);
+    }
+
+
+    private _musicClip: cc.AudioClip | string
+    private _musicLoops: boolean
+    private _musicComplete: Function
+    /**
+     * 播放背景音乐 仅支持Laya cocos
+     * @param audioClip cocos cc.AudioClip  laya 文件路径
+     * @param loops 是否循环播放
+     * @param complete 播放完成回调
+     */
+    public playMusic(audioClip: cc.AudioClip | string, loops: boolean = true, complete = null) {
+        if (this.isMute)
+            return;
+
+        this._musicClip = audioClip;
+        this._musicLoops = loops;
+        this._musicComplete = complete;
+
+        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
+            let soundId = cc.audioEngine.playMusic(audioClip as cc.AudioClip, loops);
+            cc.audioEngine.setFinishCallback(soundId, (res) => {
+                if (complete) {
+                    complete(res);
+                }
+            })
+            return soundId
+        }
+        else if (Common.getEngine() == ENGINE_TYPE.LAYA) {
+            Laya.SoundManager.playMusic("" + audioClip, 1, new Laya.Handler(this, (res) => {
+                if (complete) {
+                    complete(res);
+                }
+            }));
+        }
+    }
+    /**
+     * 关闭所有背景音效
+     */
+    public stopMusic() {
+        // if (this.mMusicId)
+        //     cc.audioEngine.stop(this.mMusicId)
+        if (Common.getEngine() == ENGINE_TYPE.COCOS)
+            cc.audioEngine.stopMusic()
+        else if (Common.getEngine() == ENGINE_TYPE.LAYA)
+            Laya.SoundManager.stopMusic();
+
+    }
+
+
 
     /**
      * 保存数据到本地

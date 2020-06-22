@@ -102,7 +102,13 @@ export default class PlatformModule extends BaseModule {
      * 更新版本
      */
     private updateProgram;
+    /**
+     * 短震动
+     */
     vibrateShort(): void;
+    /**
+     * 长震动
+     */
     vibrateLong(): void;
     showLoading(title: string): void;
     hideLoading(): void;
