@@ -1030,7 +1030,6 @@ export default class PlatformModule extends BaseModule {
         console.log('执行 showIntervalBanner')
         moosnow.http.getAllConfig(res => {
             let gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
-            let gameBanner = res && res.gameBanner == 1 ? true : false;
             this.schedule(this.showAutoBanner, gameBannerInterval)
         })
     }
@@ -1093,12 +1092,7 @@ export default class PlatformModule extends BaseModule {
             moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
-        if (this.video) {
-            this.video.offClose(this._onVideoClose);
-            this.video.offError(this._onVideoError);
-            this.video.offLoad(this._onVideoLoad);
-        } else {
-
+        if (!this.video) {
             this.video = window[this.platformName].createRewardedVideoAd({
                 adUnitId: this.videoId
             });
@@ -1107,12 +1101,12 @@ export default class PlatformModule extends BaseModule {
                 return;
             }
 
+            this.video.onError(this._onVideoError);
+            this.video.onClose(this._onVideoClose);
+            this.video.onLoad(this._onVideoLoad);
         }
-        this.video.onError(this._onVideoError);
-        this.video.onClose(this._onVideoClose);
-        this.video.onLoad(this._onVideoLoad);
         moosnow.platform.videoLoading = true;
-        this.videoPlaying = false;
+        moosnow.platform.videoPlaying = false;
         this.video.load()
             .then(() => {
                 if (show) {
@@ -1130,7 +1124,7 @@ export default class PlatformModule extends BaseModule {
     public _onVideoError(msg, code) {
         console.log(MSG.VIDEO_ERROR_COMPLETED, msg, code)
         moosnow.platform.videoLoading = false;
-        this.videoPlaying = false;
+        moosnow.platform.videoPlaying = false;
         if (moosnow.platform.videoCb) {
             moosnow.platform.videoCb(VIDEO_STATUS.ERR);
             moosnow.platform.videoCb = null;
@@ -1140,7 +1134,7 @@ export default class PlatformModule extends BaseModule {
     public _onVideoClose(isEnd) {
         console.log(MSG.VIDEO_CLOSE_COMPLETED, isEnd.isEnded)
         moosnow.platform.videoLoading = false;
-        this.videoPlaying = false;
+        moosnow.platform.videoPlaying = false;
         if (!!isEnd.isEnded) {
             moosnow.http.clickVideo();
         }

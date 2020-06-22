@@ -218,7 +218,7 @@ export default class TTModule extends PlatformModule {
             title = item.title;
             imageUrl = item.img;
         }
-        let channel = SHARE_CHANNEL.LINK;
+        let channel = SHARE_CHANNEL.ARTICLE;
 
         if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
             channel = query.channel;

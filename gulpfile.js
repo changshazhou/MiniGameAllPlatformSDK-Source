@@ -33,8 +33,8 @@ gulp.task('tsc', () => {
 				sourceMap: false,
 				compress: false
 			}),
-			terser.terser(),
-			// uglify.uglify(),
+			// terser.terser(),
+			uglify.uglify(),
 			/*terser({
 				output: {
 				},
