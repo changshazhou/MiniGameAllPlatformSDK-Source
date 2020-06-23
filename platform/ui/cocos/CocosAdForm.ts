@@ -37,6 +37,33 @@ export default class CocosAdForm extends AdForm {
         )
     }
 
+    public sideOut() {
+        let wxsys = moosnow.platform.getSystemInfoSync();
+        let statusBarHeight = 0;
+        let notchHeight = 0;
+        if (wxsys) {
+            statusBarHeight = wxsys.statusBarHeight || 0;
+            notchHeight = wxsys.notchHeight || 0;
+        }
+
+        this.sideView.node.runAction(cc.sequence(
+            cc.moveTo(1, statusBarHeight + notchHeight + this.sideView.node.width + 20, 0),
+            cc.callFunc(() => {
+                this.btnSideShow.active = false;
+                this.btnSideHide.active = true;
+            })
+        ))
+    }
+
+    public sideIn() {
+        this.sideView.node.runAction(cc.sequence(
+            cc.moveTo(1, 0, 0),
+            cc.callFunc(() => {
+                this.btnSideShow.active = true;
+                this.btnSideHide.active = false;
+            })
+        ))
+    }
     public pushScroll(scrollView: any, layout: any) {
         if (layout.type == cc.Layout.Type.GRID) {
             if (scrollView.vertical) {
@@ -65,7 +92,7 @@ export default class CocosAdForm extends AdForm {
             })
         }
     }
-    
+
     private mMoveSpeed: number = 2;
     public onFwUpdate() {
         for (let i = 0; i < this.mScrollVec.length; i++) {

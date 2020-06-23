@@ -208,31 +208,10 @@ export default class AdForm extends BaseForm {
 
 
     public sideOut() {
-        let wxsys = moosnow.platform.getSystemInfoSync();
-        let statusBarHeight = 0;
-        let notchHeight = 0;
-        if (wxsys) {
-            statusBarHeight = wxsys.statusBarHeight || 0;
-            notchHeight = wxsys.notchHeight || 0;
-        }
-
-        this.sideView.node.runAction(cc.sequence(
-            cc.moveTo(1, statusBarHeight + notchHeight + this.sideView.node.width + 20, 0),
-            cc.callFunc(() => {
-                this.btnSideShow.active = false;
-                this.btnSideHide.active = true;
-            })
-        ))
     }
 
     public sideIn() {
-        this.sideView.node.runAction(cc.sequence(
-            cc.moveTo(1, 0, 0),
-            cc.callFunc(() => {
-                this.btnSideShow.active = true;
-                this.btnSideHide.active = false;
-            })
-        ))
+
     }
 
     private mEndLogic = [];

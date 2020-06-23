@@ -34,7 +34,7 @@ gulp.task('tsc', () => {
 				compress: false
 			}),
 			// terser.terser(),
-			// uglify.uglify(),
+			uglify.uglify(),
 			/*terser({
 				output: {
 				},
@@ -78,7 +78,7 @@ gulp.task('ui', () => {
 				compress: false
 			}),
 			// terser.terser(),
-			// uglify.uglify(),
+			uglify.uglify(),
 			/*terser({
 				output: {
 				},
@@ -98,48 +98,3 @@ gulp.task('ui', () => {
 
 	})
 });
-// const runTypeDoc = () => gulp
-// 	.src(['platform'])
-// 	.pipe(typedoc({
-// 		out: './docs',
-// 		// 这个文件里都是 export * from '...' 就没必要导出文档了
-// 		input: './platform/Main.ts',
-// 		tsconfig: 'tsconfig.json',
-// 	}))
-
-// const reload = (done) => {
-// 	browserSync.reload()
-// 	done()
-// }
-
-// const runBrowserSync = (done) => {
-// 	browserSync.init({
-// 		server: {
-// 			baseDir: './docs',
-// 		},
-// 	})
-// 	done()
-// }
-// const watch = () => gulp.watch(
-// 	['README.md', 'src/*.ts'],
-// 	gulp.series(runTypeDoc, reload)
-// )
-
-// gulp.task('default', gulp.series(runTypeDoc, runBrowserSync, watch))
-
-
-
-// var ts = require('gulp-typescript');
-// var merge = require('merge2');  // Require separate installation
-// gulp.task('release', function () {
-// 	var tsResult = gulp.src('dist/**/*.ts')
-// 		.pipe(ts({
-// 			declaration: true,
-// 			noResolve: true
-// 		}));
-
-// 	return merge([
-// 		tsResult.dts.pipe(gulp.dest('release/definitions')),
-// 		tsResult.js.pipe(gulp.dest('release/js'))
-// 	]);
-// });

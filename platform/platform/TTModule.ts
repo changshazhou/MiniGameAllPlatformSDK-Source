@@ -9,6 +9,7 @@ import bannerStyle from "../model/bannerStyle";
 import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowResult from "../model/moosnowResult";
 import { MSG } from "../config/MSG";
+import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 
 export default class TTModule extends PlatformModule {
 
@@ -16,7 +17,6 @@ export default class TTModule extends PlatformModule {
     public recordRes: any = null;
     public recordCb: any = null;
     public recordNumber: number = 0;
-    public bannerWidth: number = 208;
 
 
     public moreGameCb: Function = null;
@@ -28,6 +28,7 @@ export default class TTModule extends PlatformModule {
         this.initBanner();
         this.initRecord();
         this.initInter();
+        this.bannerWidth = 208;
     }
 
     private _registerTTCallback() {
@@ -69,20 +70,20 @@ export default class TTModule extends PlatformModule {
 
 
     public _bottomCenterBanner(size) {
-        if (this.bannerWidth != size.width) {
-            let wxsys = this.getSystemInfoSync();
-            let windowWidth = wxsys.windowWidth;
-            let windowHeight = wxsys.windowHeight;
-            this.bannerWidth = size.width;
-            this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
-            let top = windowHeight - this.bannerHeigth - 30
-            console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
-            if (this.banner) {
-                this.banner.style.top = top;
-                this.banner.style.left = (windowWidth - size.width) / 2;
-            }
-
+        // if (this.bannerWidth != size.width) {
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        this.bannerWidth = size.width;
+        this.bannerHeigth = size.height;// (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+        let top = windowHeight - this.bannerHeigth
+        //     console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
+        if (this.banner) {
+            this.banner.style.top = top;
+            this.banner.style.left = (windowWidth - this.bannerWidth) / 2;
         }
+
+        // }
     }
 
     public initRecord() {
@@ -269,21 +270,44 @@ export default class TTModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - this.bannerHeigth - 30
+        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
+            windowWidth = cc.Canvas.instance.node.width;
+            windowHeight = cc.Canvas.instance.node.height;
         }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP)
-            top = 0;
+        if (Common.getEngine() == ENGINE_TYPE.LAYA) {
+            windowWidth = Laya.stage.width;
+            windowHeight = Laya.stage.height;
+        }
+
+        let top = 0;
+        if (this.isLandscape(windowHeight, windowWidth)) {
+            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+                top = windowHeight - this.bannerHeigth - 30
+            }
+            else if (this.bannerPosition == BANNER_POSITION.CENTER)
+                top = (windowHeight - this.bannerHeigth) / 2;
+            else if (this.bannerPosition == BANNER_POSITION.TOP)
+                top = 0;
+        }
+        else {
+            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+                top = windowHeight - this.bannerHeigth - 30
+            }
+            else if (this.bannerPosition == BANNER_POSITION.CENTER)
+                top = (windowHeight - this.bannerHeigth) / 2;
+            else if (this.bannerPosition == BANNER_POSITION.TOP)
+                top = 0;
+        }
+
+
+
 
         if (this.bannerStyle) {
             this.banner.style = this.bannerStyle;
         }
         else {
             this.banner.style.top = top;
-            console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
+            console.log(MSG.BANNER_RESIZE, this.banner.style, this.banner)
         }
     }
     /**

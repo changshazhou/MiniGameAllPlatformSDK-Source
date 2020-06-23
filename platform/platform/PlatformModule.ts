@@ -666,6 +666,7 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) {
             if (callback)
                 callback(true);
+            return;
         }
         this.currentShareCallback = callback;
         this.share_clickTime = Date.now();

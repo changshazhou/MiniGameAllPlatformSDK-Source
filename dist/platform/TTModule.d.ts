@@ -6,7 +6,6 @@ export default class TTModule extends PlatformModule {
     recordRes: any;
     recordCb: any;
     recordNumber: number;
-    bannerWidth: number;
     moreGameCb: Function;
     constructor();
     private _registerTTCallback;

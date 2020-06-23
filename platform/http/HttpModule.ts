@@ -22,7 +22,7 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "2.0.1";
+    public version: string = "2.0.2";
     public baseUrl: string = "https://api.liteplay.com.cn/";
     private _cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
 
@@ -541,12 +541,19 @@ export class HttpModule extends BaseModule {
     }
 
     public getShareInfo(cb) {
-        this.request(`${this.baseUrl}admin/wx_share/getShare`, {
+        this.request(`${this._cdnUrl}/share/${Common.config.moosnowAppId}.json`, {
             appid: Common.config.moosnowAppId
-        }, "POST", (res) => {
-            console.log('分享数据', res.data)
+        }, "GET", (res) => {
             cb(res.data);
             moosnow.platform.initShare(res.data);
+        }, () => {
+            this.request(`${this.baseUrl}admin/wx_share/getShare`, {
+                appid: Common.config.moosnowAppId
+            }, "POST", (res) => {
+                console.log('分享数据', res.data)
+                cb(res.data);
+                moosnow.platform.initShare(res.data);
+            });
         });
     }
 }
