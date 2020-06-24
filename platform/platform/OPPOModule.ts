@@ -600,6 +600,7 @@ export default class OPPOModule extends PlatformModule {
                 this.nativeIdIndex += 1;
                 this._destroyNative();
                 this._prepareNative();
+                this.nativeCb(null)
             }
             else {
                 console.log(MSG.NATIVE_NOT_ID_USE)
