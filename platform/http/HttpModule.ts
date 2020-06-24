@@ -544,8 +544,8 @@ export class HttpModule extends BaseModule {
         this.request(`${this._cdnUrl}/share/${Common.config.moosnowAppId}.json`, {
             appid: Common.config.moosnowAppId
         }, "GET", (res) => {
-            cb(res.data);
-            moosnow.platform.initShare(res.data);
+            cb(res);
+            moosnow.platform.initShare(res);
         }, () => {
             this.request(`${this.baseUrl}admin/wx_share/getShare`, {
                 appid: Common.config.moosnowAppId
