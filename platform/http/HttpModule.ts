@@ -2,6 +2,7 @@ import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
 import { PlatformType } from "../enum/PlatformType";
 import { MSG } from "../config/MSG";
+import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 
 
 let ErrorType = {
@@ -86,14 +87,31 @@ export class HttpModule extends BaseModule {
      * @param {*} complete 
      */
     public request(url: string, data: any, method: 'POST' | 'GET', success?: Function, fail?: Function, complete?: Function) {
+        let newUrl = "";
+        if (moosnow && moosnow.platform && moosnow.platform.getSystemInfoSync) {
+            let sys = moosnow.platform.getSystemInfoSync();
+            if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
+                let originUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/"
+                let cdnUrl = "https://cdn.liteplay.com.cn/"
+                newUrl = url.replace(originUrl, cdnUrl);
+                if (newUrl.indexOf('?') == -1) {
+                    newUrl += '?t1=' + Date.now();
+                }
+                else
+                    newUrl += '&t1=' + Date.now();
+            }
+            else
+                newUrl = url;
+        }
+        else
+            newUrl = url;
+
+
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 var response = xhr.responseText;
                 if (xhr.status >= 200 && xhr.status < 400) {
-                    // if (method1 == "JSON") {
-                    //     var result = response;
-                    // } else {
                     var result = {};
                     try {
                         result = JSON.parse(response)
@@ -124,16 +142,16 @@ export class HttpModule extends BaseModule {
             if (fail)
                 fail(event);
         }
-        xhr.open(method, url, true);
+
         if (method == "POST") {
-            xhr.open('POST', url);
+            xhr.open('POST', newUrl);
             xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
             xhr.send(this._object2Query(data));
         }
         else {
+            xhr.open(method, newUrl, true);
             xhr.send();
         }
-
     }
     public _object2Query(obj) {
         var args = []
@@ -310,6 +328,7 @@ export class HttpModule extends BaseModule {
                             ...res,
                             mistouchNum: 0,
                             mistouchPosNum: 0,
+                            mistouchInterval: 0,
                             bannerShowCountLimit: 1
                         })
                     }
@@ -330,8 +349,6 @@ export class HttpModule extends BaseModule {
             callback(this.cfgData);
         }
         else {
-
-
             this._cfgQuene.push(callback);
             if (this._cfgQuene.length > 1)
                 return
@@ -340,14 +357,19 @@ export class HttpModule extends BaseModule {
             if (Common.config.url)
                 url = Common.config.url + "?t=" + Date.now();
             else
-                url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json`;
+                url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
 
             this.request(url, {}, 'GET',
                 (res) => {
+                    let mistouchOn = res && res.mistouchOn == 1 ? true : false;
                     this.cfgData = {
                         ...Common.deepCopy(res),
                         zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
                         zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
+                        mistouchNum: mistouchOn ? res.mistouchNum : 0,
+                        mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0,
+                        mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
+
                     };
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);

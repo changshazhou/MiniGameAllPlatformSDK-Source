@@ -356,47 +356,37 @@ export default class OPPOModule extends PlatformModule {
     }
 
     /**
-     * 
+     * 显示平台的banner广告
+     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
      * @param callback 点击回调
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
-        // this.bannerPosition = position;
-        // if (this.banner) {
-        //     if (this.bannerPosition != position) {
-        //         this.bannerPosition = position;
-        //         this.bannerStyle = style;
-        //         this.destroyBanner();
-        //         this._prepareBanner();
-        //         console.log('位置要更换,销毁重建');
-        //     }
-        // }
-        // else {
-        //     this.bannerPosition = position;
-        //     this.bannerStyle = style;
-        //     this.initBanner();
-        // }
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
+    }
+
+    public _showBanner() {
 
         if (this.banner) {
-            // let wxsys = this.getSystemInfoSync();
-            // let windowWidth = wxsys.windowWidth;
-            // let windowHeight = wxsys.windowHeight;
-            // if (position == BannerPosition.Bottom) {
-
-            // }
-            // this.banner.top = 1
-            // this.banner.hide();
-            // console.log('show banner style 1', this.banner.style)
-
-            // console.log('show banner style 2', this.banner.style)
-            // this.banner.hide();
 
             this._resetBanenrStyle({
                 width: this.banner.style.width,
@@ -409,18 +399,12 @@ export default class OPPOModule extends PlatformModule {
                     height: this.banner.style.height
                 });
             }, 500)
-
-            // .then(() => {
-            //     this._resetBanenrStyle({
-            //         width: this.banner.style.width,
-            //         height: this.banner.style.height
-            //     });
-            // })
         }
         else {
             this.initBanner();
         }
     }
+
     public hideBanner() {
         console.log(MSG.HIDE_BANNER)
         if (!this.isBannerShow)

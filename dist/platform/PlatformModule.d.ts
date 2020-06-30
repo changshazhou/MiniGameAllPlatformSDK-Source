@@ -9,6 +9,7 @@ export default class PlatformModule extends BaseModule {
     moosnowConfig: moosnowAppConfig;
     share_clickTime: number;
     currentShareCallback: Function;
+    currentShortCall: Function;
     shareFail: boolean;
     vibrateOn: boolean;
     systemInfo: any;
@@ -161,8 +162,9 @@ export default class PlatformModule extends BaseModule {
      * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
      * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
      * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+     * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
      */
-    share(query?: Object, callback?: (shared: boolean) => void): void;
+    share(query?: Object, callback?: (shared: boolean) => void, shortCall?: (err: any) => void): void;
     shareWithoutCheck(query?: Object, callback?: (shared: boolean) => void): void;
     private _share;
     _buildShareInfo(query?: any): {
@@ -203,12 +205,14 @@ export default class PlatformModule extends BaseModule {
     _bottomCenterBanner(size: any): void;
     _resetBanenrStyle(size: any): void;
     /**
-      *
+      * 显示平台的banner广告
+      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
       * @param callback 点击回调
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    showBanner(callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    _showBanner(): void;
     private mTimeoutId;
     /**
      * 会自动隐藏的banner

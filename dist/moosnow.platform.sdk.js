@@ -705,6 +705,7 @@
             var _this = _super.call(this) || this;
             _this.baseUrl = "https://api.liteplay.com.cn/";
             _this.currentShareCallback = null;
+            _this.currentShortCall = null;
             _this.shareFail = null;
             _this.vibrateOn = false;
             _this.systemInfo = null;
@@ -1305,8 +1306,9 @@
          * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
          * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
          * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+         * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
          */
-        PlatformModule.prototype.share = function (query, callback) {
+        PlatformModule.prototype.share = function (query, callback, shortCall) {
             if (query === void 0) { query = {}; }
             if (!window[this.platformName]) {
                 if (callback)
@@ -1314,6 +1316,7 @@
                 return;
             }
             this.currentShareCallback = callback;
+            this.currentShortCall = shortCall;
             this.share_clickTime = Date.now();
             this.shareFail = false;
             this._share(query);
@@ -1592,16 +1595,16 @@
             }
         };
         /**
-          *
+          * 显示平台的banner广告
+          * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
           * @param callback 点击回调
           * @param position banner的位置，默认底部
           * @param style 自定义样式
           */
-        PlatformModule.prototype.showBanner = function (callback, position, style) {
+        PlatformModule.prototype.showBanner = function (remoteOn, callback, position, style) {
             var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
-            // if (this.isBannerShow)
-            //     return;
             console.log(MSG.BANNER_SHOW);
             this.bannerCb = callback;
             this.isBannerShow = true;
@@ -1614,21 +1617,28 @@
                 clearTimeout(this.mTimeoutId);
                 this.mTimeoutId = null;
             }
-            if (this.banner) {
-                // let wxsys = this.getSystemInfoSync();
-                // let windowWidth = wxsys.windowWidth;
-                // let windowHeight = wxsys.windowHeight;
-                // if (position == BannerPosition.Bottom) {
-                // }
-                // this.banner.top = 1
-                console.log('show banner style ', this.banner.style);
-                // this.hideBanner();
-                this.banner.hide();
-                this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.realHeight
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this._showBanner();
+                    }
                 });
-                this.banner.show().then(function () {
+            else
+                this._showBanner();
+        };
+        PlatformModule.prototype._showBanner = function () {
+            var _this = this;
+            if (this.banner) {
+                console.log('show banner style ', this.banner.style);
+                this.banner.hide();
+                var showPromise = this.banner.show();
+                showPromise && showPromise
+                    .then(function () {
                     _this._resetBanenrStyle({
                         width: _this.banner.style.width,
                         height: _this.banner.style.realHeight
@@ -2379,14 +2389,29 @@
          * @param {*} complete
          */
         HttpModule.prototype.request = function (url, data, method, success, fail, complete) {
+            var newUrl = "";
+            if (moosnow && moosnow.platform && moosnow.platform.getSystemInfoSync) {
+                var sys = moosnow.platform.getSystemInfoSync();
+                if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
+                    var originUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/";
+                    var cdnUrl = "https://cdn.liteplay.com.cn/";
+                    newUrl = url.replace(originUrl, cdnUrl);
+                    if (newUrl.indexOf('?') == -1) {
+                        newUrl += '?t1=' + Date.now();
+                    }
+                    else
+                        newUrl += '&t1=' + Date.now();
+                }
+                else
+                    newUrl = url;
+            }
+            else
+                newUrl = url;
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
                     var response = xhr.responseText;
                     if (xhr.status >= 200 && xhr.status < 400) {
-                        // if (method1 == "JSON") {
-                        //     var result = response;
-                        // } else {
                         var result = {};
                         try {
                             result = JSON.parse(response);
@@ -2417,13 +2442,13 @@
                 if (fail)
                     fail(event);
             };
-            xhr.open(method, url, true);
             if (method == "POST") {
-                xhr.open('POST', url);
+                xhr.open('POST', newUrl);
                 xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                 xhr.send(this._object2Query(data));
             }
             else {
+                xhr.open(method, newUrl, true);
                 xhr.send();
             }
         };
@@ -2582,7 +2607,7 @@
                 _this.loadArea(function (res2) {
                     _this.disableAd(res, res2, function (disable) {
                         if (disable) {
-                            callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, bannerShowCountLimit: 1 }));
+                            callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, bannerShowCountLimit: 1 }));
                         }
                         else {
                             callback(res);
@@ -2604,9 +2629,10 @@
                 if (Common.config.url)
                     url = Common.config.url + "?t=" + Date.now();
                 else
-                    url = this._cdnUrl + "/config/" + Common.config.moosnowAppId + ".json";
+                    url = this._cdnUrl + "/config/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0 });
+                    var mistouchOn = res && res.mistouchOn == 1 ? true : false;
+                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0 });
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
                     }
@@ -3112,13 +3138,15 @@
             }
         };
         /**
-         *
+         * 显示平台的banner广告
+         * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
          * @param callback 点击回调
          * @param position banner的位置，默认底部
          * @param style 自定义样式
          */
-        OPPOModule.prototype.showBanner = function (callback, position, style) {
+        OPPOModule.prototype.showBanner = function (remoteOn, callback, position, style) {
             var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
             console.log(MSG.BANNER_SHOW);
             this.bannerCb = callback;
@@ -3126,32 +3154,23 @@
             if (!window[this.platformName]) {
                 return;
             }
-            // this.bannerPosition = position;
-            // if (this.banner) {
-            //     if (this.bannerPosition != position) {
-            //         this.bannerPosition = position;
-            //         this.bannerStyle = style;
-            //         this.destroyBanner();
-            //         this._prepareBanner();
-            //         console.log('位置要更换,销毁重建');
-            //     }
-            // }
-            // else {
-            //     this.bannerPosition = position;
-            //     this.bannerStyle = style;
-            //     this.initBanner();
-            // }
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this._showBanner();
+                    }
+                });
+            else
+                this._showBanner();
+        };
+        OPPOModule.prototype._showBanner = function () {
+            var _this = this;
             if (this.banner) {
-                // let wxsys = this.getSystemInfoSync();
-                // let windowWidth = wxsys.windowWidth;
-                // let windowHeight = wxsys.windowHeight;
-                // if (position == BannerPosition.Bottom) {
-                // }
-                // this.banner.top = 1
-                // this.banner.hide();
-                // console.log('show banner style 1', this.banner.style)
-                // console.log('show banner style 2', this.banner.style)
-                // this.banner.hide();
                 this._resetBanenrStyle({
                     width: this.banner.style.width,
                     height: this.banner.style.height
@@ -3163,12 +3182,6 @@
                         height: _this.banner.style.height
                     });
                 }, 500);
-                // .then(() => {
-                //     this._resetBanenrStyle({
-                //         width: this.banner.style.width,
-                //         height: this.banner.style.height
-                //     });
-                // })
             }
             else {
                 this.initBanner();
@@ -3857,14 +3870,17 @@
                 this.record.resume();
         };
         /**
-         * 分享
-         * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
-         * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
-         * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
-         */
-        TTModule.prototype.share = function (query, callback) {
+          * 分享
+          * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
+          * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
+          * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+          * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
+          */
+        TTModule.prototype.share = function (query, callback, shortCall) {
             if (query === void 0) { query = {}; }
             this.currentShareCallback = callback;
+            this.currentShortCall = shortCall;
+            console.log('是否有回调：', shortCall);
             var shareInfo = this._buildShareInfo(query);
             console.log('shareInfo:', shareInfo);
             if (!window[this.platformName]) {
@@ -3888,7 +3904,7 @@
                 title = item.title;
                 imageUrl = item.img;
             }
-            var channel = SHARE_CHANNEL.ARTICLE;
+            var channel = SHARE_CHANNEL.LINK;
             if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
                 channel = query.channel;
             }
@@ -3910,7 +3926,12 @@
                         _this.currentShareCallback(true);
                 },
                 fail: function (e) {
-                    console.log('share video success ', e);
+                    console.log('share video fail ', e);
+                    console.log('index of : ', e.errMsg.indexOf('short'));
+                    if (e && e.errMsg && e.errMsg.indexOf('short') != -1 && _this.currentShortCall) {
+                        console.log('时间太短 执行回调', _this.currentShortCall);
+                        _this.currentShortCall(e);
+                    }
                     if (_this.currentShareCallback)
                         _this.currentShareCallback(false);
                 }
@@ -3971,13 +3992,15 @@
             }
         };
         /**
-        *
-        * @param callback 点击回调
-        * @param position banner的位置，默认底部
-        * @param style 自定义样式
-        */
-        TTModule.prototype.showBanner = function (callback, position, style) {
+         * 显示平台的banner广告
+         * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+         * @param callback 点击回调
+         * @param position banner的位置，默认底部
+         * @param style 自定义样式
+         */
+        TTModule.prototype.showBanner = function (remoteOn, callback, position, style) {
             var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
             // if (this.isBannerShow)
             //     return;
@@ -3992,21 +4015,28 @@
             }
             this.bannerPosition = position;
             this.bannerStyle = style;
-            if (this.banner) {
-                // let wxsys = this.getSystemInfoSync();
-                // let windowWidth = wxsys.windowWidth;
-                // let windowHeight = wxsys.windowHeight;
-                // if (position == BannerPosition.Bottom) {
-                // }
-                // this.banner.top = 1
-                console.log('show banner style ', this.banner.style);
-                // this.hideBanner();
-                this.banner.hide();
-                this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.realHeight
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this._showBanner();
+                    }
                 });
-                this.banner.show().then(function () {
+            else
+                this._showBanner();
+        };
+        TTModule.prototype._showBanner = function () {
+            var _this = this;
+            if (this.banner) {
+                console.log('show banner style ', this.banner.style);
+                this.banner.hide();
+                var showPromise = this.banner.show();
+                showPromise && showPromise
+                    .then(function () {
                     _this._resetBanenrStyle({
                         width: _this.banner.style.width,
                         height: _this.banner.style.realHeight
@@ -4234,13 +4264,15 @@
             return banner;
         };
         /**
-           *
-           * @param callback 点击回调
-           * @param position banner的位置，默认底部
-           * @param style 自定义样式
-           */
-        QQModule.prototype.showBanner = function (callback, position, style) {
+          * 显示平台的banner广告
+          * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+          * @param callback 点击回调
+          * @param position banner的位置，默认底部
+          * @param style 自定义样式
+          */
+        QQModule.prototype.showBanner = function (remoteOn, callback, position, style) {
             var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
             console.log(MSG.BANNER_SHOW);
             this.bannerCb = callback;
@@ -4250,7 +4282,22 @@
             }
             this.bannerPosition = position;
             this.bannerStyle = style;
-            this._resetBanenrStyle({});
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this._showBanner();
+                    }
+                });
+            else
+                this._showBanner();
+        };
+        QQModule.prototype._showBanner = function () {
+            var _this = this;
             if (this.banner) {
                 var t = this.banner.show();
                 if (t)
@@ -5018,8 +5065,8 @@
             var _this = _super.call(this) || this;
             _this.platformName = "qg";
             _this.appSid = "";
-            _this.bannerWidth = 720;
-            _this.bannerHeight = 113;
+            _this.bannerWidth = 1080;
+            _this.bannerHeight = 114;
             _this.interLoadedShow = false;
             _this.prevNavigate = Date.now();
             _this.mMinInterval = 10;
@@ -5261,6 +5308,8 @@
             return retVal;
         };
         VIVOModule.prototype._bottomCenterBanner = function (size) {
+            this.bannerHeight = size.realHeight;
+            this.bannerWidth = size.realWidth;
             console.log('onSize callback  ', size);
         };
         VIVOModule.prototype._onBannerClose = function () {
@@ -5280,12 +5329,15 @@
             }
         };
         /**
-         *
-         * @param callback 点击回调
-         * @param position banner的位置，默认底部
-         * @param style 自定义样式
-         */
-        VIVOModule.prototype.showBanner = function (callback, position, style) {
+          * 显示平台的banner广告
+          * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+          * @param callback 点击回调
+          * @param position banner的位置，默认底部
+          * @param style 自定义样式
+          */
+        VIVOModule.prototype.showBanner = function (remoteOn, callback, position, style) {
+            var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
             this.bannerCb = callback;
             this.isBannerShow = true;
@@ -5293,6 +5345,21 @@
                 return;
             this.bannerPosition = position;
             this.bannerStyle = style;
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this._showBanner();
+                    }
+                });
+            else
+                this._showBanner();
+        };
+        VIVOModule.prototype._showBanner = function () {
             if (!this.banner) {
                 this.initBanner();
             }
@@ -5495,7 +5562,8 @@
                     console.log(MSG.NATIVE_ERROR, err);
                     this.nativeIdIndex += 1;
                     this._destroyNative();
-                    this._prepareNative();
+                    // this._prepareNative();
+                    this.nativeCb(null);
                 }
                 else {
                     console.log(MSG.NATIVE_NOT_ID_USE);
@@ -5539,9 +5607,16 @@
         * @param callback 回调函数
         */
         VIVOModule.prototype.showNativeAd = function (callback) {
+            var _this = this;
             this.nativeCb = callback;
-            if (this.native)
-                this.native.load();
+            if (this.native) {
+                var ret = this.native.load();
+                ret && ret.then(function () {
+                    console.log('加载完成');
+                }).catch(function (err) {
+                    _this.nativeCb(null);
+                });
+            }
             else {
                 this._prepareNative(true);
                 // if (this.native)

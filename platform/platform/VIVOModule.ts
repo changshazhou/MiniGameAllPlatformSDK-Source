@@ -12,8 +12,8 @@ export default class VIVOModule extends PlatformModule {
     public platformName: string = "qg";
     public appSid: string = "";
 
-    public bannerWidth: number = 720;
-    public bannerHeight: number = 113;
+    public bannerWidth: number = 1080;
+    public bannerHeight: number = 114;
 
     private interLoadedShow: boolean = false;
     constructor() {
@@ -291,6 +291,8 @@ export default class VIVOModule extends PlatformModule {
     }
 
     public _bottomCenterBanner(size) {
+        this.bannerHeight = size.realHeight
+        this.bannerWidth = size.realWidth
 
         console.log('onSize callback  ', size)
     }
@@ -316,12 +318,13 @@ export default class VIVOModule extends PlatformModule {
     }
 
     /**
-     * 
-     * @param callback 点击回调
-     * @param position banner的位置，默认底部
-     * @param style 自定义样式
-     */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+      * 显示平台的banner广告
+      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+      * @param callback 点击回调
+      * @param position banner的位置，默认底部
+      * @param style 自定义样式
+      */
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
 
 
         this.bannerCb = callback;
@@ -330,7 +333,23 @@ export default class VIVOModule extends PlatformModule {
         this.bannerPosition = position;
         this.bannerStyle = style;
 
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
 
+    }
+
+    public _showBanner() {
         if (!this.banner) {
             this.initBanner();
         }
@@ -359,6 +378,7 @@ export default class VIVOModule extends PlatformModule {
             }
         });
     }
+
     public hideBanner() {
         console.log(MSG.HIDE_BANNER)
         if (!this.isBannerShow)
@@ -539,7 +559,8 @@ export default class VIVOModule extends PlatformModule {
                 console.log(MSG.NATIVE_ERROR, err,)
                 this.nativeIdIndex += 1;
                 this._destroyNative();
-                this._prepareNative();
+                // this._prepareNative();
+                this.nativeCb(null)
             }
             else {
                 console.log(MSG.NATIVE_NOT_ID_USE)
@@ -588,8 +609,15 @@ export default class VIVOModule extends PlatformModule {
     */
     public showNativeAd(callback: Function) {
         this.nativeCb = callback;
-        if (this.native)
-            this.native.load();
+        if (this.native) {
+            let ret = this.native.load();
+            ret && ret.then(() => {
+                console.log('加载完成')
+            }).catch((err) => {
+                this.nativeCb(null);
+            })
+
+        }
         else {
             this._prepareNative(true);
             // if (this.native)

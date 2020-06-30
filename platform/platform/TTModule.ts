@@ -191,13 +191,16 @@ export default class TTModule extends PlatformModule {
     }
 
     /**
-     * 分享
-     * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
-     * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
-     * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
-     */
-    public share(query: Object = {}, callback?: (shared: boolean) => void) {
+      * 分享
+      * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
+      * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
+      * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+      * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
+      */
+    public share(query: Object = {}, callback?: (shared: boolean) => void, shortCall?: (err: any) => void) {
         this.currentShareCallback = callback;
+        this.currentShortCall = shortCall;
+        console.log('是否有回调：', shortCall)
         let shareInfo = this._buildShareInfo(query);
         console.log('shareInfo:', shareInfo);
         if (!window[this.platformName]) {
@@ -219,8 +222,7 @@ export default class TTModule extends PlatformModule {
             title = item.title;
             imageUrl = item.img;
         }
-        let channel = SHARE_CHANNEL.ARTICLE;
-
+        let channel = SHARE_CHANNEL.LINK;
         if (query && [SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO].indexOf(query.channel) != -1) {
             channel = query.channel;
         }
@@ -242,9 +244,15 @@ export default class TTModule extends PlatformModule {
                     this.currentShareCallback(true);
             },
             fail: (e) => {
-                console.log('share video success ', e)
+                console.log('share video fail ', e)
+                console.log('index of : ', e.errMsg.indexOf('short'))
+                if (e && e.errMsg && e.errMsg.indexOf('short') != -1 && this.currentShortCall) {
+                    console.log('时间太短 执行回调', this.currentShortCall)
+                    this.currentShortCall(e);
+                }
                 if (this.currentShareCallback)
                     this.currentShareCallback(false);
+
             }
         }
     }
@@ -311,12 +319,13 @@ export default class TTModule extends PlatformModule {
         }
     }
     /**
-    * 
-    * @param callback 点击回调
-    * @param position banner的位置，默认底部
-    * @param style 自定义样式
-    */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+     * 显示平台的banner广告
+     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+     * @param callback 点击回调
+     * @param position banner的位置，默认底部
+     * @param style 自定义样式
+     */
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log(MSG.BANNER_SHOW)
@@ -333,30 +342,41 @@ export default class TTModule extends PlatformModule {
         this.bannerPosition = position;
         this.bannerStyle = style;
 
+
+
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
+    }
+
+
+
+    public _showBanner() {
         if (this.banner) {
-            // let wxsys = this.getSystemInfoSync();
-            // let windowWidth = wxsys.windowWidth;
-            // let windowHeight = wxsys.windowHeight;
-            // if (position == BannerPosition.Bottom) {
-
-            // }
-            // this.banner.top = 1
             console.log('show banner style ', this.banner.style)
-
-            // this.hideBanner();
             this.banner.hide();
-            this._resetBanenrStyle({
-                width: this.banner.style.width,
-                height: this.banner.style.realHeight
-            })
-            this.banner.show().then(() => {
-                this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.realHeight
+            let showPromise = this.banner.show();
+
+            showPromise && showPromise
+                .then(() => {
+                    this._resetBanenrStyle({
+                        width: this.banner.style.width,
+                        height: this.banner.style.realHeight
+                    })
                 })
-            })
         }
     }
+
     /**
     * 盒子广告
     * @param callback 关闭回调

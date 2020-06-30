@@ -34,6 +34,7 @@ export default class PlatformModule extends BaseModule {
     public moosnowConfig: moosnowAppConfig;
     public share_clickTime: number;
     public currentShareCallback: Function = null;
+    public currentShortCall: Function = null;
     public shareFail: boolean = null;
     public vibrateOn: boolean = false;
     public systemInfo: any = null;
@@ -661,14 +662,16 @@ export default class PlatformModule extends BaseModule {
      * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
      * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
      * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+     * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
      */
-    public share(query: Object = {}, callback?: (shared: boolean) => void) {
+    public share(query: Object = {}, callback?: (shared: boolean) => void, shortCall?: (err: any) => void) {
         if (!window[this.platformName]) {
             if (callback)
                 callback(true);
             return;
         }
         this.currentShareCallback = callback;
+        this.currentShortCall = shortCall;
         this.share_clickTime = Date.now();
         this.shareFail = false;
         this._share(query);
@@ -953,14 +956,14 @@ export default class PlatformModule extends BaseModule {
 
 
     /**
-      * 
+      * 显示平台的banner广告
+      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
       * @param callback 点击回调
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
-        // if (this.isBannerShow)
-        //     return;
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -975,29 +978,34 @@ export default class PlatformModule extends BaseModule {
             this.mTimeoutId = null;
         }
 
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
+    }
 
+    public _showBanner() {
         if (this.banner) {
-            // let wxsys = this.getSystemInfoSync();
-            // let windowWidth = wxsys.windowWidth;
-            // let windowHeight = wxsys.windowHeight;
-            // if (position == BannerPosition.Bottom) {
-
-            // }
-            // this.banner.top = 1
             console.log('show banner style ', this.banner.style)
-
-            // this.hideBanner();
             this.banner.hide();
-            this._resetBanenrStyle({
-                width: this.banner.style.width,
-                height: this.banner.style.realHeight
-            })
-            this.banner.show().then(() => {
-                this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.realHeight
+            let showPromise = this.banner.show();
+
+            showPromise && showPromise
+                .then(() => {
+                    this._resetBanenrStyle({
+                        width: this.banner.style.width,
+                        height: this.banner.style.realHeight
+                    })
                 })
-            })
         }
     }
 
