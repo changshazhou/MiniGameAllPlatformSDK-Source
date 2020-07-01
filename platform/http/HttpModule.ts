@@ -336,6 +336,7 @@ export class HttpModule extends BaseModule {
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             mistouchInterval: 0,
+                            exportBtnNavigate: 0,
                             exportAutoNavigate,
                             bannerShowCountLimit: 1,
                             isLimitArea: 1
@@ -386,6 +387,7 @@ export class HttpModule extends BaseModule {
                         mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0,
                         mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
                         exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0,
+                        exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0,
 
                     };
                     if (moosnow.platform) {

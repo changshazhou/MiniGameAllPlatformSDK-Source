@@ -146,9 +146,11 @@ export default class AdForm extends BaseForm {
         this.mChangeLen++;
         if (this.mChangeLen > 1 && data.showAd != AD_POSITION.RECOVER) {
             this.mPrevShowAd = this.mShowAd;
+            this.mPrevBackCall = this.mBackCall;
         }
         if (data.showAd == AD_POSITION.RECOVER) {
             data.showAd = this.mPrevShowAd;
+            data.callback = this.mPrevBackCall;
         }
         this.displayChange(data.showAd, data.callback)
 
@@ -184,6 +186,7 @@ export default class AdForm extends BaseForm {
 
     private mShowAd = moosnow.AD_POSITION.NONE;
     private mPrevShowAd = moosnow.AD_POSITION.NONE;
+    private mPrevBackCall: Function
     private mBackCall: Function
     public displayChange(data, callback = null) {
         let curApp = moosnow.getAppPlatform()

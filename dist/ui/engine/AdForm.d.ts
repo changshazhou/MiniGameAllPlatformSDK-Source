@@ -90,6 +90,7 @@ export default class AdForm extends BaseForm {
     willShow(data: any): void;
     private mShowAd;
     private mPrevShowAd;
+    private mPrevBackCall;
     private mBackCall;
     displayChange(data: any, callback?: any): void;
     onBack(): void;
