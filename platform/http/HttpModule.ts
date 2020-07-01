@@ -23,7 +23,7 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "2.0.2";
+    public version: string = "2.0.4";
     public baseUrl: string = "https://api.liteplay.com.cn/";
     private _cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
 
@@ -88,23 +88,23 @@ export class HttpModule extends BaseModule {
      */
     public request(url: string, data: any, method: 'POST' | 'GET', success?: Function, fail?: Function, complete?: Function) {
         let newUrl = "";
-        if (moosnow && moosnow.platform && moosnow.platform.getSystemInfoSync) {
-            let sys = moosnow.platform.getSystemInfoSync();
-            if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
-                let originUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/"
-                let cdnUrl = "https://cdn.liteplay.com.cn/"
-                newUrl = url.replace(originUrl, cdnUrl);
-                if (newUrl.indexOf('?') == -1) {
-                    newUrl += '?t1=' + Date.now();
-                }
-                else
-                    newUrl += '&t1=' + Date.now();
-            }
-            else
-                newUrl = url;
-        }
-        else
-            newUrl = url;
+        // if (moosnow && moosnow.platform && moosnow.platform.getSystemInfoSync) {
+        //     let sys = moosnow.platform.getSystemInfoSync();
+        //     if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
+        //         let originUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/"
+        //         let cdnUrl = "https://cdn.liteplay.com.cn/"
+        //         newUrl = url.replace(originUrl, cdnUrl);
+        //         if (newUrl.indexOf('?') == -1) {
+        //             newUrl += '?t1=' + Date.now();
+        //         }
+        //         else
+        //             newUrl += '&t1=' + Date.now();
+        //     }
+        //     else
+        //         newUrl = url;
+        // }
+        // else
+        newUrl = url;
 
 
         var xhr = new XMLHttpRequest();
@@ -323,17 +323,32 @@ export class HttpModule extends BaseModule {
         this.loadCfg(res => {
             this.loadArea(res2 => {
                 this.disableAd(res, res2, (disable) => {
+                    let exportAutoNavigate = 0;
                     if (disable) {
+                        //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
+
+                        if (res.exportAutoNavigate == 1)
+                            exportAutoNavigate = 0
+                        if (res.exportAutoNavigate == 2)
+                            exportAutoNavigate = 1
                         callback({
                             ...res,
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             mistouchInterval: 0,
-                            bannerShowCountLimit: 1
+                            exportAutoNavigate,
+                            bannerShowCountLimit: 1,
+                            isLimitArea: 1
                         })
                     }
                     else {
-                        callback(res)
+                        if (res.exportAutoNavigate == 2)
+                            exportAutoNavigate = 1
+                        callback({
+                            ...res,
+                            exportAutoNavigate,
+                            isLimitArea: 0
+                        })
                     }
                 })
             })
@@ -361,6 +376,7 @@ export class HttpModule extends BaseModule {
 
             this.request(url, {}, 'GET',
                 (res) => {
+                    //总开关控制
                     let mistouchOn = res && res.mistouchOn == 1 ? true : false;
                     this.cfgData = {
                         ...Common.deepCopy(res),
@@ -369,6 +385,7 @@ export class HttpModule extends BaseModule {
                         mistouchNum: mistouchOn ? res.mistouchNum : 0,
                         mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0,
                         mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
+                        exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0,
 
                     };
                     if (moosnow.platform) {
@@ -384,7 +401,8 @@ export class HttpModule extends BaseModule {
                         item({
                             mistouchNum: 0,
                             mistouchPosNum: 0,
-                            bannerShowCountLimit: 1
+                            bannerShowCountLimit: 1,
+                            exportAutoNavigate: 0
                         });
                     })
                     this._cfgQuene = [];

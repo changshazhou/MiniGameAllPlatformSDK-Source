@@ -88,7 +88,7 @@ export default class MistouchFormQQ extends MistouchForm {
                     })
                 }
                 else {
-                    moosnow.platform.showBanner((e) => {
+                    moosnow.platform.showBanner(true, (e) => {
                         console.log('banner click callback ', e)
                         this.bannerClickCallback(e);
                     });
