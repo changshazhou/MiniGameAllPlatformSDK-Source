@@ -278,14 +278,14 @@ export default class TTModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        if (Common.getEngine() == ENGINE_TYPE.COCOS) {
-            windowWidth = cc.Canvas.instance.node.width;
-            windowHeight = cc.Canvas.instance.node.height;
-        }
-        if (Common.getEngine() == ENGINE_TYPE.LAYA) {
-            windowWidth = Laya.stage.width;
-            windowHeight = Laya.stage.height;
-        }
+        // if (Common.getEngine() == ENGINE_TYPE.COCOS) {
+        //     windowWidth = cc.Canvas.instance.node.width;
+        //     windowHeight = cc.Canvas.instance.node.height;
+        // }
+        // if (Common.getEngine() == ENGINE_TYPE.LAYA) {
+        //     windowWidth = Laya.stage.width;
+        //     windowHeight = Laya.stage.height;
+        // }
 
         let top = 0;
         if (this.isLandscape(windowHeight, windowWidth)) {
@@ -365,6 +365,10 @@ export default class TTModule extends PlatformModule {
         if (this.banner) {
             console.log('show banner style ', this.banner.style)
             this.banner.hide();
+            this._resetBanenrStyle({
+                width: this.banner.style.width,
+                height: this.banner.style.realHeight
+            })
             let showPromise = this.banner.show();
 
             showPromise && showPromise
