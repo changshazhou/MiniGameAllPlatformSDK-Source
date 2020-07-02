@@ -75,7 +75,7 @@ export default class WXModule extends PlatformModule {
         }
 
         moosnow.http.request(`${this.baseUrl}api/channel/login.html`, {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+            appid: Common.config.moosnowAppId,
             code: code,
             user_id: user_id,
             channel_id: channel_id,

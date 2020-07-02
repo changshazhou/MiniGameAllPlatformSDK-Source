@@ -344,7 +344,7 @@ export class HttpModule extends BaseModule {
                     }
                     else {
                         if (res.exportAutoNavigate == 2)
-                            exportAutoNavigate = 1
+                            exportAutoNavigate = 1;
                         callback({
                             ...res,
                             exportAutoNavigate,
@@ -374,6 +374,12 @@ export class HttpModule extends BaseModule {
                 url = Common.config.url + "?t=" + Date.now();
             else
                 url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
+
+
+            if (Common.platform == PlatformType.WX) {
+                let options = this.appLaunchOptions();
+                [1005]
+            }
 
             this.request(url, {}, 'GET',
                 (res) => {
@@ -555,8 +561,9 @@ export class HttpModule extends BaseModule {
                 }
             }
         }
-        if (this.appLaunchOptions) {
-            if ([1005, 1007, 1008, 1044].indexOf(this.appLaunchOptions.scene) != -1) {
+        if (this.appLaunchOptions && res) {
+            if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
+                || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                 callback(true)
                 console.log('appLaunchOptions', this.appLaunchOptions);
                 return;
