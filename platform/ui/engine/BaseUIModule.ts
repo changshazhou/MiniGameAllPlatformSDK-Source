@@ -69,7 +69,7 @@ export class BaseUIModule extends BaseModule {
      * @param {Object} data 携带的自定义数据
      * @param {Function} callback ui显示后回调:(formModel,data:Object)
      */
-    pushUIForm(name, data?, callback?) {
+    pushUIForm(name: string, data?: any, callback?: Function, uiRoot?: string) {
         let self = this;
         let cachedFormModel = this._getUINodeFromCacheByName(name);
         if (cachedFormModel == null) {
@@ -78,7 +78,7 @@ export class BaseUIModule extends BaseModule {
                 if (callback) {
                     callback(formModel, data);
                 }
-            });
+            }, uiRoot);
         } else {
             //缓存取出
             cachedFormModel.zIndex = this.layerIndex++;
@@ -169,9 +169,13 @@ export class BaseUIModule extends BaseModule {
      * @param {string} name resources下的路径   
      * @param {Function} callback 参数 node
      */
-    _createUINode(name: string, formId: number, callback: Function) {
+    _createUINode(name: string, formId: number, callback: Function, uiRoot?: string) {
         let path = this.UIRoot + name;
+        if (uiRoot)
+            path = uiRoot + name
         cc.loader.loadRes(path, cc.Prefab, (err, prefab) => {
+            if (err)
+                console.warn(`预制体不存在：${name} path : ${path}`)
             var formNode = cc.instantiate(prefab);
             if (callback) callback(formNode, formId);
         });
@@ -182,7 +186,7 @@ export class BaseUIModule extends BaseModule {
      * @param {string} name  
      * @param {Function} callback (node, index)
      */
-    _createUIFormModel(name: string, callback: Function) {
+    _createUIFormModel(name: string, callback: Function, uiRoot?: string) {
         //防止异步加载UI层级错乱方案
         //1异步加载预设前初始化一个model,记录将要加载的预设名以及zindex
         //2异步时传入该zindex，在加载完成时回调返回该zindex
@@ -214,7 +218,7 @@ export class BaseUIModule extends BaseModule {
                     }
                 }
             }
-        });
+        }, uiRoot);
     }
 
 

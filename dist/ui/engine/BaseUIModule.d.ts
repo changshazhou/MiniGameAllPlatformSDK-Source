@@ -38,7 +38,7 @@ export declare class BaseUIModule extends BaseModule {
      * @param {Object} data 携带的自定义数据
      * @param {Function} callback ui显示后回调:(formModel,data:Object)
      */
-    pushUIForm(name: any, data?: any, callback?: any): void;
+    pushUIForm(name: string, data?: any, callback?: Function, uiRoot?: string): void;
     /**
      * 从栈顶隐藏一个UI
      * @param {bool} destroy 是否销毁
@@ -64,13 +64,13 @@ export declare class BaseUIModule extends BaseModule {
      * @param {string} name resources下的路径
      * @param {Function} callback 参数 node
      */
-    _createUINode(name: string, formId: number, callback: Function): void;
+    _createUINode(name: string, formId: number, callback: Function, uiRoot?: string): void;
     /**
      * 创建一个formModel
      * @param {string} name
      * @param {Function} callback (node, index)
      */
-    _createUIFormModel(name: string, callback: Function): void;
+    _createUIFormModel(name: string, callback: Function, uiRoot?: string): void;
     _getUINodeFromCacheByName(name: string): any;
     _showUIForm(formModel: FormModel, data: any): void;
     _hideUIForm(formModel: FormModel, data: any, cb?: any): void;

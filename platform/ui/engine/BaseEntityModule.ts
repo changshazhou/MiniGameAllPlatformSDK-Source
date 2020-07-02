@@ -45,8 +45,15 @@ export default class BaseEntityModule extends BaseModule {
     public getAllEntity(name: any) {
         return this.entityLogics.filter(item => item.poolName == name);
     }
-    
-    public showEntity(name, parentNode, data): any {
+
+    /**
+     * 
+     * @param name 名称
+     * @param parentNode  父节点
+     * @param data 传输的数据
+     * @param uiRoot 基础的路径
+     */
+    public showEntity(name, parentNode, data?: any, uiRoot?: string): any {
 
     }
 

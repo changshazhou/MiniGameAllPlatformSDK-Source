@@ -2,10 +2,10 @@ import BaseEntityModule from '../engine/BaseEntityModule';
 export declare class CocosEntityModule extends BaseEntityModule {
     prefabPath: string;
     preload(name: any, callback: any): void;
-    showEntity(name: any, parentNode: any, data: any): any;
-    _createEntity(name: any): any;
-    _showEntity(name: any): any;
-    _getPrefabByName(name: any): any;
+    showEntity(name: any, parentNode: any, data?: any, uiRoot?: string): any;
+    _createEntity(name: any, uiRoot?: string): any;
+    _showEntity(name: any, uiRoot?: string): any;
+    _getPrefabByName(name: any, uiRoot?: string): any;
     _getOrNewEntityPool(name: any): any;
     private _getPoolName;
     _getEntityPool(name: any): any;

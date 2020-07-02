@@ -16,8 +16,8 @@ export class CocosEntityModule extends BaseEntityModule {
         })
     }
 
-    public showEntity(name, parentNode, data): any {
-        let logic = this._showEntity(name);
+    public showEntity(name, parentNode, data?: any, uiRoot?: string): any {
+        let logic = this._showEntity(name, uiRoot);
         logic.id = this._serializeId--;
         logic.node.parent = parentNode;
         logic.willShow(data);
@@ -29,29 +29,30 @@ export class CocosEntityModule extends BaseEntityModule {
     }
 
 
-    public _createEntity(name) {
+    public _createEntity(name, uiRoot?: string) {
         let prefab
         if (Common.isString(name))
-            prefab = this._getPrefabByName(name);
+            prefab = this._getPrefabByName(name, uiRoot);
         else
             prefab = name;
         return cc.instantiate(prefab);
     }
 
-    public _showEntity(name) {
+    public _showEntity(name, uiRoot?: string) {
 
         let pool = this._getOrNewEntityPool(name);
         let entity = pool.get();
         if (entity == null) {
-            entity = this._createEntity(name);
+            entity = this._createEntity(name, uiRoot);
         }
         let logic = this._findComponent(entity, "EntityLogic");
         logic.poolName = pool.name;
         return logic;
     }
 
-    public _getPrefabByName(name) {
-        var profab = cc.loader.getRes(this.prefabPath + '' + name, cc.Prefab)
+    public _getPrefabByName(name, uiRoot?: string) {
+        let rootPath = this.prefabPath || uiRoot
+        var profab = cc.loader.getRes(rootPath + '' + name, cc.Prefab)
         return profab;
     }
 
