@@ -17,9 +17,10 @@ export default class UIForm {
      */
     showToast(msg: string): void;
     /**
-     * 预加载广告
+     *  预加载广告
+     * @param callback
      */
-    preloadAd(): void;
+    preloadAd(callback?: Function): void;
     private mLoadedAdFrom;
     /**
      * 显示广告

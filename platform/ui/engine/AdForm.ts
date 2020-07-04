@@ -22,6 +22,7 @@ export default class AdForm extends BaseForm {
     public exportClose: any = null;
     public exportMask: any = null;
     public exportCloseTxt: any = null;
+    public btnBack: any = null;
     public floatContainer: any = null;
     public floatFull: any = null;
     public bannerContainer: any = null;
@@ -135,9 +136,11 @@ export default class AdForm extends BaseForm {
 
     public addEvent() {
         moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
+        moosnow.event.addListener(EventType.RANDOWM_NAVIGATE, this, this.onRandomNavigate)
     }
     public removeEvent() {
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
+        moosnow.event.removeListener(EventType.RANDOWM_NAVIGATE, this)
     }
 
     private mChangeLen: number = 0;
@@ -207,7 +210,23 @@ export default class AdForm extends BaseForm {
             this.mBackCall();
         }
     }
+    public onRandomNavigate() {
+        let item = this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)];
+        moosnow.platform.navigate2Mini(item, () => { }, () => {
 
+        })
+    }
+
+    public onNavigate() {
+        moosnow.http.getAllConfig(res => {
+            if (res && res.exportBtnNavigate == 1) {
+                this.onRandomNavigate();
+            }
+            else {
+                this.onBack();
+            }
+        })
+    }
 
     public sideOut() {
     }
@@ -344,25 +363,12 @@ export default class AdForm extends BaseForm {
 
 
     }
-    private hasAd(ad) {
+    public hasAd(ad) {
         return (this.mShowAd & ad) == ad;
     }
 
 
-    private mSecond: number = 3
-    private showExportClose() {
-        this.mSecond -= 1;
-        this.exportCloseTxt.active = true;
-        let closeLabel = this.exportCloseTxt.getComponent(cc.Label)
-        if (this.mSecond <= 0) {
-            this.exportClose.active = true;
-            this.exportCloseTxt.active = false;
-            this.unschedule(this.showExportClose)
-            return;
-        }
-        closeLabel.string = `剩余${this.mSecond}秒可关闭`
-
-
+    public showExportClose() {
     }
 
 
@@ -396,28 +402,9 @@ export default class AdForm extends BaseForm {
         this.showInviteBox(visible)
     }
 
-    private showClose(visible) {
+    public showClose(visible) {
 
-        this.exportClose.active = false;
-        this.exportCloseTxt.active = false;
 
-        this.unschedule(this.showExportClose)
-
-        if (visible && this.hasAd(AD_POSITION.BACK)) {
-            if (this.hasAd(AD_POSITION.WAIT)) {
-                this.mSecond = 3;
-                this.showExportClose();
-                this.schedule(this.showExportClose, 1);
-            }
-            else {
-                this.exportClose.active = true;
-                this.exportCloseTxt.active = false;
-            }
-        }
-        else {
-            this.exportClose.active = false;
-            this.exportCloseTxt.active = false;
-        }
     }
 
     private showInviteBox(visible) {

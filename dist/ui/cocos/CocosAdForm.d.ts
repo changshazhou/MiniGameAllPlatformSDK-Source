@@ -6,6 +6,9 @@ export default class CocosAdForm extends AdForm {
     sideOut(): void;
     sideIn(): void;
     pushScroll(scrollView: any, layout: any): void;
+    showClose(visible: any): void;
+    mSecond: number;
+    showExportClose(): void;
     private mMoveSpeed;
     onFwUpdate(): void;
 }

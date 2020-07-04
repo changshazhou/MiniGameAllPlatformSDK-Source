@@ -12,6 +12,8 @@ export default class EventType {
     static readonly AD_VIEW_CHANGE: string = "AD_VIEW_CHANGE";
     static readonly AD_VIEW_REFRESH: string = "AD_VIEW_REFRESH";
     static readonly COIN_CHANGED: string = "COIN_CHANGED";
+    static readonly RANDOWM_NAVIGATE: string = "RANDOWM_NAVIGATE";
+    
 
 
 

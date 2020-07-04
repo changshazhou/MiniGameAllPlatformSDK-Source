@@ -8,8 +8,10 @@ import CocosNodeEvent from "./CocosNodeEvent";
 export default class CocosAdForm extends AdForm {
 
     public addEvent() {
+        if (this.btnBack)
+            this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
-            this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onBack, this)
+            this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
         if (this.btnSideShow)
             this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
@@ -17,14 +19,18 @@ export default class CocosAdForm extends AdForm {
         super.addEvent();
     }
     public removeEvent() {
+        if (this.btnBack)
+            this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
-            this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onBack, this)
+            this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
         if (this.btnSideShow)
             this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
             this.btnSideHide.off(CocosNodeEvent.TOUCH_START, this.sideIn, this)
         super.removeEvent();
     }
+
+
     public floatAnim(floatNode) {
         floatNode.runAction(
             cc.sequence(
@@ -92,6 +98,47 @@ export default class CocosAdForm extends AdForm {
             })
         }
     }
+    public showClose(visible) {
+
+        this.exportClose.active = false;
+        this.exportCloseTxt.active = false;
+        this.btnBack.active = false;
+
+        this.unschedule(this.showExportClose)
+
+        if (visible && this.hasAd(AD_POSITION.BACK)) {
+            if (this.hasAd(AD_POSITION.WAIT)) {
+                this.mSecond = 3;
+                this.showExportClose();
+                this.schedule(this.showExportClose, 1);
+            }
+            else {
+                this.exportClose.active = true;
+                this.btnBack.active = true;
+                this.exportCloseTxt.active = false;
+            }
+        }
+        else {
+            this.exportClose.active = false;
+            this.btnBack.active = false;
+            this.exportCloseTxt.active = false;
+        }
+    }
+    public mSecond: number = 3
+    public showExportClose() {
+        this.mSecond -= 1;
+        this.exportCloseTxt.active = true;
+        let closeLabel = this.exportCloseTxt.getComponent(cc.Label)
+        if (this.mSecond <= 0) {
+            this.exportClose.active = true;
+            this.btnBack.active = true;
+            this.exportCloseTxt.active = false;
+            this.unschedule(this.showExportClose)
+            return;
+        }
+        closeLabel.string = `剩余${this.mSecond}秒可关闭`
+    }
+
 
     private mMoveSpeed: number = 2;
     public onFwUpdate() {

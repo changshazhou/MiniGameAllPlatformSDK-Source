@@ -1114,22 +1114,6 @@
         return CocosUIModule;
     }(BaseUIModule));
 
-    var EventType = /** @class */ (function () {
-        function EventType() {
-        }
-        EventType.VIBRATESWITCH_CHANGED = "VIBRATESWITCH_CHANGED";
-        EventType.SOUNDSWITCH_CHANGED = "SOUNDSWITCH_CHANGED";
-        EventType.MUSICSWITCH_CHANGED = "MUSICSWITCH_CHANGED";
-        EventType.ON_PLATFORM_SHOW = "ON_PLATFORM_SHOW";
-        EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
-        EventType.ON_BANNER_HIDE = "ON_BANNER_HIDE";
-        EventType.ON_AD_SHOW = "ON_AD_SHOW";
-        EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
-        EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
-        EventType.COIN_CHANGED = "COIN_CHANGED";
-        return EventType;
-    }());
-
     var AD_POSITION = {
         /**
          * 不显示
@@ -1195,6 +1179,23 @@
         RECOVER: 16384,
     };
 
+    var EventType = /** @class */ (function () {
+        function EventType() {
+        }
+        EventType.VIBRATESWITCH_CHANGED = "VIBRATESWITCH_CHANGED";
+        EventType.SOUNDSWITCH_CHANGED = "SOUNDSWITCH_CHANGED";
+        EventType.MUSICSWITCH_CHANGED = "MUSICSWITCH_CHANGED";
+        EventType.ON_PLATFORM_SHOW = "ON_PLATFORM_SHOW";
+        EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
+        EventType.ON_BANNER_HIDE = "ON_BANNER_HIDE";
+        EventType.ON_AD_SHOW = "ON_AD_SHOW";
+        EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
+        EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
+        EventType.COIN_CHANGED = "COIN_CHANGED";
+        EventType.RANDOWM_NAVIGATE = "RANDOWM_NAVIGATE";
+        return EventType;
+    }());
+
     var BaseForm = /** @class */ (function (_super) {
         __extends(BaseForm, _super);
         function BaseForm() {
@@ -1250,6 +1251,7 @@
             _this.exportClose = null;
             _this.exportMask = null;
             _this.exportCloseTxt = null;
+            _this.btnBack = null;
             _this.floatContainer = null;
             _this.floatFull = null;
             _this.bannerContainer = null;
@@ -1305,7 +1307,6 @@
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
             _this.mFloatCache = {};
-            _this.mSecond = 3;
             return _this;
         }
         AdForm.prototype.setPosition = function (source, position, callback, refresh) {
@@ -1359,9 +1360,11 @@
         };
         AdForm.prototype.addEvent = function () {
             moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
+            moosnow.event.addListener(EventType.RANDOWM_NAVIGATE, this, this.onRandomNavigate);
         };
         AdForm.prototype.removeEvent = function () {
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
+            moosnow.event.removeListener(EventType.RANDOWM_NAVIGATE, this);
         };
         AdForm.prototype.onAdChange = function (data) {
             this.mChangeLen++;
@@ -1414,6 +1417,22 @@
             if (this.mBackCall) {
                 this.mBackCall();
             }
+        };
+        AdForm.prototype.onRandomNavigate = function () {
+            var item = this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)];
+            moosnow.platform.navigate2Mini(item, function () { }, function () {
+            });
+        };
+        AdForm.prototype.onNavigate = function () {
+            var _this = this;
+            moosnow.http.getAllConfig(function (res) {
+                if (res && res.exportBtnNavigate == 1) {
+                    _this.onRandomNavigate();
+                }
+                else {
+                    _this.onBack();
+                }
+            });
         };
         AdForm.prototype.sideOut = function () {
         };
@@ -1528,16 +1547,6 @@
             return (this.mShowAd & ad) == ad;
         };
         AdForm.prototype.showExportClose = function () {
-            this.mSecond -= 1;
-            this.exportCloseTxt.active = true;
-            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
-            if (this.mSecond <= 0) {
-                this.exportClose.active = true;
-                this.exportCloseTxt.active = false;
-                this.unschedule(this.showExportClose);
-                return;
-            }
-            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
         };
         AdForm.prototype.displayAd = function (visible) {
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
@@ -1557,24 +1566,6 @@
             this.showInviteBox(visible);
         };
         AdForm.prototype.showClose = function (visible) {
-            this.exportClose.active = false;
-            this.exportCloseTxt.active = false;
-            this.unschedule(this.showExportClose);
-            if (visible && this.hasAd(AD_POSITION.BACK)) {
-                if (this.hasAd(AD_POSITION.WAIT)) {
-                    this.mSecond = 3;
-                    this.showExportClose();
-                    this.schedule(this.showExportClose, 1);
-                }
-                else {
-                    this.exportClose.active = true;
-                    this.exportCloseTxt.active = false;
-                }
-            }
-            else {
-                this.exportClose.active = false;
-                this.exportCloseTxt.active = false;
-            }
         };
         AdForm.prototype.showInviteBox = function (visible) {
             var _this = this;
@@ -1678,12 +1669,15 @@
         __extends(CocosAdForm, _super);
         function CocosAdForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mSecond = 3;
             _this.mMoveSpeed = 2;
             return _this;
         }
         CocosAdForm.prototype.addEvent = function () {
+            if (this.btnBack)
+                this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this);
             if (this.exportClose)
-                this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onBack, this);
+                this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
             if (this.btnSideShow)
                 this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this);
             if (this.btnSideHide)
@@ -1691,8 +1685,10 @@
             _super.prototype.addEvent.call(this);
         };
         CocosAdForm.prototype.removeEvent = function () {
+            if (this.btnBack)
+                this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this);
             if (this.exportClose)
-                this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onBack, this);
+                this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
             if (this.btnSideShow)
                 this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this);
             if (this.btnSideHide)
@@ -1750,6 +1746,42 @@
                     move2Up: false
                 });
             }
+        };
+        CocosAdForm.prototype.showClose = function (visible) {
+            this.exportClose.active = false;
+            this.exportCloseTxt.active = false;
+            this.btnBack.active = false;
+            this.unschedule(this.showExportClose);
+            if (visible && this.hasAd(AD_POSITION.BACK)) {
+                if (this.hasAd(AD_POSITION.WAIT)) {
+                    this.mSecond = 3;
+                    this.showExportClose();
+                    this.schedule(this.showExportClose, 1);
+                }
+                else {
+                    this.exportClose.active = true;
+                    this.btnBack.active = true;
+                    this.exportCloseTxt.active = false;
+                }
+            }
+            else {
+                this.exportClose.active = false;
+                this.btnBack.active = false;
+                this.exportCloseTxt.active = false;
+            }
+        };
+        CocosAdForm.prototype.showExportClose = function () {
+            this.mSecond -= 1;
+            this.exportCloseTxt.active = true;
+            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
+            if (this.mSecond <= 0) {
+                this.exportClose.active = true;
+                this.btnBack.active = true;
+                this.exportCloseTxt.active = false;
+                this.unschedule(this.showExportClose);
+                return;
+            }
+            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
         };
         CocosAdForm.prototype.onFwUpdate = function () {
             for (var i = 0; i < this.mScrollVec.length; i++) {
@@ -3391,10 +3423,11 @@
             moosnow.ui.showToast(msg);
         };
         /**
-         * 预加载广告
+         *  预加载广告
+         * @param callback
          */
-        UIForm.prototype.preloadAd = function () {
-            moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null, ROOT_CONFIG.UI_ROOT);
+        UIForm.prototype.preloadAd = function (callback) {
+            moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, callback, ROOT_CONFIG.UI_ROOT);
         };
         /**
          * 显示广告
@@ -3403,7 +3436,6 @@
          * @param zIndex  层级
          */
         UIForm.prototype.showAd = function (adType, callback, zIndex) {
-            var _this = this;
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = 999; }
             //
@@ -3411,17 +3443,7 @@
                 console.log('头条iphone 不显示广告');
                 return;
             }
-            if (!this.mLoadedAdFrom) {
-                moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, function () {
-                    _this.mLoadedAdFrom = true;
-                    var adForm = moosnow.ui.getUIFrom(UIFormSetting.AdForm);
-                    adForm.node.zIndex = zIndex;
-                    moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback, zIndex: zIndex });
-                }, ROOT_CONFIG.UI_ROOT);
-            }
-            else {
-                moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback, zIndex: zIndex });
-            }
+            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback: callback, zIndex: zIndex });
         };
         /**
          * 金币动画

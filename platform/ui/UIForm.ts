@@ -38,10 +38,11 @@ export default class UIForm {
     }
 
     /**
-     * 预加载广告
+     *  预加载广告
+     * @param callback 
      */
-    public preloadAd() {
-        moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null, ROOT_CONFIG.UI_ROOT);
+    public preloadAd(callback?: Function) {
+        moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, callback, ROOT_CONFIG.UI_ROOT);
     }
 
 
@@ -61,17 +62,7 @@ export default class UIForm {
             console.log('头条iphone 不显示广告')
             return;
         }
-        if (!this.mLoadedAdFrom) {
-            moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, () => {
-                this.mLoadedAdFrom = true;
-                let adForm = moosnow.ui.getUIFrom(UIFormSetting.AdForm);
-                adForm.node.zIndex = zIndex;
-                moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
-            }, ROOT_CONFIG.UI_ROOT);
-        }
-        else {
-            moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
-        }
+        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
 
     }
 

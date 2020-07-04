@@ -13,6 +13,7 @@ export default class AdForm extends BaseForm {
     exportClose: any;
     exportMask: any;
     exportCloseTxt: any;
+    btnBack: any;
     floatContainer: any;
     floatFull: any;
     bannerContainer: any;
@@ -94,6 +95,8 @@ export default class AdForm extends BaseForm {
     private mBackCall;
     displayChange(data: any, callback?: any): void;
     onBack(): void;
+    onRandomNavigate(): void;
+    onNavigate(): void;
     sideOut(): void;
     sideIn(): void;
     private mEndLogic;
@@ -122,11 +125,10 @@ export default class AdForm extends BaseForm {
     initFloatAd(parentNode: any, prefabs: Array<string>, points: Array<object>, position: string, callback?: Function): void;
     floatAnim(floatNode: any): void;
     private updateFloat;
-    private hasAd;
-    private mSecond;
-    private showExportClose;
+    hasAd(ad: any): boolean;
+    showExportClose(): void;
     private displayAd;
-    private showClose;
+    showClose(visible: any): void;
     private showInviteBox;
     private _createInviteBox;
     onFwUpdate(): void;
