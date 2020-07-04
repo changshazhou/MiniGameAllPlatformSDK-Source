@@ -36,7 +36,7 @@ export class BaseUIModule extends BaseModule {
     constructor() {
         super();
         this.layerIndex = 0;
-        this.UIRoot = 'moosnow/prefab/ui/';     //定义resources目录下存放UI预设的目录
+        this.UIRoot = 'prefab/ui/';     //定义resources目录下存放UI预设的目录
         this.UIFormStack = [];
         this.cachedUIForms = [];
         this.toastForm = null;
@@ -65,9 +65,10 @@ export class BaseUIModule extends BaseModule {
 
     /**
      * 显示一个ui
-     * @param {string} name  resources/UI目录下的预设名字 
+     * @param {string} name  prefab/ui/目录下的预设名字 
      * @param {Object} data 携带的自定义数据
      * @param {Function} callback ui显示后回调:(formModel,data:Object)
+     * @param {string} uiRoot 指定根目录 
      */
     pushUIForm(name: string, data?: any, callback?: Function, uiRoot?: string) {
         let self = this;

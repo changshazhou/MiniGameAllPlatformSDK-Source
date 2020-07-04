@@ -2,7 +2,7 @@
 import MistouchForm from "../engine/MistouchForm";
 import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import MistouchFormQQ from "../engine/MistouchFormQQ";
 import CocosNodeEvent from "./CocosNodeEvent";
 

@@ -2,7 +2,7 @@
 import MistouchForm from "./MistouchForm";
 import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import Common from "../../utils/Common";
 import BaseModule from "../../framework/BaseModule";
 
@@ -111,7 +111,7 @@ export default class MistouchFormQQ extends MistouchForm {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
             this.scheduleOnce(() => {
-                moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
+                moosnow.ui.destroyUIForm(UIFormSetting.MistouchForm, null)
                 if (this.FormData && this.FormData.callback)
                     this.FormData.callback();
             }, 0.2)

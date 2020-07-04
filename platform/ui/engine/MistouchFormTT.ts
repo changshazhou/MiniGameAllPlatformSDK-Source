@@ -1,5 +1,5 @@
 import BaseForm from "./BaseForm";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import MistouchForm from "./MistouchForm";
 import BaseModule from "../../framework/BaseModule";
 
@@ -74,7 +74,7 @@ export default class MistouchFormTT extends MistouchForm {
             })
         }
         else {
-            moosnow.ui.hideUIForm(UIForms.MistouchForm, null);
+            moosnow.ui.hideUIForm(UIFormSetting.MistouchForm, null);
         }
     }
 

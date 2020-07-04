@@ -20,6 +20,7 @@ export default class UIForm {
      * 预加载广告
      */
     preloadAd(): void;
+    private mLoadedAdFrom;
     /**
      * 显示广告
      * @param adType 广告类型

@@ -1,8 +1,9 @@
 
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import BaseForm from "./BaseForm";
 import showPrizeOptions from "../../model/showPrizeOptions";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 export default class PrizeForm extends BaseForm {
 
@@ -29,16 +30,16 @@ export default class PrizeForm extends BaseForm {
     }
 
     closeForm() {
-        moosnow.ui.destroyUIForm(UIForms.PrizeForm, null)
-        moosnow.ui.destroyUIForm(UIForms.MistouchForm, null);
+        moosnow.ui.destroyUIForm(UIFormSetting.PrizeForm, null)
+        moosnow.ui.destroyUIForm(UIFormSetting.MistouchForm, null);
         if (this.FormData.showCoinAnim == true) {
-            moosnow.ui.pushUIForm(UIForms.CoinForm, {
+            moosnow.ui.pushUIForm(UIFormSetting.CoinForm, {
                 ...Common.deepCopy(this.FormData),
                 callback: () => {
                     if (this.FormData.callback)
                         this.FormData.callback();
                 }
-            })
+            }, () => { }, ROOT_CONFIG.UI_ROOT)
         }
         else {
             if (this.FormData.callback)

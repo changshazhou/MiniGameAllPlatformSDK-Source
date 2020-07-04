@@ -34,9 +34,10 @@ export declare class BaseUIModule extends BaseModule {
     showToast(msg: string): void;
     /**
      * 显示一个ui
-     * @param {string} name  resources/UI目录下的预设名字
+     * @param {string} name  prefab/ui/目录下的预设名字
      * @param {Object} data 携带的自定义数据
      * @param {Function} callback ui显示后回调:(formModel,data:Object)
+     * @param {string} uiRoot 指定根目录
      */
     pushUIForm(name: string, data?: any, callback?: Function, uiRoot?: string): void;
     /**

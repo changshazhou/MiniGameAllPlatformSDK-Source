@@ -1,5 +1,5 @@
 import BaseForm from "../engine/BaseForm";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import MistouchForm from "../engine/MistouchForm";
 import MistouchFormTT from "../engine/MistouchFormTT";
 import CocosNodeEvent from "./CocosNodeEvent";

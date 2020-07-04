@@ -21,6 +21,7 @@ import showShareOptions from "./model/showShareOptions";
 import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
+import UIFormSetting from "./config/UIFormSetting";
 
 declare global {
     class moosnow {
@@ -59,6 +60,7 @@ declare global {
         static Common: typeof Common;
         static PLATFORM_EVENT: typeof EventType;
         static APP_PLATFORM: typeof PlatformType;
+        static formSetting: typeof UIFormSetting;
         static AD_POSITION: {
             NONE: number;
             BANNER: number;

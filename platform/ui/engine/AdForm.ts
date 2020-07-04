@@ -4,8 +4,7 @@ import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
 import moosnowAdRow from "../../model/moosnowAdRow";
 import moosnowResult from "../../model/moosnowResult";
-import AdViewItem from "./AdViewItem";
-import BaseModule from "../../framework/BaseModule";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 
 export default class AdForm extends BaseForm {
@@ -452,22 +451,25 @@ export default class AdForm extends BaseForm {
     }
 
     private _createInviteBox() {
-
-        moosnow.http.getAllConfig(res => {
-            if (res) {
-                let inviteDelay = isNaN(res.inviteDelay) ? 0 : parseFloat(res.inviteDelay)
-                if (inviteDelay > 0)
-                    this.scheduleOnce(() => {
-                        moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
-                    }, inviteDelay)
+        let entityName = "inviteBox";
+        moosnow.entity.preload(entityName, () => {
+            moosnow.http.getAllConfig(res => {
+                if (res) {
+                    let inviteDelay = isNaN(res.inviteDelay) ? 0 : parseFloat(res.inviteDelay)
+                    if (inviteDelay > 0)
+                        this.scheduleOnce(() => {
+                            moosnow.entity.showEntity(entityName, cc.Canvas.instance.node, {}, ROOT_CONFIG.ENTITY_ROOT);
+                        }, inviteDelay)
+                    else
+                        moosnow.entity.showEntity(entityName, cc.Canvas.instance.node, {});
+                }
                 else
-                    moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
-            }
-            else
-                moosnow.entity.showEntity("inviteBox", cc.Canvas.instance.node, {});
+                    moosnow.entity.showEntity(entityName, cc.Canvas.instance.node, {});
+            })
         })
-
     }
+
+
 
     public onFwUpdate() {
 

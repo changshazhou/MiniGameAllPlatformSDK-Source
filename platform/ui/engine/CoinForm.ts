@@ -1,6 +1,6 @@
 import BaseForm from "./BaseForm";
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import showCoinOptions from "../../model/showCoinOptions";
 import BaseModule from "../../framework/BaseModule";
 
@@ -35,7 +35,7 @@ export default class CoinForm extends BaseForm {
             }
             this.scheduleOnce(() => {
                 if (this.FormData.hideForm)
-                    moosnow.ui.hideUIForm(UIForms.CoinForm, null);
+                    moosnow.ui.hideUIForm(UIFormSetting.CoinForm, null);
                 if (Common.isFunction(callback))
                     callback();
             }, 2.1)

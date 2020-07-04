@@ -1,6 +1,6 @@
 import BaseForm from "../engine/BaseForm";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import Common from "../../utils/Common";
 import showTouchOptions from "../../model/showTouchOptions";
 import BaseModule from "../../framework/BaseModule";
@@ -120,7 +120,7 @@ export default class MistouchForm extends BaseForm {
         if (this.mCurrentNum >= this.mMaxNum) {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            moosnow.ui.destroyUIForm(UIForms.MistouchForm, null)
+            moosnow.ui.destroyUIForm(UIFormSetting.MistouchForm, null)
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback(true);
         }

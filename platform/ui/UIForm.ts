@@ -1,5 +1,5 @@
 import EventType from "../utils/EventType";
-import UIForms from "../config/UIForms";
+import UIFormSetting from "../config/UIFormSetting";
 import { AD_POSITION } from "../enum/AD_POSITION";
 import showCoinOptions from "../model/showCoinOptions";
 import showOptions from "../model/showOptions";
@@ -8,12 +8,12 @@ import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
+import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 
 /**
  * 广告结果
  */
 export default class UIForm {
-
 
     constructor() {
 
@@ -41,7 +41,7 @@ export default class UIForm {
      * 预加载广告
      */
     public preloadAd() {
-        moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null);
+        moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, null, ROOT_CONFIG.UI_ROOT);
     }
 
 
@@ -62,17 +62,17 @@ export default class UIForm {
             return;
         }
         if (!this.mLoadedAdFrom) {
-            moosnow.ui.pushUIForm(UIForms.AdForm, { showAd: moosnow.AD_POSITION.NONE }, () => {
+            moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, () => {
                 this.mLoadedAdFrom = true;
-                let adForm = moosnow.ui.getUIFrom(UIForms.AdForm);
+                let adForm = moosnow.ui.getUIFrom(UIFormSetting.AdForm);
                 adForm.node.zIndex = zIndex;
                 moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
-            });
+            }, ROOT_CONFIG.UI_ROOT);
         }
         else {
             moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
         }
-        
+
     }
 
 
@@ -81,7 +81,7 @@ export default class UIForm {
      * @param options 
      */
     public showCoin(options: showCoinOptions) {
-        moosnow.ui.pushUIForm(UIForms.CoinForm, options)
+        moosnow.ui.pushUIForm(UIFormSetting.CoinForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -91,9 +91,9 @@ export default class UIForm {
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
     public showMistouch(options: showTouchOptions) {
-        moosnow.ui.pushUIForm(UIForms.MistouchForm, options, () => {
+        moosnow.ui.pushUIForm(UIFormSetting.MistouchForm, options, () => {
 
-        })
+        }, ROOT_CONFIG.UI_ROOT)
     }
     /**
      * 显示奖励
@@ -103,9 +103,9 @@ export default class UIForm {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
-        moosnow.ui.pushUIForm(UIForms.PrizeForm, options, () => {
+        moosnow.ui.pushUIForm(UIFormSetting.PrizeForm, options, () => {
 
-        })
+        }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -115,7 +115,7 @@ export default class UIForm {
      * @param callback 
      */
     public showTotal(options: showTotalOptions) {
-        moosnow.ui.pushUIForm(UIForms.TotalForm, options)
+        moosnow.ui.pushUIForm(UIFormSetting.TotalForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -125,7 +125,7 @@ export default class UIForm {
     * @param callback 
     */
     public showEnd(options: showEndOptions) {
-        moosnow.ui.pushUIForm(UIForms.EndForm, options)
+        moosnow.ui.pushUIForm(UIFormSetting.EndForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -134,6 +134,6 @@ export default class UIForm {
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        moosnow.ui.pushUIForm(UIForms.ShareForm, options)
+        moosnow.ui.pushUIForm(UIFormSetting.ShareForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 }

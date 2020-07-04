@@ -9,6 +9,7 @@ import showShareOptions from "./model/showShareOptions";
 import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
+import UIFormSetting from "./config/UIFormSetting";
 export default class moosnowUI {
     showOptions: {
         endOptions: typeof showEndOptions;
@@ -18,30 +19,17 @@ export default class moosnowUI {
         touchOptions: typeof showTouchOptions;
         coinOptions: typeof showCoinOptions;
     };
-    constructor();
-    private initUI;
-    private initEntity;
-    /**
-     * UI控制
-     */
-    private mUi;
-    get ui(): BaseUIModule;
+
+    static formSetting: typeof UIFormSetting;
+    static ui: BaseUIModule;
     /**
      * form UI 操作
      */
-    private mForm;
-    get form(): UIForm;
-    set form(value: UIForm);
+    static form: UIForm;
     /**
      * form表单控制
      */
-    private mControl;
-    get control(): LogicControl;
-    set control(value: LogicControl);
-    private mEntity;
-    get entity(): BaseEntityModule;
-    set entity(value: BaseEntityModule);
-    private mDelay;
-    get delay(): Delay;
-    set delay(value: Delay);
+    static control: LogicControl;
+    static entity: BaseEntityModule;
+    static delay: Delay;
 }

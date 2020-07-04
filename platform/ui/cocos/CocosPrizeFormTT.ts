@@ -1,6 +1,6 @@
 
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import PrizeFormTT from "../engine/PrizeFormTT";
 import CocosNodeEvent from "./CocosNodeEvent";
 

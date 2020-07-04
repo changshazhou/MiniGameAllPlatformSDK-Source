@@ -1,5 +1,5 @@
 window.moosnowConfig = {
-    debug: "byte",
+    debug: "wx",
     /**
      * 微信平台
      */

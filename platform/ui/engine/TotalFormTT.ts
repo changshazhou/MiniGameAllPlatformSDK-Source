@@ -1,8 +1,9 @@
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIForms from "../../config/UIFormSetting";
 import EventType from "../../utils/EventType";
 import BaseForm from "./BaseForm";
 import BaseModule from "../../framework/BaseModule";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 
 export default class totalFormTT extends BaseForm {
@@ -110,10 +111,10 @@ export default class totalFormTT extends BaseForm {
                     moosnow.ui.hideUIForm(UIForms.TotalForm, null);
                     moosnow.http.getMisTouchNum(misNum => {
                         if (misNum == 0) {
-                            moosnow.ui.pushUIForm(UIForms.EndForm, this.FormData)
+                            moosnow.ui.pushUIForm(UIForms.EndForm, this.FormData, () => { }, ROOT_CONFIG.UI_ROOT)
                         }
                         else {
-                            moosnow.ui.pushUIForm(UIForms.MistouchForm)
+                            moosnow.ui.pushUIForm(UIForms.MistouchForm, null, () => { }, ROOT_CONFIG.UI_ROOT)
                         }
                     })
 
@@ -142,10 +143,10 @@ export default class totalFormTT extends BaseForm {
                         moosnow.ui.hideUIForm(UIForms.TotalForm, null);
                         moosnow.http.getMisTouchNum(misNum => {
                             if (misNum == 0) {
-                                moosnow.ui.pushUIForm(UIForms.EndForm, this.FormData)
+                                moosnow.ui.pushUIForm(UIForms.EndForm, this.FormData, () => { }, ROOT_CONFIG.UI_ROOT)
                             }
                             else {
-                                moosnow.ui.pushUIForm(UIForms.MistouchForm)
+                                moosnow.ui.pushUIForm(UIForms.MistouchForm, null, () => { }, ROOT_CONFIG.UI_ROOT)
                             }
                         })
 

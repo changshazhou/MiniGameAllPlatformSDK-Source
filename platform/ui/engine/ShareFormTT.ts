@@ -1,4 +1,4 @@
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import Common from "../../utils/Common";
 import BaseForm from "./BaseForm";
 import showShareOptions from "../../model/showShareOptions";
@@ -33,7 +33,7 @@ export default class ShareFormTT extends BaseForm {
 
     public onBack() {
         if (this.FormData.hideForm)
-            moosnow.ui.hideUIForm(UIForms.ShareForm, null);
+            moosnow.ui.hideUIForm(UIFormSetting.ShareForm, null);
         if (this.FormData && this.FormData.callback)
             this.FormData.callback();
     }
@@ -77,7 +77,7 @@ export default class ShareFormTT extends BaseForm {
             this.mShareing = false;
             if (res == moosnow.VIDEO_STATUS.END) {
                 if (this.FormData.hideForm)
-                    moosnow.ui.hideUIForm(UIForms.ShareForm, null);
+                    moosnow.ui.hideUIForm(UIFormSetting.ShareForm, null);
                 if (this.FormData && this.FormData.videoCallback)
                     this.FormData.videoCallback();
             }
@@ -98,7 +98,7 @@ export default class ShareFormTT extends BaseForm {
             this.mShareing = false;
             if (res) {
                 if (this.FormData.hideForm)
-                    moosnow.ui.hideUIForm(UIForms.ShareForm, null);
+                    moosnow.ui.hideUIForm(UIFormSetting.ShareForm, null);
                 if (this.FormData && this.FormData.shareCallback)
                     this.FormData.shareCallback(res);
             }

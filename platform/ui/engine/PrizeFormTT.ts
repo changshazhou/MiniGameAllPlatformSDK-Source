@@ -1,5 +1,5 @@
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import EventType from "../../utils/EventType";
 import BaseForm from "./BaseForm";
 import showPrizeOptions from "../../model/showPrizeOptions";
@@ -89,7 +89,7 @@ export default class PrizeFormTT extends BaseForm {
         let num = this.mTotalSecond - this.mCurrentSecond;
         if (num < 0) {
             this.unschedule(this.onCountdown);
-            moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+            moosnow.ui.hideUIForm(UIFormSetting.PrizeForm, null);
             return;
         }
         this.txtCoutdown.string = `${num}秒`
@@ -120,7 +120,7 @@ export default class PrizeFormTT extends BaseForm {
     }
 
     closeForm() {
-        moosnow.ui.hideUIForm(UIForms.PrizeForm, null)
+        moosnow.ui.hideUIForm(UIFormSetting.PrizeForm, null)
     }
 
     public onChecked() {
@@ -134,7 +134,7 @@ export default class PrizeFormTT extends BaseForm {
             this.resumeCountdown();
             if (this.FormData) {
                 if (this.FormData.hideForm)
-                    moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                    moosnow.ui.hideUIForm(UIFormSetting.PrizeForm, null);
                 if (this.FormData.shareCallback)
                     this.FormData.shareCallback(shared)
             }
@@ -147,7 +147,7 @@ export default class PrizeFormTT extends BaseForm {
         else
             if (this.FormData) {
                 if (this.FormData.hideForm)
-                    moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                    moosnow.ui.hideUIForm(UIFormSetting.PrizeForm, null);
                 if (this.FormData.callback)
                     this.FormData.callback()
             }
@@ -159,7 +159,7 @@ export default class PrizeFormTT extends BaseForm {
             if (res == moosnow.VIDEO_STATUS.END) {
                 if (this.FormData) {
                     if (this.FormData.hideForm)
-                        moosnow.ui.hideUIForm(UIForms.PrizeForm, null);
+                        moosnow.ui.hideUIForm(UIFormSetting.PrizeForm, null);
                     if (this.FormData.videoCallback)
                         this.FormData.videoCallback()
                 }

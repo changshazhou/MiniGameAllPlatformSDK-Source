@@ -1,7 +1,8 @@
 
 import Common from "../../utils/Common";
-import UIForms from "../../config/UIForms";
+import UIFormSetting from "../../config/UIFormSetting";
 import BaseForm from "./BaseForm";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 export default class TotalForm extends BaseForm {
 
@@ -41,8 +42,8 @@ export default class TotalForm extends BaseForm {
     }
 
     private openEndForm(coin) {
-        moosnow.ui.hideUIForm(UIForms.TotalForm, null)
-        moosnow.ui.pushUIForm(UIForms.EndForm, { coin, level: this.FormData.level, levelShareCoinNum: this.mLevelShareCoinNum, ...this.FormData })
+        moosnow.ui.hideUIForm(UIFormSetting.TotalForm, null)
+        moosnow.ui.pushUIForm(UIFormSetting.EndForm, { coin, level: this.FormData.level, levelShareCoinNum: this.mLevelShareCoinNum, ...this.FormData }, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
     public onShareChange() {

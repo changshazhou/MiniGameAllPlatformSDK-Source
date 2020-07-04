@@ -376,11 +376,6 @@ export class HttpModule extends BaseModule {
                 url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
 
 
-            if (Common.platform == PlatformType.WX) {
-                let options = this.appLaunchOptions();
-                [1005]
-            }
-
             this.request(url, {}, 'GET',
                 (res) => {
                     //总开关控制
