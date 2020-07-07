@@ -1340,6 +1340,24 @@ export default class PlatformModule extends BaseModule {
         this.postMessage(data);
     }
 
+    /**
+     * 用户是否关注抖音号
+     * @param success 
+     * @param fail 
+     */
+    public checkFollowAwemeSate(success: (hasFollowed) => void, fail: (err) => void) {
+        if (success)
+            success(true)
+    }
+    /**
+     * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+     * @param success 
+     * @param fail 
+     */
+    public openAwemeUserProile(success: (hasFollowed) => void, fail: (err) => void) {
+        if (success)
+            success(true)
+    }
     onDisable() {
     }
 }

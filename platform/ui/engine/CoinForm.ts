@@ -3,6 +3,7 @@ import Common from "../../utils/Common";
 import UIFormSetting from "../../config/UIFormSetting";
 import showCoinOptions from "../../model/showCoinOptions";
 import BaseModule from "../../framework/BaseModule";
+import { EntitysName } from "../../config/EntitysName";
 
 
 export default class CoinForm extends BaseForm {
@@ -24,9 +25,9 @@ export default class CoinForm extends BaseForm {
         let { imgNum, coinNum, starVec, endVec, callback } = this.FormData;
 
         console.log('showCoin', data);
-        cc.loader.loadRes(moosnow.entity.prefabPath + 'coin', cc.Prefab, () => {
+        cc.loader.loadRes(moosnow.entity.prefabPath + EntitysName.COIN, cc.Prefab, () => {
             for (let i = 0; i < imgNum; i++) {
-                let logic = moosnow.entity.showEntity("coin", this.rootNode, {
+                let logic = moosnow.entity.showEntity(EntitysName.COIN, this.rootNode, {
                     x: Common.randomNumBoth(starVec.x - data.randomX, starVec.x + data.randomX),
                     y: Common.randomNumBoth(starVec.y - data.randomY, starVec.y + data.randomY)
                 });

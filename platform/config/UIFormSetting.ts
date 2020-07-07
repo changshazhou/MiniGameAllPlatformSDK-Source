@@ -58,7 +58,14 @@ export default class UIFormSetting {
         },
         coinForm: {
             [moosnow.APP_PLATFORM.WX]: "coinForm",
+        },
+        homeForm: {
+            [moosnow.APP_PLATFORM.WX]: "homeForm",
+        },
+        gameForm: {
+            [moosnow.APP_PLATFORM.WX]: "gameForm",
         }
+
     }
 
     public static append(setting: object) {
@@ -131,4 +138,12 @@ export default class UIFormSetting {
     public static get TryForm() {
         return this.convertUIName(this.mapping.tryForm)
     }
+
+    public static get HomeForm() {
+        return this.convertUIName(this.mapping.homeForm)
+    }
+    public static get GameForm() {
+        return this.convertUIName(this.mapping.gameForm)
+    }
+
 }

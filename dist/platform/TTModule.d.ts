@@ -76,4 +76,16 @@ export default class TTModule extends PlatformModule {
      */
     isIphone(): boolean;
     navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function): void;
+    /**
+      * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+      * @param success
+      * @param fail
+      */
+    checkFollowAwemeSate(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
+    /**
+     * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+     * @param success
+     * @param fail
+     */
+    openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
 }

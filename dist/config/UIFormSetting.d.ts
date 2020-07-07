@@ -60,6 +60,12 @@ export default class UIFormSetting {
         coinForm: {
             0: string;
         };
+        homeForm: {
+            0: string;
+        };
+        gameForm: {
+            0: string;
+        };
     };
     static convertUIName(mappingForm: any): any;
     static get AdForm(): any;
@@ -77,4 +83,6 @@ export default class UIFormSetting {
     static get PrizeForm(): any;
     static get MistouchForm(): any;
     static get TryForm(): any;
+    static get HomeForm(): any;
+    static get GameForm(): any;
 }

@@ -307,9 +307,6 @@ export default class TTModule extends PlatformModule {
                 top = 0;
         }
 
-
-
-
         if (this.bannerStyle) {
             this.banner.style = this.bannerStyle;
         }
@@ -561,5 +558,63 @@ export default class TTModule extends PlatformModule {
         this.showAppBox(() => {
             console.log('tt showAppBox close ')
         }, false)
+    }
+    /**
+      * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+      * @param success 
+      * @param fail 
+      */
+    public checkFollowAwemeSate(success: (hasFollowed) => void, fail: (err) => void) {
+        if (!window[this.platformName]) {
+            success(true);
+            return;
+        }
+        if (!window[this.platformName].checkFollowAwemeState) {
+            success(true);
+            return;
+        }
+        window[this.platformName].checkFollowAwemeState({
+            success: (res) => {
+                console.log('---- check success, res:', res)
+                let { hasFollowed } = res;
+                success(hasFollowed)
+            },
+            fail: (err) => {
+                fail(err);
+                // console.log('---- check fail,', err)
+            },
+            complete: (res) => {
+                // console.log('---- check complete, res: ', res)
+            }
+        })
+    }
+    /**
+     * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+     * @param success 
+     * @param fail 
+     */
+    public openAwemeUserProile(success: (hasFollowed) => void, fail: (err) => void) {
+        if (!window[this.platformName]) {
+            success(true);
+            return;
+        }
+        if (!window[this.platformName].openAwemeUserProfile) {
+            success(true);
+            return;
+        }
+        window[this.platformName].openAwemeUserProfile({
+            success: (res) => {
+                console.log('---- open success, res: ', res)
+                let { hasFollowed } = res;
+                success(hasFollowed);
+            },
+            fail: (err) => {
+                // console.log('---- open fail, err: ', err)
+                fail(err);
+            },
+            complete: (res) => {
+                // console.log('---- open complete, res: ',res)
+            }
+        })
     }
 }

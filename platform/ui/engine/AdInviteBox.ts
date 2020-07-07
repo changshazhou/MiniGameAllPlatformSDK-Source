@@ -2,6 +2,8 @@ import BaseLogic from "./BaseLogic";
 import EventType from "../../utils/EventType";
 import moosnowAdRow from "../../model/moosnowAdRow";
 import Common from "../../utils/Common";
+import { EntitysName } from "../../config/EntitysName";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 export default class AdInviteBox extends BaseLogic {
 
@@ -11,19 +13,18 @@ export default class AdInviteBox extends BaseLogic {
     public btnConfirm: any = null;
     public btnCancel: any = null;
 
-    private url: string = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Avatar";
 
     private mCurrentAdRow: moosnowAdRow
     willShow(data) {
         super.willShow(data);
         this.addListener();
-        moosnow.http.request(`${this.url}/avatar.json`, {}, "GET", (res) => {
+        moosnow.http.request(`${ROOT_CONFIG.HTTP_ROOT}/Avatar/avatar.json`, {}, "GET", (res) => {
             let userName = res.name[Common.randomNumBoth(0, res.name.length - 1)];
             let logo = Common.randomNumBoth(res.logo[0], res.logo[1])
             moosnow.ad.getAd(ad => {
                 let idx = Common.randomNumBoth(0, ad.indexLeft.length - 1)
                 let adRow: moosnowAdRow = ad.indexLeft[idx];
-                this.initBox(userName, `${this.url}/${logo}.png`, adRow.title);
+                this.initBox(userName, `${ROOT_CONFIG.HTTP_ROOT}/Avatar/${logo}.png`, adRow.title);
                 this.mCurrentAdRow = adRow;
             })
 
@@ -61,7 +62,7 @@ export default class AdInviteBox extends BaseLogic {
         moosnow.platform.navigate2Mini(this.mCurrentAdRow);
     }
     public onCancel() {
-        moosnow.entity.hideAllEntity("inviteBox", null)
+        moosnow.entity.hideAllEntity(EntitysName.INVITE_BOX, null)
     }
 
 }

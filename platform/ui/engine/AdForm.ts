@@ -5,6 +5,7 @@ import Common from "../../utils/Common";
 import moosnowAdRow from "../../model/moosnowAdRow";
 import moosnowResult from "../../model/moosnowResult";
 import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
+import { EntitysName } from "../../config/EntitysName";
 
 
 export default class AdForm extends BaseForm {
@@ -438,7 +439,7 @@ export default class AdForm extends BaseForm {
     }
 
     private _createInviteBox() {
-        let entityName = "inviteBox";
+        let entityName = EntitysName.INVITE_BOX;
         moosnow.entity.preload(entityName, () => {
             moosnow.http.getAllConfig(res => {
                 if (res) {

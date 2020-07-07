@@ -1,9 +1,11 @@
 import AdModule from "./AdModule";
+import Common from "../utils/Common";
+import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 
 export default class WXAdModule extends AdModule {
 
     public getRemoteAd(cb) {
-        let url = `https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/exportConfig/${moosnow.platform.moosnowConfig.moosnowAppId}.json?t=${Date.now()}`;
+        let url = `${ROOT_CONFIG.HTTP_ROOT}/exportConfig/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
         moosnow.http.request(url, {}, 'GET',
             (res) => {
                 cb(res)

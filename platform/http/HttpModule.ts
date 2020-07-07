@@ -3,6 +3,7 @@ import Common from "../utils/Common";
 import { PlatformType } from "../enum/PlatformType";
 import { MSG } from "../config/MSG";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
+import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 
 
 let ErrorType = {
@@ -25,14 +26,13 @@ export class HttpModule extends BaseModule {
     private versionNumber: string = "";
     public version: string = "2.0.4";
     public baseUrl: string = "https://api.liteplay.com.cn/";
-    private _cdnUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
 
     constructor() {
         super();
 
 
 
-        let versionUrl = `${this._cdnUrl}/SDK/version.json?t=` + Date.now();
+        let versionUrl = `${ROOT_CONFIG.HTTP_ROOT}/SDK/version.json?t=` + Date.now();
         if (Common.platform == PlatformType.PC) {
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
@@ -88,25 +88,7 @@ export class HttpModule extends BaseModule {
      */
     public request(url: string, data: any, method: 'POST' | 'GET', success?: Function, fail?: Function, complete?: Function) {
         let newUrl = "";
-        // if (moosnow && moosnow.platform && moosnow.platform.getSystemInfoSync) {
-        //     let sys = moosnow.platform.getSystemInfoSync();
-        //     if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
-        //         let originUrl = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/"
-        //         let cdnUrl = "https://cdn.liteplay.com.cn/"
-        //         newUrl = url.replace(originUrl, cdnUrl);
-        //         if (newUrl.indexOf('?') == -1) {
-        //             newUrl += '?t1=' + Date.now();
-        //         }
-        //         else
-        //             newUrl += '&t1=' + Date.now();
-        //     }
-        //     else
-        //         newUrl = url;
-        // }
-        // else
         newUrl = url;
-
-
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
@@ -373,7 +355,7 @@ export class HttpModule extends BaseModule {
             if (Common.config.url)
                 url = Common.config.url + "?t=" + Date.now();
             else
-                url = `${this._cdnUrl}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
+                url = `${ROOT_CONFIG.HTTP_ROOT}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
 
 
             this.request(url, {}, 'GET',
@@ -585,7 +567,7 @@ export class HttpModule extends BaseModule {
     }
 
     public getShareInfo(cb) {
-        this.request(`${this._cdnUrl}/share/${Common.config.moosnowAppId}.json`, {
+        this.request(`${ROOT_CONFIG.HTTP_ROOT}/share/${Common.config.moosnowAppId}.json`, {
             appid: Common.config.moosnowAppId
         }, "GET", (res) => {
             cb(res);
