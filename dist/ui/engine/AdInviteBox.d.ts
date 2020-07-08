@@ -5,7 +5,6 @@ export default class AdInviteBox extends BaseLogic {
     userName: any;
     btnConfirm: any;
     btnCancel: any;
-    private url;
     private mCurrentAdRow;
     willShow(data: any): void;
     willHide(): void;

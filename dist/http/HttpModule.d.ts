@@ -5,7 +5,6 @@ export declare class HttpModule extends BaseModule {
     private versionNumber;
     version: string;
     baseUrl: string;
-    private _cdnUrl;
     constructor();
     private mLaunchOptions;
     private get appLaunchOptions();

@@ -794,6 +794,9 @@ export default class PlatformModule extends BaseModule {
     public resumeRecord() {
     }
 
+    public createGameRecorderShareButton(imgUrl, iconUrl, style, callback?: Function) {
+
+    }
     //-----------------注册事件------------------
 
     /**

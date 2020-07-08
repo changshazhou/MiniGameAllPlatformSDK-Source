@@ -127,4 +127,9 @@ export default class UIForm {
     public showShare(options: showShareOptions) {
         moosnow.ui.pushUIForm(UIFormSetting.ShareForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
+
+
+    public createForm() {
+
+    }
 }
