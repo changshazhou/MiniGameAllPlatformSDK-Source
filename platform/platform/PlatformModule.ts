@@ -632,6 +632,7 @@ export default class PlatformModule extends BaseModule {
         this.shareInfoArr = shareInfoArr;
         window[this.platformName].showShareMenu({
             withShareTicket: true,
+            menus: ['shareAppMessage', 'shareTimeline'],
             success: null,
             fail: null,
             complete: null
@@ -793,8 +794,17 @@ export default class PlatformModule extends BaseModule {
     }
     public resumeRecord() {
     }
+    /**
+     * 
+     * @param style 
+     * @param timeRange 
+     * @param callback 
+     */
+    public showShareButton(style: object, timeRange?: Array<Array<number>>, callback?: Function) {
 
-    public createGameRecorderShareButton(imgUrl, iconUrl, style, callback?: Function) {
+    }
+
+    public hideShareButton() {
 
     }
     //-----------------注册事件------------------

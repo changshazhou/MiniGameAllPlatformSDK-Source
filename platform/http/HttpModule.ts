@@ -539,10 +539,14 @@ export class HttpModule extends BaseModule {
             }
         }
         if (this.appLaunchOptions && res) {
+
+            console.log('后台禁止场景 1 ', res.seachEntryScene);
+            console.log('后台禁止场景 2 ', res.shareEntryScene);
+
             if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
                 || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                 callback(true)
-                console.log('appLaunchOptions', this.appLaunchOptions);
+                console.log('后台禁止场景 ', this.appLaunchOptions.scene);
                 return;
             }
         }

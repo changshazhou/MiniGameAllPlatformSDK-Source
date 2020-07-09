@@ -151,11 +151,11 @@ export default class WXModule extends PlatformModule {
         stopPromise && stopPromise.then((res) => {
             if (!res.error.code) {
                 this.record.off('timeUpdate');
-                this.createGameRecorderShareButton(
-                    () => {
+                // this.showShareButton(
+                //     () => {
 
-                    }
-                );
+                //     }
+                // );
             }
             console.log(' stop Record  then  ', res);
         })
@@ -174,19 +174,28 @@ export default class WXModule extends PlatformModule {
             this.record.resume();
         }
     }
-
-    public createGameRecorderShareButton(style: object, timeRange?: Array<Array<number>>, callback?: Function) {
+    private mShareButton: any
+    public showShareButton(style: any, timeRange?: Array<Array<number>>, callback?: Function) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createGameRecorderShareButton) return;
+        if (!timeRange)
+            timeRange = [[0, this.writeTime]];
         moosnow.http.getAllConfig(res => {
 
-            const button = window[this.platformName].createGameRecorderShareButton({
+            //     sys.pixelRatio
+
+            if (style.left == "center") {
+                let sys = this.getSystemInfoSync();
+                style.left = (sys.windowWidth - 168) / 2
+            }
+
+            this.mShareButton = window[this.platformName].createGameRecorderShareButton({
                 // 样式参数
                 style: {
                     left: 10,
                     top: 150,
-                    ...style,
                     height: 50,
+                    ...style,
                     color: '#ffffff',
                     textAlign: 'center',
                     fontSize: 16,
@@ -205,13 +214,19 @@ export default class WXModule extends PlatformModule {
                     timeRange: timeRange
                 }
             })
-            button.show();
-            button.onTap(res => {
+            this.mShareButton.show();
+            this.mShareButton.onTap(res => {
                 console.log(`错误码：${res.error.code}，错误信息：${res.error.message}`)
                 if (callback)
                     callback(res);
             })
         })
 
+    }
+
+    public hideShareButton() {
+        if (this.mShareButton) {
+            this.mShareButton.hide();
+        }
     }
 }

@@ -1276,6 +1276,7 @@
             this.shareInfoArr = shareInfoArr;
             window[this.platformName].showShareMenu({
                 withShareTicket: true,
+                menus: ['shareAppMessage', 'shareTimeline'],
                 success: null,
                 fail: null,
                 complete: null
@@ -1445,7 +1446,15 @@
         };
         PlatformModule.prototype.resumeRecord = function () {
         };
-        PlatformModule.prototype.createGameRecorderShareButton = function (imgUrl, iconUrl, style, callback) {
+        /**
+         *
+         * @param style
+         * @param timeRange
+         * @param callback
+         */
+        PlatformModule.prototype.showShareButton = function (style, timeRange, callback) {
+        };
+        PlatformModule.prototype.hideShareButton = function () {
         };
         //-----------------注册事件------------------
         /**
@@ -2128,8 +2137,10 @@
             stopPromise && stopPromise.then(function (res) {
                 if (!res.error.code) {
                     _this.record.off('timeUpdate');
-                    _this.createGameRecorderShareButton('https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/guide/guide_error2.png', 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/guide/guide_error2.png', {}, function () {
-                    });
+                    // this.showShareButton(
+                    //     () => {
+                    //     }
+                    // );
                 }
                 console.log(' stop Record  then  ', res);
             })
@@ -2147,41 +2158,45 @@
                 this.record.resume();
             }
         };
-        WXModule.prototype.createGameRecorderShareButton = function (imgUrl, iconUrl, style, callback) {
+        WXModule.prototype.showShareButton = function (style, timeRange, callback) {
+            var _this = this;
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].createGameRecorderShareButton)
                 return;
-            var button = window[this.platformName].createGameRecorderShareButton({
-                // 样式参数
-                style: {
-                    left: 10,
-                    top: 150,
-                    height: 50,
-                    color: '#ffffff',
-                    textAlign: 'center',
-                    fontSize: 16,
-                    borderRadius: 4,
-                    iconMarginRight: 16,
-                    paddingLeft: 1,
-                    paddingRight: 30,
-                },
-                // 按钮的背景图片
-                text: '自定义文案',
-                // 分享参数
-                share: {
-                    query: 'a=1&b=2',
-                    // 背景音乐的路径
-                    bgm: '',
-                    timeRange: [[0, 1000], [2000, 3000]]
+            if (!timeRange)
+                timeRange = [[0, this.writeTime]];
+            moosnow.http.getAllConfig(function (res) {
+                //     sys.pixelRatio
+                if (style.left == "center") {
+                    var sys = _this.getSystemInfoSync();
+                    style.left = (sys.windowWidth - 168) / 2;
                 }
+                _this.mShareButton = window[_this.platformName].createGameRecorderShareButton({
+                    // 样式参数
+                    style: __assign(__assign({ left: 10, top: 150, height: 50 }, style), { color: '#ffffff', textAlign: 'center', fontSize: 16, borderRadius: 4, iconMarginRight: 16, paddingLeft: 1, paddingRight: 30 }),
+                    // 按钮的背景图片
+                    text: res.shareButtonText || '自定义文案',
+                    // 分享参数
+                    share: {
+                        query: 'a=1&b=2',
+                        // 背景音乐的路径
+                        bgm: '',
+                        timeRange: timeRange
+                    }
+                });
+                _this.mShareButton.show();
+                _this.mShareButton.onTap(function (res) {
+                    console.log("\u9519\u8BEF\u7801\uFF1A" + res.error.code + "\uFF0C\u9519\u8BEF\u4FE1\u606F\uFF1A" + res.error.message);
+                    if (callback)
+                        callback(res);
+                });
             });
-            button.show();
-            button.onTap(function (res) {
-                console.log("\u9519\u8BEF\u7801\uFF1A" + res.error.code + "\uFF0C\u9519\u8BEF\u4FE1\u606F\uFF1A" + res.error.message);
-                if (callback)
-                    callback(res);
-            });
+        };
+        WXModule.prototype.hideShareButton = function () {
+            if (this.mShareButton) {
+                this.mShareButton.hide();
+            }
         };
         return WXModule;
     }(PlatformModule));
@@ -2918,10 +2933,12 @@
                 }
             }
             if (this.appLaunchOptions && res) {
+                console.log('后台禁止场景 1 ', res.seachEntryScene);
+                console.log('后台禁止场景 2 ', res.shareEntryScene);
                 if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
                     || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                     callback(true);
-                    console.log('appLaunchOptions', this.appLaunchOptions);
+                    console.log('后台禁止场景 ', this.appLaunchOptions.scene);
                     return;
                 }
             }

@@ -34,5 +34,7 @@ export default class WXModule extends PlatformModule {
     stopRecord(callback?: any): void;
     pauseRecord(): void;
     resumeRecord(): void;
-    createGameRecorderShareButton(imgUrl: any, iconUrl: any, style: any, callback?: Function): void;
+    private mShareButton;
+    showShareButton(style: any, timeRange?: Array<Array<number>>, callback?: Function): void;
+    hideShareButton(): void;
 }

@@ -189,7 +189,14 @@ export default class PlatformModule extends BaseModule {
     stopRecord(callback?: any): void;
     pauseRecord(): void;
     resumeRecord(): void;
-    createGameRecorderShareButton(imgUrl: any, iconUrl: any, style: any, callback?: Function): void;
+    /**
+     *
+     * @param style
+     * @param timeRange
+     * @param callback
+     */
+    showShareButton(style: object, timeRange?: Array<Array<number>>, callback?: Function): void;
+    hideShareButton(): void;
     /**
      * 注册微信各种回调
      */
