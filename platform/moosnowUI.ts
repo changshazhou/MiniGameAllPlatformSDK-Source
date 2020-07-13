@@ -13,6 +13,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 import UIFormSetting from "./config/UIFormSetting";
+import CocosFormHelper from "./ui/cocos/CocosFormHelper";
 
 class moosnowUI {
 
@@ -24,7 +25,7 @@ class moosnowUI {
         touchOptions: showTouchOptions,
         coinOptions: showCoinOptions
     };
-    
+
     constructor() {
         if (!window["moosnow"]) {
             console.log('没有引入主SDK')
@@ -38,7 +39,8 @@ class moosnowUI {
         window["moosnow"].form = this.form
         window["moosnow"].control = this.control
         window["moosnow"].delay = this.delay
-        window["moosnow"].formSetting = UIFormSetting
+        window["moosnow"].formSetting = UIFormSetting;
+
 
     }
 
@@ -49,7 +51,7 @@ class moosnowUI {
     private initEntity() {
         this.mEntity = new CocosEntityModule();
     }
-
+    
     /**
      * UI控制
      */

@@ -23,18 +23,28 @@ export default class ResourceModule extends BaseModule {
     loadAsset(url, assetType, callback) {
 
         if (Common.getEngine() == ENGINE_TYPE.COCOS) {
-            let res = cc.loader.getRes(url, assetType);
-            if (res) {
-                if (callback) {
-                    callback(null, res);
-                }
-                return;
+
+            if (cc.resources)
+                cc.resources.load(url, assetType, (err, asset) => {
+                    if (err) {
+                        console.log(' cc.resources.load ', err)
+                        return;
+                    }
+                    if (callback) {
+                        callback(err, asset);
+                    }
+                });
+            else {
+                let res = cc.loader.load(url, assetType, (err, asset) => {
+                    if (err) {
+                        console.log(' cc.loader.load ', err)
+                        return;
+                    }
+                    if (callback) {
+                        callback(null, res);
+                    }
+                });
             }
-            cc.loader.loadRes(url, assetType, function (err, asset) {
-                if (callback) {
-                    callback(err, asset);
-                }
-            });
         }
         else if (Common.getEngine() == ENGINE_TYPE.LAYA) {
             let res = Laya.loader.getRes(url);

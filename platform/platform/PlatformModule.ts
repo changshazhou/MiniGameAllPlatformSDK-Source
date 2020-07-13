@@ -47,8 +47,38 @@ export default class PlatformModule extends BaseModule {
 
 
     public platformName: string = "wx";
-    public bannerId: string = "";
-    public videoId: string = "";
+    public mBannerId: string = "";
+    public mBannerIndex: number = 0;
+    public get bannerId() {
+        let id = Common.config["bannerId"] as any;
+        if (id instanceof Array) {
+            if (this.mBannerIndex > id.length - 1)
+                this.mBannerIndex = 0;
+            let retValue = id[this.mBannerIndex];
+            this.mBannerIndex++;
+            console.log('使用banner id ', retValue)
+            return retValue;
+        }
+        else {
+            return id;
+        }
+    };
+    public mVideoId: string;
+    public mVideoIndex: number = 0;
+    public get videoId() {
+        let id = Common.config["videoId"] as any;
+        if (id instanceof Array) {
+            if (this.mBannerIndex > id.length - 1)
+                this.mBannerIndex = 0;
+            let retValue = id[this.mBannerIndex];
+            this.mBannerIndex++;
+            console.log('使用 video id ', retValue)
+            return retValue;
+        }
+        else {
+            return id;
+        }
+    };
     public interId = "";
     public boxId = "";
 
@@ -108,8 +138,6 @@ export default class PlatformModule extends BaseModule {
     public initAppConfig() {
         this.moosnowConfig = Common.config;
 
-        this.bannerId = this.moosnowConfig["bannerId"];
-        this.videoId = this.moosnowConfig["videoId"];
         this.interId = this.moosnowConfig["interId"];
         this.boxId = this.moosnowConfig["boxId"];
         this.nativeId = this.moosnowConfig["nativeId"] as [];
@@ -641,6 +669,11 @@ export default class PlatformModule extends BaseModule {
             window[this.platformName].onShareAppMessage(() => {
                 return this._buildShareInfo();
             });
+        if (window[this.platformName].onShareTimeline)
+            // 绑定分享参数
+            window[this.platformName].onShareTimeline(() => {
+                return this._buildShareInfo();
+            })
     }
 
     public getShareInfo(ticket: string, success: (encryptedData: string, iv: string) => void, fail: Function = null) {
@@ -897,12 +930,13 @@ export default class PlatformModule extends BaseModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let left = (windowWidth - this.bannerWidth) / 2;
-        if (Common.isEmpty(this.bannerId)) {
+        let bannerId = this.bannerId;
+        if (Common.isEmpty(bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
+            adUnitId: bannerId,
             style: {
                 top: 0,
                 left: left,
@@ -919,6 +953,8 @@ export default class PlatformModule extends BaseModule {
         this.banner = null;
         this.isBannerShow = false;
         moosnow.event.sendEventImmediately(EventType.ON_BANNER_HIDE, null);
+        moosnow.event.sendEventImmediately(EventType.ON_BANNER_ERROR, null);
+
     }
     public _bottomCenterBanner(size) {
 
@@ -962,9 +998,6 @@ export default class PlatformModule extends BaseModule {
             this.banner.style.top = top;
             console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
         }
-
-
-
     }
 
 
@@ -1114,14 +1147,15 @@ export default class PlatformModule extends BaseModule {
             moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
-        if (Common.isEmpty(this.videoId)) {
+        let videoId = this.videoId;
+        if (Common.isEmpty(videoId)) {
             console.warn(MSG.VIDEO_KEY_IS_NULL)
             moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
         if (!this.video) {
             this.video = window[this.platformName].createRewardedVideoAd({
-                adUnitId: this.videoId
+                adUnitId: videoId
             });
             if (!this.video) {
                 console.warn('创建视频广告失败')

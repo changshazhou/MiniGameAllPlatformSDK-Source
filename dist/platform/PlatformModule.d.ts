@@ -19,8 +19,12 @@ export default class PlatformModule extends BaseModule {
     native: any;
     box: any;
     platformName: string;
-    bannerId: string;
-    videoId: string;
+    mBannerId: string;
+    mBannerIndex: number;
+    get bannerId(): any;
+    mVideoId: string;
+    mVideoIndex: number;
+    get videoId(): any;
     interId: string;
     boxId: string;
     /**

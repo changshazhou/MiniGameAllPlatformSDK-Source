@@ -184,10 +184,10 @@ export default class WXModule extends PlatformModule {
 
             //     sys.pixelRatio
 
-            if (style.left == "center") {
-                let sys = this.getSystemInfoSync();
-                style.left = (sys.windowWidth - 168) / 2
-            }
+            // if (style.left == "center") {
+            //     let sys = this.getSystemInfoSync();
+            //     style.left = (sys.windowWidth - 168) / 2
+            // }
 
             this.mShareButton = window[this.platformName].createGameRecorderShareButton({
                 // 样式参数
@@ -205,7 +205,9 @@ export default class WXModule extends PlatformModule {
                     paddingRight: 30,
                 },
                 // 按钮的背景图片
-                text: res.shareButtonText || '自定义文案',
+                text: res.shareButtonText || "",
+                image: res.shareBgImage || "",
+                icon: res.shareIconImage || "",
                 // 分享参数
                 share: {
                     query: 'a=1&b=2',

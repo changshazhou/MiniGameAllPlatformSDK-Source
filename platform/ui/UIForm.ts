@@ -9,6 +9,7 @@ import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
+import CocosFormHelper from "./cocos/CocosFormHelper";
 
 /**
  * 广告结果
@@ -130,6 +131,6 @@ export default class UIForm {
 
 
     public createForm() {
-
+        CocosFormHelper.createForm("homeForm")
     }
 }

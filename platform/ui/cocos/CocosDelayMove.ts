@@ -13,7 +13,7 @@ export default class CocosDelayMove extends DelayMove {
 
     public initPos() {
         if (this.pos1.x == 0 && this.pos1.y == 0) {
-            this.pos1 = this.moveNode.position.clone();
+            this.pos1 = this.moveNode.position.clone() as any;
             this.pos2 = this.pos1.add(new cc.Vec2(0, this.distince))
         }
         this.moveNode.active = false;

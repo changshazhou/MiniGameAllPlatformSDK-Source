@@ -99,7 +99,7 @@ export default class CocosAdForm extends AdForm {
         }
     }
     public showClose(visible) {
-
+return;
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;
         this.btnBack.active = false;
