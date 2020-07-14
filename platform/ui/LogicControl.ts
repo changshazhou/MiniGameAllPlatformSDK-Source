@@ -23,6 +23,8 @@ import ShareFormTT from "./engine/ShareFormTT";
 import CocosShareFormTT from "./cocos/CocosShareFormTT";
 import AdInviteBox from "./engine/AdInviteBox";
 import CocosAdInviteBox from "./cocos/CocosAdInviteBox";
+import CocosForm from "./cocos/CocosForm";
+import CocosEndForm from "./cocos/CocosEndForm";
 
 /**
  * 页面逻辑控制
@@ -130,5 +132,8 @@ export default class LogicControl {
         return this.mShareForm;
     }
 
+    public test() {
+        CocosForm.instance.showForm("endForm", CocosEndForm)
+    }
 
 }

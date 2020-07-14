@@ -3543,7 +3543,7 @@
             }
         };
         CocosNodeHelper.createMask = function (parent) {
-            var skin = "texture/game/img_mask";
+            var skin = ROOT_CONFIG.UI_ROOT + "/SDK/layout/img_mask.png";
             var mask = this.createNode("img_mask");
             var sprite = mask.addComponent(cc.Sprite);
             var widget = mask.addComponent(cc.Widget);
@@ -3584,7 +3584,7 @@
             var _this = this;
             if (!parent)
                 parent = CocosNodeHelper.canvasNode;
-            this.getLayout('https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/layout.json', function (res) {
+            this.getLayout('https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json', function (res) {
                 if (res[name]) {
                     var formCfg = res[name];
                     var formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg.url, formCfg.x, formCfg.y, formCfg.width, formCfg.height, name);
@@ -3689,8 +3689,9 @@
         UIForm.prototype.showShare = function (options) {
             moosnow.ui.pushUIForm(UIFormSetting.ShareForm, options, function () { }, ROOT_CONFIG.UI_ROOT);
         };
-        UIForm.prototype.createForm = function () {
-            CocosFormHelper.createForm("homeForm");
+        UIForm.prototype.createForm = function (formName) {
+            if (formName === void 0) { formName = ""; }
+            CocosFormHelper.createForm(formName);
         };
         return UIForm;
     }());

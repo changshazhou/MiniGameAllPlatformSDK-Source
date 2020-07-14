@@ -9,7 +9,8 @@ import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
-import CocosFormHelper from "./cocos/CocosFormHelper";
+import CocosFormHelper from "./cocos/CocosForm";
+import CocosForm from "./cocos/CocosForm";
 
 /**
  * 广告结果
@@ -45,8 +46,6 @@ export default class UIForm {
     public preloadAd(callback?: Function) {
         moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, callback, ROOT_CONFIG.UI_ROOT);
     }
-
-
 
 
 
@@ -130,7 +129,7 @@ export default class UIForm {
     }
 
 
-    public createForm() {
-        CocosFormHelper.createForm("homeForm")
+    public createForm(formName: string = "") {
+        
     }
 }
