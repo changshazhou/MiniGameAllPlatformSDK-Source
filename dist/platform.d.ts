@@ -7,10 +7,6 @@ import Common from "./utils/Common";
 import { PlatformType } from "./enum/PlatformType";
 import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
-import { BaseUIModule } from "./ui/engine/BaseUIModule";
-import BaseEntityModule from "./ui/engine/BaseEntityModule";
-import LogicControl from "./ui/LogicControl";
-import UIForm from "./ui/UIForm";
 import Delay from "./framework/Delay";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
@@ -22,6 +18,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 import UIFormSetting from "./config/UIFormSetting";
+import FormFactory from "./ui/FormFactory";
 
 declare global {
     class moosnow {
@@ -90,10 +87,7 @@ declare global {
         static setting: SettingModule
         static data: GameDataCenter
         static event: EventModule
-        static ui: BaseUIModule
-        static entity: BaseEntityModule
-        static form: UIForm
-        static control: LogicControl
+        static form: FormFactory
         static delay: Delay
         static audio: AudioModule
         static resource: ResourceModule

@@ -19,6 +19,71 @@
         return EventType;
     }());
 
+    var AD_POSITION = {
+        /**
+         * 不显示
+         */
+        NONE: 0,
+        BANNER: 1,
+        FLOAT: 2,
+        /**
+         * 侧拉广告
+         */
+        SIDE: 4,
+        /**
+         * 中部大导出
+         */
+        CENTER: 8,
+        /**
+         * 导出
+         */
+        EXPORT: 16,
+        /**
+         * 返回按钮
+         */
+        BACK: 32,
+        /**
+         * 黑色半透明遮挡
+         */
+        MASK: 64,
+        /**
+         * 延迟显示
+         */
+        WAIT: 128,
+        /**
+         * 左右两侧
+         */
+        LEFTRIGHT: 256,
+        /**
+        * 固定的六个
+        */
+        EXPORT_FIXED: 512,
+        /**
+        * 扩展1
+        */
+        EXTEND1: 1024,
+        /**
+        * 扩展2
+        */
+        EXTEND2: 2048,
+        /**
+        * 扩展3
+        */
+        EXTEND3: 4096,
+        /**
+        * 扩展4
+        */
+        EXTEND4: 8192,
+        /**
+         * 顶部
+         */
+        TOP: 32768,
+        /**
+         * 恢复到上一个状态
+         */
+        RECOVER: 16384,
+    };
+
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
 
@@ -233,281 +298,6 @@
         return value;
     }
 
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-    var UIFormSetting = /** @class */ (function () {
-        function UIFormSetting() {
-        }
-        UIFormSetting.append = function (setting) {
-            this.mSetting = __assign(__assign({}, this.mSetting), setting);
-        };
-        Object.defineProperty(UIFormSetting, "mapping", {
-            get: function () {
-                return this.mSetting;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        UIFormSetting.convertUIName = function (mappingForm) {
-            if (!mappingForm) {
-                console.warn("convertUIName fail  mappingForm is null ");
-                return null;
-            }
-            var curApp = moosnow.getAppPlatform();
-            if (mappingForm[curApp])
-                return mappingForm[curApp];
-            else if (mappingForm[moosnow.APP_PLATFORM.WX])
-                return mappingForm[moosnow.APP_PLATFORM.WX];
-            else {
-                console.warn("convertUIName fail ", mappingForm);
-                return null;
-            }
-            return null;
-        };
-        Object.defineProperty(UIFormSetting, "AdForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.adForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "CoinForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.coinForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "ShareForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.shareForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(UIFormSetting, "TotalForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.totalForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(UIFormSetting, "EndForm", {
-            /**
-             * 结束页
-             */
-            get: function () {
-                return this.convertUIName(this.mapping.endForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "ToastForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.toastForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "PauseForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.pauseForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "RespawnForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.respawnForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "SetForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.setForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(UIFormSetting, "PrizeForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.prizeForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(UIFormSetting, "MistouchForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.mistouchForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "TryForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.tryForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "HomeForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.homeForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(UIFormSetting, "GameForm", {
-            get: function () {
-                return this.convertUIName(this.mapping.gameForm);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        UIFormSetting.mSetting = {
-            adForm: (_a = {},
-                _a[moosnow.APP_PLATFORM.WX] = "adForm",
-                _a),
-            pauseForm: (_b = {},
-                _b[moosnow.APP_PLATFORM.WX] = "pauseForm",
-                _b[moosnow.APP_PLATFORM.BYTEDANCE] = "pauseFormTT",
-                _b[moosnow.APP_PLATFORM.OPPO] = "pauseFormOPPO",
-                _b[moosnow.APP_PLATFORM.OPPO_ZS] = "pauseFormOPPO",
-                _b[moosnow.APP_PLATFORM.VIVO] = "pauseFormOPPO",
-                _b[moosnow.APP_PLATFORM.QQ] = "pauseFormTT",
-                _b),
-            respawnForm: (_c = {},
-                _c[moosnow.APP_PLATFORM.WX] = "respawnForm",
-                _c[moosnow.APP_PLATFORM.BYTEDANCE] = "respawnFormTT",
-                _c[moosnow.APP_PLATFORM.OPPO] = "respawnFormOPPO",
-                _c[moosnow.APP_PLATFORM.OPPO_ZS] = "respawnFormOPPO",
-                _c[moosnow.APP_PLATFORM.VIVO] = "respawnFormOPPO",
-                _c[moosnow.APP_PLATFORM.QQ] = "respawnFormQQ",
-                _c),
-            endForm: (_d = {},
-                _d[moosnow.APP_PLATFORM.WX] = "endForm",
-                _d[moosnow.APP_PLATFORM.BYTEDANCE] = "endFormTT",
-                _d[moosnow.APP_PLATFORM.OPPO] = "endFormOPPO",
-                _d[moosnow.APP_PLATFORM.OPPO_ZS] = "endFormOPPO",
-                _d[moosnow.APP_PLATFORM.VIVO] = "endFormOPPO",
-                _d),
-            totalForm: (_e = {},
-                _e[moosnow.APP_PLATFORM.WX] = "totalForm",
-                _e[moosnow.APP_PLATFORM.BYTEDANCE] = "totalFormTT",
-                _e[moosnow.APP_PLATFORM.QQ] = "totalFormQQ",
-                _e),
-            tryForm: (_f = {},
-                _f[moosnow.APP_PLATFORM.WX] = "tryForm",
-                _f[moosnow.APP_PLATFORM.BYTEDANCE] = "tryFormTT",
-                _f[moosnow.APP_PLATFORM.QQ] = "tryFormTT",
-                _f),
-            mistouchForm: (_g = {},
-                _g[moosnow.APP_PLATFORM.WX] = "mistouchForm",
-                _g[moosnow.APP_PLATFORM.QQ] = "mistouchFormQQ",
-                _g[moosnow.APP_PLATFORM.BYTEDANCE] = "mistouchFormTT",
-                _g),
-            prizeForm: (_h = {},
-                _h[moosnow.APP_PLATFORM.BYTEDANCE] = "prizeFormTT",
-                _h[moosnow.APP_PLATFORM.QQ] = "prizeForm",
-                _h),
-            shareForm: (_j = {},
-                _j[moosnow.APP_PLATFORM.WX] = "shareFormTT",
-                _j[moosnow.APP_PLATFORM.BYTEDANCE] = "shareFormTT",
-                _j),
-            setForm: (_k = {},
-                _k[moosnow.APP_PLATFORM.WX] = "setForm",
-                _k),
-            toastForm: (_l = {},
-                _l[moosnow.APP_PLATFORM.WX] = "toastForm",
-                _l),
-            coinForm: (_m = {},
-                _m[moosnow.APP_PLATFORM.WX] = "coinForm",
-                _m),
-            homeForm: (_o = {},
-                _o[moosnow.APP_PLATFORM.WX] = "homeForm",
-                _o),
-            gameForm: (_p = {},
-                _p[moosnow.APP_PLATFORM.WX] = "gameForm",
-                _p)
-        };
-        return UIFormSetting;
-    }());
-
-    var AD_POSITION = {
-        /**
-         * 不显示
-         */
-        NONE: 0,
-        BANNER: 1,
-        FLOAT: 2,
-        /**
-         * 侧拉广告
-         */
-        SIDE: 4,
-        /**
-         * 中部大导出
-         */
-        CENTER: 8,
-        /**
-         * 导出
-         */
-        EXPORT: 16,
-        /**
-         * 返回按钮
-         */
-        BACK: 32,
-        /**
-         * 黑色半透明遮挡
-         */
-        MASK: 64,
-        /**
-         * 延迟显示
-         */
-        WAIT: 128,
-        /**
-         * 左右两侧
-         */
-        LEFTRIGHT: 256,
-        /**
-        * 固定的六个
-        */
-        EXPORT_FIXED: 512,
-        /**
-        * 扩展1
-        */
-        EXTEND1: 1024,
-        /**
-        * 扩展2
-        */
-        EXTEND2: 2048,
-        /**
-        * 扩展3
-        */
-        EXTEND3: 4096,
-        /**
-        * 扩展4
-        */
-        EXTEND4: 8192,
-        /**
-         * 顶部
-         */
-        TOP: 32768,
-        /**
-         * 恢复到上一个状态
-         */
-        RECOVER: 16384,
-    };
-
-    var ROOT_CONFIG = {
-        UI_ROOT: "moosnow/prefab/ui/",
-        ENTITY_ROOT: "moosnow/prefab/entity/",
-        HTTP_ROOT: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com",
-    };
-
     var FormKeyValue = /** @class */ (function () {
         function FormKeyValue(formNode, formLogic) {
             this.formNode = null;
@@ -685,6 +475,10 @@
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
         };
+        NodeHelper.createText = function (parent, url, x, y, width, height, name) {
+            if (x === void 0) { x = 0; }
+            if (y === void 0) { y = 0; }
+        };
         NodeHelper.changeSrc = function (image, url) {
         };
         NodeHelper.createMask = function (parent) {
@@ -692,6 +486,12 @@
         NodeHelper.nodeNum = 0;
         return NodeHelper;
     }());
+
+    var ROOT_CONFIG = {
+        UI_ROOT: "moosnow/prefab/ui/",
+        ENTITY_ROOT: "moosnow/prefab/entity/",
+        HTTP_ROOT: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com",
+    };
 
     var CocosNodeHelper = /** @class */ (function (_super) {
         __extends(CocosNodeHelper, _super);
@@ -719,6 +519,25 @@
             var node = this.createNode(name);
             node.addComponent(cc.Sprite);
             this.changeSrc(node, url);
+            node.x = x;
+            node.y = y;
+            node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
+            node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height);
+            parent.addChild(node);
+            return node;
+        };
+        CocosNodeHelper.createText = function (parent, url, x, y, width, height, name) {
+            if (x === void 0) { x = 0; }
+            if (y === void 0) { y = 0; }
+            var node = this.createNode(name);
+            var txt = node.addComponent(cc.Label);
+            txt.enableWrapText = false;
+            txt.overflow = cc.Label.Overflow.SHRINK;
+            txt.fontSize = 32;
+            txt.lineHeight = 32;
+            txt.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
+            txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
+            txt.useSystemFont = true;
             node.x = x;
             node.y = y;
             node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
@@ -810,7 +629,11 @@
         CocosFormFactory.prototype._createChild = function (parent, children) {
             for (var i = 0; i < children.length; i++) {
                 var nodeCfg = children[i];
-                var node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+                var node = null;
+                if (nodeCfg.type == 'text')
+                    node = CocosNodeHelper.createText(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+                else
+                    node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
                 if (nodeCfg.child && nodeCfg.child.length > 0) {
                     this._createChild(node, nodeCfg.child);
                 }
@@ -1573,6 +1396,94 @@
         return CocosPauseForm;
     }(CocosBaseForm));
 
+    var TotalForm = /** @class */ (function (_super) {
+        __extends(TotalForm, _super);
+        function TotalForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.checked = null;
+            _this.unchecked = null;
+            _this.btnReceive = null;
+            _this.levelCoin = null;
+            _this.mCheckedVideo = true;
+            _this.mLevelCoinNum = 0;
+            _this.mLevelShareCoinNum = 0;
+            return _this;
+        }
+        TotalForm.prototype.initForm = function (logic) {
+            this.initProperty(logic);
+            // this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.closeForm, this)
+        };
+        TotalForm.prototype.addEvent = function () {
+        };
+        TotalForm.prototype.removeEvent = function () {
+        };
+        TotalForm.prototype.onReceive = function () {
+            var _this = this;
+            if (this.mCheckedVideo) {
+                moosnow.platform.showVideo(function (res) {
+                    if (res == moosnow.VIDEO_STATUS.END) {
+                        _this.openEndForm(_this.mLevelCoinNum * 5);
+                    }
+                    else if (res == moosnow.VIDEO_STATUS.ERR) {
+                    }
+                    else {
+                    }
+                });
+            }
+            else {
+                this.openEndForm(this.mLevelCoinNum);
+            }
+        };
+        TotalForm.prototype.openEndForm = function (coin) {
+        };
+        TotalForm.prototype.onShareChange = function () {
+            this.mCheckedVideo = !this.mCheckedVideo;
+            this.changeUI();
+        };
+        TotalForm.prototype.changeUI = function () {
+        };
+        TotalForm.prototype.onShow = function (data) {
+            var coin = data.coin, shareCoin = data.shareCoin;
+            this.mLevelCoinNum = coin;
+            this.mLevelShareCoinNum = shareCoin;
+            this.levelCoin.string = "" + Common.formatMoney(this.mLevelCoinNum);
+            this.addEvent();
+            this.mCheckedVideo = true;
+            this.changeUI();
+            moosnow.platform.stopRecord();
+            moosnow.platform.showBanner();
+        };
+        TotalForm.prototype.willHide = function () {
+            this.removeEvent();
+            moosnow.platform.hideBanner();
+        };
+        return TotalForm;
+    }(BaseForm));
+
+    var CocosTotalForm = /** @class */ (function (_super) {
+        __extends(CocosTotalForm, _super);
+        function CocosTotalForm() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        CocosTotalForm.prototype.addEvent = function () {
+            this.unchecked.node.on(CocosNodeEvent.TOUCH_END, this.onShareChange, this);
+            this.btnReceive.node.on(CocosNodeEvent.TOUCH_END, this.onReceive, this);
+        };
+        CocosTotalForm.prototype.removeEvent = function () {
+            this.unchecked.node.off(CocosNodeEvent.TOUCH_END, this.onShareChange, this);
+            this.btnReceive.node.off(CocosNodeEvent.TOUCH_END, this.onReceive, this);
+        };
+        CocosTotalForm.prototype.changeUI = function () {
+            if (this.mCheckedVideo) {
+                this.checked.node.active = true;
+            }
+            else {
+                this.checked.node.active = false;
+            }
+        };
+        return CocosTotalForm;
+    }(TotalForm));
+
     /**
      * 广告结果
      */
@@ -1591,14 +1502,12 @@
          * @param msg  消息内容
          */
         FormFactory.prototype.showToast = function (msg) {
-            moosnow.ui.showToast(msg);
         };
         /**
          *  预加载广告
          * @param callback
          */
         FormFactory.prototype.preloadAd = function (callback) {
-            moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, callback, ROOT_CONFIG.UI_ROOT);
         };
         /**
          * 显示广告
@@ -1621,7 +1530,6 @@
          * @param options
          */
         FormFactory.prototype.showCoin = function (options) {
-            moosnow.ui.pushUIForm(UIFormSetting.CoinForm, options, function () { }, ROOT_CONFIG.UI_ROOT);
         };
         /**
          * 显示狂点页面
@@ -1629,8 +1537,6 @@
          * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
          */
         FormFactory.prototype.showMistouch = function (options) {
-            moosnow.ui.pushUIForm(UIFormSetting.MistouchForm, options, function () {
-            }, ROOT_CONFIG.UI_ROOT);
         };
         /**
          * 显示奖励
@@ -1640,8 +1546,6 @@
          * @param callback
          */
         FormFactory.prototype.showPrize = function (options) {
-            moosnow.ui.pushUIForm(UIFormSetting.PrizeForm, options, function () {
-            }, ROOT_CONFIG.UI_ROOT);
         };
         /**
          * 显示结算统计页
@@ -1649,7 +1553,7 @@
          * @param callback
          */
         FormFactory.prototype.showTotal = function (options) {
-            moosnow.ui.pushUIForm(UIFormSetting.TotalForm, options, function () { }, ROOT_CONFIG.UI_ROOT);
+            CocosFormFactory.instance.showForm("totalForm", CocosTotalForm, options);
         };
         /**
         * 显示结算统计页
@@ -1671,7 +1575,6 @@
          *  showShare
          */
         FormFactory.prototype.showShare = function (options) {
-            moosnow.ui.pushUIForm(UIFormSetting.ShareForm, options, function () { }, ROOT_CONFIG.UI_ROOT);
         };
         FormFactory.prototype.createForm = function (formName) {
             CocosFormFactory.instance.showForm(formName, CocosEndForm, {});
@@ -1858,6 +1761,7 @@
              * 扩展参数
              */
             this.extraData = {};
+            this.zIndex = 0;
         }
         /**
          * 实例化参数
@@ -1962,26 +1866,7 @@
     var showTotalOptions = /** @class */ (function (_super) {
         __extends(showTotalOptions, _super);
         function showTotalOptions() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            // /**
-            // * 实例化参数
-            // */
-            // public static create(): showTotalOptions {
-            //     return new showTotalOptions();
-            // }
-            /**
-             * 金币数量
-             */
-            _this.coinNum = 0;
-            /**
-            * 金币数量
-            */
-            _this.videoNum = 0;
-            /**
-            * 分享得到金币数量
-            */
-            _this.shareCoinNum = 0;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         return showTotalOptions;
     }(showOptions));

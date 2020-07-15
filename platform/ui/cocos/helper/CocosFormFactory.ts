@@ -20,7 +20,11 @@ export default class CocosFormFactory extends FormFactory {
     public _createChild(parent: cc.Node, children: Array<NodeAttribute>) {
         for (let i = 0; i < children.length; i++) {
             let nodeCfg = children[i] as NodeAttribute;
-            let node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+            let node = null;
+            if (nodeCfg.type == 'text')
+                node = CocosNodeHelper.createText(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+            else
+                node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
             if (nodeCfg.child && nodeCfg.child.length > 0) {
                 this._createChild(node, nodeCfg.child);
             }

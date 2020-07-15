@@ -9,4 +9,5 @@ export default class NodeAttribute {
     isMask: boolean;
     child: Array<NodeAttribute>;
     event: Array<string>;
+    type: string;
 }

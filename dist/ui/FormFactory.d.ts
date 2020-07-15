@@ -5,6 +5,7 @@ import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
+import showPauseOptions from "../model/showPauseOptions";
 /**
  * 广告结果
  */
@@ -65,7 +66,7 @@ export default class FormFactory {
       * @param coinNum
       * @param callback
       */
-    showPause(options: showEndOptions): void;
+    showPause(options: showPauseOptions): void;
     /**
      *  showShare
      */

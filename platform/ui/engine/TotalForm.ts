@@ -29,10 +29,8 @@ export default class TotalForm extends BaseForm {
                     this.openEndForm(this.mLevelCoinNum * 5)
                 }
                 else if (res == moosnow.VIDEO_STATUS.ERR) {
-                    moosnow.ui.showToast(moosnow.VIDEO_MSG.ERR)
                 }
                 else {
-                    moosnow.ui.showToast(moosnow.VIDEO_MSG.NOTEND)
                 }
             })
         }
@@ -42,9 +40,7 @@ export default class TotalForm extends BaseForm {
     }
 
     private openEndForm(coin) {
-        moosnow.ui.hideUIForm(UIFormSetting.TotalForm, null)
-        moosnow.ui.pushUIForm(UIFormSetting.EndForm, { coin, level: this.FormData.level, levelShareCoinNum: this.mLevelShareCoinNum, ...this.FormData }, () => { }, ROOT_CONFIG.UI_ROOT)
-    }
+   }
 
     public onShareChange() {
         this.mCheckedVideo = !this.mCheckedVideo;

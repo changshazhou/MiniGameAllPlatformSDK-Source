@@ -24,6 +24,10 @@ export default class NodeHelper {
 
     }
 
+    public static createText(parent: cc.Node, url: string, x: number = 0, y: number = 0, width?: number | string, height?: number | string, name?: string) {
+
+    }
+
     public static changeSrc(image: any, url: string) {
 
     }

@@ -29,6 +29,26 @@ export default class CocosNodeHelper extends NodeHelper {
         return node;
     }
 
+
+
+    public static createText(parent: cc.Node, url: string, x: number = 0, y: number = 0, width?: number | string, height?: number | string, name?: string) {
+        let node = this.createNode(name);
+        let txt = node.addComponent(cc.Label);
+        txt.enableWrapText = false;
+        txt.overflow = cc.Label.Overflow.SHRINK;
+        txt.fontSize = 32;
+        txt.lineHeight = 32;
+        txt.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
+        txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
+        txt.useSystemFont = true;
+        node.x = x;
+        node.y = y;
+        node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width)
+        node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height)
+        parent.addChild(node)
+        return node;
+    }
+
     public static changeSrc(image: cc.Node, url: string, callback?: Function) {
         let sprite = image.getComponent(cc.Sprite);
         if (url) {

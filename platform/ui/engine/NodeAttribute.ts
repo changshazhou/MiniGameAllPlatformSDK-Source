@@ -11,5 +11,6 @@ export default class NodeAttribute {
     public isMask: boolean = false;
     public child: Array<NodeAttribute> = null;
     public event: Array<string> = [];
+    public type: string = "";
 
 }

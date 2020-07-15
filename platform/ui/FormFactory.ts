@@ -13,6 +13,7 @@ import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 import CocosFormFactory from "./cocos/helper/CocosFormFactory";
 import CocosEndForm from "./cocos/form/CocosEndForm";
 import CocosPauseForm from "./cocos/form/CocosPauseForm";
+import CocosTotalForm from "./cocos/form/CocosTotalForm";
 
 /**
  * 广告结果
@@ -38,7 +39,6 @@ export default class FormFactory {
      * @param msg  消息内容
      */
     public showToast(msg: string) {
-        moosnow.ui.showToast(msg)
     }
 
     /**
@@ -46,7 +46,6 @@ export default class FormFactory {
      * @param callback 
      */
     public preloadAd(callback?: Function) {
-        moosnow.ui.pushUIForm(UIFormSetting.AdForm, { showAd: moosnow.AD_POSITION.NONE }, callback, ROOT_CONFIG.UI_ROOT);
     }
 
 
@@ -74,7 +73,6 @@ export default class FormFactory {
      * @param options 
      */
     public showCoin(options: showCoinOptions) {
-        moosnow.ui.pushUIForm(UIFormSetting.CoinForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -84,9 +82,6 @@ export default class FormFactory {
      * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
      */
     public showMistouch(options: showTouchOptions) {
-        moosnow.ui.pushUIForm(UIFormSetting.MistouchForm, options, () => {
-
-        }, ROOT_CONFIG.UI_ROOT)
     }
     /**
      * 显示奖励
@@ -96,9 +91,6 @@ export default class FormFactory {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
-        moosnow.ui.pushUIForm(UIFormSetting.PrizeForm, options, () => {
-
-        }, ROOT_CONFIG.UI_ROOT)
     }
 
 
@@ -108,7 +100,7 @@ export default class FormFactory {
      * @param callback 
      */
     public showTotal(options: showTotalOptions) {
-        moosnow.ui.pushUIForm(UIFormSetting.TotalForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
+        CocosFormFactory.instance.showForm("totalForm", CocosTotalForm, options)
     }
 
 
@@ -134,7 +126,6 @@ export default class FormFactory {
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        moosnow.ui.pushUIForm(UIFormSetting.ShareForm, options, () => { }, ROOT_CONFIG.UI_ROOT)
     }
 
 

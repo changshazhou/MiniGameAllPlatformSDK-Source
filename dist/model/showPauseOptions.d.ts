@@ -1,8 +1,8 @@
 import showOptions from "./showOptions";
 /**
- * 唤起结算页参数
+ * 唤起暂停页参数
  */
-export default class showTotalOptions extends showOptions {
+export default class showPauseOptions extends showOptions {
     /**
      * 返回 回调
      */
@@ -10,5 +10,5 @@ export default class showTotalOptions extends showOptions {
     /**
      * 重新开始回调
      */
-    videoCallback?: Function;
+    replayCallback?: Function;
 }

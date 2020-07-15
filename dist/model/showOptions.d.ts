@@ -15,4 +15,5 @@ export default class showOptions {
      * 扩展参数
      */
     extraData?: Object;
+    zIndex?: number;
 }
