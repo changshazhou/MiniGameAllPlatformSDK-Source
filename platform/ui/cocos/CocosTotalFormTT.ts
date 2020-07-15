@@ -1,6 +1,6 @@
 
 import TotalFormTT from "../engine/TotalFormTT";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosTotalFormTT extends TotalFormTT {
 

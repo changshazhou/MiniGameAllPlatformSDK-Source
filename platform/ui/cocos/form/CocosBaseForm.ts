@@ -1,5 +1,5 @@
-import BaseForm from "../engine/BaseForm"
-import CocosNodeEvent from "./CocosNodeEvent";
+import BaseForm from "../../engine/BaseForm"
+import CocosNodeEvent from "../enum/CocosNodeEvent";
 
 export default class CocosBaseForm extends BaseForm {
 

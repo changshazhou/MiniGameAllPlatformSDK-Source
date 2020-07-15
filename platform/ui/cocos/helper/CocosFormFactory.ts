@@ -1,7 +1,7 @@
-import FormFactory, { FormQuene } from "../engine/FormFactory"
+import FormFactory, { FormQuene } from "../../engine/FormFactory"
 import CocosNodeHelper from "./CocosNodeHelper";
-import NodeAttribute from "../engine/NodeAttribute";
-import BaseForm from "../engine/BaseForm";
+import NodeAttribute from "../../engine/NodeAttribute";
+import BaseForm from "../../engine/BaseForm";
 
 
 
@@ -21,6 +21,9 @@ export default class CocosFormFactory extends FormFactory {
         for (let i = 0; i < children.length; i++) {
             let nodeCfg = children[i] as NodeAttribute;
             let node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+            if (nodeCfg.child && nodeCfg.child.length > 0) {
+                this._createChild(node, nodeCfg.child);
+            }
         }
     }
 

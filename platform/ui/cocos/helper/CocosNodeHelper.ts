@@ -1,5 +1,5 @@
-import NodeHelper from "../engine/NodeHelper";
-import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
+import NodeHelper from "../../engine/NodeHelper";
+import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -72,7 +72,7 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static createMask(parent: cc.Node) {
-        let skin = `${ROOT_CONFIG.UI_ROOT}/SDK/layout/img_mask.png`;
+        let skin = `${ROOT_CONFIG.HTTP_ROOT}/SDK/layout/img_mask.png`;
         let mask = this.createNode("img_mask");
         let sprite = mask.addComponent(cc.Sprite);
         let widget = mask.addComponent(cc.Widget);

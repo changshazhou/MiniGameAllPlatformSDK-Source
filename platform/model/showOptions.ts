@@ -20,6 +20,9 @@ export default class showOptions {
     /**
      * 扩展参数
      */
-    public extraData?: Object = {}
+    public extraData?: Object = {};
+
+
+    public zIndex?: number = 0;
 
 }

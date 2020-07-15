@@ -1,6 +1,6 @@
 
 import TotalForm from "../engine/TotalForm";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosTotalForm extends TotalForm {
 

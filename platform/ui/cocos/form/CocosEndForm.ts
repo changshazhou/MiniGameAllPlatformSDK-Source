@@ -1,6 +1,6 @@
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "./CocosBaseForm";
-import showEndOptions from "../../model/showEndOptions";
+import showEndOptions from "../../../model/showEndOptions";
 
 export default class CocosEndForm extends CocosBaseForm {
 

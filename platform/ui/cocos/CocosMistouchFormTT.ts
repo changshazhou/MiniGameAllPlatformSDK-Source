@@ -2,7 +2,7 @@ import BaseForm from "../engine/BaseForm";
 import UIFormSetting from "../../config/UIFormSetting";
 import MistouchForm from "../engine/MistouchForm";
 import MistouchFormTT from "../engine/MistouchFormTT";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosMistouchFormTT extends MistouchFormTT {
 

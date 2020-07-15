@@ -1,4 +1,4 @@
-import NodeEvent from "../engine/NodeEvent";
+import NodeEvent from "../../engine/NodeEvent";
 
 export default class CocosNodeEvent extends NodeEvent {
 

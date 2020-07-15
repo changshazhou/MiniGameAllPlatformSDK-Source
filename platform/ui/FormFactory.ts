@@ -8,14 +8,16 @@ import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
+import showPauseOptions from "../model/showPauseOptions";
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
-import CocosFormFactory from "./cocos/CocosFormFactory";
-import CocosEndForm from "./cocos/CocosEndForm";
+import CocosFormFactory from "./cocos/helper/CocosFormFactory";
+import CocosEndForm from "./cocos/form/CocosEndForm";
+import CocosPauseForm from "./cocos/form/CocosPauseForm";
 
 /**
  * 广告结果
  */
-export default class UIForm {
+export default class FormFactory {
 
     constructor() {
 
@@ -119,7 +121,14 @@ export default class UIForm {
         CocosFormFactory.instance.showForm("endForm", CocosEndForm, options)
     }
 
-
+    /**
+      * 显示结算统计页
+      * @param coinNum 
+      * @param callback 
+      */
+    public showPause(options: showPauseOptions) {
+        CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options)
+    }
 
     /**
      *  showShare

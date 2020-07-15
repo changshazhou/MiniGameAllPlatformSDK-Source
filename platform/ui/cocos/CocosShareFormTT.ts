@@ -1,5 +1,5 @@
 import shareFormTT from "../engine/shareFormTT";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosShareFormTT extends shareFormTT {
 

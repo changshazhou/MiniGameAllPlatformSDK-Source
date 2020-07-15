@@ -4,7 +4,7 @@ import EventType from "../../utils/EventType";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIFormSetting from "../../config/UIFormSetting";
 import MistouchFormQQ from "../engine/MistouchFormQQ";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosMistouchFormQQ extends MistouchFormQQ {
     clickProgress: any = null;

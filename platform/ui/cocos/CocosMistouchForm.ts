@@ -1,7 +1,7 @@
 
 import MistouchForm from "../engine/MistouchForm";
 import EventType from "../../utils/EventType";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosMistouchForm extends MistouchForm {
 

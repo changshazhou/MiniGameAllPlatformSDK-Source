@@ -44,4 +44,5 @@ export default class FormFactory {
     static removeAllFormFromQuene(name: string, callback?: (formKV: FormKeyValue) => void): void;
     getLayout(url: string, callback: (attr: any) => void): void;
     showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, remoteLayout?: boolean, layoutOptions?: any): void;
+    hideForm(name: string, formNode: any, formData?: any): void;
 }

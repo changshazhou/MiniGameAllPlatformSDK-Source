@@ -1,7 +1,7 @@
 import AdInviteBox from "../engine/AdInviteBox";
 import Common from "../../utils/Common";
 import { MSG } from "../../config/MSG";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 
 export default class CocosAdInviteBox extends AdInviteBox {

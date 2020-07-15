@@ -152,6 +152,9 @@ export default class FormFactory {
 
     }
 
+    public hideForm(name: string, formNode: any, formData?: any) {
+    
+    }
 
 
 

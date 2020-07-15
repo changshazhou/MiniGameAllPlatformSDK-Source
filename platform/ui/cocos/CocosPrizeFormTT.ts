@@ -2,7 +2,7 @@
 import Common from "../../utils/Common";
 import UIFormSetting from "../../config/UIFormSetting";
 import PrizeFormTT from "../engine/PrizeFormTT";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosPrizeFormTT extends PrizeFormTT {
 

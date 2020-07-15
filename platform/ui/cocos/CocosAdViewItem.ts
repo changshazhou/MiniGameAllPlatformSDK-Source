@@ -1,6 +1,6 @@
 import AdViewItem from "../engine/AdViewItem";
 import moosnowAdRow from "../../model/moosnowAdRow";
-import CocosNodeEvent from "./CocosNodeEvent";
+import CocosNodeEvent from "./enum/CocosNodeEvent";
 
 export default class CocosAdViewItem extends AdViewItem {
 

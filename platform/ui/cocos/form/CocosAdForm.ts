@@ -1,13 +1,87 @@
-import EventType from "../../utils/EventType";
-import { AD_POSITION } from "../../enum/AD_POSITION";
-import BaseForm from "../engine/BaseForm";
-import AdForm from "../engine/AdForm";
-import CocosNodeEvent from "./CocosNodeEvent";
+import { AD_POSITION } from "../../../enum/AD_POSITION";
+import CocosNodeEvent from "../enum/CocosNodeEvent";
+import CocosBaseForm from "./CocosBaseForm";
+import moosnowResult from "../../../model/moosnowResult";
+import Common from "../../../utils/Common";
 
 
-export default class CocosAdForm extends AdForm {
+export default class CocosAdForm extends CocosBaseForm {
 
-    public addEvent() {
+    public pauseContainer: any = null;
+    public pauseView: any = null;
+    public pauseLayout: any = null;
+    public centerContainer: any = null;
+    public centerView: any = null;
+    public centerLayout: any = null;
+    public exportContainer: any = null;
+    public exportView: any = null;
+    public exportLayout: any = null;
+    public exportClose: any = null;
+    public exportMask: any = null;
+    public exportCloseTxt: any = null;
+    public btnBack: any = null;
+    public floatContainer: any = null;
+    public floatFull: any = null;
+    public bannerContainer: any = null;
+    public bannerView: any = null;
+    public bannerLayout: any = null;
+    public endContainer: any = null;
+    public endView: any = null;
+    public endLayout: any = null;
+    public failContainer: any = null;
+    public failView: any = null;
+    public failLayout: any = null;
+    public gameOverContainer: any = null;
+    public gameOverView: any = null;
+    public gameOverLayout: any = null;
+    public respawnContainer: any = null;
+    public respawnScrollView: any = null;
+    public respawnLayout: any = null;
+    public playerDiedContainer: any = null;
+    public playerDiedScrollView: any = null;
+    public playerDiedLayout: any = null;
+    public leftContainer: any = null;
+    public leftView: any = null;
+    public leftLayout: any = null;
+    public rightView: any = null;
+    public rightLayout: any = null;
+    public sideContainer: any = null;
+    public sideView: any = null;
+    public sideLayout: any = null;
+    public btnSideShow: any = null;
+    public btnSideHide: any = null;
+
+    public extend1Container: any = null;
+    public extend1View: any = null;
+    public extend1Layout: any = null;
+
+    public extend2Container: any = null;
+    public extend2View: any = null;
+    public extend2Layout: any = null;
+
+    public extend3Container: any = null;
+    public extend3View: any = null;
+    public extend3Layout: any = null;
+
+    public extend4Container: any = null;
+    public extend4View: any = null;
+    public extend4Layout: any = null;
+
+
+
+    public topContainer: any = null;
+    public topView: any = null;
+    public topLayout: any = null;
+
+
+
+    private mShowAd = moosnow.AD_POSITION.NONE;
+    private mPrevShowAd = moosnow.AD_POSITION.NONE;
+    private mPrevBackCall: Function
+    private mBackCall: Function
+
+
+    public addListener() {
         if (this.btnBack)
             this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
@@ -16,9 +90,8 @@ export default class CocosAdForm extends AdForm {
             this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
             this.btnSideHide.on(CocosNodeEvent.TOUCH_START, this.sideIn, this)
-        super.addEvent();
     }
-    public removeEvent() {
+    public removeListener() {
         if (this.btnBack)
             this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
@@ -27,9 +100,49 @@ export default class CocosAdForm extends AdForm {
             this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
             this.btnSideHide.off(CocosNodeEvent.TOUCH_START, this.sideIn, this)
-        super.removeEvent();
+    }
+    public onBack() {
+        if (this.mBackCall) {
+            this.mBackCall();
+        }
     }
 
+    private mFloatIndex = 0;
+    private mFloatRefresh = 3;
+    private mFloatCache = {};
+    private mAdData: moosnowResult;
+
+    private loadAd(callback?: Function) {
+        if (this.mAdData)
+            callback(this.mAdData.indexLeft)
+        else
+            moosnow.ad.getAd((res) => {
+                this.mAdData = res;
+                if (res.indexLeft.length == 0)
+                    return;
+                callback(this.mAdData.indexLeft)
+            })
+    }
+
+    public onRandomNavigate() {
+        this.loadAd(res => {
+            let item = res[Common.randomNumBoth(0, res.length - 1)];
+            moosnow.platform.navigate2Mini(item, () => { }, () => {
+
+            })
+        })
+
+    }
+    public onNavigate() {
+        moosnow.http.getAllConfig(res => {
+            if (res && res.exportBtnNavigate == 1) {
+                this.onRandomNavigate();
+            }
+            else {
+                this.onBack();
+            }
+        })
+    }
 
     public floatAnim(floatNode) {
         floatNode.runAction(
@@ -99,7 +212,7 @@ export default class CocosAdForm extends AdForm {
         }
     }
     public showClose(visible) {
-return;
+        return;
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;
         this.btnBack.active = false;
