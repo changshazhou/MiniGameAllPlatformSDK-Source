@@ -64,5 +64,5 @@ export default class UIForm {
      *  showShare
      */
     showShare(options: showShareOptions): void;
-    createForm(formName?: string): void;
+    createForm(formName: string): void;
 }

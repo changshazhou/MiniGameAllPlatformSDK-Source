@@ -23,7 +23,7 @@ import ShareFormTT from "./engine/ShareFormTT";
 import CocosShareFormTT from "./cocos/CocosShareFormTT";
 import AdInviteBox from "./engine/AdInviteBox";
 import CocosAdInviteBox from "./cocos/CocosAdInviteBox";
-import CocosForm from "./cocos/CocosForm";
+import CocosForm from "./cocos/CocosFormFactory";
 import CocosEndForm from "./cocos/CocosEndForm";
 
 /**

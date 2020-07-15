@@ -1,10 +1,14 @@
 import BaseModule from "../../framework/BaseModule";
+import Common from "../../utils/Common";
 
 
 export default class BaseForm extends BaseModule {
 
     public mFormData: any;
 
+    start() {
+
+    }
 
     /**
      * 父类缓存willShow，onShow传递到实体的逻辑数据
@@ -13,12 +17,31 @@ export default class BaseForm extends BaseModule {
 
         return this.mFormData;
     }
+    private mNodeMap: Array<string> = [];
     /**
      * 初始化
-     * @param logic 
+     * @param node 
      */
-    initForm(logic) {
-        this.initProperty(logic);
+    initForm(node) {
+
+        for (let v in this) {
+            if (!Common.isFunction(this[v])) {
+                let findNode = this.findNodeByName(node, v);
+                if (findNode)
+                    this[v] = findNode;
+                this.mNodeMap.push(v);
+            }
+        }
+    }
+
+    disable() {
+        this.mNodeMap.forEach(v => {
+            this[v] = null;
+        })
+    }
+
+    public findNodeByName(node: any, attrName: string): any {
+        return null;
     }
 
     willShow(data?) {

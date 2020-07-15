@@ -5,7 +5,7 @@ export default class showOptions {
     static create<T extends showOptions>(c: {
         new (): T;
     }): T;
-    private _hideForm;
+    private _hideForm?;
     /**
      * 完成后是否隐藏 默认 true
      */
@@ -14,5 +14,5 @@ export default class showOptions {
     /**
      * 扩展参数
      */
-    extraData: Object;
+    extraData?: Object;
 }

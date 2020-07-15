@@ -8,6 +8,11 @@ export default class NodeHelper {
     public static get canvasNode() {
         return cc.Canvas.instance.node;
     }
+    private static nodeNum: number = 0;
+    public static getNodeName() {
+        this.nodeNum++;
+        return 'createNode' + this.nodeNum
+    }
 
     public static createNode() {
 

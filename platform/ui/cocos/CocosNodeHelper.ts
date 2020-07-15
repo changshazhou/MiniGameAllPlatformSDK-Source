@@ -6,11 +6,10 @@ export default class CocosNodeHelper extends NodeHelper {
     public static get canvasNode() {
         return cc.Canvas.instance.node;
     }
-    private static nodeNum: number = 0;
+
     public static createNode(name?: string) {
         if (!name) {
-            this.nodeNum++;
-            name = 'createNode' + this.nodeNum
+            name = this.getNodeName();
         }
         let node = new cc.Node();
         node.name = name

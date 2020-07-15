@@ -1,5 +1,6 @@
 export default class NodeAttribute {
     constructor(parameters: any);
+    name: string;
     x: number;
     y: number;
     width: number | string;

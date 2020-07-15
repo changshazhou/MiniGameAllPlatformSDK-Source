@@ -50,4 +50,5 @@ export default class LogicControl {
      * 分享
      */
     get shareFormTT(): ShareFormTT;
+    test(): void;
 }

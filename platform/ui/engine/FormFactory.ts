@@ -26,12 +26,12 @@ export class FormQuene {
 
     }
 }
-export default class Form {
+export default class FormFactory {
 
-    public static mInstance: Form = null;
+    public static mInstance: FormFactory = null;
     public static get instance() {
         if (!this.mInstance)
-            this.mInstance = new Form()
+            this.mInstance = new FormFactory()
         return this.mInstance;
     }
 

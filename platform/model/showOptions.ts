@@ -7,19 +7,19 @@ export default class showOptions {
         return new c();
     }
 
-    private _hideForm: boolean = true;
+    private _hideForm?: boolean = true;
     /**
      * 完成后是否隐藏 默认 true
      */
-    get hideForm(): boolean {
+    public get hideForm(): boolean {
         return this._hideForm
     }
-    set hideForm(value: boolean) {
+    public set hideForm(value: boolean) {
         this._hideForm = value;
     }
     /**
      * 扩展参数
      */
-    public extraData: Object = {}
+    public extraData?: Object = {}
 
 }

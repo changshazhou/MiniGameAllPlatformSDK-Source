@@ -13,7 +13,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showTouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 import UIFormSetting from "./config/UIFormSetting";
-import CocosFormHelper from "./ui/cocos/CocosForm";
+import CocosFormHelper from "./ui/cocos/CocosFormFactory";
 
 class moosnowUI {
 
