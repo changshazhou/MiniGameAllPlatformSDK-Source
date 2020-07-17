@@ -1,5 +1,6 @@
 import NodeHelper from "../../engine/NodeHelper";
 import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
+import CocosNodeEvent from "../enum/CocosNodeEvent";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -91,13 +92,14 @@ export default class CocosNodeHelper extends NodeHelper {
         }
     }
 
-    public static createMask(parent: cc.Node) {
+    public static createMask(parent: cc.Node, maskUrl: string = undefined) {
         let skin = `${ROOT_CONFIG.HTTP_ROOT}/SDK/layout/img_mask.png`;
         let mask = this.createNode("img_mask");
         let sprite = mask.addComponent(cc.Sprite);
         let widget = mask.addComponent(cc.Widget);
         widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
         widget.left = widget.top = widget.right = widget.bottom = 0;
+
         this.changeSrc(mask, skin, () => {
             sprite.type = cc.Sprite.Type.SLICED;
             sprite.spriteFrame.insetBottom = 1;
@@ -110,7 +112,7 @@ export default class CocosNodeHelper extends NodeHelper {
 
         parent.addChild(mask);
         mask.zIndex = -1;
-        mask.on(cc.Node.EventType.TOUCH_START, this.onMaskMouseDown, this)
+        mask.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
     }
 
     private static onMaskMouseDown(e: cc.Event.EventTouch) {

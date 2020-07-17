@@ -34,7 +34,8 @@ export default class CocosFormFactory extends FormFactory {
     private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any) {
         let formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg.url, formCfg.x, formCfg.y, formCfg.width, formCfg.height, formCfg.name);
         if (formCfg.isMask)
-            CocosNodeHelper.createMask(formNode);
+            CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
+
         this._createChild(formNode, formCfg.child);
 
         let logic = new formLogic();
@@ -83,6 +84,7 @@ export default class CocosFormFactory extends FormFactory {
                         let formCfg = res[name] as NodeAttribute;
                         formCfg.name = name;
                         this._createUINode(formCfg, formLogic, formData);
+                        console.log('_createUINode ', Date.now())
                     }
                 })
             }

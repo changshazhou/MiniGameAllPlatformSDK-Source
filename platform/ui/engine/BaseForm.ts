@@ -4,6 +4,8 @@ import Common from "../../utils/Common";
 
 export default class BaseForm extends BaseModule {
 
+
+    public node: any
     public mFormData: any;
 
     start() {
@@ -23,7 +25,7 @@ export default class BaseForm extends BaseModule {
      * @param node 
      */
     initForm(node) {
-
+        this.node = node;
         for (let v in this) {
             if (!Common.isFunction(this[v])) {
                 let findNode = this.findNodeByName(node, v);
@@ -35,6 +37,7 @@ export default class BaseForm extends BaseModule {
     }
 
     disable() {
+        this.node = null;
         this.mNodeMap.forEach(v => {
             this[v] = null;
         })

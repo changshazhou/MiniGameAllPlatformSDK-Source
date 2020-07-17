@@ -11,4 +11,8 @@ export default class showTotalOptions extends showOptions {
      * 重新开始回调
      */
     videoCallback?: Function;
+    /**
+     * 显示金币数量
+     */
+    coinNum: number;
 }

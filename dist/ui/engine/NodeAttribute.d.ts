@@ -1,5 +1,4 @@
 export default class NodeAttribute {
-    constructor(parameters: any);
     name: string;
     x: number;
     y: number;
@@ -7,6 +6,7 @@ export default class NodeAttribute {
     height: number | string;
     url: string;
     isMask: boolean;
+    maskUrl: string;
     child: Array<NodeAttribute>;
     event: Array<string>;
     type: string;

@@ -251,8 +251,8 @@ export class HttpModule extends BaseModule {
         if (Common.platform == PlatformType.WX)
             if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onStart({
-                    stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                    stageName: level,//关卡名称，该字段必传
+                    stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                    stageName: "" + level,//关卡名称，该字段必传
                     userId: moosnow.data.getToken() //用户ID
                 });
             else
@@ -270,8 +270,8 @@ export class HttpModule extends BaseModule {
         var desc = isWin ? "关卡完成" : "关卡失败";
         if (window['wx'] && window['wx'].aldStage)
             window['wx'].aldStage.onEnd({
-                stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                stageName: level,//关卡名称，该字段必传
+                stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                stageName: "" + level,//关卡名称，该字段必传
                 userId: moosnow.data.getToken(), //用户ID
                 event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
                 params: {

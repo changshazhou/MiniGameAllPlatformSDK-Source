@@ -14,6 +14,11 @@ export default class showTouchOptions extends showOptions {
     /**
      * 点击完成回调
      */
-    callback?: Function
+    callback?: Function;
+
+    /**
+     * 金币数量
+     */
+    coinNum: number = 0;
 
 }

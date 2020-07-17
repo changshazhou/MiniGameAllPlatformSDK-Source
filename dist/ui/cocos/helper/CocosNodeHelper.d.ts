@@ -5,6 +5,6 @@ export default class CocosNodeHelper extends NodeHelper {
     static createImage(parent: cc.Node, url: string, x?: number, y?: number, width?: number | string, height?: number | string, name?: string): cc.Node;
     static createText(parent: cc.Node, url: string, x?: number, y?: number, width?: number | string, height?: number | string, name?: string): cc.Node;
     static changeSrc(image: cc.Node, url: string, callback?: Function): void;
-    static createMask(parent: cc.Node): void;
+    static createMask(parent: cc.Node, maskUrl?: string): void;
     private static onMaskMouseDown;
 }

@@ -15,4 +15,9 @@ export default class showTotalOptions extends showOptions {
      */
     videoCallback?: Function
 
+    /**
+     * 显示金币数量
+     */
+    coinNum: number
+
 }

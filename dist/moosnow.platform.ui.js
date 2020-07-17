@@ -324,6 +324,7 @@
     }());
     var FormFactory = /** @class */ (function () {
         function FormFactory() {
+            this.mLayoutQuene = [];
         }
         Object.defineProperty(FormFactory, "instance", {
             get: function () {
@@ -383,18 +384,21 @@
          * @param formLogic
          */
         FormFactory.addForm2Quene = function (name, formNode, formLogic) {
-            var formQuene = null;
+            var idx = -1;
             for (var i = 0; i < this._FormQuene.length; i++) {
                 var item = this._FormQuene[i];
                 if (item.formName == name) {
-                    formQuene = item;
+                    idx = i;
                     break;
                 }
             }
-            if (formQuene)
-                formQuene.addForm(formNode, formLogic);
+            console.log('addForm2Quene 1 ', this._FormQuene);
+            if (idx != -1) {
+                this._FormQuene[idx].addForm(formNode, formLogic);
+            }
             else
                 this._FormQuene.push(new FormQuene(name, formNode, formLogic));
+            console.log('addForm2Quene 2 ', this._FormQuene);
         };
         /**
          * 从队列里移除Form
@@ -439,9 +443,20 @@
             }
         };
         FormFactory.prototype.getLayout = function (url, callback) {
-            moosnow.http.request(url, {}, 'GET', function (res) {
-                callback(res);
-            });
+            var _this = this;
+            if (!this.mCachedLayout) {
+                this.mLayoutQuene.push(callback);
+                if (this.mLayoutQuene.length == 1)
+                    moosnow.http.request(url, {}, 'GET', function (res) {
+                        _this.mCachedLayout = res;
+                        _this.mLayoutQuene.forEach(function (item) {
+                            item(res);
+                        });
+                        _this.mLayoutQuene = [];
+                    });
+            }
+            else
+                callback(this.mCachedLayout);
         };
         FormFactory.prototype.showForm = function (name, formLogic, formData, parent, remoteLayout, layoutOptions) {
             if (remoteLayout === void 0) { remoteLayout = true; }
@@ -492,212 +507,6 @@
         ENTITY_ROOT: "moosnow/prefab/entity/",
         HTTP_ROOT: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com",
     };
-
-    var CocosNodeHelper = /** @class */ (function (_super) {
-        __extends(CocosNodeHelper, _super);
-        function CocosNodeHelper() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(CocosNodeHelper, "canvasNode", {
-            get: function () {
-                return cc.Canvas.instance.node;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CocosNodeHelper.createNode = function (name) {
-            if (!name) {
-                name = this.getNodeName();
-            }
-            var node = new cc.Node();
-            node.name = name;
-            return node;
-        };
-        CocosNodeHelper.createImage = function (parent, url, x, y, width, height, name) {
-            if (x === void 0) { x = 0; }
-            if (y === void 0) { y = 0; }
-            var node = this.createNode(name);
-            node.addComponent(cc.Sprite);
-            this.changeSrc(node, url);
-            node.x = x;
-            node.y = y;
-            node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
-            node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height);
-            parent.addChild(node);
-            return node;
-        };
-        CocosNodeHelper.createText = function (parent, url, x, y, width, height, name) {
-            if (x === void 0) { x = 0; }
-            if (y === void 0) { y = 0; }
-            var node = this.createNode(name);
-            var txt = node.addComponent(cc.Label);
-            txt.enableWrapText = false;
-            txt.overflow = cc.Label.Overflow.SHRINK;
-            txt.fontSize = 32;
-            txt.lineHeight = 32;
-            txt.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
-            txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
-            txt.useSystemFont = true;
-            node.x = x;
-            node.y = y;
-            node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
-            node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height);
-            parent.addChild(node);
-            return node;
-        };
-        CocosNodeHelper.changeSrc = function (image, url, callback) {
-            var sprite = image.getComponent(cc.Sprite);
-            if (url) {
-                var isRemote = url.indexOf("http") != -1;
-                if (cc.resources)
-                    if (!isRemote)
-                        cc.resources.load(url, cc.SpriteFrame, function (err, spriteFrame) {
-                            if (err) {
-                                console.log(' cc.resources.load ', err);
-                                return;
-                            }
-                            sprite.spriteFrame = spriteFrame;
-                            if (callback)
-                                callback();
-                        });
-                    else {
-                        cc.assetManager.loadRemote(url, cc.SpriteFrame, function (err, tex) {
-                            if (err) {
-                                console.log(' cc.assetManager.loadRemote ', err);
-                                return;
-                            }
-                            var spriteFrame = new cc.SpriteFrame(tex);
-                            sprite.spriteFrame = spriteFrame;
-                            if (callback)
-                                callback();
-                        });
-                    }
-                else {
-                    cc.loader.load(url, function (err, tex) {
-                        if (err) {
-                            console.log(' cc.loader.load ', err);
-                            return;
-                        }
-                        var spriteFrame = new cc.SpriteFrame(tex);
-                        sprite.spriteFrame = spriteFrame;
-                        if (callback)
-                            callback();
-                    });
-                }
-            }
-        };
-        CocosNodeHelper.createMask = function (parent) {
-            var skin = ROOT_CONFIG.HTTP_ROOT + "/SDK/layout/img_mask.png";
-            var mask = this.createNode("img_mask");
-            var sprite = mask.addComponent(cc.Sprite);
-            var widget = mask.addComponent(cc.Widget);
-            widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
-            widget.left = widget.top = widget.right = widget.bottom = 0;
-            this.changeSrc(mask, skin, function () {
-                sprite.type = cc.Sprite.Type.SLICED;
-                sprite.spriteFrame.insetBottom = 1;
-                sprite.spriteFrame.insetTop = 1;
-                sprite.spriteFrame.insetLeft = 1;
-                sprite.spriteFrame.insetRight = 1;
-                mask.width = parent.width;
-                mask.height = parent.height;
-            });
-            parent.addChild(mask);
-            mask.zIndex = -1;
-            mask.on(cc.Node.EventType.TOUCH_START, this.onMaskMouseDown, this);
-        };
-        CocosNodeHelper.onMaskMouseDown = function (e) {
-            e.stopPropagation();
-        };
-        return CocosNodeHelper;
-    }(NodeHelper));
-
-    var CocosFormFactory = /** @class */ (function (_super) {
-        __extends(CocosFormFactory, _super);
-        function CocosFormFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(CocosFormFactory, "instance", {
-            get: function () {
-                if (!this.mInstance)
-                    this.mInstance = new CocosFormFactory();
-                return this.mInstance;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CocosFormFactory.prototype._createChild = function (parent, children) {
-            for (var i = 0; i < children.length; i++) {
-                var nodeCfg = children[i];
-                var node = null;
-                if (nodeCfg.type == 'text')
-                    node = CocosNodeHelper.createText(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
-                else
-                    node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
-                if (nodeCfg.child && nodeCfg.child.length > 0) {
-                    this._createChild(node, nodeCfg.child);
-                }
-            }
-        };
-        CocosFormFactory.prototype._createUINode = function (formCfg, formLogic, formData) {
-            var formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg.url, formCfg.x, formCfg.y, formCfg.width, formCfg.height, formCfg.name);
-            if (formCfg.isMask)
-                CocosNodeHelper.createMask(formNode);
-            this._createChild(formNode, formCfg.child);
-            var logic = new formLogic();
-            logic.initForm(formNode);
-            logic.willShow(formData);
-            formNode.active = true;
-            logic.onShow(formNode);
-            FormFactory.addForm2Quene(formCfg.name, formNode, logic);
-        };
-        CocosFormFactory.prototype.hideForm = function (name, formNode, formData) {
-            if (formNode) {
-                FormFactory.removeFormFromQuene(name, formNode, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                });
-            }
-            else
-                FormFactory.removeAllFormFromQuene(name, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                });
-        };
-        CocosFormFactory.prototype.showForm = function (name, formLogic, formData, parent, remoteLayout, layoutOptions) {
-            var _this = this;
-            if (remoteLayout === void 0) { remoteLayout = true; }
-            if (layoutOptions === void 0) { layoutOptions = null; }
-            if (!parent)
-                parent = CocosNodeHelper.canvasNode;
-            var formKV = FormFactory.getFormFromCached(name);
-            if (formKV) {
-                parent.addChild(formKV.formNode);
-                formKV.formLogic.willShow(formData);
-                formKV.formNode.active = true;
-                formKV.formLogic.onShow(formData);
-                FormFactory.addForm2Quene(name, formKV);
-            }
-            else {
-                var url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json';
-                if (remoteLayout) {
-                    this.getLayout(url, function (res) {
-                        if (res[name]) {
-                            var formCfg = res[name];
-                            formCfg.name = name;
-                            _this._createUINode(formCfg, formLogic, formData);
-                        }
-                    });
-                }
-                else {
-                    this._createUINode(layoutOptions, formLogic, formData);
-                }
-            }
-        };
-        return CocosFormFactory;
-    }(FormFactory));
 
     var PlatformType;
     (function (PlatformType) {
@@ -1138,6 +947,7 @@
          * @param node
          */
         BaseForm.prototype.initForm = function (node) {
+            this.node = node;
             for (var v in this) {
                 if (!Common.isFunction(this[v])) {
                     var findNode = this.findNodeByName(node, v);
@@ -1149,6 +959,7 @@
         };
         BaseForm.prototype.disable = function () {
             var _this = this;
+            this.node = null;
             this.mNodeMap.forEach(function (v) {
                 _this[v] = null;
             });
@@ -1218,6 +1029,214 @@
         });
         return CocosNodeEvent;
     }(NodeEvent));
+
+    var CocosNodeHelper = /** @class */ (function (_super) {
+        __extends(CocosNodeHelper, _super);
+        function CocosNodeHelper() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(CocosNodeHelper, "canvasNode", {
+            get: function () {
+                return cc.Canvas.instance.node;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosNodeHelper.createNode = function (name) {
+            if (!name) {
+                name = this.getNodeName();
+            }
+            var node = new cc.Node();
+            node.name = name;
+            return node;
+        };
+        CocosNodeHelper.createImage = function (parent, url, x, y, width, height, name) {
+            if (x === void 0) { x = 0; }
+            if (y === void 0) { y = 0; }
+            var node = this.createNode(name);
+            node.addComponent(cc.Sprite);
+            this.changeSrc(node, url);
+            node.x = x;
+            node.y = y;
+            node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
+            node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height);
+            parent.addChild(node);
+            return node;
+        };
+        CocosNodeHelper.createText = function (parent, url, x, y, width, height, name) {
+            if (x === void 0) { x = 0; }
+            if (y === void 0) { y = 0; }
+            var node = this.createNode(name);
+            var txt = node.addComponent(cc.Label);
+            txt.enableWrapText = false;
+            txt.overflow = cc.Label.Overflow.SHRINK;
+            txt.fontSize = 32;
+            txt.lineHeight = 32;
+            txt.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
+            txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
+            txt.useSystemFont = true;
+            node.x = x;
+            node.y = y;
+            node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width);
+            node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height);
+            parent.addChild(node);
+            return node;
+        };
+        CocosNodeHelper.changeSrc = function (image, url, callback) {
+            var sprite = image.getComponent(cc.Sprite);
+            if (url) {
+                var isRemote = url.indexOf("http") != -1;
+                if (cc.resources)
+                    if (!isRemote)
+                        cc.resources.load(url, cc.SpriteFrame, function (err, spriteFrame) {
+                            if (err) {
+                                console.log(' cc.resources.load ', err);
+                                return;
+                            }
+                            sprite.spriteFrame = spriteFrame;
+                            if (callback)
+                                callback();
+                        });
+                    else {
+                        cc.assetManager.loadRemote(url, cc.SpriteFrame, function (err, tex) {
+                            if (err) {
+                                console.log(' cc.assetManager.loadRemote ', err);
+                                return;
+                            }
+                            var spriteFrame = new cc.SpriteFrame(tex);
+                            sprite.spriteFrame = spriteFrame;
+                            if (callback)
+                                callback();
+                        });
+                    }
+                else {
+                    cc.loader.load(url, function (err, tex) {
+                        if (err) {
+                            console.log(' cc.loader.load ', err);
+                            return;
+                        }
+                        var spriteFrame = new cc.SpriteFrame(tex);
+                        sprite.spriteFrame = spriteFrame;
+                        if (callback)
+                            callback();
+                    });
+                }
+            }
+        };
+        CocosNodeHelper.createMask = function (parent, maskUrl) {
+            if (maskUrl === void 0) { maskUrl = undefined; }
+            var skin = ROOT_CONFIG.HTTP_ROOT + "/SDK/layout/img_mask.png";
+            var mask = this.createNode("img_mask");
+            var sprite = mask.addComponent(cc.Sprite);
+            var widget = mask.addComponent(cc.Widget);
+            widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
+            widget.left = widget.top = widget.right = widget.bottom = 0;
+            this.changeSrc(mask, skin, function () {
+                sprite.type = cc.Sprite.Type.SLICED;
+                sprite.spriteFrame.insetBottom = 1;
+                sprite.spriteFrame.insetTop = 1;
+                sprite.spriteFrame.insetLeft = 1;
+                sprite.spriteFrame.insetRight = 1;
+                mask.width = parent.width;
+                mask.height = parent.height;
+            });
+            parent.addChild(mask);
+            mask.zIndex = -1;
+            mask.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+        };
+        CocosNodeHelper.onMaskMouseDown = function (e) {
+            e.stopPropagation();
+        };
+        return CocosNodeHelper;
+    }(NodeHelper));
+
+    var CocosFormFactory = /** @class */ (function (_super) {
+        __extends(CocosFormFactory, _super);
+        function CocosFormFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(CocosFormFactory, "instance", {
+            get: function () {
+                if (!this.mInstance)
+                    this.mInstance = new CocosFormFactory();
+                return this.mInstance;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosFormFactory.prototype._createChild = function (parent, children) {
+            for (var i = 0; i < children.length; i++) {
+                var nodeCfg = children[i];
+                var node = null;
+                if (nodeCfg.type == 'text')
+                    node = CocosNodeHelper.createText(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+                else
+                    node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+                if (nodeCfg.child && nodeCfg.child.length > 0) {
+                    this._createChild(node, nodeCfg.child);
+                }
+            }
+        };
+        CocosFormFactory.prototype._createUINode = function (formCfg, formLogic, formData) {
+            var formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg.url, formCfg.x, formCfg.y, formCfg.width, formCfg.height, formCfg.name);
+            if (formCfg.isMask)
+                CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
+            this._createChild(formNode, formCfg.child);
+            var logic = new formLogic();
+            logic.initForm(formNode);
+            logic.willShow(formData);
+            formNode.active = true;
+            logic.onShow(formNode);
+            FormFactory.addForm2Quene(formCfg.name, formNode, logic);
+        };
+        CocosFormFactory.prototype.hideForm = function (name, formNode, formData) {
+            if (formNode) {
+                FormFactory.removeFormFromQuene(name, formNode, function (formKV) {
+                    formKV.formLogic.willHide(formData);
+                    formKV.formNode.active = false;
+                    formKV.formLogic.onHide(formData);
+                });
+            }
+            else
+                FormFactory.removeAllFormFromQuene(name, function (formKV) {
+                    formKV.formLogic.willHide(formData);
+                    formKV.formNode.active = false;
+                    formKV.formLogic.onHide(formData);
+                });
+        };
+        CocosFormFactory.prototype.showForm = function (name, formLogic, formData, parent, remoteLayout, layoutOptions) {
+            var _this = this;
+            if (remoteLayout === void 0) { remoteLayout = true; }
+            if (layoutOptions === void 0) { layoutOptions = null; }
+            if (!parent)
+                parent = CocosNodeHelper.canvasNode;
+            var formKV = FormFactory.getFormFromCached(name);
+            if (formKV) {
+                parent.addChild(formKV.formNode);
+                formKV.formLogic.willShow(formData);
+                formKV.formNode.active = true;
+                formKV.formLogic.onShow(formData);
+                FormFactory.addForm2Quene(name, formKV);
+            }
+            else {
+                var url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json';
+                if (remoteLayout) {
+                    this.getLayout(url, function (res) {
+                        if (res[name]) {
+                            var formCfg = res[name];
+                            formCfg.name = name;
+                            _this._createUINode(formCfg, formLogic, formData);
+                            console.log('_createUINode ', Date.now());
+                        }
+                    });
+                }
+                else {
+                    this._createUINode(layoutOptions, formLogic, formData);
+                }
+            }
+        };
+        return CocosFormFactory;
+    }(FormFactory));
 
     var CocosBaseForm = /** @class */ (function (_super) {
         __extends(CocosBaseForm, _super);
@@ -1396,9 +1415,9 @@
         return CocosPauseForm;
     }(CocosBaseForm));
 
-    var TotalForm = /** @class */ (function (_super) {
-        __extends(TotalForm, _super);
-        function TotalForm() {
+    var CocosTotalForm = /** @class */ (function (_super) {
+        __extends(CocosTotalForm, _super);
+        function CocosTotalForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.checked = null;
             _this.unchecked = null;
@@ -1409,20 +1428,33 @@
             _this.mLevelShareCoinNum = 0;
             return _this;
         }
-        TotalForm.prototype.initForm = function (logic) {
-            this.initProperty(logic);
-            // this.btnConfirm.on(CocosNodeEvent.TOUCH_END, this.closeForm, this)
+        Object.defineProperty(CocosTotalForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosTotalForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.unchecked, function () {
+                _this.onContinue();
+            });
+            this.applyClickAnim(this.btnReceive, function () {
+                _this.onReceive();
+            });
         };
-        TotalForm.prototype.addEvent = function () {
+        CocosTotalForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.unchecked);
+            this.removeClickAnim(this.btnReceive);
         };
-        TotalForm.prototype.removeEvent = function () {
-        };
-        TotalForm.prototype.onReceive = function () {
+        CocosTotalForm.prototype.onReceive = function () {
             var _this = this;
             if (this.mCheckedVideo) {
                 moosnow.platform.showVideo(function (res) {
                     if (res == moosnow.VIDEO_STATUS.END) {
-                        _this.openEndForm(_this.mLevelCoinNum * 5);
+                        if (_this.FormData.videoCallback)
+                            _this.FormData.videoCallback();
                     }
                     else if (res == moosnow.VIDEO_STATUS.ERR) {
                     }
@@ -1431,58 +1463,64 @@
                 });
             }
             else {
-                this.openEndForm(this.mLevelCoinNum);
             }
         };
-        TotalForm.prototype.openEndForm = function (coin) {
+        CocosTotalForm.prototype.onContinue = function () {
+            if (this.FormData.callback)
+                this.FormData.callback();
         };
-        TotalForm.prototype.onShareChange = function () {
-            this.mCheckedVideo = !this.mCheckedVideo;
-            this.changeUI();
+        CocosTotalForm.prototype.changeUI = function () {
+            if (this.mCheckedVideo) {
+                this.checked.active = true;
+            }
+            else {
+                this.checked.active = false;
+            }
         };
-        TotalForm.prototype.changeUI = function () {
-        };
-        TotalForm.prototype.onShow = function (data) {
-            var coin = data.coin, shareCoin = data.shareCoin;
-            this.mLevelCoinNum = coin;
-            this.mLevelShareCoinNum = shareCoin;
+        CocosTotalForm.prototype.onShow = function (data) {
+            this.mLevelCoinNum = this.FormData.coinNum;
+            this.mLevelShareCoinNum = this.FormData.coinNum;
             this.levelCoin.string = "" + Common.formatMoney(this.mLevelCoinNum);
-            this.addEvent();
+            this.addListener();
             this.mCheckedVideo = true;
             this.changeUI();
             moosnow.platform.stopRecord();
             moosnow.platform.showBanner();
         };
-        TotalForm.prototype.willHide = function () {
-            this.removeEvent();
+        CocosTotalForm.prototype.willHide = function () {
+            this.removeListener();
             moosnow.platform.hideBanner();
         };
-        return TotalForm;
-    }(BaseForm));
-
-    var CocosTotalForm = /** @class */ (function (_super) {
-        __extends(CocosTotalForm, _super);
-        function CocosTotalForm() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        CocosTotalForm.prototype.addEvent = function () {
-            this.unchecked.node.on(CocosNodeEvent.TOUCH_END, this.onShareChange, this);
-            this.btnReceive.node.on(CocosNodeEvent.TOUCH_END, this.onReceive, this);
-        };
-        CocosTotalForm.prototype.removeEvent = function () {
-            this.unchecked.node.off(CocosNodeEvent.TOUCH_END, this.onShareChange, this);
-            this.btnReceive.node.off(CocosNodeEvent.TOUCH_END, this.onReceive, this);
-        };
-        CocosTotalForm.prototype.changeUI = function () {
-            if (this.mCheckedVideo) {
-                this.checked.node.active = true;
-            }
-            else {
-                this.checked.node.active = false;
-            }
-        };
         return CocosTotalForm;
-    }(TotalForm));
+    }(CocosBaseForm));
+
+    var CocosToastForm = /** @class */ (function (_super) {
+        __extends(CocosToastForm, _super);
+        function CocosToastForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.msgText = null;
+            return _this;
+        }
+        CocosToastForm.prototype.onMaskMouseDown = function (e) {
+            e.stopPropagation();
+        };
+        CocosToastForm.prototype.willShow = function (msg) {
+            this.node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+            this.node.zIndex = cc.macro.MAX_ZINDEX;
+            this.msgText.getComponent(cc.Label).string = msg;
+            this.node.active = true;
+            this.node.runAction(cc.sequence(cc.scaleTo(0.1, 1.2), cc.scaleTo(0.1, 1)));
+            this.scheduleOnce(this.hide, 1);
+        };
+        CocosToastForm.prototype.willHide = function () {
+            this.node.off(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+        };
+        CocosToastForm.prototype.hide = function () {
+            // this.node.active = false;
+            CocosFormFactory.instance.hideForm("toastForm", null);
+        };
+        return CocosToastForm;
+    }(CocosBaseForm));
 
     /**
      * 广告结果
@@ -1502,6 +1540,7 @@
          * @param msg  消息内容
          */
         FormFactory.prototype.showToast = function (msg) {
+            CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
         };
         /**
          *  预加载广告
@@ -1885,6 +1924,10 @@
              * 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
              */
             _this.type = 1;
+            /**
+             * 金币数量
+             */
+            _this.coinNum = 0;
             return _this;
         }
         return showTouchOptions;

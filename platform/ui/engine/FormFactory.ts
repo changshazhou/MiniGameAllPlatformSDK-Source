@@ -84,18 +84,23 @@ export default class FormFactory {
      * @param formLogic 
      */
     public static addForm2Quene(name: string, formNode: any, formLogic?: BaseForm) {
-        let formQuene: FormQuene = null;
+
+        let idx = -1;
         for (let i = 0; i < this._FormQuene.length; i++) {
             let item = this._FormQuene[i];
             if (item.formName == name) {
-                formQuene = item;
+                idx = i
                 break;
             }
         }
-        if (formQuene)
-            formQuene.addForm(formNode, formLogic)
+        console.log('addForm2Quene 1 ', this._FormQuene)
+        if (idx != -1) {
+            this._FormQuene[idx].addForm(formNode, formLogic);
+        }
         else
             this._FormQuene.push(new FormQuene(name, formNode, formLogic));
+
+        console.log('addForm2Quene 2 ', this._FormQuene)
     }
 
     /**
@@ -140,12 +145,23 @@ export default class FormFactory {
             }
         }
     }
-
-
+    private mLayoutQuene = [];
+    private mCachedLayout: any;
     public getLayout(url: string, callback: (attr) => void) {
-        moosnow.http.request(url, {}, 'GET', (res) => {
-            callback(res)
-        })
+        if (!this.mCachedLayout) {
+            this.mLayoutQuene.push(callback);
+            if (this.mLayoutQuene.length == 1)
+                moosnow.http.request(url, {}, 'GET', (res) => {
+                    this.mCachedLayout = res;
+                    this.mLayoutQuene.forEach(item => {
+                        item(res)
+                    })
+                    this.mLayoutQuene = [];
+                })
+
+        }
+        else
+            callback(this.mCachedLayout);
     }
 
     public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
@@ -153,7 +169,7 @@ export default class FormFactory {
     }
 
     public hideForm(name: string, formNode: any, formData?: any) {
-    
+
     }
 
 

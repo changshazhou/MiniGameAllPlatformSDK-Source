@@ -14,6 +14,7 @@ import CocosFormFactory from "./cocos/helper/CocosFormFactory";
 import CocosEndForm from "./cocos/form/CocosEndForm";
 import CocosPauseForm from "./cocos/form/CocosPauseForm";
 import CocosTotalForm from "./cocos/form/CocosTotalForm";
+import CocosToastForm from "./cocos/form/CocosToastForm";
 
 /**
  * 广告结果
@@ -39,6 +40,7 @@ export default class FormFactory {
      * @param msg  消息内容
      */
     public showToast(msg: string) {
+        CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg)
     }
 
     /**

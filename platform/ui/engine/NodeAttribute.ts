@@ -1,7 +1,5 @@
 export default class NodeAttribute {
-    constructor(parameters) {
 
-    }
     public name: string;
     public x: number = 0;
     public y: number = 0;
@@ -9,6 +7,7 @@ export default class NodeAttribute {
     public height: number | string = 0;
     public url: string = "";
     public isMask: boolean = false;
+    public maskUrl: string = "";
     public child: Array<NodeAttribute> = null;
     public event: Array<string> = [];
     public type: string = "";
