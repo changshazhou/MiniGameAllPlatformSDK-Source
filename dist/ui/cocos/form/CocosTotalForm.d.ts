@@ -1,23 +1,20 @@
 import CocosBaseForm from "./CocosBaseForm";
 import showTotalOptions from "../../../model/showTotalOptions";
+import CheckboxComponent from "../common/CheckboxComponent";
 export default class CocosTotalForm extends CocosBaseForm {
     checked: cc.Node;
     unchecked: cc.Node;
     btnContinue: cc.Node;
     coinNum: cc.Node;
     videoText: cc.Node;
-    mCheckedVideo: boolean;
+    private mCheckedVideo;
+    formComponents: CheckboxComponent[];
     get FormData(): showTotalOptions;
     addListener(): void;
     removeListener(): void;
     onReceive(): void;
-    checkToggle(mistouch?: boolean): void;
     mLevelCoinNum: number;
     mLevelShareCoinNum: number;
-    private mCanNum;
-    private mCheckBoxMistouch;
-    private mClickNum;
-    private mVideoNum;
     onShow(data: any): void;
-    willHide(): void;
+    willHide(data: any): void;
 }

@@ -1,5 +1,6 @@
 import BaseModule from "../../framework/BaseModule";
 import Common from "../../utils/Common";
+import EventType from "../../utils/EventType";
 
 
 export default class BaseForm extends BaseModule {
@@ -21,7 +22,6 @@ export default class BaseForm extends BaseModule {
 
 
     public formComponents: Array<any> = [];
-    private mComponentQuene = [];
 
     private mNodeMap: Array<string> = [];
     /**
@@ -39,9 +39,7 @@ export default class BaseForm extends BaseModule {
             }
         }
         for (let i = 0; i < this.formComponents.length; i++) {
-            let componentLogic = new this.formComponents[i]();
-            this.mComponentQuene.push(componentLogic)
-            componentLogic.initForm(node);
+            this.formComponents[i].initForm(node);
         }
     }
 
@@ -50,10 +48,9 @@ export default class BaseForm extends BaseModule {
         this.mNodeMap.forEach(v => {
             this[v] = null;
         })
-        this.mComponentQuene.forEach(item => {
+        this.formComponents.forEach(item => {
             item.disable();
         })
-        this.mComponentQuene = [];
         this.formComponents = [];
     }
 
@@ -63,25 +60,25 @@ export default class BaseForm extends BaseModule {
 
     willShow(data?) {
         this.mFormData = data;
-        this.mComponentQuene.forEach(item => {
+        this.formComponents.forEach(item => {
             item.willShow(data);
         })
     }
 
     onShow(data) {
-        this.mComponentQuene.forEach(item => {
+        this.formComponents.forEach(item => {
             item.onShow(data);
         })
     }
 
     willHide(data) {
-        this.mComponentQuene.forEach(item => {
+        this.formComponents.forEach(item => {
             item.willHide(data);
         })
     }
 
     onHide(data) {
-        this.mComponentQuene.forEach(item => {
+        this.formComponents.forEach(item => {
             item.onHide(data);
         })
     }

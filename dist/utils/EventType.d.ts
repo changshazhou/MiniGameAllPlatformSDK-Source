@@ -11,4 +11,5 @@ export default class EventType {
     static readonly AD_VIEW_REFRESH: string;
     static readonly COIN_CHANGED: string;
     static readonly RANDOWM_NAVIGATE: string;
+    static readonly COMPONENT_CHECKBOX_TOGGLE: string;
 }

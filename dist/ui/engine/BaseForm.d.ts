@@ -8,7 +8,6 @@ export default class BaseForm extends BaseModule {
      */
     get FormData(): any;
     formComponents: Array<any>;
-    private mComponentQuene;
     private mNodeMap;
     /**
      * 初始化

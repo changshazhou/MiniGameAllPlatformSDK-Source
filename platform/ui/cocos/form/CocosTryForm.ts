@@ -12,8 +12,12 @@ export default class CocosTryForm extends CocosBaseForm {
     btnVideo: cc.Node = null;
     btnNext: cc.Node = null;
 
-
-    public formComponents = [CheckboxComponent];
+    private mCheckedVideo: boolean = false;
+    public formComponents = [
+        new CheckboxComponent((e) => {
+            this.mCheckedVideo = e;
+        })
+    ];
 
     public get FormData(): showTryOptions {
         return this.mFormData;

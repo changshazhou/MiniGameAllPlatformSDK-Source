@@ -2,6 +2,7 @@ import CocosBaseForm from "./CocosBaseForm";
 import Common from "../../../utils/Common";
 import showTotalOptions from "../../../model/showTotalOptions";
 import MathUtils from "../../../utils/MathUtils";
+import CheckboxComponent from "../common/CheckboxComponent";
 
 export default class CocosTotalForm extends CocosBaseForm {
 
@@ -11,27 +12,23 @@ export default class CocosTotalForm extends CocosBaseForm {
     coinNum: cc.Node = null;
     videoText: cc.Node = null;
 
-    public mCheckedVideo: boolean = true;
-
+    private mCheckedVideo: boolean = false;
+    public formComponents = [
+        new CheckboxComponent((e) => {
+            this.mCheckedVideo = e;
+        })
+    ];
     public get FormData(): showTotalOptions {
 
         return this.mFormData;
     }
 
     public addListener() {
-        this.applyClickAnim(this.unchecked, () => {
-            this.checkToggle(true);
-        })
-        this.applyClickAnim(this.checked, () => {
-            this.checkToggle(true);
-        })
         this.applyClickAnim(this.btnContinue, () => {
             this.onReceive();
         })
     }
     public removeListener() {
-        this.removeClickAnim(this.checked)
-        this.removeClickAnim(this.unchecked)
         this.removeClickAnim(this.btnContinue)
     }
     public onReceive() {
@@ -53,52 +50,23 @@ export default class CocosTotalForm extends CocosBaseForm {
         }
     }
 
-    public checkToggle(mistouch: boolean = false) {
-        if (mistouch && this.mCheckBoxMistouch) {
-            this.mClickNum++;
-            if (this.mClickNum == this.mVideoNum) {
-                moosnow.platform.showVideo(() => { });
-            }
-            if (this.mClickNum >= this.mCanNum) {
-                this.checked.active = this.mCheckedVideo
-                this.unchecked.active = !this.mCheckedVideo;
-                this.mCheckedVideo = !this.mCheckedVideo
-            }
-            return;
-        }
-
-        this.checked.active = this.mCheckedVideo
-        this.unchecked.active = !this.mCheckedVideo;
-        this.mCheckedVideo = !this.mCheckedVideo
-    }
-
     public mLevelCoinNum: number = 0;
     public mLevelShareCoinNum: number = 0;
-    private mCanNum: number = 0;
-    private mCheckBoxMistouch: boolean = false;
-    private mClickNum: number = 0;
-    private mVideoNum: number = 4;
     public onShow(data) {
 
-
-
-        moosnow.http.getAllConfig(res => {
-            this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
-            this.mCheckBoxMistouch = res.checkBoxMistouch == 1
-        })
+        super.onShow(data);
 
         this.mLevelCoinNum = this.FormData.coinNum;
         this.mLevelShareCoinNum = this.FormData.coinNum;
         this.videoText.getComponent(cc.Label).string = `${this.FormData.videoText}`
         this.coinNum.getComponent(cc.Label).string = `${Common.formatMoney(this.mLevelCoinNum)}`
         this.addListener();
-        this.mCheckedVideo = true;
-        this.checkToggle();
         moosnow.platform.stopRecord();
         moosnow.platform.showBanner();
     }
 
-    public willHide() {
+    public willHide(data) {
+        super.willHide(data);
         this.removeListener();
         moosnow.platform.hideBanner();
     }

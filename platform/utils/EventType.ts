@@ -13,8 +13,9 @@ export default class EventType {
     static readonly AD_VIEW_REFRESH: string = "AD_VIEW_REFRESH";
     static readonly COIN_CHANGED: string = "COIN_CHANGED";
     static readonly RANDOWM_NAVIGATE: string = "RANDOWM_NAVIGATE";
-    
 
+
+    static readonly COMPONENT_CHECKBOX_TOGGLE: string = "COMPONENT_CHECKBOX_TOGGLE";
 
 
 }

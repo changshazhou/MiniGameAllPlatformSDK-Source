@@ -1,12 +1,23 @@
 import CocosBaseForm from "../form/CocosBaseForm";
 import MathUtils from "../../../utils/MathUtils";
 import CocosBaseComponent from "./CocosBaseComponent";
+import EventType from "../../../utils/EventType";
 
 export default class CheckboxComponent extends CocosBaseComponent {
+
+
+    /**
+     * 变化回调
+     * @param callback 
+     */
+    constructor(callback: (isChecked) => void) {
+        super();
+        this.toggleCallback = callback;
+    }
     checked: cc.Node = null;
     unchecked: cc.Node = null;
 
-
+    private toggleCallback: Function
     public mCheckedVideo: boolean = true;
 
     public addListener() {
@@ -54,13 +65,16 @@ export default class CheckboxComponent extends CocosBaseComponent {
             if (this.mClickNum >= this.mCanNum) {
                 this.checked.active = this.mCheckedVideo
                 this.unchecked.active = !this.mCheckedVideo;
+                this.sendEventImmediately();
                 this.mCheckedVideo = !this.mCheckedVideo
+
             }
             return;
         }
 
         this.checked.active = this.mCheckedVideo
         this.unchecked.active = !this.mCheckedVideo;
+        this.sendEventImmediately();
         this.mCheckedVideo = !this.mCheckedVideo
     }
 
@@ -72,7 +86,14 @@ export default class CheckboxComponent extends CocosBaseComponent {
         this.addListener();
         this.mCheckedVideo = true;
         this.checkToggle();
+        this.sendEventImmediately();
     }
+
+    private sendEventImmediately() {
+        if (this.toggleCallback)
+            this.toggleCallback(this.mCheckedVideo);
+    }
+
     public willHide() {
         this.removeListener();
     }

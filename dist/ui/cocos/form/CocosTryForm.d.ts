@@ -5,7 +5,8 @@ export default class CocosTryForm extends CocosBaseForm {
     logo: cc.Node;
     btnVideo: cc.Node;
     btnNext: cc.Node;
-    formComponents: (typeof CheckboxComponent)[];
+    private mCheckedVideo;
+    formComponents: CheckboxComponent[];
     get FormData(): showTryOptions;
     addListener(): void;
     removeListener(): void;
