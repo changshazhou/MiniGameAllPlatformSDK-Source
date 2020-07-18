@@ -23,5 +23,5 @@ export default class showTotalOptions extends showOptions {
     /**
      * 视频文本
      */
-    videoText: number
+    videoText: string
 }

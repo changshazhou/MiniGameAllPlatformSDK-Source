@@ -1096,6 +1096,8 @@
             txt.horizontalAlign = horizontalAlign ? horizontalAlign : cc.Label.HorizontalAlign.CENTER;
             txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
             txt.useSystemFont = true;
+            if (textCfg.text)
+                txt.string = textCfg.text;
             node.x = textCfg.x;
             node.y = textCfg.y;
             node.width = textCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + textCfg.width);
@@ -1201,6 +1203,7 @@
             _this.color = "#ffffff";
             _this.fontSize = 32;
             _this.lineHeight = 32;
+            _this.text = "";
             return _this;
         }
         TextAttribute.parse = function (json) {
@@ -1490,6 +1493,44 @@
         return CocosPauseForm;
     }(CocosBaseForm));
 
+    var MathUtils = /** @class */ (function () {
+        function MathUtils() {
+        }
+        MathUtils.randomNumBoth = function (Min, Max) {
+            var Range = Max - Min;
+            var Rand = Math.random();
+            var num = Min + Math.round(Rand * Range); //四舍五入
+            return num;
+        };
+        /**
+        * 传入概率值数组，返回中标的概率下标
+        * @param parr 概率数组
+        */
+        MathUtils.probabilitys = function (parr) {
+            var arr = 0;
+            var pres = __spreadArrays(parr);
+            var probabilityCount = 0;
+            for (var i = 0; i < pres.length; i++) {
+                probabilityCount += pres[i];
+            }
+            if (probabilityCount != 100) {
+                throw '所有概率值总和不等于100%';
+            }
+            var nums = new Array();
+            for (var i = 0; i < pres.length; i++) {
+                var element = pres[i];
+                for (var index = 0; index < element; index++) {
+                    nums.push(arr);
+                }
+                arr++;
+            }
+            var random = this.randomNumBoth(0, 99);
+            var targetIndex = nums[random];
+            return targetIndex;
+        };
+        return MathUtils;
+    }());
+
     var CocosTotalForm = /** @class */ (function (_super) {
         __extends(CocosTotalForm, _super);
         function CocosTotalForm() {
@@ -1518,10 +1559,10 @@
         CocosTotalForm.prototype.addListener = function () {
             var _this = this;
             this.applyClickAnim(this.unchecked, function () {
-                _this.checkChange(true);
+                _this.checkToggle(true);
             });
             this.applyClickAnim(this.checked, function () {
-                _this.checkChange(true);
+                _this.checkToggle(true);
             });
             this.applyClickAnim(this.btnContinue, function () {
                 _this.onReceive();
@@ -1551,7 +1592,7 @@
                     this.FormData.callback();
             }
         };
-        CocosTotalForm.prototype.checkChange = function (mistouch) {
+        CocosTotalForm.prototype.checkToggle = function (mistouch) {
             if (mistouch === void 0) { mistouch = false; }
             if (mistouch && this.mCheckBoxMistouch) {
                 this.mClickNum++;
@@ -1572,8 +1613,8 @@
         CocosTotalForm.prototype.onShow = function (data) {
             var _this = this;
             moosnow.http.getAllConfig(function (res) {
-                _this.mCanNum = 3; // MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
-                _this.mCheckBoxMistouch = true; // res.checkBoxMistouch == 1
+                _this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
+                _this.mCheckBoxMistouch = res.checkBoxMistouch == 1;
             });
             this.mLevelCoinNum = this.FormData.coinNum;
             this.mLevelShareCoinNum = this.FormData.coinNum;
@@ -1581,7 +1622,7 @@
             this.coinNum.getComponent(cc.Label).string = "" + Common.formatMoney(this.mLevelCoinNum);
             this.addListener();
             this.mCheckedVideo = true;
-            this.checkChange();
+            this.checkToggle();
             moosnow.platform.stopRecord();
             moosnow.platform.showBanner();
         };
@@ -1618,6 +1659,75 @@
             CocosFormFactory.instance.hideForm("toastForm", null);
         };
         return CocosToastForm;
+    }(CocosBaseForm));
+
+    var VIDEO_STATUS = {
+        END: "__video_end",
+        NOTEND: "__video_not_end",
+        ERR: "__video_error"
+    };
+
+    var VIDEO_MSG = {
+        ERR: "视频正在加载中,请稍后",
+        NOTEND: "请完整观看完视频！"
+    };
+
+    var CocosTryForm = /** @class */ (function (_super) {
+        __extends(CocosTryForm, _super);
+        function CocosTryForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.logo = null;
+            _this.btnVideo = null;
+            _this.btnNext = null;
+            return _this;
+        }
+        Object.defineProperty(CocosTryForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosTryForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.btnVideo, function () {
+                _this.onVideoTry();
+            });
+            this.applyClickAnim(this.btnNext, function () {
+                _this.onNext();
+            });
+        };
+        CocosTryForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.btnVideo);
+            this.removeClickAnim(this.btnNext);
+        };
+        CocosTryForm.prototype.onShow = function (data) {
+            CocosNodeHelper.changeSrc(this.logo, this.FormData.skinUrl);
+            this.addListener();
+        };
+        CocosTryForm.prototype.onHide = function () {
+            this.removeListener();
+        };
+        CocosTryForm.prototype.onVideoTry = function () {
+            var _this = this;
+            moosnow.platform.showVideo(function (res) {
+                if (res == VIDEO_STATUS.END) {
+                    if (_this.FormData.videoCallback)
+                        _this.FormData.videoCallback();
+                }
+                else if (res == VIDEO_STATUS.ERR) {
+                    moosnow.form.showToast(VIDEO_MSG.ERR);
+                }
+                else if (res == VIDEO_STATUS.NOTEND) {
+                    moosnow.form.showToast(VIDEO_MSG.NOTEND);
+                }
+            });
+        };
+        CocosTryForm.prototype.onNext = function () {
+            if (this.FormData.callback)
+                this.FormData.callback();
+        };
+        return CocosTryForm;
     }(CocosBaseForm));
 
     /**
@@ -1713,6 +1823,12 @@
          */
         FormFactory.prototype.showShare = function (options) {
             CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options);
+        };
+        /**
+        *  showShare
+        */
+        FormFactory.prototype.showTry = function (options) {
+            CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options);
         };
         FormFactory.prototype.createForm = function (formName) {
             CocosFormFactory.instance.showForm(formName, CocosEndForm, {});

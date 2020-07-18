@@ -8,4 +8,5 @@ export default class TextAttribute extends NodeAttribute {
     color: string;
     fontSize: number;
     lineHeight: number;
+    text: string;
 }

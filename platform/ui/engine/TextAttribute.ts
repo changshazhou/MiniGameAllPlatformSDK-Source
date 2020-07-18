@@ -13,6 +13,7 @@ export default class TextAttribute extends NodeAttribute {
     public color: string = "#ffffff";
     public fontSize: number = 32;
     public lineHeight: number = 32;
+    public text: string = "";
 
 
 }

@@ -1,6 +1,7 @@
 import EventType from "../utils/EventType";
 import UIFormSetting from "../config/UIFormSetting";
 import { AD_POSITION } from "../enum/AD_POSITION";
+
 import showCoinOptions from "../model/showCoinOptions";
 import showOptions from "../model/showOptions";
 import showTotalOptions from "../model/showTotalOptions";
@@ -9,12 +10,15 @@ import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
+import showTryOptions from "../model/showTryOptions";
+
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 import CocosFormFactory from "./cocos/helper/CocosFormFactory";
 import CocosEndForm from "./cocos/form/CocosEndForm";
 import CocosPauseForm from "./cocos/form/CocosPauseForm";
 import CocosTotalForm from "./cocos/form/CocosTotalForm";
 import CocosToastForm from "./cocos/form/CocosToastForm";
+import CocosTryForm from "./cocos/form/CocosTryForm";
 
 /**
  * 广告结果
@@ -129,6 +133,13 @@ export default class FormFactory {
      */
     public showShare(options: showShareOptions) {
         CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options)
+    }
+
+    /**
+    *  showShare
+    */
+    public showTry(options: showTryOptions) {
+        CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options)
     }
 
 

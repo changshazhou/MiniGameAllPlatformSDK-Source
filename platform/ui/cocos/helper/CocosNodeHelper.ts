@@ -66,6 +66,8 @@ export default class CocosNodeHelper extends NodeHelper {
         txt.horizontalAlign = horizontalAlign ? horizontalAlign : cc.Label.HorizontalAlign.CENTER;
         txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
         txt.useSystemFont = true;
+        if (textCfg.text)
+            txt.string = textCfg.text;
 
         node.x = textCfg.x;
         node.y = textCfg.y;

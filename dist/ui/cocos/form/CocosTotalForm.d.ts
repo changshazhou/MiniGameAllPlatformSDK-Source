@@ -11,7 +11,7 @@ export default class CocosTotalForm extends CocosBaseForm {
     addListener(): void;
     removeListener(): void;
     onReceive(): void;
-    checkChange(mistouch?: boolean): void;
+    checkToggle(mistouch?: boolean): void;
     mLevelCoinNum: number;
     mLevelShareCoinNum: number;
     private mCanNum;

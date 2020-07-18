@@ -6,6 +6,7 @@ import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
+import showTryOptions from "../model/showTryOptions";
 /**
  * 广告结果
  */
@@ -71,5 +72,9 @@ export default class FormFactory {
      *  showShare
      */
     showShare(options: showShareOptions): void;
+    /**
+    *  showShare
+    */
+    showTry(options: showTryOptions): void;
     createForm(formName: string): void;
 }

@@ -20,10 +20,10 @@ export default class CocosTotalForm extends CocosBaseForm {
 
     public addListener() {
         this.applyClickAnim(this.unchecked, () => {
-            this.checkChange(true);
+            this.checkToggle(true);
         })
         this.applyClickAnim(this.checked, () => {
-            this.checkChange(true);
+            this.checkToggle(true);
         })
         this.applyClickAnim(this.btnContinue, () => {
             this.onReceive();
@@ -53,7 +53,7 @@ export default class CocosTotalForm extends CocosBaseForm {
         }
     }
 
-    public checkChange(mistouch: boolean = false) {
+    public checkToggle(mistouch: boolean = false) {
         if (mistouch && this.mCheckBoxMistouch) {
             this.mClickNum++;
             if (this.mClickNum == this.mVideoNum) {
@@ -83,8 +83,8 @@ export default class CocosTotalForm extends CocosBaseForm {
 
 
         moosnow.http.getAllConfig(res => {
-            this.mCanNum = 3;// MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
-            this.mCheckBoxMistouch = true;// res.checkBoxMistouch == 1
+            this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
+            this.mCheckBoxMistouch = res.checkBoxMistouch == 1
         })
 
         this.mLevelCoinNum = this.FormData.coinNum;
@@ -93,7 +93,7 @@ export default class CocosTotalForm extends CocosBaseForm {
         this.coinNum.getComponent(cc.Label).string = `${Common.formatMoney(this.mLevelCoinNum)}`
         this.addListener();
         this.mCheckedVideo = true;
-        this.checkChange();
+        this.checkToggle();
         moosnow.platform.stopRecord();
         moosnow.platform.showBanner();
     }
