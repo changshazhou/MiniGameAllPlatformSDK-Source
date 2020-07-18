@@ -16,9 +16,13 @@ export default class BaseForm extends BaseModule {
      * 父类缓存willShow，onShow传递到实体的逻辑数据
      */
     public get FormData() {
-
         return this.mFormData;
     }
+
+
+    public formComponents: Array<any> = [];
+    private mComponentQuene = [];
+
     private mNodeMap: Array<string> = [];
     /**
      * 初始化
@@ -34,6 +38,11 @@ export default class BaseForm extends BaseModule {
                 this.mNodeMap.push(v);
             }
         }
+        for (let i = 0; i < this.formComponents.length; i++) {
+            let componentLogic = new this.formComponents[i]();
+            this.mComponentQuene.push(componentLogic)
+            componentLogic.initForm(node);
+        }
     }
 
     disable() {
@@ -41,6 +50,11 @@ export default class BaseForm extends BaseModule {
         this.mNodeMap.forEach(v => {
             this[v] = null;
         })
+        this.mComponentQuene.forEach(item => {
+            item.disable();
+        })
+        this.mComponentQuene = [];
+        this.formComponents = [];
     }
 
     public findNodeByName(node: any, attrName: string): any {
@@ -49,18 +63,27 @@ export default class BaseForm extends BaseModule {
 
     willShow(data?) {
         this.mFormData = data;
+        this.mComponentQuene.forEach(item => {
+            item.willShow(data);
+        })
     }
 
     onShow(data) {
-
+        this.mComponentQuene.forEach(item => {
+            item.onShow(data);
+        })
     }
 
     willHide(data) {
-
+        this.mComponentQuene.forEach(item => {
+            item.willHide(data);
+        })
     }
 
     onHide(data) {
-
+        this.mComponentQuene.forEach(item => {
+            item.onHide(data);
+        })
     }
 
 

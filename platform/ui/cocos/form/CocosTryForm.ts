@@ -4,12 +4,16 @@ import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import CocosFormFactory from "../helper/CocosFormFactory";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
+import CheckboxComponent from "../common/CheckboxComponent";
 
 export default class CocosTryForm extends CocosBaseForm {
 
     logo: cc.Node = null;
     btnVideo: cc.Node = null;
     btnNext: cc.Node = null;
+
+
+    public formComponents = [CheckboxComponent];
 
     public get FormData(): showTryOptions {
         return this.mFormData;
@@ -29,11 +33,13 @@ export default class CocosTryForm extends CocosBaseForm {
     }
 
     public onShow(data) {
+        super.onShow(data);
         CocosNodeHelper.changeSrc(this.logo, this.FormData.skinUrl);
         this.addListener();
     }
 
-    public onHide() {
+    public onHide(data) {
+        super.onHide(data);
         this.removeListener();
     }
     private onVideoTry() {

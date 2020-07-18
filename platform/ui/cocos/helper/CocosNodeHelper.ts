@@ -146,4 +146,23 @@ export default class CocosNodeHelper extends NodeHelper {
         e.stopPropagation();
     }
 
+
+    public static findNodeByName(node: cc.Node, attrName: string): cc.Node {
+        let targetNode = null;
+        for (let i = 0; i < node.childrenCount; i++) {
+            let child = node.children[i]
+            if (child.name == attrName) {
+                targetNode = child
+                break;
+            }
+            else {
+                let node = this.findNodeByName(child, attrName);
+                if (node) {
+                    targetNode = node;
+                    break;
+                }
+            }
+        }
+        return targetNode;
+    }
 }

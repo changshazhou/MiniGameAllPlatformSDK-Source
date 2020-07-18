@@ -931,6 +931,8 @@
         __extends(BaseForm, _super);
         function BaseForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.formComponents = [];
+            _this.mComponentQuene = [];
             _this.mNodeMap = [];
             return _this;
         }
@@ -960,6 +962,11 @@
                     this.mNodeMap.push(v);
                 }
             }
+            for (var i = 0; i < this.formComponents.length; i++) {
+                var componentLogic = new this.formComponents[i]();
+                this.mComponentQuene.push(componentLogic);
+                componentLogic.initForm(node);
+            }
         };
         BaseForm.prototype.disable = function () {
             var _this = this;
@@ -967,18 +974,35 @@
             this.mNodeMap.forEach(function (v) {
                 _this[v] = null;
             });
+            this.mComponentQuene.forEach(function (item) {
+                item.disable();
+            });
+            this.mComponentQuene = [];
+            this.formComponents = [];
         };
         BaseForm.prototype.findNodeByName = function (node, attrName) {
             return null;
         };
         BaseForm.prototype.willShow = function (data) {
             this.mFormData = data;
+            this.mComponentQuene.forEach(function (item) {
+                item.willShow(data);
+            });
         };
         BaseForm.prototype.onShow = function (data) {
+            this.mComponentQuene.forEach(function (item) {
+                item.onShow(data);
+            });
         };
         BaseForm.prototype.willHide = function (data) {
+            this.mComponentQuene.forEach(function (item) {
+                item.willHide(data);
+            });
         };
         BaseForm.prototype.onHide = function (data) {
+            this.mComponentQuene.forEach(function (item) {
+                item.onHide(data);
+            });
         };
         return BaseForm;
     }(BaseModule));
@@ -1169,6 +1193,24 @@
         };
         CocosNodeHelper.onMaskMouseDown = function (e) {
             e.stopPropagation();
+        };
+        CocosNodeHelper.findNodeByName = function (node, attrName) {
+            var targetNode = null;
+            for (var i = 0; i < node.childrenCount; i++) {
+                var child = node.children[i];
+                if (child.name == attrName) {
+                    targetNode = child;
+                    break;
+                }
+                else {
+                    var node_1 = this.findNodeByName(child, attrName);
+                    if (node_1) {
+                        targetNode = node_1;
+                        break;
+                    }
+                }
+            }
+            return targetNode;
         };
         return CocosNodeHelper;
     }(NodeHelper));
@@ -1368,22 +1410,7 @@
             }
         };
         CocosBaseForm.prototype.findNodeByName = function (node, attrName) {
-            var targetNode = null;
-            for (var i = 0; i < node.childrenCount; i++) {
-                var child = node.children[i];
-                if (child.name == attrName) {
-                    targetNode = child;
-                    break;
-                }
-                else {
-                    var node_1 = this.findNodeByName(child, attrName);
-                    if (node_1) {
-                        targetNode = node_1;
-                        break;
-                    }
-                }
-            }
-            return targetNode;
+            return CocosNodeHelper.findNodeByName(node, attrName);
         };
         return CocosBaseForm;
     }(BaseForm));
@@ -1672,6 +1699,93 @@
         NOTEND: "请完整观看完视频！"
     };
 
+    var CocosBaseComponent = /** @class */ (function (_super) {
+        __extends(CocosBaseComponent, _super);
+        function CocosBaseComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return CocosBaseComponent;
+    }(CocosBaseForm));
+
+    var CheckboxComponent = /** @class */ (function (_super) {
+        __extends(CheckboxComponent, _super);
+        function CheckboxComponent() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.checked = null;
+            _this.unchecked = null;
+            _this.mCheckedVideo = true;
+            _this.mCanNum = 0;
+            _this.mCheckBoxMistouch = false;
+            _this.mClickNum = 0;
+            _this.mVideoNum = 4;
+            return _this;
+        }
+        CheckboxComponent.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.unchecked, function () {
+                _this.checkToggle(true);
+            });
+            this.applyClickAnim(this.checked, function () {
+                _this.checkToggle(true);
+            });
+        };
+        CheckboxComponent.prototype.removeListener = function () {
+            this.removeClickAnim(this.checked);
+            this.removeClickAnim(this.unchecked);
+        };
+        CheckboxComponent.prototype.onReceive = function () {
+            var _this = this;
+            if (this.mCheckedVideo) {
+                moosnow.platform.showVideo(function (res) {
+                    if (res == moosnow.VIDEO_STATUS.END) {
+                        if (_this.FormData.videoCallback)
+                            _this.FormData.videoCallback();
+                    }
+                    else if (res == moosnow.VIDEO_STATUS.ERR) {
+                    }
+                    else {
+                    }
+                });
+            }
+            else {
+                if (this.FormData.callback)
+                    this.FormData.callback();
+            }
+        };
+        CheckboxComponent.prototype.checkToggle = function (mistouch) {
+            if (mistouch === void 0) { mistouch = false; }
+            if (mistouch && this.mCheckBoxMistouch) {
+                this.mClickNum++;
+                if (this.mClickNum == this.mVideoNum) {
+                    moosnow.platform.showVideo(function () { });
+                }
+                if (this.mClickNum >= this.mCanNum) {
+                    this.checked.active = this.mCheckedVideo;
+                    this.unchecked.active = !this.mCheckedVideo;
+                    this.mCheckedVideo = !this.mCheckedVideo;
+                }
+                return;
+            }
+            this.checked.active = this.mCheckedVideo;
+            this.unchecked.active = !this.mCheckedVideo;
+            this.mCheckedVideo = !this.mCheckedVideo;
+        };
+        CheckboxComponent.prototype.onShow = function (data) {
+            var _this = this;
+            moosnow.http.getAllConfig(function (res) {
+                _this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
+                _this.mCheckBoxMistouch = res.checkBoxMistouch == 1;
+            });
+            this.addListener();
+            this.mCheckedVideo = true;
+            this.checkToggle();
+        };
+        CheckboxComponent.prototype.willHide = function () {
+            this.removeListener();
+        };
+        return CheckboxComponent;
+    }(CocosBaseComponent));
+
     var CocosTryForm = /** @class */ (function (_super) {
         __extends(CocosTryForm, _super);
         function CocosTryForm() {
@@ -1679,6 +1793,7 @@
             _this.logo = null;
             _this.btnVideo = null;
             _this.btnNext = null;
+            _this.formComponents = [CheckboxComponent];
             return _this;
         }
         Object.defineProperty(CocosTryForm.prototype, "FormData", {
@@ -1702,10 +1817,12 @@
             this.removeClickAnim(this.btnNext);
         };
         CocosTryForm.prototype.onShow = function (data) {
+            _super.prototype.onShow.call(this, data);
             CocosNodeHelper.changeSrc(this.logo, this.FormData.skinUrl);
             this.addListener();
         };
-        CocosTryForm.prototype.onHide = function () {
+        CocosTryForm.prototype.onHide = function (data) {
+            _super.prototype.onHide.call(this, data);
             this.removeListener();
         };
         CocosTryForm.prototype.onVideoTry = function () {

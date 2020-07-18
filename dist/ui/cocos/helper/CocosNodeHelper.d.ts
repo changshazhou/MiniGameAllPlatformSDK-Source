@@ -14,4 +14,5 @@ export default class CocosNodeHelper extends NodeHelper {
     static changeSrc(image: cc.Node, url: string, callback?: Function): void;
     static createMask(parent: cc.Node, maskUrl?: string): void;
     private static onMaskMouseDown;
+    static findNodeByName(node: cc.Node, attrName: string): cc.Node;
 }

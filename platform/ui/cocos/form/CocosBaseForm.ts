@@ -1,8 +1,10 @@
 import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
+import CocosNodeHelper from "../helper/CocosNodeHelper";
+import CocosBaseComponent from "../common/CocosBaseComponent";
+import showCoinOptions from "../../../../dist/model/showCoinOptions";
 
 export default class CocosBaseForm extends BaseForm {
-
 
 
     private downAnim(node) {
@@ -74,22 +76,7 @@ export default class CocosBaseForm extends BaseForm {
     }
 
     public findNodeByName(node: cc.Node, attrName: string): cc.Node {
-        let targetNode = null;
-        for (let i = 0; i < node.childrenCount; i++) {
-            let child = node.children[i]
-            if (child.name == attrName) {
-                targetNode = child
-                break;
-            }
-            else {
-                let node = this.findNodeByName(child, attrName);
-                if (node) {
-                    targetNode = node;
-                    break;
-                }
-            }
-        }
-        return targetNode;
+        return CocosNodeHelper.findNodeByName(node, attrName)
     }
 
 }

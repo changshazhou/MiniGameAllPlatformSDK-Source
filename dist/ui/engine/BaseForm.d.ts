@@ -7,6 +7,8 @@ export default class BaseForm extends BaseModule {
      * 父类缓存willShow，onShow传递到实体的逻辑数据
      */
     get FormData(): any;
+    formComponents: Array<any>;
+    private mComponentQuene;
     private mNodeMap;
     /**
      * 初始化
