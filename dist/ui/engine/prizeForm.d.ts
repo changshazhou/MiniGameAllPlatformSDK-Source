@@ -1,7 +1,7 @@
 import BaseForm from "./BaseForm";
 import showPrizeOptions from "../../model/showPrizeOptions";
 export default class PrizeForm extends BaseForm {
-    coinNum: cc.Label;
+    coinNum: cc.Node;
     btnConfirm: cc.Node;
     get FormData(): showPrizeOptions;
     initForm(logic: any): void;

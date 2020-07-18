@@ -1,6 +1,8 @@
 
 import { ENGINE_TYPE } from "../../enum/ENGINE_TYPE";
 import Common from "../../utils/Common";
+import NodeAttribute from "./NodeAttribute";
+import TextAttribute from "./TextAttribute";
 
 export default class NodeHelper {
 
@@ -20,11 +22,11 @@ export default class NodeHelper {
 
 
 
-    public static createImage(parent: any, url: string, x: number = 0, y: number = 0, width?: number, heigth?: number) {
+    public static createImage(parent: cc.Node, imgCfg: NodeAttribute) {
 
     }
 
-    public static createText(parent: cc.Node, url: string, x: number = 0, y: number = 0, width?: number | string, height?: number | string, name?: string) {
+    public static createText(parent: cc.Node, textCfg: TextAttribute) {
 
     }
 

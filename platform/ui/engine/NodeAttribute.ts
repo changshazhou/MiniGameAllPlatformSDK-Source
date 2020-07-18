@@ -1,5 +1,10 @@
 export default class NodeAttribute {
 
+    public static parse(json: any): NodeAttribute {
+        return { ...new NodeAttribute(), ...json }
+    }
+
+
     public name: string;
     public x: number = 0;
     public y: number = 0;

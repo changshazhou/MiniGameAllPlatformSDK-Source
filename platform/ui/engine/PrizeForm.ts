@@ -7,7 +7,7 @@ import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 export default class PrizeForm extends BaseForm {
 
-    coinNum: cc.Label = null;
+    coinNum: cc.Node = null;
     btnConfirm: cc.Node = null;
 
     public get FormData(): showPrizeOptions {
@@ -25,7 +25,7 @@ export default class PrizeForm extends BaseForm {
 
     willShow(data) {
         super.willShow(data);
-        this.coinNum.string = `${Common.formatMoney(data.coinNum)}`;
+        this.coinNum.getComponent(cc.Label).string = `${Common.formatMoney(data.coinNum)}`;
         moosnow.platform.hideBanner();
     }
 

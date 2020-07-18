@@ -20,4 +20,8 @@ export default class showTotalOptions extends showOptions {
      */
     coinNum: number
 
+    /**
+     * 视频文本
+     */
+    videoText: number
 }

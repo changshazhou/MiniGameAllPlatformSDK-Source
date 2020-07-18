@@ -319,6 +319,7 @@ export class HttpModule extends BaseModule {
                             mistouchPosNum: 0,
                             mistouchInterval: 0,
                             exportBtnNavigate: 0,
+                            checkBoxMistouch: 0,
                             exportAutoNavigate,
                             bannerShowCountLimit: 1,
                             isLimitArea: 1
@@ -371,7 +372,8 @@ export class HttpModule extends BaseModule {
                         mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
                         exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0,
                         exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0,
-
+                        checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0,
+                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
                     };
                     if (moosnow.platform) {
                         moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
@@ -384,6 +386,8 @@ export class HttpModule extends BaseModule {
                 () => {
                     this._cfgQuene.forEach(item => {
                         item({
+                            checkBoxMistouch: 0,
+                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             bannerShowCountLimit: 1,

@@ -2,6 +2,7 @@ import FormFactory, { FormQuene } from "../../engine/FormFactory"
 import CocosNodeHelper from "./CocosNodeHelper";
 import NodeAttribute from "../../engine/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
+import TextAttribute from "../../engine/TextAttribute";
 
 
 
@@ -19,12 +20,17 @@ export default class CocosFormFactory extends FormFactory {
 
     public _createChild(parent: cc.Node, children: Array<NodeAttribute>) {
         for (let i = 0; i < children.length; i++) {
-            let nodeCfg = children[i] as NodeAttribute;
+            let jsonCfg = children[i];
             let node = null;
-            if (nodeCfg.type == 'text')
-                node = CocosNodeHelper.createText(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
-            else
-                node = CocosNodeHelper.createImage(parent, nodeCfg.url, nodeCfg.x, nodeCfg.y, nodeCfg.width, nodeCfg.height, nodeCfg.name);
+            let nodeCfg: NodeAttribute = null
+            if (jsonCfg.type == 'text') {
+                nodeCfg = TextAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
+            }
+            else {
+                nodeCfg = TextAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createImage(parent, nodeCfg);
+            }
             if (nodeCfg.child && nodeCfg.child.length > 0) {
                 this._createChild(node, nodeCfg.child);
             }
@@ -32,7 +38,7 @@ export default class CocosFormFactory extends FormFactory {
     }
 
     private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any) {
-        let formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg.url, formCfg.x, formCfg.y, formCfg.width, formCfg.height, formCfg.name);
+        let formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg);
         if (formCfg.isMask)
             CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
 
@@ -81,7 +87,7 @@ export default class CocosFormFactory extends FormFactory {
             if (remoteLayout) {
                 this.getLayout(url, (res) => {
                     if (res[name]) {
-                        let formCfg = res[name] as NodeAttribute;
+                        let formCfg = NodeAttribute.parse(res[name]);
                         formCfg.name = name;
                         this._createUINode(formCfg, formLogic, formData);
                         console.log('_createUINode ', Date.now())

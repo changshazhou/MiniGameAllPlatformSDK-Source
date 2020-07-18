@@ -209,6 +209,16 @@ export default class Common {
             config = winCfg.wx;
         return config;
     }
+    static colorRGB2Hex(color) {
+        var rgb = color.split(',');
+        var r = parseInt(rgb[0].split('(')[1]);
+        var g = parseInt(rgb[1]);
+        var b = parseInt(rgb[2].split(')')[0]);
+
+        var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        return hex;
+    }
+
 
     static deepCopy(obj): object | [] {
         //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝

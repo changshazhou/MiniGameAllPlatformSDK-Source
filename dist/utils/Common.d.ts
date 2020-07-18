@@ -32,6 +32,7 @@ export default class Common {
      */
     static get platform(): PlatformType;
     static get config(): moosnowAppConfig;
+    static colorRGB2Hex(color: any): string;
     static deepCopy(obj: any): object | [];
     static getEngine(): string;
     static popOpenAnim(node: cc.Node, callback?: Function): void;

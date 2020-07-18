@@ -1,4 +1,5 @@
 export default class NodeAttribute {
+    static parse(json: any): NodeAttribute;
     name: string;
     x: number;
     y: number;

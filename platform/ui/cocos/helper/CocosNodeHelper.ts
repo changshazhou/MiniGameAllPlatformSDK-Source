@@ -1,6 +1,9 @@
 import NodeHelper from "../../engine/NodeHelper";
 import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
+import Common from "../../../utils/Common";
+import NodeAttribute from "../../engine/NodeAttribute";
+import TextAttribute from "../../engine/TextAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -17,35 +20,57 @@ export default class CocosNodeHelper extends NodeHelper {
         return node;
     }
 
-    public static createImage(parent: cc.Node, url: string, x: number = 0, y: number = 0, width?: number | string, height?: number | string, name?: string): cc.Node {
+    public static createImage(parent: cc.Node, imgCfg: NodeAttribute): cc.Node {
 
-        let node = this.createNode(name);
+        let node = this.createNode(imgCfg.name);
         node.addComponent(cc.Sprite);
-        this.changeSrc(node, url);
-        node.x = x;
-        node.y = y;
-        node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width)
-        node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height)
+        this.changeSrc(node, imgCfg.url);
+        node.x = imgCfg.x;
+        node.y = imgCfg.y;
+        node.width = imgCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + imgCfg.width)
+        node.height = imgCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + imgCfg.height)
         parent.addChild(node)
         return node;
     }
 
+    /**
+     * 16进制颜色转换为RGB色值
+     * @method hexColor
+     */
+    public static colorHex2RGB(hexColor: string) {
 
+        if (hexColor.substr(0, 1) == "#") hexColor = hexColor.substring(1);
+        hexColor = hexColor.toLowerCase();
+        let b = new Array();
+        for (let x = 0; x < 3; x++) {
+            b[0] = hexColor.substr(x * 2, 2)
+            b[3] = "0123456789abcdef";
+            b[1] = b[0].substr(0, 1)
+            b[2] = b[0].substr(1, 1)
+            b[20 + x] = b[3].indexOf(b[1]) * 16 + b[3].indexOf(b[2])
+        }
+        //return b[20] + "," + b[21] + "," + b[22];
+        return new cc.Color(b[20], b[21], b[22]);
 
-    public static createText(parent: cc.Node, url: string, x: number = 0, y: number = 0, width?: number | string, height?: number | string, name?: string) {
-        let node = this.createNode(name);
+    }
+
+    public static createText(parent: cc.Node, textCfg: TextAttribute) {
+        let node = this.createNode(textCfg.name);
+        node.color = this.colorHex2RGB(textCfg.color);
         let txt = node.addComponent(cc.Label);
         txt.enableWrapText = false;
         txt.overflow = cc.Label.Overflow.SHRINK;
-        txt.fontSize = 32;
-        txt.lineHeight = 32;
-        txt.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
+        txt.fontSize = textCfg.fontSize;
+        txt.lineHeight = textCfg.lineHeight;
+        let horizontalAlign = cc.Label.HorizontalAlign[textCfg.horizontalAlign.toUpperCase()]
+        txt.horizontalAlign = horizontalAlign ? horizontalAlign : cc.Label.HorizontalAlign.CENTER;
         txt.verticalAlign = cc.Label.VerticalAlign.CENTER;
         txt.useSystemFont = true;
-        node.x = x;
-        node.y = y;
-        node.width = width == "canvasWidth" ? this.canvasNode.width : parseInt("" + width)
-        node.height = height == "canvasHeight" ? this.canvasNode.height : parseInt("" + height)
+
+        node.x = textCfg.x;
+        node.y = textCfg.y;
+        node.width = textCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + textCfg.width)
+        node.height = textCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + textCfg.height)
         parent.addChild(node)
         return node;
     }

@@ -6,10 +6,10 @@ import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 
 export default class TotalForm extends BaseForm {
 
-    checked: cc.Sprite = null;
-    unchecked: cc.Sprite = null;
-    btnReceive: cc.Sprite = null;
-    levelCoin: cc.Label = null;
+    checked: cc.Node = null;
+    unchecked: cc.Node = null;
+    btnReceive: cc.Node = null;
+    coinNum: cc.Node = null;
     public mCheckedVideo: boolean = true;
 
 
@@ -40,7 +40,7 @@ export default class TotalForm extends BaseForm {
     }
 
     private openEndForm(coin) {
-   }
+    }
 
     public onShareChange() {
         this.mCheckedVideo = !this.mCheckedVideo;
@@ -57,7 +57,7 @@ export default class TotalForm extends BaseForm {
         let { coin, shareCoin } = data;
         this.mLevelCoinNum = coin;
         this.mLevelShareCoinNum = shareCoin;
-        this.levelCoin.string = `${Common.formatMoney(this.mLevelCoinNum)}`
+        this.coinNum.getComponent(cc.Label).string = `${Common.formatMoney(this.mLevelCoinNum)}`
         this.addEvent();
         this.mCheckedVideo = true;
         this.changeUI();

@@ -53,17 +53,24 @@ export default class CocosBaseForm extends BaseForm {
     }
 
     public applyClickAnim(node: cc.Node, callback?: Function) {
-        this.mClickQuene[node.uuid] = callback;
-        node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
-        node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
-        node.on(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+        if (node && node.uuid) {
+            this.mClickQuene[node.uuid] = callback;
+            node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
+            node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
+            node.on(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+        }
+        else {
+            console.log('缺少对象，无法绑定事件')
+        }
     }
     public removeClickAnim(node: cc.Node) {
-        this.mClickQuene[node.uuid] = null;
-        delete this.mClickQuene[node.uuid];
-        node.off(CocosNodeEvent.TOUCH_START, this.onTouchStart, this)
-        node.off(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
-        node.off(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+        if (node && node.uuid) {
+            this.mClickQuene[node.uuid] = null;
+            delete this.mClickQuene[node.uuid];
+            node.off(CocosNodeEvent.TOUCH_START, this.onTouchStart, this)
+            node.off(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
+            node.off(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+        }
     }
 
     public findNodeByName(node: cc.Node, attrName: string): cc.Node {
@@ -75,7 +82,11 @@ export default class CocosBaseForm extends BaseForm {
                 break;
             }
             else {
-                targetNode = this.findNodeByName(child, attrName)
+                let node = this.findNodeByName(child, attrName);
+                if (node) {
+                    targetNode = node;
+                    break;
+                }
             }
         }
         return targetNode;

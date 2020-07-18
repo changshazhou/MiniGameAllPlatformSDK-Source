@@ -1,9 +1,9 @@
 import BaseForm from "./BaseForm";
 export default class TotalForm extends BaseForm {
-    checked: cc.Sprite;
-    unchecked: cc.Sprite;
-    btnReceive: cc.Sprite;
-    levelCoin: cc.Label;
+    checked: cc.Node;
+    unchecked: cc.Node;
+    btnReceive: cc.Node;
+    coinNum: cc.Node;
     mCheckedVideo: boolean;
     initForm(logic: any): void;
     addEvent(): void;

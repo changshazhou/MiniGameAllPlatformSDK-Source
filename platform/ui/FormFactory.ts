@@ -128,6 +128,7 @@ export default class FormFactory {
      *  showShare
      */
     public showShare(options: showShareOptions) {
+        CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options)
     }
 
 
