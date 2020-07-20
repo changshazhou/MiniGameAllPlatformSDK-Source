@@ -7,6 +7,7 @@ import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
 import showTryOptions from "../model/showTryOptions";
+import showSetOptions from "../model/showSetOptions";
 /**
  * 广告结果
  */
@@ -76,5 +77,9 @@ export default class FormFactory {
     *  showShare
     */
     showTry(options: showTryOptions): void;
+    /**
+     *  showShare
+     */
+    showSet(options: showSetOptions): void;
     createForm(formName: string): void;
 }

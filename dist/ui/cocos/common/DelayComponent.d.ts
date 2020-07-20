@@ -1,14 +1,13 @@
 import CocosBaseComponent from "./CocosBaseComponent";
-export default class CheckboxComponent extends CocosBaseComponent {
-    private checkedName;
-    private uncheckedName;
+export default class DelayComponent extends CocosBaseComponent {
     /**
      * 变化回调
      * @param isChecked
      * @param callback
      */
-    constructor(isChecked: any, callback: (isChecked: any) => void, checkedName?: string, uncheckedName?: string);
-    initForm(node: any): void;
+    constructor(isChecked: any, callback: (isChecked: any) => void);
+    checked: cc.Node;
+    unchecked: cc.Node;
     private toggleCallback;
     mCheckedVideo: boolean;
     addListener(): void;

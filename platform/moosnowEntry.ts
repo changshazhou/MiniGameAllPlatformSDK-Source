@@ -48,11 +48,11 @@ class moosnow {
         (window["moosnow"]) = this;
         this.mData = new GameDataCenter();
         this.mSetting = new SettingModule();
-        this.mEvent = new EventModule();
 
         this.initPlatform();
         this.initHttp();
         this.initAd();
+        this.mAudio = new AudioModule();
 
     }
 
@@ -146,13 +146,13 @@ class moosnow {
     /**
      * 事件消息
      */
-    private mEvent: EventModule;
+    private mEvent: EventModule = new EventModule();
     public get event() {
         return this.mEvent;
     }
 
 
-    private mAudio: AudioModule = null;
+    private mAudio: AudioModule;
     public get audio() {
         return this.mAudio;
     }

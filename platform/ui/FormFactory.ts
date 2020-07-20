@@ -19,6 +19,8 @@ import CocosPauseForm from "./cocos/form/CocosPauseForm";
 import CocosTotalForm from "./cocos/form/CocosTotalForm";
 import CocosToastForm from "./cocos/form/CocosToastForm";
 import CocosTryForm from "./cocos/form/CocosTryForm";
+import showSetOptions from "../model/showSetOptions";
+import CocosSetForm from "./cocos/form/CocosSetForm";
 
 /**
  * 广告结果
@@ -141,6 +143,15 @@ export default class FormFactory {
     public showTry(options: showTryOptions) {
         CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options)
     }
+
+    /**
+     *  showShare
+     */
+    public showSet(options: showSetOptions) {
+        CocosFormFactory.instance.showForm("setForm", CocosSetForm, options)
+    }
+
+
 
 
     public createForm(formName: string) {

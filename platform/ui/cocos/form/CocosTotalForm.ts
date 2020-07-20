@@ -14,7 +14,7 @@ export default class CocosTotalForm extends CocosBaseForm {
 
     private mCheckedVideo: boolean = false;
     public formComponents = [
-        new CheckboxComponent((e) => {
+        new CheckboxComponent(this.mCheckedVideo, (e) => {
             this.mCheckedVideo = e;
         })
     ];

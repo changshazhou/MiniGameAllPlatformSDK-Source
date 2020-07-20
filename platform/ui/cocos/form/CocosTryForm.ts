@@ -11,11 +11,16 @@ export default class CocosTryForm extends CocosBaseForm {
     logo: cc.Node = null;
     btnVideo: cc.Node = null;
     btnNext: cc.Node = null;
+    btnTry: cc.Node = null;
 
     private mCheckedVideo: boolean = false;
     public formComponents = [
-        new CheckboxComponent((e) => {
-            this.mCheckedVideo = e;
+        new CheckboxComponent(this.mCheckedVideo, (isChecked) => {
+            this.mCheckedVideo = isChecked;
+            if (this.btnNext)
+                this.btnNext.active = isChecked;
+            if (this.btnTry)
+                this.btnTry.active = !isChecked;
         })
     ];
 
@@ -30,10 +35,14 @@ export default class CocosTryForm extends CocosBaseForm {
         this.applyClickAnim(this.btnNext, () => {
             this.onNext();
         })
+        this.applyClickAnim(this.btnTry, () => {
+            this.onTextTry();
+        })
     }
     public removeListener() {
         this.removeClickAnim(this.btnVideo)
         this.removeClickAnim(this.btnNext)
+        this.removeClickAnim(this.btnTry)
     }
 
     public onShow(data) {
@@ -64,6 +73,13 @@ export default class CocosTryForm extends CocosBaseForm {
     private onNext() {
         if (this.FormData.callback)
             this.FormData.callback();
+    }
+
+    private onTextTry() {
+        if (this.mCheckedVideo)
+            this.onVideoTry();
+        else
+            this.onNext();
     }
 
 }

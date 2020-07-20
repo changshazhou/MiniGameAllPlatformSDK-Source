@@ -180,8 +180,5 @@ export default class AudioModule extends BaseModule {
     getSave() {
         this.isMute = moosnow.setting.getString(this.IS_MUTE, "false") == "true" ? true : false;
         this.isMuteMusic = moosnow.setting.getString(this.IS_MUTE_MUSIC, "false") == "true" ? true : false;
-        this.isMuteSound = moosnow.setting.getString(this.IS_MUTE_SOUND, "false") == "true" ? true : false;
-        // this.isMute = cc.sys.localStorage.getItem(this.IS_MUTE) == "true" ? true : false;
-        // this.isMute = cc.sys.localStorage.getItem(this.IS_MUTE) == "true" ? true : false;
     }
 }

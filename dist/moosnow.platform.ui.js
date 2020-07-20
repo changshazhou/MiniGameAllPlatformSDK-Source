@@ -1563,48 +1563,70 @@
         return CocosBaseComponent;
     }(CocosBaseForm));
 
+    var VIDEO_STATUS = {
+        END: "__video_end",
+        NOTEND: "__video_not_end",
+        ERR: "__video_error"
+    };
+
+    var VIDEO_MSG = {
+        ERR: "视频正在加载中,请稍后",
+        NOTEND: "请完整观看完视频！"
+    };
+
     var CheckboxComponent = /** @class */ (function (_super) {
         __extends(CheckboxComponent, _super);
         /**
          * 变化回调
+         * @param isChecked
          * @param callback
          */
-        function CheckboxComponent(callback) {
+        function CheckboxComponent(isChecked, callback, checkedName, uncheckedName) {
             var _this = _super.call(this) || this;
-            _this.checked = null;
-            _this.unchecked = null;
+            _this.checkedName = "checked";
+            _this.uncheckedName = "unchecked";
             _this.mCheckedVideo = true;
             _this.mCanNum = 0;
             _this.mCheckBoxMistouch = false;
             _this.mClickNum = 0;
             _this.mVideoNum = 4;
             _this.toggleCallback = callback;
+            _this.mCheckedVideo = isChecked;
+            _this.checkedName = checkedName;
+            _this.uncheckedName = uncheckedName;
+            _this[_this.checkedName] = null;
+            _this[_this.uncheckedName] = null;
             return _this;
         }
+        CheckboxComponent.prototype.initForm = function (node) {
+            _super.prototype.initForm.call(this, node);
+        };
         CheckboxComponent.prototype.addListener = function () {
             var _this = this;
-            this.applyClickAnim(this.unchecked, function () {
+            this.applyClickAnim(this[this.uncheckedName], function () {
                 _this.checkToggle(true);
             });
-            this.applyClickAnim(this.checked, function () {
+            this.applyClickAnim(this[this.checkedName], function () {
                 _this.checkToggle(true);
             });
         };
         CheckboxComponent.prototype.removeListener = function () {
-            this.removeClickAnim(this.checked);
-            this.removeClickAnim(this.unchecked);
+            this.removeClickAnim(this[this.checkedName]);
+            this.removeClickAnim(this[this.uncheckedName]);
         };
         CheckboxComponent.prototype.onReceive = function () {
             var _this = this;
             if (this.mCheckedVideo) {
                 moosnow.platform.showVideo(function (res) {
-                    if (res == moosnow.VIDEO_STATUS.END) {
+                    if (res == VIDEO_STATUS.END) {
                         if (_this.FormData.videoCallback)
                             _this.FormData.videoCallback();
                     }
-                    else if (res == moosnow.VIDEO_STATUS.ERR) {
+                    else if (res == VIDEO_STATUS.ERR) {
+                        moosnow.form.showToast(VIDEO_MSG.ERR);
                     }
                     else {
+                        moosnow.form.showToast(VIDEO_MSG.NOTEND);
                     }
                 });
             }
@@ -1621,16 +1643,16 @@
                     moosnow.platform.showVideo(function () { });
                 }
                 if (this.mClickNum >= this.mCanNum) {
-                    this.checked.active = this.mCheckedVideo;
-                    this.unchecked.active = !this.mCheckedVideo;
-                    this.sendEventImmediately();
+                    this[this.checkedName].active = this.mCheckedVideo;
+                    this[this.uncheckedName].active = !this.mCheckedVideo;
+                    this.checkCallback();
                     this.mCheckedVideo = !this.mCheckedVideo;
                 }
                 return;
             }
-            this.checked.active = this.mCheckedVideo;
-            this.unchecked.active = !this.mCheckedVideo;
-            this.sendEventImmediately();
+            this[this.checkedName].active = this.mCheckedVideo;
+            this[this.uncheckedName].active = !this.mCheckedVideo;
+            this.checkCallback();
             this.mCheckedVideo = !this.mCheckedVideo;
         };
         CheckboxComponent.prototype.onShow = function (data) {
@@ -1642,9 +1664,9 @@
             this.addListener();
             this.mCheckedVideo = true;
             this.checkToggle();
-            this.sendEventImmediately();
+            this.checkCallback();
         };
-        CheckboxComponent.prototype.sendEventImmediately = function () {
+        CheckboxComponent.prototype.checkCallback = function () {
             if (this.toggleCallback)
                 this.toggleCallback(this.mCheckedVideo);
         };
@@ -1665,7 +1687,7 @@
             _this.videoText = null;
             _this.mCheckedVideo = false;
             _this.formComponents = [
-                new CheckboxComponent(function (e) {
+                new CheckboxComponent(_this.mCheckedVideo, function (e) {
                     _this.mCheckedVideo = e;
                 })
             ];
@@ -1754,17 +1776,6 @@
         return CocosToastForm;
     }(CocosBaseForm));
 
-    var VIDEO_STATUS = {
-        END: "__video_end",
-        NOTEND: "__video_not_end",
-        ERR: "__video_error"
-    };
-
-    var VIDEO_MSG = {
-        ERR: "视频正在加载中,请稍后",
-        NOTEND: "请完整观看完视频！"
-    };
-
     var CocosTryForm = /** @class */ (function (_super) {
         __extends(CocosTryForm, _super);
         function CocosTryForm() {
@@ -1772,10 +1783,15 @@
             _this.logo = null;
             _this.btnVideo = null;
             _this.btnNext = null;
+            _this.btnTry = null;
             _this.mCheckedVideo = false;
             _this.formComponents = [
-                new CheckboxComponent(function (e) {
-                    _this.mCheckedVideo = e;
+                new CheckboxComponent(_this.mCheckedVideo, function (isChecked) {
+                    _this.mCheckedVideo = isChecked;
+                    if (_this.btnNext)
+                        _this.btnNext.active = isChecked;
+                    if (_this.btnTry)
+                        _this.btnTry.active = !isChecked;
                 })
             ];
             return _this;
@@ -1795,10 +1811,14 @@
             this.applyClickAnim(this.btnNext, function () {
                 _this.onNext();
             });
+            this.applyClickAnim(this.btnTry, function () {
+                _this.onTextTry();
+            });
         };
         CocosTryForm.prototype.removeListener = function () {
             this.removeClickAnim(this.btnVideo);
             this.removeClickAnim(this.btnNext);
+            this.removeClickAnim(this.btnTry);
         };
         CocosTryForm.prototype.onShow = function (data) {
             _super.prototype.onShow.call(this, data);
@@ -1828,7 +1848,47 @@
             if (this.FormData.callback)
                 this.FormData.callback();
         };
+        CocosTryForm.prototype.onTextTry = function () {
+            if (this.mCheckedVideo)
+                this.onVideoTry();
+            else
+                this.onNext();
+        };
         return CocosTryForm;
+    }(CocosBaseForm));
+
+    var CocosSetForm = /** @class */ (function (_super) {
+        __extends(CocosSetForm, _super);
+        function CocosSetForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.formComponents = [
+                new CheckboxComponent(moosnow.data.getVibrateSetting(), function (isChecked) {
+                    _this.vibrateSwitch(isChecked);
+                }, "vibrateOn", "vibrateOff"),
+                new CheckboxComponent(moosnow.audio.isMute, function (isChecked) {
+                    _this.musicSwitch(isChecked);
+                }, "musicOn", "musicOff"),
+            ];
+            return _this;
+        }
+        Object.defineProperty(CocosSetForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosSetForm.prototype.vibrateSwitch = function (isChecked) {
+            moosnow.data.setVibrateSetting(isChecked);
+            if (this.FormData.vibrateCallback)
+                this.FormData.vibrateCallback(isChecked);
+        };
+        CocosSetForm.prototype.musicSwitch = function (isChecked) {
+            moosnow.audio.isMute = isChecked;
+            if (this.FormData.musicCallback)
+                this.FormData.musicCallback(isChecked);
+        };
+        return CocosSetForm;
     }(CocosBaseForm));
 
     /**
@@ -1930,6 +1990,12 @@
         */
         FormFactory.prototype.showTry = function (options) {
             CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options);
+        };
+        /**
+         *  showShare
+         */
+        FormFactory.prototype.showSet = function (options) {
+            CocosFormFactory.instance.showForm("setForm", CocosSetForm, options);
         };
         FormFactory.prototype.createForm = function (formName) {
             CocosFormFactory.instance.showForm(formName, CocosEndForm, {});

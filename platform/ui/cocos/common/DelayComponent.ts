@@ -6,45 +6,36 @@ import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import { MSG } from "../../../config/MSG";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 
-export default class CheckboxComponent extends CocosBaseComponent {
+export default class DelayComponent extends CocosBaseComponent {
 
 
-    private checkedName: string = "checked";
-    private uncheckedName: string = "unchecked";
     /**
      * 变化回调
      * @param isChecked 
      * @param callback 
      */
-    constructor(isChecked, callback: (isChecked) => void, checkedName?: string, uncheckedName?: string) {
+    constructor(isChecked, callback: (isChecked) => void) {
         super();
         this.toggleCallback = callback;
         this.mCheckedVideo = isChecked;
-        this.checkedName = checkedName;
-        this.uncheckedName = uncheckedName;
-        this[this.checkedName] = null;
-        this[this.uncheckedName] = null;
     }
-
-
-    public initForm(node) {
-        super.initForm(node);
-    }
+    checked: cc.Node = null;
+    unchecked: cc.Node = null;
 
     private toggleCallback: Function
     public mCheckedVideo: boolean = true;
 
     public addListener() {
-        this.applyClickAnim(this[this.uncheckedName], () => {
+        this.applyClickAnim(this.unchecked, () => {
             this.checkToggle(true);
         })
-        this.applyClickAnim(this[this.checkedName], () => {
+        this.applyClickAnim(this.checked, () => {
             this.checkToggle(true);
         })
     }
     public removeListener() {
-        this.removeClickAnim(this[this.checkedName])
-        this.removeClickAnim(this[this.uncheckedName])
+        this.removeClickAnim(this.checked)
+        this.removeClickAnim(this.unchecked)
     }
 
     public onReceive() {
@@ -79,8 +70,8 @@ export default class CheckboxComponent extends CocosBaseComponent {
                 moosnow.platform.showVideo(() => { });
             }
             if (this.mClickNum >= this.mCanNum) {
-                this[this.checkedName].active = this.mCheckedVideo
-                this[this.uncheckedName].active = !this.mCheckedVideo;
+                this.checked.active = this.mCheckedVideo
+                this.unchecked.active = !this.mCheckedVideo;
                 this.checkCallback();
                 this.mCheckedVideo = !this.mCheckedVideo
 
@@ -88,8 +79,8 @@ export default class CheckboxComponent extends CocosBaseComponent {
             return;
         }
 
-        this[this.checkedName].active = this.mCheckedVideo
-        this[this.uncheckedName].active = !this.mCheckedVideo;
+        this.checked.active = this.mCheckedVideo
+        this.unchecked.active = !this.mCheckedVideo;
         this.checkCallback();
         this.mCheckedVideo = !this.mCheckedVideo
     }
