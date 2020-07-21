@@ -15,7 +15,10 @@ export default class EventType {
     static readonly RANDOWM_NAVIGATE: string = "RANDOWM_NAVIGATE";
 
 
+    
+
     static readonly COMPONENT_CHECKBOX_TOGGLE: string = "COMPONENT_CHECKBOX_TOGGLE";
+    static readonly PRIZE_BOX_UNLOCAK: string = "PRIZE_BOX_UNLOCAK";
 
 
 }

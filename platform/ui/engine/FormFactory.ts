@@ -164,15 +164,39 @@ export default class FormFactory {
             callback(this.mCachedLayout);
     }
 
+    private mTemplatesQuene = [];
+    private mCachedTemplates: any;
+    public getTemplates(url: string, callback: (attr) => void) {
+        if (!this.mCachedTemplates) {
+            this.mTemplatesQuene.push(callback);
+            if (this.mTemplatesQuene.length == 1)
+                moosnow.http.request(url, {}, 'GET', (res) => {
+                    this.mCachedTemplates = res;
+                    this.mTemplatesQuene.forEach(item => {
+                        item(res)
+                    })
+                    this.mTemplatesQuene = [];
+                })
+
+        }
+        else
+            callback(this.mCachedTemplates);
+    }
+
     public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
 
     }
 
-    public hideForm(name: string, formNode: any, formData?: any) {
+public hideForm(name: string, formNode: any, formData?: any) {
 
     }
 
+    public createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
 
+    }
 
+    public hideNodeByTemplate(name: string, formNode: any, formData?: any) {
+
+    }
 
 }

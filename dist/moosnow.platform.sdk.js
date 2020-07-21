@@ -705,6 +705,7 @@
         EventType.COIN_CHANGED = "COIN_CHANGED";
         EventType.RANDOWM_NAVIGATE = "RANDOWM_NAVIGATE";
         EventType.COMPONENT_CHECKBOX_TOGGLE = "COMPONENT_CHECKBOX_TOGGLE";
+        EventType.PRIZE_BOX_UNLOCAK = "PRIZE_BOX_UNLOCAK";
         return EventType;
     }());
 
@@ -3690,6 +3691,7 @@
             _this.COIN = "COIN";
             _this.mUserToken = "";
             _this.VIBRATE_SWITCH = "VIBRATE_SWITCH";
+            _this.USER_PRIZE_KEY = "USER_PRIZE_KEY";
             _this.mCoin = 0;
             _this.mCurrentMisTouchCount = 0;
             _this.mChannel_id = "0";
@@ -3760,6 +3762,40 @@
         GameDataCenter.prototype.setVibrateSetting = function (on) {
             moosnow.setting.setBool(this.VIBRATE_SWITCH, on);
             moosnow.event.sendEventImmediately(EventType.VIBRATESWITCH_CHANGED, on);
+        };
+        GameDataCenter.prototype.getPrizeBox = function () {
+            if (!this.mPrizeBox)
+                this.mPrizeBox = {};
+            return this.mPrizeBox;
+        };
+        GameDataCenter.prototype.clearPrizeBox = function () {
+            this.mPrizeBox = {};
+        };
+        GameDataCenter.prototype.lockPrizeBox = function (prizeId, type, coinNum) {
+            if (coinNum === void 0) { coinNum = 0; }
+            var userBox = this.getPrizeBox();
+            userBox[prizeId] = {
+                prizeId: prizeId,
+                type: type == 0 ? 0 : 1,
+                coinNum: coinNum
+            };
+            this.mPrizeBox = userBox;
+        };
+        GameDataCenter.prototype.getUserPrizeBoxById = function (prizeId) {
+            var userBox = this.getPrizeBox();
+            return userBox[prizeId];
+        };
+        GameDataCenter.prototype.getPrizeKey = function () {
+            if (this.mPrizeKey == null)
+                this.mPrizeKey = 3;
+            return this.mPrizeKey;
+        };
+        GameDataCenter.prototype.addPrizeKey = function (keyNum) {
+            this.mPrizeKey += keyNum;
+        };
+        GameDataCenter.prototype.clearPrizeKey = function () {
+            this.mPrizeKey = null;
+            moosnow.setting.setValue(this.USER_PRIZE_KEY, "");
         };
         return GameDataCenter;
     }(BaseModule));

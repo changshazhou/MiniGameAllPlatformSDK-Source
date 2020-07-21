@@ -3,6 +3,7 @@ import CocosNodeHelper from "./CocosNodeHelper";
 import NodeAttribute from "../../engine/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
 import TextAttribute from "../../engine/TextAttribute";
+import LayoutAttribute from "../../engine/LayoutAttribute";
 
 
 
@@ -27,6 +28,10 @@ export default class CocosFormFactory extends FormFactory {
                 nodeCfg = TextAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
             }
+            else if (jsonCfg.type == 'layout') {
+                nodeCfg = LayoutAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
+            }
             else {
                 nodeCfg = TextAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createImage(parent, nodeCfg);
@@ -37,8 +42,10 @@ export default class CocosFormFactory extends FormFactory {
         }
     }
 
-    private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any) {
-        let formNode = CocosNodeHelper.createImage(CocosNodeHelper.canvasNode, formCfg);
+    private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any, parent?: any) {
+        if (!parent)
+            parent = CocosNodeHelper.canvasNode
+        let formNode = CocosNodeHelper.createImage(parent, formCfg);
         if (formCfg.isMask)
             CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
 
@@ -89,7 +96,7 @@ export default class CocosFormFactory extends FormFactory {
                     if (res[name]) {
                         let formCfg = NodeAttribute.parse(res[name]);
                         formCfg.name = name;
-                        this._createUINode(formCfg, formLogic, formData);
+                        this._createUINode(formCfg, formLogic, formData, parent);
                         console.log('_createUINode ', Date.now())
                     }
                 })
@@ -98,6 +105,54 @@ export default class CocosFormFactory extends FormFactory {
                 this._createUINode(layoutOptions, formLogic, formData);
             }
         }
+    }
 
+
+
+    public createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
+        if (!parent)
+            parent = CocosNodeHelper.canvasNode;
+
+        let formKV = FormFactory.getFormFromCached(name);
+        if (formKV) {
+            parent.addChild(formKV.formNode);
+            formKV.formLogic.willShow(tempData);
+            formKV.formNode.active = true;
+            formKV.formLogic.onShow(tempData);
+            FormFactory.addForm2Quene(name, formKV)
+        }
+        else {
+            let url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json'
+            if (remoteLayout) {
+                this.getTemplates(url, (res) => {
+                    let tempCfg = res[name]
+                    if (tempCfg) {
+                        let formCfg = NodeAttribute.parse(tempCfg);
+                        formCfg.name = name;
+                        this._createUINode(formCfg, tempLogic, tempData, parent);
+                        console.log('_createUINode ', Date.now())
+                    }
+                })
+            }
+            else {
+                this._createUINode(layoutOptions, tempLogic, tempData);
+            }
+        }
+    }
+
+    public hideNodeByTemplate(name: string, formNode: any, formData?: any) {
+        if (formNode) {
+            FormFactory.removeFormFromQuene(name, formNode, (formKV) => {
+                formKV.formLogic.willHide(formData);
+                formKV.formNode.active = false;
+                formKV.formLogic.onHide(formData);
+            })
+        }
+        else
+            FormFactory.removeAllFormFromQuene(name, (formKV) => {
+                formKV.formLogic.willHide(formData);
+                formKV.formNode.active = false;
+                formKV.formLogic.onHide(formData);
+            })
     }
 }

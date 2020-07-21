@@ -8,6 +8,7 @@ import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
 import showTryOptions from "../model/showTryOptions";
 import showSetOptions from "../model/showSetOptions";
+import showBoxOptions from "../model/showBoxOptions";
 /**
  * 广告结果
  */
@@ -81,5 +82,9 @@ export default class FormFactory {
      *  showShare
      */
     showSet(options: showSetOptions): void;
+    /**
+        *  showShare
+        */
+    showBox(options: showBoxOptions): void;
     createForm(formName: string): void;
 }

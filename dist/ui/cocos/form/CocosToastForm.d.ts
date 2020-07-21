@@ -3,6 +3,6 @@ export default class CocosToastForm extends CocosBaseForm {
     msgText: cc.Node;
     private onMaskMouseDown;
     willShow(msg: string): void;
-    willHide(): void;
+    willHide(data: any): void;
     hide(): void;
 }

@@ -10,6 +10,7 @@ export default class CocosToastForm extends CocosBaseForm {
         e.stopPropagation();
     }
     willShow(msg: string) {
+        super.willShow();
         this.node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
         this.node.zIndex = cc.macro.MAX_ZINDEX;
         this.msgText.getComponent(cc.Label).string = msg;
@@ -20,7 +21,8 @@ export default class CocosToastForm extends CocosBaseForm {
         ))
         this.scheduleOnce(this.hide, 1)
     }
-    willHide() {
+    willHide(data) {
+        super.willHide(data);
         this.node.off(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
     }
     hide() {

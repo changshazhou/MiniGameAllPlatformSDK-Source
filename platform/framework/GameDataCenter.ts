@@ -9,6 +9,7 @@ export default class GameDataCenter extends BaseModule {
 
     private mUserToken: string = "";
     private VIBRATE_SWITCH: string = "VIBRATE_SWITCH";
+    private USER_PRIZE_KEY = "USER_PRIZE_KEY";
 
     private mCoin: number = 0;
     /***********
@@ -76,7 +77,7 @@ export default class GameDataCenter extends BaseModule {
     setChannelAppId(value) {
         this.mChannel_appid = value
     }
-    
+
     //振动
     getVibrateSetting(): boolean {
         return moosnow.setting.getBool(this.VIBRATE_SWITCH, true);
@@ -84,6 +85,49 @@ export default class GameDataCenter extends BaseModule {
     setVibrateSetting(on: boolean) {
         moosnow.setting.setBool(this.VIBRATE_SWITCH, on);
         moosnow.event.sendEventImmediately(EventType.VIBRATESWITCH_CHANGED, on);
+    }
+
+    private mPrizeBox;
+    public getPrizeBox() {
+        if (!this.mPrizeBox)
+            this.mPrizeBox = {}
+        return this.mPrizeBox;
+    }
+
+
+    
+    public clearPrizeBox() {
+        this.mPrizeBox = {}
+    }
+    public lockPrizeBox(prizeId: number, type: number, coinNum: number = 0) {
+        let userBox = this.getPrizeBox();
+        userBox[prizeId] = {
+            prizeId: prizeId,
+            type: type == 0 ? 0 : 1,
+            coinNum
+        }
+        this.mPrizeBox = userBox
+    }
+    public getUserPrizeBoxById(prizeId: number) {
+        let userBox = this.getPrizeBox();
+        return userBox[prizeId];
+    }
+
+    private mPrizeKey: number;
+    public getPrizeKey() {
+        if (this.mPrizeKey == null)
+            this.mPrizeKey = 3
+        return this.mPrizeKey
+    }
+
+    public addPrizeKey(keyNum) {
+        this.mPrizeKey += keyNum
+    }
+
+
+    public clearPrizeKey() {
+        this.mPrizeKey = null;
+        moosnow.setting.setValue(this.USER_PRIZE_KEY, "")
     }
 
 }

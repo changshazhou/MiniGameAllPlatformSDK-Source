@@ -11,6 +11,8 @@ export default class CheckboxComponent extends CocosBaseComponent {
 
     private checkedName: string = "checked";
     private uncheckedName: string = "unchecked";
+    private toggleCallback: Function
+    public mCheckedVideo: boolean = true;
     /**
      * 变化回调
      * @param isChecked 
@@ -20,21 +22,28 @@ export default class CheckboxComponent extends CocosBaseComponent {
         super();
         this.toggleCallback = callback;
         this.mCheckedVideo = isChecked;
-        this.checkedName = checkedName;
-        this.uncheckedName = uncheckedName;
+        if (checkedName)
+            this.checkedName = checkedName;
+        if (uncheckedName)
+            this.uncheckedName = uncheckedName;
         this[this.checkedName] = null;
         this[this.uncheckedName] = null;
+        // if (callback)
+        //     callback(isChecked)
     }
-
 
     public initForm(node) {
-        super.initForm(node);
+        super.initForm(node)
     }
 
-    private toggleCallback: Function
-    public mCheckedVideo: boolean = true;
 
-    public addListener() {
+    private addListener() {
+        if (!this[this.uncheckedName])
+            console.log('unchecked node is null')
+
+        if (!this[this.checkedName])
+            console.log('checked node is null')
+
         this.applyClickAnim(this[this.uncheckedName], () => {
             this.checkToggle(true);
         })
@@ -42,7 +51,7 @@ export default class CheckboxComponent extends CocosBaseComponent {
             this.checkToggle(true);
         })
     }
-    public removeListener() {
+    private removeListener() {
         this.removeClickAnim(this[this.checkedName])
         this.removeClickAnim(this[this.uncheckedName])
     }
@@ -79,29 +88,31 @@ export default class CheckboxComponent extends CocosBaseComponent {
                 moosnow.platform.showVideo(() => { });
             }
             if (this.mClickNum >= this.mCanNum) {
+                this.mCheckedVideo = !this.mCheckedVideo
                 this[this.checkedName].active = this.mCheckedVideo
                 this[this.uncheckedName].active = !this.mCheckedVideo;
                 this.checkCallback();
-                this.mCheckedVideo = !this.mCheckedVideo
 
             }
             return;
         }
 
+        this.mCheckedVideo = !this.mCheckedVideo
         this[this.checkedName].active = this.mCheckedVideo
         this[this.uncheckedName].active = !this.mCheckedVideo;
         this.checkCallback();
-        this.mCheckedVideo = !this.mCheckedVideo
     }
 
     public onShow(data) {
+        super.onShow(data);
         moosnow.http.getAllConfig(res => {
             this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
             this.mCheckBoxMistouch = res.checkBoxMistouch == 1
         })
         this.addListener();
         this.mCheckedVideo = true;
-        this.checkToggle();
+        this[this.checkedName].active = this.mCheckedVideo
+        this[this.uncheckedName].active = !this.mCheckedVideo;
         this.checkCallback();
     }
 

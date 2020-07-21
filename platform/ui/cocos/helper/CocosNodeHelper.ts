@@ -4,6 +4,7 @@ import CocosNodeEvent from "../enum/CocosNodeEvent";
 import Common from "../../../utils/Common";
 import NodeAttribute from "../../engine/NodeAttribute";
 import TextAttribute from "../../engine/TextAttribute";
+import LayoutAttribute from "../../engine/LayoutAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -32,6 +33,8 @@ export default class CocosNodeHelper extends NodeHelper {
         parent.addChild(node)
         return node;
     }
+
+
 
     /**
      * 16进制颜色转换为RGB色值
@@ -73,6 +76,31 @@ export default class CocosNodeHelper extends NodeHelper {
         node.y = textCfg.y;
         node.width = textCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + textCfg.width)
         node.height = textCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + textCfg.height)
+        parent.addChild(node)
+        return node;
+    }
+
+
+    public static createLayout(parent: cc.Node, layoutCfg: LayoutAttribute): cc.Node {
+
+        let node = this.createNode(layoutCfg.name);
+        let layout: cc.Layout = node.addComponent(cc.Layout);
+        layout.paddingLeft = layoutCfg.left;
+        layout.paddingTop = layoutCfg.top;
+        layout.paddingRight = layoutCfg.right;
+        layout.paddingBottom = layoutCfg.bottom;
+
+        layout.spacingX = layoutCfg.spacingX;
+        layout.spacingY = layoutCfg.spacingY;
+
+        layout.type = layoutCfg.layoutType;
+        layout.resizeMode = layoutCfg.mode;
+        layout.startAxis = layoutCfg.startAxis;
+
+        node.x = layoutCfg.x;
+        node.y = layoutCfg.y;
+        node.width = layoutCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + layoutCfg.width)
+        node.height = layoutCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + layoutCfg.height)
         parent.addChild(node)
         return node;
     }

@@ -4,6 +4,7 @@ export default class GameDataCenter extends BaseModule {
     private COIN;
     private mUserToken;
     private VIBRATE_SWITCH;
+    private USER_PRIZE_KEY;
     private mCoin;
     /***********
      * 金币
@@ -27,4 +28,13 @@ export default class GameDataCenter extends BaseModule {
     setChannelAppId(value: any): void;
     getVibrateSetting(): boolean;
     setVibrateSetting(on: boolean): void;
+    private mPrizeBox;
+    getPrizeBox(): any;
+    clearPrizeBox(): void;
+    lockPrizeBox(prizeId: number, type: number, coinNum?: number): void;
+    getUserPrizeBoxById(prizeId: number): any;
+    private mPrizeKey;
+    getPrizeKey(): number;
+    addPrizeKey(keyNum: any): void;
+    clearPrizeKey(): void;
 }
