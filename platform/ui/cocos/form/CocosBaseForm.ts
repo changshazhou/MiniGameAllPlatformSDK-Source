@@ -2,7 +2,8 @@ import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import CocosBaseComponent from "../common/CocosBaseComponent";
-import showCoinOptions from "../../../../dist/model/showCoinOptions";
+import FormFactory from "../../engine/FormFactory";
+import CocosFormFactory from "../helper/CocosFormFactory";
 
 export default class CocosBaseForm extends BaseForm {
 
@@ -77,6 +78,12 @@ export default class CocosBaseForm extends BaseForm {
 
     public findNodeByName(node: cc.Node, attrName: string): cc.Node {
         return CocosNodeHelper.findNodeByName(node, attrName)
+    }
+
+    public hideForm() {
+        if (this.FormData.hideForm) {
+            CocosFormFactory.instance.hideFormByLogic(this)
+        }
     }
 
 }

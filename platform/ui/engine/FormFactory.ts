@@ -102,6 +102,37 @@ export default class FormFactory {
 
         console.log('addForm2Quene 2 ', this._FormQuene)
     }
+    /**
+     * 根据逻辑类回收
+     * @param item 
+     * @param idx 
+     * @param callback 
+     * @param num 
+     */
+    private static recoverFormLogic(item: FormQuene, idx, callback: (formKV: FormKeyValue | Array<FormKeyValue>) => void, num: number = 1) {
+        let formKVs = item.quene.splice(idx, num);
+        formKVs.forEach(formKV => {
+            this.addFrom2Cached(item.formName, formKV);
+        })
+        if (callback) {
+            if (formKVs.length == 1)
+                callback(formKVs[0])
+            else
+                callback(formKVs)
+        }
+    }
+
+    public static removeFormByLogic(logic: BaseForm, callback: (formKV: FormKeyValue) => void) {
+        for (let i = 0; i < this.formQuene.length; i++) {
+            let item = this.formQuene[i];
+            for (let j = 0; j < item.quene.length; j++) {
+                if (item.quene[j].formLogic == logic) {
+                    this.recoverFormLogic(item, j, callback);
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * 从队列里移除Form
@@ -114,10 +145,7 @@ export default class FormFactory {
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
                     if (item.quene[j] == formKV) {
-                        item.quene.splice(j, 1);
-                        this.addFrom2Cached(name, formKV);
-                        if (callback)
-                            callback(formKV)
+                        this.recoverFormLogic(item, j, callback);
                         break;
                     }
                 }
@@ -134,11 +162,7 @@ export default class FormFactory {
             let item = this.formQuene[i];
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
-                    let formKeyValue = item.quene[j];
-                    item.quene.splice(j, 1);
-                    this.addFrom2Cached(name, formKeyValue);
-                    if (callback)
-                        callback(formKeyValue)
+                    this.recoverFormLogic(item, j, callback);
                     j--;
                 }
                 break;
@@ -187,7 +211,11 @@ export default class FormFactory {
 
     }
 
-public hideForm(name: string, formNode: any, formData?: any) {
+    public hideFormByLogic(logic: BaseForm, callback?: (formKV) => void) {
+
+    }
+
+    public hideForm(name: string, formNode: any, formData?: any) {
 
     }
 

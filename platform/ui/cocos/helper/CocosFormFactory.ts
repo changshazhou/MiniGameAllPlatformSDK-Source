@@ -60,6 +60,24 @@ export default class CocosFormFactory extends FormFactory {
         FormFactory.addForm2Quene(formCfg.name, formNode, logic)
     }
 
+    public hideFormByLogic(logic: BaseForm, formData?: any) {
+        FormFactory.removeFormByLogic(logic, (formKV) => {
+            if (formKV instanceof Array) {
+                formKV.forEach(item => {
+                    item.formLogic.willHide(formData);
+                    item.formNode.active = false;
+                    item.formLogic.onHide(formData);
+                })
+            }
+            else {
+                formKV.formLogic.willHide(formData);
+                formKV.formNode.active = false;
+                formKV.formLogic.onHide(formData);
+            }
+        })
+    }
+
+
     public hideForm(name: string, formNode: any, formData?: any) {
         if (formNode) {
             FormFactory.removeFormFromQuene(name, formNode, (formKV) => {

@@ -1,4 +1,4 @@
-(function () {
+var mx = (function () {
     'use strict';
 
     /*! *****************************************************************************
@@ -6468,5 +6468,7 @@
         return moosnow;
     }());
     new moosnow$1();
+
+    return moosnow$1;
 
 }());

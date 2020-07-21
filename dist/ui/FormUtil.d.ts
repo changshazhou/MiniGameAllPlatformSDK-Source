@@ -5,10 +5,14 @@ import showEndOptions from "../model/showEndOptions";
 import showTouchOptions from "../model/showTouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
+import showPauseOptions from "../model/showPauseOptions";
+import showTryOptions from "../model/showTryOptions";
+import showSetOptions from "../model/showSetOptions";
+import showBoxOptions from "../model/showBoxOptions";
 /**
  * 广告结果
  */
-export default class UIForm {
+export default class FormUtil {
     constructor();
     optionsFactory: typeof showOptions;
     /**
@@ -61,8 +65,26 @@ export default class UIForm {
     */
     showEnd(options: showEndOptions): void;
     /**
+      * 显示结算统计页
+      * @param coinNum
+      * @param callback
+      */
+    showPause(options: showPauseOptions): void;
+    /**
      *  showShare
      */
     showShare(options: showShareOptions): void;
+    /**
+    *  showShare
+    */
+    showTry(options: showTryOptions): void;
+    /**
+     *  showShare
+     */
+    showSet(options: showSetOptions): void;
+    /**
+        *  showShare
+        */
+    showBox(options: showBoxOptions): void;
     createForm(formName: string): void;
 }

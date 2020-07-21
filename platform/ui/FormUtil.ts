@@ -23,11 +23,14 @@ import showSetOptions from "../model/showSetOptions";
 import CocosSetForm from "./cocos/form/CocosSetForm";
 import showBoxOptions from "../model/showBoxOptions";
 import CocosBoxForm from "./cocos/form/CocosBoxForm";
+import CocosShareForm from "./cocos/form/CocosShareForm";
+import { PlatformType } from "../enum/PlatformType";
+import Common from "../utils/Common";
 
 /**
  * 广告结果
  */
-export default class FormFactory {
+export default class FormUtil {
 
     constructor() {
 
@@ -69,7 +72,7 @@ export default class FormFactory {
      */
     public showAd(adType: number = AD_POSITION.NONE, callback: Function, zIndex: number = 999) {
         //
-        if (moosnow.getAppPlatform() == moosnow.APP_PLATFORM.BYTEDANCE && moosnow.platform.isIphone()) {
+        if (Common.platform == PlatformType.BYTEDANCE && moosnow.platform.isIphone()) {
             console.log('头条iphone 不显示广告')
             return;
         }
@@ -136,7 +139,7 @@ export default class FormFactory {
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options)
+        CocosFormFactory.instance.showForm("shareForm", CocosShareForm, options)
     }
 
     /**

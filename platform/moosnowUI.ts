@@ -1,6 +1,6 @@
 
 import { BaseUIModule } from "./ui/engine/BaseUIModule";
-import FormFactory from "./ui/FormFactory";
+import FormUtil from "./ui/FormUtil";
 import Delay from "./framework/Delay";
 import showEndOptions from "./model/showEndOptions";
 import showPrizeOptions from "./model/showPrizeOptions";
@@ -25,7 +25,7 @@ class moosnowUI {
             console.log('没有引入主SDK')
             return;
         }
-        window["moosnow"].form = this.formFactory
+        window["moosnow"].form = this.formUtil
         window["moosnow"].delay = this.delay
 
 
@@ -41,9 +41,9 @@ class moosnowUI {
     /**
      * form UI 操作
      */
-    private mFormFactory: FormFactory = new FormFactory();
-    public get formFactory() {
-        return this.mFormFactory;
+    private mFormUtil: FormUtil = new FormUtil();
+    public get formUtil() {
+        return this.mFormUtil;
     }
 
     private mDelay: Delay = new Delay();

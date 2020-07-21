@@ -404,6 +404,38 @@
             console.log('addForm2Quene 2 ', this._FormQuene);
         };
         /**
+         * 根据逻辑类回收
+         * @param item
+         * @param idx
+         * @param callback
+         * @param num
+         */
+        FormFactory.recoverFormLogic = function (item, idx, callback, num) {
+            var _this = this;
+            if (num === void 0) { num = 1; }
+            var formKVs = item.quene.splice(idx, num);
+            formKVs.forEach(function (formKV) {
+                _this.addFrom2Cached(item.formName, formKV);
+            });
+            if (callback) {
+                if (formKVs.length == 1)
+                    callback(formKVs[0]);
+                else
+                    callback(formKVs);
+            }
+        };
+        FormFactory.removeFormByLogic = function (logic, callback) {
+            for (var i = 0; i < this.formQuene.length; i++) {
+                var item = this.formQuene[i];
+                for (var j = 0; j < item.quene.length; j++) {
+                    if (item.quene[j].formLogic == logic) {
+                        this.recoverFormLogic(item, j, callback);
+                        break;
+                    }
+                }
+            }
+        };
+        /**
          * 从队列里移除Form
          * @param name
          * @param formNode
@@ -414,10 +446,7 @@
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
                         if (item.quene[j] == formKV) {
-                            item.quene.splice(j, 1);
-                            this.addFrom2Cached(name, formKV);
-                            if (callback)
-                                callback(formKV);
+                            this.recoverFormLogic(item, j, callback);
                             break;
                         }
                     }
@@ -434,11 +463,7 @@
                 var item = this.formQuene[i];
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
-                        var formKeyValue = item.quene[j];
-                        item.quene.splice(j, 1);
-                        this.addFrom2Cached(name, formKeyValue);
-                        if (callback)
-                            callback(formKeyValue);
+                        this.recoverFormLogic(item, j, callback);
                         j--;
                     }
                     break;
@@ -480,6 +505,8 @@
         FormFactory.prototype.showForm = function (name, formLogic, formData, parent, remoteLayout, layoutOptions) {
             if (remoteLayout === void 0) { remoteLayout = true; }
             if (layoutOptions === void 0) { layoutOptions = null; }
+        };
+        FormFactory.prototype.hideFormByLogic = function (logic, callback) {
         };
         FormFactory.prototype.hideForm = function (name, formNode, formData) {
         };
@@ -1365,6 +1392,22 @@
             logic.onShow(formNode);
             FormFactory.addForm2Quene(formCfg.name, formNode, logic);
         };
+        CocosFormFactory.prototype.hideFormByLogic = function (logic, formData) {
+            FormFactory.removeFormByLogic(logic, function (formKV) {
+                if (formKV instanceof Array) {
+                    formKV.forEach(function (item) {
+                        item.formLogic.willHide(formData);
+                        item.formNode.active = false;
+                        item.formLogic.onHide(formData);
+                    });
+                }
+                else {
+                    formKV.formLogic.willHide(formData);
+                    formKV.formNode.active = false;
+                    formKV.formLogic.onHide(formData);
+                }
+            });
+        };
         CocosFormFactory.prototype.hideForm = function (name, formNode, formData) {
             if (formNode) {
                 FormFactory.removeFormFromQuene(name, formNode, function (formKV) {
@@ -1525,6 +1568,11 @@
         };
         CocosBaseForm.prototype.findNodeByName = function (node, attrName) {
             return CocosNodeHelper.findNodeByName(node, attrName);
+        };
+        CocosBaseForm.prototype.hideForm = function () {
+            if (this.FormData.hideForm) {
+                CocosFormFactory.instance.hideFormByLogic(this);
+            }
         };
         return CocosBaseForm;
     }(BaseForm));
@@ -2248,11 +2296,112 @@
         return CocosBoxForm;
     }(CocosBaseForm));
 
+    var CocosShareForm = /** @class */ (function (_super) {
+        __extends(CocosShareForm, _super);
+        function CocosShareForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.btnShare = null;
+            _this.btnNext = null;
+            _this.coinNum = null;
+            return _this;
+        }
+        Object.defineProperty(CocosShareForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosShareForm.prototype.onShow = function (data) {
+            _super.prototype.onShow.call(this, data);
+            this.addListener();
+            this.coinNum.getComponent(cc.Label).string = "" + Common.formatMoney(this.FormData.shareCoinNum);
+        };
+        CocosShareForm.prototype.onHide = function (data) {
+            _super.prototype.onHide.call(this, data);
+            this.removeListener();
+        };
+        CocosShareForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.btnShare, function () {
+                _this.onShareVideo();
+            });
+            this.applyClickAnim(this.btnNext, function () {
+                _this.onNext();
+            });
+        };
+        CocosShareForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.btnShare);
+            this.removeClickAnim(this.btnNext);
+        };
+        CocosShareForm.prototype.onNext = function () {
+            this.hideForm();
+            if (this.FormData.callback)
+                this.FormData.callback();
+        };
+        CocosShareForm.prototype.onShareVideo = function () {
+            var _this = this;
+            moosnow.http.getAllConfig(function (res) {
+                if (res) {
+                    if (res.shareFormVideo == 1) {
+                        _this.onVideo();
+                    }
+                    else if (res.shareFormVideo == 2) {
+                        _this.onShare();
+                    }
+                    else {
+                        var precent = res && res.shareFormVideoPrecent ? parseFloat(res.shareFormVideoPrecent) : 0.5;
+                        if (Common.randomNumBoth(0, 100) / 100.0 < precent) {
+                            _this.onVideo();
+                        }
+                        else
+                            _this.onShare();
+                    }
+                }
+                else {
+                    _this.onVideo();
+                }
+            });
+        };
+        CocosShareForm.prototype.onVideo = function () {
+            var _this = this;
+            moosnow.platform.showVideo(function (res) {
+                if (res == moosnow.VIDEO_STATUS.END) {
+                    _this.hideForm();
+                    if (_this.FormData.shareCallback)
+                        _this.FormData.shareCallback(true);
+                }
+                else if (res == moosnow.VIDEO_STATUS.NOTEND) {
+                    moosnow.form.showToast(moosnow.VIDEO_MSG.NOTEND);
+                }
+                else {
+                    moosnow.form.showToast(moosnow.VIDEO_MSG.ERR);
+                }
+            });
+        };
+        CocosShareForm.prototype.onShare = function () {
+            var _this = this;
+            moosnow.platform.share({
+                channel: moosnow.SHARE_CHANNEL.VIDEO
+            }, function (res) {
+                _this.hideForm();
+                if (_this.FormData.shareCallback)
+                    _this.FormData.shareCallback(res);
+                console.log('分享结束', res);
+            }, function (err) {
+                _this.hideForm();
+                if (_this.FormData.shareCallback)
+                    _this.FormData.shareCallback(err);
+            });
+        };
+        return CocosShareForm;
+    }(CocosBaseForm));
+
     /**
      * 广告结果
      */
-    var FormFactory$1 = /** @class */ (function () {
-        function FormFactory() {
+    var FormUtil = /** @class */ (function () {
+        function FormUtil() {
             // showOptions.create(showTotalOptions)
             // console.log('showTotalOptions', showOptions.create(showTotalOptions))
             this.mLoadedAdFrom = false;
@@ -2265,14 +2414,14 @@
          * Toast消息
          * @param msg  消息内容
          */
-        FormFactory.prototype.showToast = function (msg) {
+        FormUtil.prototype.showToast = function (msg) {
             CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
         };
         /**
          *  预加载广告
          * @param callback
          */
-        FormFactory.prototype.preloadAd = function (callback) {
+        FormUtil.prototype.preloadAd = function (callback) {
         };
         /**
          * 显示广告
@@ -2280,11 +2429,11 @@
          * @param callback  有返回按钮时的回调
          * @param zIndex  层级
          */
-        FormFactory.prototype.showAd = function (adType, callback, zIndex) {
+        FormUtil.prototype.showAd = function (adType, callback, zIndex) {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = 999; }
             //
-            if (moosnow.getAppPlatform() == moosnow.APP_PLATFORM.BYTEDANCE && moosnow.platform.isIphone()) {
+            if (Common.platform == PlatformType.BYTEDANCE && moosnow.platform.isIphone()) {
                 console.log('头条iphone 不显示广告');
                 return;
             }
@@ -2294,14 +2443,14 @@
          * 金币动画
          * @param options
          */
-        FormFactory.prototype.showCoin = function (options) {
+        FormUtil.prototype.showCoin = function (options) {
         };
         /**
          * 显示狂点页面
          * @param callback 点击完成回调
          * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
          */
-        FormFactory.prototype.showMistouch = function (options) {
+        FormUtil.prototype.showMistouch = function (options) {
         };
         /**
          * 显示奖励
@@ -2310,14 +2459,14 @@
          * @param showCoinAnim 显示金币动画
          * @param callback
          */
-        FormFactory.prototype.showPrize = function (options) {
+        FormUtil.prototype.showPrize = function (options) {
         };
         /**
          * 显示结算统计页
          * @param coinNum
          * @param callback
          */
-        FormFactory.prototype.showTotal = function (options) {
+        FormUtil.prototype.showTotal = function (options) {
             CocosFormFactory.instance.showForm("totalForm", CocosTotalForm, options);
         };
         /**
@@ -2325,7 +2474,7 @@
         * @param coinNum
         * @param callback
         */
-        FormFactory.prototype.showEnd = function (options) {
+        FormUtil.prototype.showEnd = function (options) {
             CocosFormFactory.instance.showForm("endForm", CocosEndForm, options);
         };
         /**
@@ -2333,37 +2482,37 @@
           * @param coinNum
           * @param callback
           */
-        FormFactory.prototype.showPause = function (options) {
+        FormUtil.prototype.showPause = function (options) {
             CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options);
         };
         /**
          *  showShare
          */
-        FormFactory.prototype.showShare = function (options) {
-            CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options);
+        FormUtil.prototype.showShare = function (options) {
+            CocosFormFactory.instance.showForm("shareForm", CocosShareForm, options);
         };
         /**
         *  showShare
         */
-        FormFactory.prototype.showTry = function (options) {
+        FormUtil.prototype.showTry = function (options) {
             CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options);
         };
         /**
          *  showShare
          */
-        FormFactory.prototype.showSet = function (options) {
+        FormUtil.prototype.showSet = function (options) {
             CocosFormFactory.instance.showForm("setForm", CocosSetForm, options);
         };
         /**
             *  showShare
             */
-        FormFactory.prototype.showBox = function (options) {
+        FormUtil.prototype.showBox = function (options) {
             CocosFormFactory.instance.showForm("boxForm", CocosBoxForm, options);
         };
-        FormFactory.prototype.createForm = function (formName) {
+        FormUtil.prototype.createForm = function (formName) {
             CocosFormFactory.instance.showForm(formName, CocosEndForm, {});
         };
-        return FormFactory;
+        return FormUtil;
     }());
 
     var DelayMove = /** @class */ (function (_super) {
@@ -2736,13 +2885,13 @@
             /**
              * form UI 操作
              */
-            this.mFormFactory = new FormFactory$1();
+            this.mFormUtil = new FormUtil();
             this.mDelay = new Delay();
             if (!window["moosnow"]) {
                 console.log('没有引入主SDK');
                 return;
             }
-            window["moosnow"].form = this.formFactory;
+            window["moosnow"].form = this.formUtil;
             window["moosnow"].delay = this.delay;
         }
         Object.defineProperty(moosnowUI.prototype, "ui", {
@@ -2752,9 +2901,9 @@
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(moosnowUI.prototype, "formFactory", {
+        Object.defineProperty(moosnowUI.prototype, "formUtil", {
             get: function () {
-                return this.mFormFactory;
+                return this.mFormUtil;
             },
             enumerable: true,
             configurable: true
