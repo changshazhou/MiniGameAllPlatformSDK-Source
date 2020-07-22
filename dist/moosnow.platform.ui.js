@@ -1132,8 +1132,8 @@
             this.changeSrc(node, imgCfg.url);
             node.x = imgCfg.x;
             node.y = imgCfg.y;
-            node.width = imgCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + imgCfg.width);
-            node.height = imgCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + imgCfg.height);
+            node.width = this.convertWidth(imgCfg.width);
+            node.height = this.convertWidth(imgCfg.height);
             parent.addChild(node);
             return node;
         };
@@ -1172,8 +1172,8 @@
                 txt.string = textCfg.text;
             node.x = textCfg.x;
             node.y = textCfg.y;
-            node.width = textCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + textCfg.width);
-            node.height = textCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + textCfg.height);
+            node.width = this.convertWidth(textCfg.width);
+            node.height = this.convertWidth(textCfg.height);
             parent.addChild(node);
             return node;
         };
@@ -1191,13 +1191,30 @@
             layout.startAxis = layoutCfg.startAxis;
             node.x = layoutCfg.x;
             node.y = layoutCfg.y;
-            node.width = layoutCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + layoutCfg.width);
-            node.height = layoutCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + layoutCfg.height);
+            node.width = this.convertWidth(layoutCfg.width);
+            node.height = this.convertWidth(layoutCfg.height);
+            parent.addChild(node);
+            return node;
+        };
+        CocosNodeHelper.createProgressBar = function (parent, progressBarCfg) {
+            var node = this.createNode(progressBarCfg.name);
+            var progressBar = node.addComponent(cc.ProgressBar);
+            var sprite = node.addComponent(cc.Sprite);
+            this.changeSrc(node, progressBarCfg.url);
+            progressBar.mode = progressBarCfg.mode;
+            node.x = progressBarCfg.x;
+            node.y = progressBarCfg.y;
+            node.width = this.convertWidth(progressBarCfg.width);
+            node.height = this.convertWidth(progressBarCfg.height);
             parent.addChild(node);
             return node;
         };
         CocosNodeHelper.changeSrc = function (image, url, callback) {
-            var sprite = image.getComponent(cc.Sprite);
+            var sprite;
+            if (image instanceof cc.Node)
+                sprite = image.getComponent(cc.Sprite);
+            else
+                sprite = image;
             if (url) {
                 var isRemote = url.indexOf("http") != -1;
                 if (cc.resources)
@@ -1279,6 +1296,20 @@
             }
             return targetNode;
         };
+        CocosNodeHelper.convertWidth = function (width) {
+            var retValue = this.canvasNode.width;
+            if (!isNaN(width)) {
+                return parseInt("" + width);
+            }
+            return retValue;
+        };
+        CocosNodeHelper.convertHeight = function (height) {
+            var retValue = this.canvasNode.height;
+            if (!isNaN(height)) {
+                return parseInt("" + height);
+            }
+            return retValue;
+        };
         return CocosNodeHelper;
     }(NodeHelper));
 
@@ -1286,8 +1317,8 @@
         function NodeAttribute() {
             this.x = 0;
             this.y = 0;
-            this.width = 0;
-            this.height = 0;
+            this.width = "canvasWidth";
+            this.height = "canvasHeight";
             this.url = "";
             this.isMask = false;
             this.maskUrl = "";
@@ -1296,7 +1327,8 @@
             this.type = "";
         }
         NodeAttribute.parse = function (json) {
-            return __assign(__assign({}, new NodeAttribute()), json);
+            var temp = __assign(__assign({}, new NodeAttribute()), json);
+            return temp;
         };
         return NodeAttribute;
     }());
@@ -1342,6 +1374,19 @@
         return LayoutAttribute;
     }(NodeAttribute));
 
+    var ProgressBarAttribute = /** @class */ (function (_super) {
+        __extends(ProgressBarAttribute, _super);
+        function ProgressBarAttribute() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mode = cc.ProgressBar.Mode.HORIZONTAL;
+            return _this;
+        }
+        ProgressBarAttribute.parse = function (json) {
+            return __assign(__assign({}, new ProgressBarAttribute()), json);
+        };
+        return ProgressBarAttribute;
+    }(NodeAttribute));
+
     var CocosFormFactory = /** @class */ (function (_super) {
         __extends(CocosFormFactory, _super);
         function CocosFormFactory() {
@@ -1361,20 +1406,32 @@
                 var jsonCfg = children[i];
                 var node = null;
                 var nodeCfg = null;
-                if (jsonCfg.type == 'text') {
-                    nodeCfg = TextAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createText(parent, nodeCfg);
-                }
-                else if (jsonCfg.type == 'layout') {
-                    nodeCfg = LayoutAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createLayout(parent, nodeCfg);
+                if (jsonCfg.type == "progressBar") {
+                    nodeCfg = ProgressBarAttribute.parse(jsonCfg);
+                    node = CocosNodeHelper.createProgressBar(parent, nodeCfg);
+                    if (nodeCfg.child && nodeCfg.child.length > 0) {
+                        this._createChild(node, nodeCfg.child);
+                    }
+                    var progressBar = node.getComponent(cc.ProgressBar);
+                    progressBar.barSprite = progressBar.node.children[0];
+                    console.log('  progressBar.barSprite', progressBar.barSprite);
                 }
                 else {
-                    nodeCfg = TextAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createImage(parent, nodeCfg);
-                }
-                if (nodeCfg.child && nodeCfg.child.length > 0) {
-                    this._createChild(node, nodeCfg.child);
+                    if (jsonCfg.type == 'text') {
+                        nodeCfg = TextAttribute.parse(jsonCfg);
+                        node = CocosNodeHelper.createText(parent, nodeCfg);
+                    }
+                    else if (jsonCfg.type == 'layout') {
+                        nodeCfg = LayoutAttribute.parse(jsonCfg);
+                        node = CocosNodeHelper.createLayout(parent, nodeCfg);
+                    }
+                    else {
+                        nodeCfg = TextAttribute.parse(jsonCfg);
+                        node = CocosNodeHelper.createImage(parent, nodeCfg);
+                    }
+                    if (nodeCfg.child && nodeCfg.child.length > 0) {
+                        this._createChild(node, nodeCfg.child);
+                    }
                 }
             }
         };
@@ -2061,13 +2118,19 @@
             enumerable: true,
             configurable: true
         });
+        CocosSetForm.prototype.addListener = function () {
+            this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+        };
+        CocosSetForm.prototype.removeListener = function () {
+            this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+        };
         CocosSetForm.prototype.willShow = function (data) {
             _super.prototype.willShow.call(this, data);
-            this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+            this.addListener();
         };
         CocosSetForm.prototype.willHide = function (data) {
             _super.prototype.willShow.call(this, data);
-            this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+            this.removeListener();
         };
         CocosSetForm.prototype.vibrateSwitch = function (isChecked) {
             moosnow.data.setVibrateSetting(isChecked);
@@ -2412,6 +2475,125 @@
         return CocosShareForm;
     }(CocosBaseForm));
 
+    var CocosMistouchForm = /** @class */ (function (_super) {
+        __extends(CocosMistouchForm, _super);
+        function CocosMistouchForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.clickProgress = null;
+            _this.btnReceive = null;
+            _this.logo = null;
+            _this.mMaxNum = 10;
+            _this.mCurrentNum = 0;
+            _this.mNavigateIndex = 0;
+            _this.mBannerShow = false;
+            _this.mShowTime = 0;
+            _this.mBannerClickType = 0;
+            return _this;
+        }
+        CocosMistouchForm.prototype.addEvent = function () {
+            this.btnReceive.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this);
+            this.btnReceive.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this);
+        };
+        CocosMistouchForm.prototype.removeEvent = function () {
+            this.btnReceive.off(CocosNodeEvent.TOUCH_START, this.onLogoUp, this);
+            this.btnReceive.off(CocosNodeEvent.TOUCH_END, this.onBannerClick, this);
+            moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
+        };
+        CocosMistouchForm.prototype.onLogoUp = function () {
+            this.logo.position = this.mEndPos;
+        };
+        CocosMistouchForm.prototype.onLogoDown = function () {
+            this.logo.position = this.mBeginPos;
+        };
+        CocosMistouchForm.prototype.initPos = function () {
+            this.mBeginPos = this.logo.position.clone();
+            this.mEndPos = this.mBeginPos.add(new cc.Vec2(0, 50));
+        };
+        Object.defineProperty(CocosMistouchForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosMistouchForm.prototype.willShow = function (data) {
+            var _this = this;
+            _super.prototype.willShow.call(this, data);
+            this.btnReceive.active = true;
+            this.initPos();
+            this.mCurrentNum = 0;
+            this.mNavigateIndex = Common.randomNumBoth(3, this.mMaxNum - 2);
+            this.addEvent();
+            this.schedule(this.subProgress, 0.1);
+            moosnow.form.showAd(moosnow.AD_POSITION.NONE, null);
+            this.mBannerShow = false;
+            moosnow.http.getAllConfig(function (res) {
+                _this.mBannerClickType = res.bannerClickType;
+            });
+        };
+        CocosMistouchForm.prototype.willHide = function () {
+            this.unschedule(this.subProgress);
+            this.unschedule(this.resetProgress);
+            this.removeEvent();
+        };
+        CocosMistouchForm.prototype.subProgress = function () {
+            if (this.mCurrentNum > 0)
+                this.mCurrentNum -= 0.1;
+        };
+        CocosMistouchForm.prototype.bannerClickCallback = function (isOpend) {
+            if (isOpend) {
+                this.unschedule(this.onHideBanner);
+                this.unschedule(this.resetProgress);
+                moosnow.platform.hideBanner();
+                this.mBannerShow = false;
+                if (this.FormData && this.FormData.callback)
+                    this.FormData.callback();
+            }
+        };
+        CocosMistouchForm.prototype.onBannerClick = function () {
+            var _this = this;
+            this.onLogoDown();
+            this.mCurrentNum += 1;
+            if (this.mCurrentNum >= this.mNavigateIndex) {
+                if (!this.mBannerShow) {
+                    this.mShowTime = Date.now();
+                    this.mBannerShow = true;
+                    moosnow.platform.showBanner(true, function (e) {
+                        console.log('banner click callback ', e);
+                        _this.bannerClickCallback(e);
+                    });
+                    if (this.mBannerClickType == 1) {
+                        this.unschedule(this.onHideBanner);
+                        this.scheduleOnce(this.onHideBanner, 2);
+                    }
+                    else if (this.mBannerClickType == 2) {
+                        this.unschedule(this.resetProgress);
+                        this.scheduleOnce(this.resetProgress, 2);
+                    }
+                }
+            }
+            if (this.mCurrentNum >= this.mMaxNum) {
+                moosnow.platform.hideBanner();
+                this.mBannerShow = false;
+                this.hideForm();
+                if (this.FormData && this.FormData.callback)
+                    this.FormData.callback(true);
+            }
+        };
+        CocosMistouchForm.prototype.resetProgress = function () {
+            this.mCurrentNum = 0;
+            moosnow.platform.hideBanner();
+            this.mBannerShow = false;
+        };
+        CocosMistouchForm.prototype.onHideBanner = function () {
+            moosnow.platform.hideBanner();
+        };
+        CocosMistouchForm.prototype.update = function () {
+            this.clickProgress.progress = this.mCurrentNum / this.mMaxNum;
+        };
+        return CocosMistouchForm;
+    }(CocosBaseForm));
+
     /**
      * 广告结果
      */
@@ -2419,7 +2601,6 @@
         function FormUtil() {
             // showOptions.create(showTotalOptions)
             // console.log('showTotalOptions', showOptions.create(showTotalOptions))
-            this.mLoadedAdFrom = false;
             // showOptions.create(showEndOptions)
             // showOptions.create(showTouchOptions)
             // showOptions.create(showPrizeOptions)
@@ -2431,12 +2612,6 @@
          */
         FormUtil.prototype.showToast = function (msg) {
             CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
-        };
-        /**
-         *  预加载广告
-         * @param callback
-         */
-        FormUtil.prototype.preloadAd = function (callback) {
         };
         /**
          * 显示广告
@@ -2462,10 +2637,10 @@
         };
         /**
          * 显示狂点页面
-         * @param callback 点击完成回调
-         * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
+         * @param options
          */
         FormUtil.prototype.showMistouch = function (options) {
+            CocosFormFactory.instance.showForm("mistouchForm", CocosMistouchForm, options);
         };
         /**
          * 显示奖励
@@ -2819,27 +2994,17 @@
         return showTotalOptions;
     }(showOptions));
 
-    var showTouchOptions = /** @class */ (function (_super) {
-        __extends(showTouchOptions, _super);
-        function showTouchOptions() {
+    var showMistouchOptions = /** @class */ (function (_super) {
+        __extends(showMistouchOptions, _super);
+        function showMistouchOptions() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            // /**
-            // * 实例化参数
-            // */
-            // public static create(): showTouchOptions {
-            //     return new showTouchOptions();
-            // }
             /**
-             * 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
-             */
-            _this.type = 1;
-            /**
-             * 金币数量
+             * 误触后得到的 金币数量
              */
             _this.coinNum = 0;
             return _this;
         }
-        return showTouchOptions;
+        return showMistouchOptions;
     }(showOptions));
 
     var vectory = /** @class */ (function () {
@@ -2894,7 +3059,7 @@
                 prizeOptions: showPrizeOptions,
                 shareOptions: showShareOptions,
                 totalOptions: showTotalOptions,
-                touchOptions: showTouchOptions,
+                touchOptions: showMistouchOptions,
                 coinOptions: showCoinOptions
             };
             /**

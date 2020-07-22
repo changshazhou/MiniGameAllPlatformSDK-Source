@@ -6,7 +6,7 @@ import showCoinOptions from "../model/showCoinOptions";
 import showOptions from "../model/showOptions";
 import showTotalOptions from "../model/showTotalOptions";
 import showEndOptions from "../model/showEndOptions";
-import showTouchOptions from "../model/showTouchOptions";
+import showMistouchOptions from "../model/showMistouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
@@ -26,6 +26,7 @@ import CocosBoxForm from "./cocos/form/CocosBoxForm";
 import CocosShareForm from "./cocos/form/CocosShareForm";
 import { PlatformType } from "../enum/PlatformType";
 import Common from "../utils/Common";
+import CocosMistouchForm from "./cocos/form/CocosMistouchForm";
 
 /**
  * 广告结果
@@ -54,16 +55,7 @@ export default class FormUtil {
         CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg)
     }
 
-    /**
-     *  预加载广告
-     * @param callback 
-     */
-    public preloadAd(callback?: Function) {
-    }
 
-
-
-    private mLoadedAdFrom: boolean = false;
     /**
      * 显示广告
      * @param adType 广告类型
@@ -91,10 +83,10 @@ export default class FormUtil {
 
     /**
      * 显示狂点页面
-     * @param callback 点击完成回调
-     * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
+     * @param options 
      */
-    public showMistouch(options: showTouchOptions) {
+    public showMistouch(options: showMistouchOptions) {
+        CocosFormFactory.instance.showForm("mistouchForm", CocosMistouchForm, options)
     }
     /**
      * 显示奖励
@@ -162,6 +154,8 @@ export default class FormUtil {
     public showBox(options: showBoxOptions) {
         CocosFormFactory.instance.showForm("boxForm", CocosBoxForm, options)
     }
+
+
 
 
     public createForm(formName: string) {

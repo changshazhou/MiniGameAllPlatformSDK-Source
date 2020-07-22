@@ -4,6 +4,7 @@ import NodeAttribute from "../../engine/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
 import TextAttribute from "../../engine/TextAttribute";
 import LayoutAttribute from "../../engine/LayoutAttribute";
+import ProgressBarAttribute from "../../engine/ProgressBarAttribute";
 
 
 
@@ -23,22 +24,30 @@ export default class CocosFormFactory extends FormFactory {
         for (let i = 0; i < children.length; i++) {
             let jsonCfg = children[i];
             let node = null;
-            let nodeCfg: NodeAttribute = null
-            if (jsonCfg.type == 'text') {
-                nodeCfg = TextAttribute.parse(jsonCfg);
-                node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
-            }
-            else if (jsonCfg.type == 'layout') {
-                nodeCfg = LayoutAttribute.parse(jsonCfg);
-                node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
+            let nodeCfg: NodeAttribute = null;
+
+            if (jsonCfg.type == "progressBar") {
+                nodeCfg = ProgressBarAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createProgressBar(parent, nodeCfg as ProgressBarAttribute);
             }
             else {
-                nodeCfg = TextAttribute.parse(jsonCfg);
-                node = CocosNodeHelper.createImage(parent, nodeCfg);
+                if (jsonCfg.type == 'text') {
+                    nodeCfg = TextAttribute.parse(jsonCfg);
+                    node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
+                }
+                else if (jsonCfg.type == 'layout') {
+                    nodeCfg = LayoutAttribute.parse(jsonCfg);
+                    node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
+                }
+                else {
+                    nodeCfg = TextAttribute.parse(jsonCfg);
+                    node = CocosNodeHelper.createImage(parent, nodeCfg);
+                }
+                if (nodeCfg.child && nodeCfg.child.length > 0) {
+                    this._createChild(node, nodeCfg.child);
+                }
             }
-            if (nodeCfg.child && nodeCfg.child.length > 0) {
-                this._createChild(node, nodeCfg.child);
-            }
+
         }
     }
 

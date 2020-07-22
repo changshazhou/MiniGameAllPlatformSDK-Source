@@ -1,4 +1,4 @@
-import showTouchOptions from "./showTouchOptions";
+import showTouchOptions from "./showMistouchOptions";
 import showOptions from "./showOptions";
 import showCoinOptions from "./showCoinOptions";
 

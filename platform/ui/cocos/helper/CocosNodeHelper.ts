@@ -5,6 +5,7 @@ import Common from "../../../utils/Common";
 import NodeAttribute from "../../engine/NodeAttribute";
 import TextAttribute from "../../engine/TextAttribute";
 import LayoutAttribute from "../../engine/LayoutAttribute";
+import ProgressBarAttribute from "../../engine/ProgressBarAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -28,8 +29,8 @@ export default class CocosNodeHelper extends NodeHelper {
         this.changeSrc(node, imgCfg.url);
         node.x = imgCfg.x;
         node.y = imgCfg.y;
-        node.width = imgCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + imgCfg.width)
-        node.height = imgCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + imgCfg.height)
+        node.width = this.convertWidth(imgCfg.width);
+        node.height = this.convertWidth(imgCfg.height);
         parent.addChild(node)
         return node;
     }
@@ -74,8 +75,8 @@ export default class CocosNodeHelper extends NodeHelper {
 
         node.x = textCfg.x;
         node.y = textCfg.y;
-        node.width = textCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + textCfg.width)
-        node.height = textCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + textCfg.height)
+        node.width = this.convertWidth(textCfg.width);
+        node.height = this.convertWidth(textCfg.height);
         parent.addChild(node)
         return node;
     }
@@ -99,14 +100,35 @@ export default class CocosNodeHelper extends NodeHelper {
 
         node.x = layoutCfg.x;
         node.y = layoutCfg.y;
-        node.width = layoutCfg.width == "canvasWidth" ? this.canvasNode.width : parseInt("" + layoutCfg.width)
-        node.height = layoutCfg.height == "canvasHeight" ? this.canvasNode.height : parseInt("" + layoutCfg.height)
+        node.width = this.convertWidth(layoutCfg.width);
+        node.height = this.convertWidth(layoutCfg.height);
         parent.addChild(node)
         return node;
     }
 
-    public static changeSrc(image: cc.Node, url: string, callback?: Function) {
-        let sprite = image.getComponent(cc.Sprite);
+    public static createProgressBar(parent: cc.Node, progressBarCfg: ProgressBarAttribute): cc.Node {
+        let node = this.createNode(progressBarCfg.name);
+        let progressBar: cc.ProgressBar = node.addComponent(cc.ProgressBar);
+        let sprite = node.addComponent(cc.Sprite);
+        this.changeSrc(node, progressBarCfg.url);
+        progressBar.mode = progressBarCfg.mode;
+
+        node.x = progressBarCfg.x;
+        node.y = progressBarCfg.y;
+        node.width = this.convertWidth(progressBarCfg.width);
+        node.height = this.convertWidth(progressBarCfg.height);
+        node.
+        parent.addChild(node)
+        return node;
+    }
+
+    public static changeSrc(image: cc.Node | cc.Sprite, url: string, callback?: Function) {
+        let sprite;
+        if (image instanceof cc.Node)
+            sprite = image.getComponent(cc.Sprite);
+        else
+            sprite = image;
+
         if (url) {
             let isRemote = url.indexOf("http") != -1
             if (cc.resources)
@@ -192,5 +214,20 @@ export default class CocosNodeHelper extends NodeHelper {
             }
         }
         return targetNode;
+    }
+
+    public static convertWidth(width: string | number): number {
+        let retValue = this.canvasNode.width
+        if (!isNaN(width as number)) {
+            return parseInt("" + width)
+        }
+        return retValue;
+    }
+    public static convertHeight(height: string | number): number {
+        let retValue = this.canvasNode.height
+        if (!isNaN(height as number)) {
+            return parseInt("" + height)
+        }
+        return retValue;
     }
 }

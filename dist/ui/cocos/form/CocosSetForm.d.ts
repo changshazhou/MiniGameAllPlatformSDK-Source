@@ -4,6 +4,8 @@ import showSetOptions from "../../../model/showSetOptions";
 export default class CocosSetForm extends CocosBaseForm {
     get FormData(): showSetOptions;
     formComponents: CheckboxComponent[];
+    addListener(): void;
+    removeListener(): void;
     willShow(data: any): void;
     willHide(data: any): void;
     private vibrateSwitch;

@@ -2,7 +2,7 @@ import showCoinOptions from "../model/showCoinOptions";
 import showOptions from "../model/showOptions";
 import showTotalOptions from "../model/showTotalOptions";
 import showEndOptions from "../model/showEndOptions";
-import showTouchOptions from "../model/showTouchOptions";
+import showMistouchOptions from "../model/showMistouchOptions";
 import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
@@ -21,12 +21,6 @@ export default class FormUtil {
      */
     showToast(msg: string): void;
     /**
-     *  预加载广告
-     * @param callback
-     */
-    preloadAd(callback?: Function): void;
-    private mLoadedAdFrom;
-    /**
      * 显示广告
      * @param adType 广告类型
      * @param callback  有返回按钮时的回调
@@ -40,10 +34,9 @@ export default class FormUtil {
     showCoin(options: showCoinOptions): void;
     /**
      * 显示狂点页面
-     * @param callback 点击完成回调
-     * @param type 类型 仅对QQ平台生效 1 是按钮点击  2 动画点击
+     * @param options
      */
-    showMistouch(options: showTouchOptions): void;
+    showMistouch(options: showMistouchOptions): void;
     /**
      * 显示奖励
      * @param style 金币动画

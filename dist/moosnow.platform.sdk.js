@@ -3932,7 +3932,7 @@
         WXAdModule.prototype.repairAd = function (cb) {
             var url = this.baseUrl + 'wx_export/getExport';
             var signParams = {
-                appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                appid: Common.config.moosnowAppId
             };
             var data = signParams;
             moosnow.http.request(url, data, 'POST', function (res) {

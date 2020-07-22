@@ -24,7 +24,7 @@ export default class WXAdModule extends AdModule {
     private repairAd(cb) {
         let url = this.baseUrl + 'wx_export/getExport';
         var signParams = {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId,
+            appid: Common.config.moosnowAppId
         };
 
 

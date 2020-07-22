@@ -6,7 +6,7 @@ import showEndOptions from "./model/showEndOptions";
 import showPrizeOptions from "./model/showPrizeOptions";
 import showShareOptions from "./model/showShareOptions";
 import showTotalOptions from "./model/showTotalOptions";
-import showTouchOptions from "./model/showTouchOptions";
+import showTouchOptions from "./model/showMistouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 
 class moosnowUI {

@@ -1,43 +1,56 @@
-import BaseForm from "../engine/BaseForm";
-import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
-import UIFormSetting from "../../config/UIFormSetting";
-import Common from "../../utils/Common";
-import showTouchOptions from "../../model/showTouchOptions";
-import BaseModule from "../../framework/BaseModule";
 
+import EventType from "../../../utils/EventType";
+import CocosNodeEvent from "../enum/CocosNodeEvent";
+import CocosBaseForm from "./CocosBaseForm";
+import Common from "../../../utils/Common";
+import showMistouchOptions from "../../../model/showMistouchOptions";
 
-export default class MistouchForm extends BaseForm {
-
+export default class CocosMistouchForm extends CocosBaseForm {
 
     clickProgress: any = null;
-    btnBanner: any = null;
+    btnReceive: any = null;
     logo: any = null;
 
-    public mBeginPos: any;
-    public mEndPos: any;
-
+    public mBeginPos: cc.Vec2;
+    public mEndPos: cc.Vec2;
     public mMaxNum: number = 10;
     public mCurrentNum: number = 0;
     public mNavigateIndex: number = 0;
     public mBannerShow: boolean = false;
     public mShowTime: number = 0;
 
+    public addEvent() {
+        this.btnReceive.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnReceive.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
+    }
+    public removeEvent() {
+        this.btnReceive.off(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
+        this.btnReceive.off(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
+        moosnow.event.removeListener(EventType.ON_PLATFORM_SHOW, this);
+    }
 
+    public onLogoUp() {
+        this.logo.position = this.mEndPos;
+    }
+    public onLogoDown() {
+        this.logo.position = this.mBeginPos;
+    }
 
-    public mBannerClickType: MISTOUCH_BANNER_TYPE = MISTOUCH_BANNER_TYPE.AUTO_HIDE;
-
-    public get FormData(): showTouchOptions {
-        return this.mFormData;
+    public initPos() {
+        this.mBeginPos = this.logo.position.clone();
+        this.mEndPos = this.mBeginPos.add(new cc.Vec2(0, 50));
     }
 
 
-    public initPos() {
+    public mBannerClickType: number = 0;
 
+    public get FormData(): showMistouchOptions {
+        return this.mFormData;
     }
 
     willShow(data) {
         super.willShow(data);
-        this.btnBanner.active = true;
+        this.btnReceive.active = true;
 
         this.initPos();
 
@@ -51,8 +64,7 @@ export default class MistouchForm extends BaseForm {
         this.mBannerShow = false;
 
         moosnow.http.getAllConfig(res => {
-            // this.mBannerClickType = res.bannerClickType
-            this.mBannerClickType = MISTOUCH_BANNER_TYPE.MAST;
+            this.mBannerClickType = res.bannerClickType
         })
 
     }
@@ -67,12 +79,6 @@ export default class MistouchForm extends BaseForm {
         if (this.mCurrentNum > 0)
             this.mCurrentNum -= 0.1
     }
-    public addEvent() {
-
-    }
-    public removeEvent() {
-
-    }
 
     public bannerClickCallback(isOpend) {
         if (isOpend) {
@@ -84,14 +90,6 @@ export default class MistouchForm extends BaseForm {
                 this.FormData.callback();
         }
     }
-
-    public onLogoUp() {
-        this.logo.position = this.mEndPos;
-    }
-    public onLogoDown() {
-        this.logo.position = this.mBeginPos;
-    }
-
 
     public onBannerClick() {
         this.onLogoDown();
@@ -106,11 +104,11 @@ export default class MistouchForm extends BaseForm {
                     console.log('banner click callback ', e)
                     this.bannerClickCallback(e);
                 });
-                if (this.mBannerClickType == MISTOUCH_BANNER_TYPE.AUTO_HIDE) {
+                if (this.mBannerClickType == 1) {
                     this.unschedule(this.onHideBanner)
                     this.scheduleOnce(this.onHideBanner, 2)
                 }
-                else if (this.mBannerClickType == MISTOUCH_BANNER_TYPE.MAST) {
+                else if (this.mBannerClickType == 2) {
                     this.unschedule(this.resetProgress)
                     this.scheduleOnce(this.resetProgress, 2)
                 }
@@ -120,7 +118,7 @@ export default class MistouchForm extends BaseForm {
         if (this.mCurrentNum >= this.mMaxNum) {
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
-            moosnow.ui.destroyUIForm(UIFormSetting.MistouchForm, null)
+            this.hideForm();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback(true);
         }
@@ -139,5 +137,4 @@ export default class MistouchForm extends BaseForm {
     update() {
         this.clickProgress.progress = this.mCurrentNum / this.mMaxNum
     }
-
 }
