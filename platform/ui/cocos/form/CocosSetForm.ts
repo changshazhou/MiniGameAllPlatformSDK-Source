@@ -1,6 +1,7 @@
 import CocosBaseForm from "./CocosBaseForm";
 import CheckboxComponent from "../common/CheckboxComponent";
 import showSetOptions from "../../../model/showSetOptions";
+import CocosNodeEvent from "../enum/CocosNodeEvent";
 
 export default class CocosSetForm extends CocosBaseForm {
 
@@ -16,6 +17,21 @@ export default class CocosSetForm extends CocosBaseForm {
             this.musicSwitch(isChecked);
         }, "musicOn", "musicOff"),
     ];
+    public addListener() {
+        this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this)
+    }
+    public removeListener() {
+        this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this)
+    }
+
+    willShow(data) {
+        super.willShow(data)
+        this.addListener();
+    }
+    willHide(data) {
+        super.willShow(data)
+        this.removeListener();
+    }
 
     private vibrateSwitch(isChecked) {
         moosnow.data.setVibrateSetting(isChecked);

@@ -117,6 +117,7 @@ export default class CocosBoxForm extends CocosBaseForm {
         moosnow.data.clearPrizeBox();
         moosnow.data.clearPrizeKey();
         this._Receiveing = false;
+        this.hideForm();
         if (this.FormData.callback)
             this.FormData.callback();
     }

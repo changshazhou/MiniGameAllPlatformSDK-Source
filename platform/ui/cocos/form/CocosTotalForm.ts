@@ -3,6 +3,7 @@ import Common from "../../../utils/Common";
 import showTotalOptions from "../../../model/showTotalOptions";
 import MathUtils from "../../../utils/MathUtils";
 import CheckboxComponent from "../common/CheckboxComponent";
+import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 
 export default class CocosTotalForm extends CocosBaseForm {
 
@@ -35,12 +36,15 @@ export default class CocosTotalForm extends CocosBaseForm {
         if (this.mCheckedVideo) {
             moosnow.platform.showVideo(res => {
                 if (res == moosnow.VIDEO_STATUS.END) {
+                    this.hideForm();
                     if (this.FormData.videoCallback)
                         this.FormData.videoCallback();
                 }
                 else if (res == moosnow.VIDEO_STATUS.ERR) {
+                    moosnow.form.showToast(VIDEO_MSG.ERR)
                 }
                 else {
+                    moosnow.form.showToast(VIDEO_MSG.NOTEND)
                 }
             })
         }

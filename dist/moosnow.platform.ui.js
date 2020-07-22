@@ -1624,6 +1624,7 @@
             this.removeListener();
         };
         CocosEndForm.prototype.onBack = function () {
+            this.hideForm();
             if (this.FormData.callback)
                 this.FormData.callback();
         };
@@ -1891,12 +1892,15 @@
             if (this.mCheckedVideo) {
                 moosnow.platform.showVideo(function (res) {
                     if (res == moosnow.VIDEO_STATUS.END) {
+                        _this.hideForm();
                         if (_this.FormData.videoCallback)
                             _this.FormData.videoCallback();
                     }
                     else if (res == moosnow.VIDEO_STATUS.ERR) {
+                        moosnow.form.showToast(VIDEO_MSG.ERR);
                     }
                     else {
+                        moosnow.form.showToast(VIDEO_MSG.NOTEND);
                     }
                 });
             }
@@ -2010,6 +2014,7 @@
             var _this = this;
             moosnow.platform.showVideo(function (res) {
                 if (res == VIDEO_STATUS.END) {
+                    _this.hideForm();
                     if (_this.FormData.videoCallback)
                         _this.FormData.videoCallback();
                 }
@@ -2022,6 +2027,7 @@
             });
         };
         CocosTryForm.prototype.onNext = function () {
+            this.hideForm();
             if (this.FormData.callback)
                 this.FormData.callback();
         };
@@ -2055,6 +2061,14 @@
             enumerable: true,
             configurable: true
         });
+        CocosSetForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+        };
+        CocosSetForm.prototype.willHide = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+        };
         CocosSetForm.prototype.vibrateSwitch = function (isChecked) {
             moosnow.data.setVibrateSetting(isChecked);
             if (this.FormData.vibrateCallback)
@@ -2287,6 +2301,7 @@
             moosnow.data.clearPrizeBox();
             moosnow.data.clearPrizeKey();
             this._Receiveing = false;
+            this.hideForm();
             if (this.FormData.callback)
                 this.FormData.callback();
         };

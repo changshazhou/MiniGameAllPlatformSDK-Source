@@ -48,6 +48,7 @@ export default class CocosEndForm extends CocosBaseForm {
     }
 
     private onBack() {
+        this.hideForm();
         if (this.FormData.callback)
             this.FormData.callback();
     }

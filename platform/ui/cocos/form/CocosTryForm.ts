@@ -58,6 +58,7 @@ export default class CocosTryForm extends CocosBaseForm {
     private onVideoTry() {
         moosnow.platform.showVideo(res => {
             if (res == VIDEO_STATUS.END) {
+                this.hideForm();
                 if (this.FormData.videoCallback)
                     this.FormData.videoCallback();
             }
@@ -71,6 +72,7 @@ export default class CocosTryForm extends CocosBaseForm {
     }
 
     private onNext() {
+        this.hideForm();
         if (this.FormData.callback)
             this.FormData.callback();
     }
