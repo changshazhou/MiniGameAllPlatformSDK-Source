@@ -10,7 +10,6 @@ export default class AdViewItem extends BaseLogic {
     public animLogo: cc.Sprite = null;
     public nameBg: cc.Sprite = null;
     public changeView: boolean = false;
-
     public mAdItem: moosnowAdRow;
 
     // public get LogicData(): moosnowAdRow {

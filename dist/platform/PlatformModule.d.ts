@@ -36,6 +36,9 @@ export default class PlatformModule extends BaseModule {
     bannerHeigth: number;
     bannerShowCount: number;
     bannerShowCountLimit: number;
+    bannerShowTime: number;
+    bannerShowTimeLimit: number;
+    bannerLimitType: number;
     bannerCb: Function;
     bannerPosition: string;
     bannerStyle: bannerStyle;
@@ -49,7 +52,7 @@ export default class PlatformModule extends BaseModule {
     nativeAdResult: nativeAdRow;
     nativeCb: Function;
     nativeLoading: boolean;
-    record: any;
+    recordObj: any;
     shareInfoArr: {
         img: string;
         title: string;
@@ -340,5 +343,7 @@ export default class PlatformModule extends BaseModule {
      * @param fail
      */
     openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
+    hasShortcutInstalled(success: (has: any) => void): void;
+    installShortcut(success: () => void, message?: string): void;
     onDisable(): void;
 }

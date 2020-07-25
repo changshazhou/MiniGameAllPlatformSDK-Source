@@ -1,5 +1,5 @@
-import NodeAttribute from "./NodeAttribute";
-import TextAttribute from "./TextAttribute";
+import NodeAttribute from "../attribute/NodeAttribute";
+import TextAttribute from "../attribute/TextAttribute";
 export default class NodeHelper {
     static get canvasNode(): cc.Node;
     private static nodeNum;

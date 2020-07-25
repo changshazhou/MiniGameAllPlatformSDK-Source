@@ -3,46 +3,68 @@ export default class UIFormSetting {
     static append(setting: object): void;
     static get mapping(): {
         adForm: {
-            [x: number]: string;
+            0: string;
         };
         pauseForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
+            2: string;
+            3: string;
+            7: string;
+            5: string;
         };
         respawnForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
+            2: string;
+            3: string;
+            7: string;
+            5: string;
         };
         endForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
+            2: string;
+            3: string;
+            7: string;
         };
         totalForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
+            5: string;
         };
         tryForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
+            5: string;
         };
         mistouchForm: {
-            [x: number]: string;
+            0: string;
+            5: string;
+            1: string;
         };
         prizeForm: {
-            [x: number]: string;
+            1: string;
+            5: string;
         };
         shareForm: {
-            [x: number]: string;
+            0: string;
+            1: string;
         };
         setForm: {
-            [x: number]: string;
+            0: string;
         };
         toastForm: {
-            [x: number]: string;
+            0: string;
         };
         coinForm: {
-            [x: number]: string;
+            0: string;
         };
         homeForm: {
-            [x: number]: string;
+            0: string;
         };
         gameForm: {
-            [x: number]: string;
+            0: string;
         };
     };
     static convertUIName(mappingForm: any): any;

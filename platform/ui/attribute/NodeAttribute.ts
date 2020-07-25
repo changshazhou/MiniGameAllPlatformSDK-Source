@@ -19,5 +19,6 @@ export default class NodeAttribute {
     public child: Array<NodeAttribute> = null;
     public event: Array<string> = [];
     public type: string = "";
+    public active: boolean = true;
 
 }

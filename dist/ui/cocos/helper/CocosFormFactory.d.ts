@@ -1,5 +1,5 @@
 import FormFactory from "../../engine/FormFactory";
-import NodeAttribute from "../../engine/NodeAttribute";
+import NodeAttribute from "../../attribute/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
 export default class CocosFormFactory extends FormFactory {
     static get instance(): FormFactory;

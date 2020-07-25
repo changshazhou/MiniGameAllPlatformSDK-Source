@@ -1,10 +1,11 @@
-import FormFactory, { FormQuene } from "../../engine/FormFactory"
+import FormFactory, { FormQuene, FormKeyValue } from "../../engine/FormFactory"
 import CocosNodeHelper from "./CocosNodeHelper";
-import NodeAttribute from "../../engine/NodeAttribute";
+import NodeAttribute from "../../attribute/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
-import TextAttribute from "../../engine/TextAttribute";
-import LayoutAttribute from "../../engine/LayoutAttribute";
-import ProgressBarAttribute from "../../engine/ProgressBarAttribute";
+import TextAttribute from "../../attribute/TextAttribute";
+import LayoutAttribute from "../../attribute/LayoutAttribute";
+import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
+import ViewScrollAttribute from "../../attribute/ViewScrollAttribute";
 
 
 
@@ -29,6 +30,10 @@ export default class CocosFormFactory extends FormFactory {
             if (jsonCfg.type == "progressBar") {
                 nodeCfg = ProgressBarAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createProgressBar(parent, nodeCfg as ProgressBarAttribute);
+                if (nodeCfg.child && nodeCfg.child.length > 1) {
+                    nodeCfg.child.splice(0, 1)
+                    this._createChild(node, nodeCfg.child);
+                }
             }
             else {
                 if (jsonCfg.type == 'text') {
@@ -39,8 +44,12 @@ export default class CocosFormFactory extends FormFactory {
                     nodeCfg = LayoutAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
                 }
+                else if (jsonCfg.type == 'view') {
+                    nodeCfg = ViewScrollAttribute.parse(jsonCfg);
+                    node = CocosNodeHelper.createView(parent, nodeCfg as ViewScrollAttribute);
+                }
                 else {
-                    nodeCfg = TextAttribute.parse(jsonCfg);
+                    nodeCfg = NodeAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createImage(parent, nodeCfg);
                 }
                 if (nodeCfg.child && nodeCfg.child.length > 0) {
@@ -51,7 +60,7 @@ export default class CocosFormFactory extends FormFactory {
         }
     }
 
-    private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any, parent?: any) {
+    private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any, parent?: any): cc.Node {
         if (!parent)
             parent = CocosNodeHelper.canvasNode
         let formNode = CocosNodeHelper.createImage(parent, formCfg);
@@ -66,7 +75,8 @@ export default class CocosFormFactory extends FormFactory {
         formNode.active = true;
         logic.onShow(formNode);
 
-        FormFactory.addForm2Quene(formCfg.name, formNode, logic)
+        FormFactory.addForm2Quene(formCfg.name, formNode, logic);
+        return formNode;
     }
 
     public hideFormByLogic(logic: BaseForm, formData?: any) {
@@ -146,7 +156,7 @@ export default class CocosFormFactory extends FormFactory {
             formKV.formLogic.willShow(tempData);
             formKV.formNode.active = true;
             formKV.formLogic.onShow(tempData);
-            FormFactory.addForm2Quene(name, formKV)
+            FormFactory.addForm2Quene(name, formKV);
         }
         else {
             let url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json'
@@ -156,13 +166,13 @@ export default class CocosFormFactory extends FormFactory {
                     if (tempCfg) {
                         let formCfg = NodeAttribute.parse(tempCfg);
                         formCfg.name = name;
-                        this._createUINode(formCfg, tempLogic, tempData, parent);
+                        let node = this._createUINode(formCfg, tempLogic, tempData, parent);
                         console.log('_createUINode ', Date.now())
                     }
                 })
             }
             else {
-                this._createUINode(layoutOptions, tempLogic, tempData);
+                let node = this._createUINode(layoutOptions, tempLogic, tempData);
             }
         }
     }

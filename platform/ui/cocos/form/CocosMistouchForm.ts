@@ -67,12 +67,15 @@ export default class CocosMistouchForm extends CocosBaseForm {
             this.mBannerClickType = res.bannerClickType
         })
 
+
+        this.schedule(this.onFwUpdate, 0.1)
+
     }
     willHide() {
         this.unschedule(this.subProgress)
         this.unschedule(this.resetProgress)
         this.removeEvent();
-
+        this.unschedule(this.onFwUpdate);
     }
 
     public subProgress() {
@@ -134,7 +137,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
         moosnow.platform.hideBanner();
     }
 
-    update() {
+    onFwUpdate() {
         this.clickProgress.progress = this.mCurrentNum / this.mMaxNum
     }
 }

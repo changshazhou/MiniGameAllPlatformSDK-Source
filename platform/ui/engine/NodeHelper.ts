@@ -1,8 +1,8 @@
 
 import { ENGINE_TYPE } from "../../enum/ENGINE_TYPE";
 import Common from "../../utils/Common";
-import NodeAttribute from "./NodeAttribute";
-import TextAttribute from "./TextAttribute";
+import NodeAttribute from "../attribute/NodeAttribute";
+import TextAttribute from "../attribute/TextAttribute";
 
 export default class NodeHelper {
 

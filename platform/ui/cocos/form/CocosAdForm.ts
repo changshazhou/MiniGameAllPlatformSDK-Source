@@ -3,75 +3,48 @@ import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "./CocosBaseForm";
 import moosnowResult from "../../../model/moosnowResult";
 import Common from "../../../utils/Common";
+import CocosFormFactory from "../helper/CocosFormFactory";
+import CocosAdViewItem from "../template/CocosAdViewItem";
+import moosnowAdRow from "../../../model/moosnowAdRow";
+import showAdOptions from "../../../model/loadAdOptions";
+import AdViewItem from "../../engine/AdViewItem";
 
 
 export default class CocosAdForm extends CocosBaseForm {
 
-    public pauseContainer: any = null;
-    public pauseView: any = null;
-    public pauseLayout: any = null;
-    public centerContainer: any = null;
-    public centerView: any = null;
-    public centerLayout: any = null;
+    public endContainer: any = null;
+    public endContainer_view: any = null;
+    public endContainer_layout: any = null;
+
     public exportContainer: any = null;
-    public exportView: any = null;
-    public exportLayout: any = null;
+    public exportContainer_view: any = null;
+    public exportContainer_layout: any = null;
+
     public exportClose: any = null;
     public exportMask: any = null;
     public exportCloseTxt: any = null;
+
     public btnBack: any = null;
     public floatContainer: any = null;
     public floatFull: any = null;
+
     public bannerContainer: any = null;
-    public bannerView: any = null;
-    public bannerLayout: any = null;
-    public endContainer: any = null;
-    public endView: any = null;
-    public endLayout: any = null;
-    public failContainer: any = null;
-    public failView: any = null;
-    public failLayout: any = null;
-    public gameOverContainer: any = null;
-    public gameOverView: any = null;
-    public gameOverLayout: any = null;
-    public respawnContainer: any = null;
-    public respawnScrollView: any = null;
-    public respawnLayout: any = null;
-    public playerDiedContainer: any = null;
-    public playerDiedScrollView: any = null;
-    public playerDiedLayout: any = null;
+    public bannerContainer_view: any = null;
+    public bannerContainer_layout: any = null;
+
+
     public leftContainer: any = null;
     public leftView: any = null;
     public leftLayout: any = null;
+
     public rightView: any = null;
     public rightLayout: any = null;
     public sideContainer: any = null;
+
     public sideView: any = null;
     public sideLayout: any = null;
     public btnSideShow: any = null;
     public btnSideHide: any = null;
-
-    public extend1Container: any = null;
-    public extend1View: any = null;
-    public extend1Layout: any = null;
-
-    public extend2Container: any = null;
-    public extend2View: any = null;
-    public extend2Layout: any = null;
-
-    public extend3Container: any = null;
-    public extend3View: any = null;
-    public extend3Layout: any = null;
-
-    public extend4Container: any = null;
-    public extend4View: any = null;
-    public extend4Layout: any = null;
-
-
-
-    public topContainer: any = null;
-    public topView: any = null;
-    public topLayout: any = null;
 
 
 
@@ -79,7 +52,8 @@ export default class CocosAdForm extends CocosBaseForm {
     private mPrevShowAd = moosnow.AD_POSITION.NONE;
     private mPrevBackCall: Function
     private mBackCall: Function
-
+    private mScrollVec = [];
+    private mEndLogic = [];
 
     public addListener() {
         if (this.btnBack)
@@ -107,12 +81,18 @@ export default class CocosAdForm extends CocosBaseForm {
         }
     }
 
+    public get FormData(): showAdOptions {
+        return this.mFormData;
+    }
+
+
+
     private mFloatIndex = 0;
     private mFloatRefresh = 3;
     private mFloatCache = {};
     private mAdData: moosnowResult;
 
-    private loadAd(callback?: Function) {
+    private loadAd(callback?: (res: Array<moosnowAdRow>) => void) {
         if (this.mAdData)
             callback(this.mAdData.indexLeft)
         else
@@ -211,6 +191,16 @@ export default class CocosAdForm extends CocosBaseForm {
             })
         }
     }
+    private addAd(ad) {
+        this.mShowAd |= ad;
+    }
+    private removeAd(ad) {
+        if (this.hasAd(ad))
+            this.mShowAd ^= ad;
+    }
+    private hasAd(ad) {
+        return (this.mShowAd & ad) == ad;
+    }
     public showClose(visible) {
         return;
         this.exportClose.active = false;
@@ -252,6 +242,145 @@ export default class CocosAdForm extends CocosBaseForm {
         closeLabel.string = `剩余${this.mSecond}秒可关闭`
     }
 
+    private mAdItemList = [];
+    public setPosition(source: Array<moosnowAdRow>, position: string = "", callback?: Function, refresh: boolean = false): Array<moosnowAdRow> {
+        let retValue = Common.deepCopy(source) as [];
+        retValue.forEach((item: moosnowAdRow) => {
+            item.position = position;
+            item.onCancel = callback;
+            item.refresh = refresh;
+        })
+        return retValue;
+    }
+    /**
+     * 
+     * @param parentNode 父节点
+     * @param prefabs 匹配的预制体
+     * @param points 需要显示的坐标点
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
+     */
+    public initFloatAd(callback?: Function) {
+
+        this.loadAd((res) => {
+            if (res.length == 0)
+                return;
+            let source = this.setPosition(res, "浮动ICON", callback, true);
+
+            let showIds = [];
+
+            this.FormData.floatTempletes.forEach((templateName, idx) => {
+                let showIndex = idx;
+                if (showIndex > source.length - 1)
+                    showIndex = 0;
+                let adRow = source[showIndex] as any;
+                showIds.push({
+                    appid: adRow.appid,
+                    position: adRow.position,
+                    index: idx
+                })
+                let point = this.FormData.floatPositon.length - 1 > idx ? this.FormData.floatPositon[idx] as any : this.FormData.floatPositon[0];
+                adRow.x = point.x;
+                adRow.y = point.y;
+                adRow.source = source;
+                adRow.showIds = showIds;
+                let logic = CocosFormFactory.instance.createNodeByTemplate(templateName, AdViewItem, adRow);
+                this.mFloatCache[idx] = {
+                    index: showIndex,
+                    logic: logic,
+                };
+                this.floatAnim((logic as any).node);
+            })
+            this.updateFloat(source);
+
+            this.schedule(() => {
+                this.updateFloat(source);
+            }, this.mFloatRefresh);
+
+        })
+
+    }
+
+    private updateFloat(source) {
+
+        for (let key in this.mFloatCache) {
+            let showIndex = this.mFloatCache[key].index;
+            let logic = this.mFloatCache[key].logic;
+            if (showIndex < this.mAdData.indexLeft.length - 1)
+                showIndex++;
+            else
+                showIndex = 0;
+            this.mFloatCache[key].index = showIndex;
+
+            logic.refreshImg({ ...this.mAdData.indexLeft[showIndex], onCancel: this.mFloatCache[key].onCancel });
+
+        }
+
+    }
+
+    /**
+       * 绑定广告数据-固定显示6个导出
+       * @param container 列表容器节点，显示/隐藏  的核心节点
+       * @param layout cc.Layout
+       * @param position 位置信息，将提交到统计后台用于分析
+       * @param entityName 需要绑定的预制体
+       * @param callback 跳转取消时的回调函数
+       */
+    public initFiexdView(container: any, layout: any, position: string, templateName: string, callback?: Function) {
+
+        this.loadAd((res) => {
+
+            CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
+
+            let banner = this.setPosition(res, position, callback, true);
+            let endAd: Array<moosnowAdRow> = [];
+            let showIds = [];
+            for (let i = 0; i < 6; i++) {
+                let item = banner.length > i ? banner[i] : banner[0];
+                showIds.push({
+                    appid: item.appid,
+                    position: item.position,
+                    index: i
+                })
+                endAd.push(item);
+            }
+            endAd.forEach(item => {
+                let adRow = { ...item, showIds, source: banner }
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout)
+            })
+        })
+    }
+
+    /**
+     * 绑定导出数据
+     * @param container 列表容器节点，显示/隐藏  的核心节点
+     * @param scrollView 
+     * @param layout cc.Layout
+     * @param position 位置信息，将提交到统计后台用于分析
+     * @param entityName  需要绑定的预制体
+     * @param callback  跳转取消时的回调函数
+     */
+    public initView(scrollView: any, layout: cc.Node, position: string, templateName: string, callback?: Function) {
+
+        this.loadAd((res) => {
+            this.hideAllAdNode(templateName, layout);
+            let source = this.setPosition(res, position, callback);
+            source.forEach((item, idx) => {
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
+            })
+            this.pushScroll(scrollView, layout);
+        })
+    }
+
+
+    public hideAllAdNode(templateName: string, node: cc.Node) {
+        for (let i = 0; i < node.childrenCount; i++) {
+            CocosFormFactory.instance.hideNodeByTemplate(templateName, node.children[i]);
+            i--
+        }
+    }
+
+
 
     private mMoveSpeed: number = 2;
     public onFwUpdate() {
@@ -292,4 +421,54 @@ export default class CocosAdForm extends CocosBaseForm {
         }
 
     }
+
+    /**
+     * 
+     * @param data 
+     */
+    public willShow(data) {
+
+        this.mAdItemList = [];
+        this.mScrollVec = []
+        // this.addEvent();
+        this.displayChange(data.showAd, data.callback)
+
+
+    }
+    public displayChange(data, callback = null) {
+        this.mShowAd = data;
+        this.displayAd(true)
+        this.mBackCall = callback;
+    }
+
+    private displayAd(visible: boolean) {
+
+        // this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+        // if (visible && this.hasAd(AD_POSITION.EXPORT)) {
+        //     moosnow.http.getAllConfig(res => {
+        //         if (res.exportAutoNavigate == 1) {
+        //             moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
+        //         }
+        //     })
+
+        //     this.exportClose.active = false;
+        //     this.unschedule(this.showExportClose)
+        //     this.schedule(this.showExportClose, 1)
+        // }
+
+        this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+
+
+    }
+
+    public onShow(data) {
+        super.onShow(data);
+        if (this.FormData && this.FormData.callback)
+            this.FormData.callback();
+        var param = {}
+
+        this.initView(this.bannerContainer_view, this.bannerContainer_layout, "banner", "bannerAdItem");
+        //控制显示广告  后续补充
+    }
+
 }

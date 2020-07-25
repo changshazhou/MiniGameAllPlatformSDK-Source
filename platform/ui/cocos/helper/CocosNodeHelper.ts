@@ -1,11 +1,11 @@
 import NodeHelper from "../../engine/NodeHelper";
 import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
-import Common from "../../../utils/Common";
-import NodeAttribute from "../../engine/NodeAttribute";
-import TextAttribute from "../../engine/TextAttribute";
-import LayoutAttribute from "../../engine/LayoutAttribute";
-import ProgressBarAttribute from "../../engine/ProgressBarAttribute";
+import ViewAttribute from "../../attribute/ViewScrollAttribute";
+import NodeAttribute from "../../attribute/NodeAttribute";
+import TextAttribute from "../../attribute/TextAttribute";
+import LayoutAttribute from "../../attribute/LayoutAttribute";
+import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -13,18 +13,20 @@ export default class CocosNodeHelper extends NodeHelper {
         return cc.Canvas.instance.node;
     }
 
-    public static createNode(name?: string) {
+    public static createNode(name?: string, nodeCfg?: NodeAttribute) {
         if (!name) {
             name = this.getNodeName();
         }
         let node = new cc.Node();
-        node.name = name
+        node.name = name;
+        if (nodeCfg)
+            node.active = nodeCfg.active;
         return node;
     }
 
     public static createImage(parent: cc.Node, imgCfg: NodeAttribute): cc.Node {
 
-        let node = this.createNode(imgCfg.name);
+        let node = this.createNode(imgCfg.name, imgCfg);
         node.addComponent(cc.Sprite);
         this.changeSrc(node, imgCfg.url);
         node.x = imgCfg.x;
@@ -59,7 +61,7 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static createText(parent: cc.Node, textCfg: TextAttribute) {
-        let node = this.createNode(textCfg.name);
+        let node = this.createNode(textCfg.name, textCfg);
         node.color = this.colorHex2RGB(textCfg.color);
         let txt = node.addComponent(cc.Label);
         txt.enableWrapText = false;
@@ -84,7 +86,7 @@ export default class CocosNodeHelper extends NodeHelper {
 
     public static createLayout(parent: cc.Node, layoutCfg: LayoutAttribute): cc.Node {
 
-        let node = this.createNode(layoutCfg.name);
+        let node = this.createNode(layoutCfg.name, layoutCfg);
         let layout: cc.Layout = node.addComponent(cc.Layout);
         layout.paddingLeft = layoutCfg.left;
         layout.paddingTop = layoutCfg.top;
@@ -107,20 +109,61 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static createProgressBar(parent: cc.Node, progressBarCfg: ProgressBarAttribute): cc.Node {
-        let node = this.createNode(progressBarCfg.name);
+        let node = this.createNode(progressBarCfg.name, progressBarCfg);
         let progressBar: cc.ProgressBar = node.addComponent(cc.ProgressBar);
         let sprite = node.addComponent(cc.Sprite);
         this.changeSrc(node, progressBarCfg.url);
-        progressBar.mode = progressBarCfg.mode;
+        progressBar.mode = cc.ProgressBar.Mode.HORIZONTAL;  // progressBarCfg.mode;
+        progressBar.totalLength = 300;
+        progressBar.progress = 0.1;
 
         node.x = progressBarCfg.x;
         node.y = progressBarCfg.y;
         node.width = this.convertWidth(progressBarCfg.width);
         node.height = this.convertWidth(progressBarCfg.height);
-        node.
         parent.addChild(node)
+
+        if (progressBarCfg.child && progressBarCfg.child.length > 0) {
+            let bar = this.createImage(node, NodeAttribute.parse(progressBarCfg.child[0]));
+            progressBar.barSprite = bar.getComponent(cc.Sprite);
+        }
+
         return node;
     }
+
+
+    public static createView(parent: cc.Node, viewCfg: ViewAttribute) {
+        viewCfg.name = parent.name
+        let node = this.createNode(viewCfg.name + '_scroll', viewCfg);
+        parent.addChild(node);
+
+        let scroll = node.addComponent(cc.ScrollView);
+        scroll.horizontal = true;
+        scroll.horizontalScrollBar = null;
+
+
+        let view = this.createNode(viewCfg.name + "_view");
+        let mask = view.addComponent(cc.Mask)
+        // mask.type = cc.Mask.Type.RECT;
+        node.addChild(view);
+
+
+        let widget = view.addComponent(cc.Widget);
+        widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom;
+        widget.left = widget.top = widget.right = widget.bottom = 0;
+
+        viewCfg.layout.name = viewCfg.name + '_layout'
+        let layoutNode = this.createLayout(view, viewCfg.layout);
+        return layoutNode;
+
+    }
+
+    public static addWidget(view: cc.Node) {
+        let widget = view.addComponent(cc.Widget);
+        widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom;
+        widget.left = widget.top = widget.right = widget.bottom = 0;
+    }
+
 
     public static changeSrc(image: cc.Node | cc.Sprite, url: string, callback?: Function) {
         let sprite;
@@ -168,6 +211,18 @@ export default class CocosNodeHelper extends NodeHelper {
             }
         }
     }
+
+    public static changeText(text: cc.Node, msg: string) {
+        if (!text) {
+            console.log('对象不存在,赋值失败')
+            return;
+        }
+        let lab = text.getComponent(cc.Label)
+        if (lab) {
+            lab.string = msg;
+        }
+    }
+
 
     public static createMask(parent: cc.Node, maskUrl: string = undefined) {
         let skin = `${ROOT_CONFIG.HTTP_ROOT}/SDK/layout/img_mask.png`;

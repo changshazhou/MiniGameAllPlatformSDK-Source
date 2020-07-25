@@ -77,7 +77,7 @@ export default class BDModule extends PlatformModule {
         let brand = this.getSystemInfoSync().brand.toLowerCase();
         if (/huawei/.test(brand) || /honor/.test(brand)) return;
         // if (!this.isDouyin()) return;
-        this.record = window[this.platformName].getVideoRecorderManager();
+        this.recordObj = window[this.platformName].getVideoRecorderManager();
     }
 
     /**
@@ -89,18 +89,18 @@ export default class BDModule extends PlatformModule {
         console.log('record startRecord');
         this.recordRes = null;
         this.recordCb = null;
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
         }
-        this.record.onStart(res => {
+        this.recordObj.onStart(res => {
             console.log('record onStart');
             if (callback)
                 callback(res);
         })
 
-        this.record.onStop(res => {
+        this.recordObj.onStop(res => {
             this.recordRes = res;
             if (this.recordCb) {
                 console.log('stop 2');
@@ -108,7 +108,7 @@ export default class BDModule extends PlatformModule {
             }
         })
 
-        this.record.start({
+        this.recordObj.start({
             duration
         });
     }
@@ -118,7 +118,7 @@ export default class BDModule extends PlatformModule {
      */
     public stopRecord(callback = null) {
         console.log('record stopRecord');
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
@@ -128,7 +128,7 @@ export default class BDModule extends PlatformModule {
             callback(this.recordRes);
         } else {
             this.recordCb = callback;
-            this.record.stop();
+            this.recordObj.stop();
         }
     }
 }

@@ -90,14 +90,14 @@ export default class TTModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].getGameRecorderManager) return;
         // if (!this.isDouyin()) return;
-        this.record = window[this.platformName].getGameRecorderManager();
+        this.recordObj = window[this.platformName].getGameRecorderManager();
     }
 
     public clipRecord() {
-        if (!this.record) return;
+        if (!this.recordObj) return;
         this.recordNumber++;
         console.log('clipRecord', this.recordNumber)
-        this.record.recordClip({
+        this.recordObj.recordClip({
             timeRange: [2, 2],
             success: (r) => {
                 console.log('clipRecord 成功 ', r)
@@ -112,7 +112,7 @@ export default class TTModule extends PlatformModule {
      */
     public startRecord(duration = 300, callback = null) {
         console.log('record startRecord');
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
@@ -122,17 +122,17 @@ export default class TTModule extends PlatformModule {
         this.recordCb = null;
         this.recordRes = null;
 
-        this.record.onStart(res => {
+        this.recordObj.onStart(res => {
             console.log('record onStart');
             if (callback)
                 callback(res);
         });
 
         let recordRes = this.recordRes
-        this.record.onStop(res => {
+        this.recordObj.onStop(res => {
             console.log('on stop ', res)
             if (this.recordNumber >= 4) {
-                this.record.clipVideo({
+                this.recordObj.clipVideo({
                     path: res.videoPath,
                     success: (r) => {
                         console.log('record clip succes:', r);
@@ -154,7 +154,7 @@ export default class TTModule extends PlatformModule {
                     this.recordCb(res);
             }
         });
-        this.record.start({
+        this.recordObj.start({
             duration
         });
     }
@@ -165,7 +165,7 @@ export default class TTModule extends PlatformModule {
      */
     public stopRecord(callback = null) {
         console.log(' stop Record  callback  ', !!callback);
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
@@ -176,18 +176,18 @@ export default class TTModule extends PlatformModule {
                 callback(this.recordRes);
         } else {
             this.recordCb = callback;
-            this.record.stop();
+            this.recordObj.stop();
             console.log('record stop  ', this.recordRes)
         }
     }
 
     public pauseRecord() {
-        if (this.record)
-            this.record.pause()
+        if (this.recordObj)
+            this.recordObj.pause()
     }
     public resumeRecord() {
-        if (this.record)
-            this.record.resume()
+        if (this.recordObj)
+            this.recordObj.resume()
     }
 
     /**

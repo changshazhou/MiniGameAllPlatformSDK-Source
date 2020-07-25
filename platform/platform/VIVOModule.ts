@@ -446,9 +446,7 @@ export default class VIVOModule extends PlatformModule {
         moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, {})
         if (moosnow.platform.videoCb) {
             let ret = (!!isEnd.isEnded) ? VIDEO_STATUS.END : VIDEO_STATUS.NOTEND;
-            setTimeout(() => {
-                moosnow.platform.videoCb(ret);
-            }, 50);
+            moosnow.platform.videoCb(ret);
         }
     }
     public prepareInter() {
@@ -666,4 +664,31 @@ export default class VIVOModule extends PlatformModule {
     }
 
 
+    public hasShortcutInstalled(success: (has) => void) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].hasShortcutInstalled) return;
+        window[this.platformName].hasShortcutInstalled({
+            success: (status) => {
+                if (success)
+                    success(!!status)
+                if (status) {
+                    console.log('已创建')
+                } else {
+                    console.log('未创建')
+                }
+            }
+        })
+    }
+    public installShortcut(success: () => void, message: string = "方便下次快速启动") {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].installShortcut) return;
+        window[this.platformName].installShortcut({
+            message,
+            success: (status) => {
+                if (success)
+                    success()
+                console.log('创建成功')
+            }
+        })
+    }
 }

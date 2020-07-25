@@ -363,6 +363,8 @@ export class HttpModule extends BaseModule {
                 (res) => {
                     //总开关控制
                     let mistouchOn = res && res.mistouchOn == 1 ? true : false;
+                    if (!mistouchOn)
+                        console.log('总开关已关闭----------------')
                     this.cfgData = {
                         ...Common.deepCopy(res),
                         zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
@@ -376,7 +378,15 @@ export class HttpModule extends BaseModule {
                         checkBoxProbabilitys: [100, 0, 0, 0, 0],
                     };
                     if (moosnow.platform) {
-                        moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                        if (res) {
+                            if (!isNaN(res.bannerShowCountLimit))
+                                moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                            if (!isNaN(res.bannerLimitType))
+                                moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
+                            if (!isNaN(res.bannerShowTimeLimit))
+                                moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+                        }
+
                     }
                     this._cfgQuene.forEach(item => {
                         item(this.cfgData);

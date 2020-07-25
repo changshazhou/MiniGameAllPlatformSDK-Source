@@ -135,6 +135,8 @@ export default class AudioModule extends BaseModule {
         this._musicComplete = complete;
 
         if (Common.getEngine() == ENGINE_TYPE.COCOS) {
+            if (!cc.audioEngine) return;
+            if (!cc.audioEngine.playMusic) return;
             let soundId = cc.audioEngine.playMusic(audioClip as cc.AudioClip, loops);
             cc.audioEngine.setFinishCallback(soundId, (res) => {
                 if (complete) {

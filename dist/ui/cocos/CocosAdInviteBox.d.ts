@@ -1,4 +1,4 @@
-import AdInviteBox from "../engine/AdInviteBox";
+import AdInviteBox from "./template/CocosInviteBox";
 export default class CocosAdInviteBox extends AdInviteBox {
     addListener(): void;
     removeListener(): void;

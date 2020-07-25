@@ -27,6 +27,9 @@ import CocosShareForm from "./cocos/form/CocosShareForm";
 import { PlatformType } from "../enum/PlatformType";
 import Common from "../utils/Common";
 import CocosMistouchForm from "./cocos/form/CocosMistouchForm";
+import CocosAdForm from "./cocos/form/CocosAdForm";
+import showAdOptions from "../model/loadAdOptions";
+import loadAdOptions from "../model/loadAdOptions";
 
 /**
  * 广告结果
@@ -55,6 +58,9 @@ export default class FormUtil {
         CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg)
     }
 
+    public loadAd(options: loadAdOptions) {
+        CocosFormFactory.instance.showForm("adForm", CocosAdForm, options)
+    }
 
     /**
      * 显示广告
@@ -72,6 +78,10 @@ export default class FormUtil {
 
     }
 
+
+    public hideAd(callback: Function) {
+        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: AD_POSITION.NONE, callback })
+    }
 
     /**
      * 金币动画

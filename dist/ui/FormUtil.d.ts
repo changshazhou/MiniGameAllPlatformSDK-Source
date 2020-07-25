@@ -9,6 +9,7 @@ import showPauseOptions from "../model/showPauseOptions";
 import showTryOptions from "../model/showTryOptions";
 import showSetOptions from "../model/showSetOptions";
 import showBoxOptions from "../model/showBoxOptions";
+import loadAdOptions from "../model/loadAdOptions";
 /**
  * 广告结果
  */
@@ -20,6 +21,7 @@ export default class FormUtil {
      * @param msg  消息内容
      */
     showToast(msg: string): void;
+    loadAd(options: loadAdOptions): void;
     /**
      * 显示广告
      * @param adType 广告类型
@@ -27,6 +29,7 @@ export default class FormUtil {
      * @param zIndex  层级
      */
     showAd(adType: number, callback: Function, zIndex?: number): void;
+    hideAd(callback: Function): void;
     /**
      * 金币动画
      * @param options

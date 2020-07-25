@@ -25,5 +25,5 @@ export default class CocosMistouchForm extends CocosBaseForm {
     onBannerClick(): void;
     resetProgress(): void;
     onHideBanner(): void;
-    update(): void;
+    onFwUpdate(): void;
 }

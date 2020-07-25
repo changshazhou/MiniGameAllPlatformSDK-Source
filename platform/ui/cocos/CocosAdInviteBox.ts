@@ -1,4 +1,4 @@
-import AdInviteBox from "../engine/AdInviteBox";
+import AdInviteBox from "./template/CocosInviteBox";
 import Common from "../../utils/Common";
 import { MSG } from "../../config/MSG";
 import CocosNodeEvent from "./enum/CocosNodeEvent";

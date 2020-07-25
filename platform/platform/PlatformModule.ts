@@ -93,6 +93,11 @@ export default class PlatformModule extends BaseModule {
     public bannerHeigth: number = 96;
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
+
+    public bannerShowTime: number = 0;
+    public bannerShowTimeLimit: number = 15;
+    public bannerLimitType: number = 0;
+
     public bannerCb: Function = null;
     public bannerPosition: string = BANNER_POSITION.BOTTOM;
     public bannerStyle: bannerStyle = null;
@@ -104,6 +109,8 @@ export default class PlatformModule extends BaseModule {
 
     public interShowCount: number = 0;
     public interShowCountLimit: number = 3;
+
+
     public isInterLoaded: boolean = false;
 
 
@@ -116,7 +123,7 @@ export default class PlatformModule extends BaseModule {
 
 
 
-    public record: any = null;
+    public recordObj: any = null;
 
 
     public shareInfoArr: { img: string, title: string }[] = [];
@@ -805,7 +812,7 @@ export default class PlatformModule extends BaseModule {
      * @param callback 如果不是抖音回调参数=false
      */
     public startRecord(duration = 300, callback = null) {
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
@@ -816,7 +823,7 @@ export default class PlatformModule extends BaseModule {
      * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
      */
     public stopRecord(callback = null) {
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
@@ -916,6 +923,8 @@ export default class PlatformModule extends BaseModule {
             this.banner.offResize(this._bottomCenterBanner);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
+            this.banner.destroy();
+            this.banner = null;
         }
         this.banner = this._createBannerAd();
         if (this.banner) {
@@ -929,16 +938,18 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName].createBannerAd) return;
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
         let left = (windowWidth - this.bannerWidth) / 2;
         let bannerId = this.bannerId;
         if (Common.isEmpty(bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
+        this.bannerShowTime = Date.now();
         let banner = window[this.platformName].createBannerAd({
             adUnitId: bannerId,
             style: {
-                top: 0,
+                top: windowHeight - this.bannerHeigth,
                 left: left,
                 width: this.bannerWidth
             }
@@ -1115,15 +1126,30 @@ export default class PlatformModule extends BaseModule {
         }
         this.bannerShowCount++;
         if (this.banner) {
-            if (this.bannerShowCount >= this.bannerShowCountLimit) {
-                console.log('banner destroy');
-                this.banner.hide();
-                this.banner.destroy();
-                this.banner = null;
-                this._prepareBanner();
-                // console.log('banner---destory');
-            } else {
-                this.banner.hide();
+            if (this.bannerLimitType == 0) {
+                if (this.bannerShowCount >= this.bannerShowCountLimit) {
+                    console.log('次数满足,销毁banner');
+                    this.banner.hide();
+                    this.banner.destroy();
+                    this.banner = null;
+                    this._prepareBanner();
+                    // console.log('banner---destory');
+                } else {
+                    this.banner.hide();
+                }
+            }
+            else {
+                if (Date.now() - this.bannerShowTime > this.bannerShowTimeLimit * 1000) {
+                    console.log('时间满足，销毁banner')
+                    this.banner.hide();
+                    this.banner.destroy();
+                    this.banner = null;
+                    this._prepareBanner();
+                }
+                else {
+                    console.log('时间太短，隐藏banner')
+                    this.banner.hide();
+                }
             }
         }
         else {
@@ -1404,6 +1430,14 @@ export default class PlatformModule extends BaseModule {
     public openAwemeUserProile(success: (hasFollowed) => void, fail: (err) => void) {
         if (success)
             success(true)
+    }
+
+    public hasShortcutInstalled(success: (has) => void) {
+        success(false)
+    }
+
+    public installShortcut(success: () => void, message: string = "方便下次快速启动") {
+
     }
     onDisable() {
     }

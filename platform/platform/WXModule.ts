@@ -99,7 +99,7 @@ export default class WXModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].getGameRecorder) return;
         // if (!this.isDouyin()) return;
-        this.record = window[this.platformName].getGameRecorder();
+        this.recordObj = window[this.platformName].getGameRecorder();
     }
 
     /**
@@ -109,24 +109,24 @@ export default class WXModule extends PlatformModule {
      */
     public startRecord(duration = 300, callback = null) {
         console.log('record startRecord');
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
         }
 
-        this.record.start()
+        this.recordObj.start()
             .then(res => {
-                this.record.on('timeUpdate', res => {
+                this.recordObj.on('timeUpdate', res => {
                     console.log(`视频时长: ${res.currentTime}`);
                     this.writeTime = Math.min(res.currentTime, 60000);
                 });
-                this.record.on('start', () => {
+                this.recordObj.on('start', () => {
                     if (callback)
                         callback();
                 })
                 // stop 事件的回调函数的执行表示录制完成
-                this.record.on('stop', (res) => {
+                this.recordObj.on('stop', (res) => {
                     console.log(`对局回放时长: `, res)
                     this.recordCb(res)
                 })
@@ -141,16 +141,16 @@ export default class WXModule extends PlatformModule {
     */
     public stopRecord(callback = null) {
         console.log(' stop Record  callback  ', !!callback);
-        if (!this.record) {
+        if (!this.recordObj) {
             if (callback)
                 callback(false);
             return;
         }
         this.recordCb = callback;
-        let stopPromise = this.record.stop();
+        let stopPromise = this.recordObj.stop();
         stopPromise && stopPromise.then((res) => {
             if (!res.error.code) {
-                this.record.off('timeUpdate');
+                this.recordObj.off('timeUpdate');
                 // this.showShareButton(
                 //     () => {
 
@@ -165,13 +165,13 @@ export default class WXModule extends PlatformModule {
     }
 
     public pauseRecord() {
-        if (this.record) {
-            this.record.pause();
+        if (this.recordObj) {
+            this.recordObj.pause();
         }
     }
     public resumeRecord() {
-        if (this.record) {
-            this.record.resume();
+        if (this.recordObj) {
+            this.recordObj.resume();
         }
     }
     private mShareButton: any

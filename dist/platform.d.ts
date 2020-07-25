@@ -55,7 +55,7 @@ declare global {
         };
         static Common: typeof Common;
         static PLATFORM_EVENT: typeof EventType;
-        static APP_PLATFORM: typeof PlatformModule;
+        static APP_PLATFORM: typeof PlatformType;
         static AD_POSITION: {
             NONE: number;
             BANNER: number;

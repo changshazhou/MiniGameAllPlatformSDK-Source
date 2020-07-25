@@ -1,5 +1,4 @@
 
-import { BaseUIModule } from "./ui/engine/BaseUIModule";
 import FormUtil from "./ui/FormUtil";
 import Delay from "./framework/Delay";
 import showEndOptions from "./model/showEndOptions";
@@ -30,14 +29,6 @@ class moosnowUI {
 
 
     }
-    /**
-     * UI控制
-     */
-    private mUi: BaseUIModule;
-    public get ui() {
-        return this.mUi;
-    }
-
     /**
      * form UI 操作
      */

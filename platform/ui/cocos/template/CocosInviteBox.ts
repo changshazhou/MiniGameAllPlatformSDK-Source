@@ -1,9 +1,9 @@
-import BaseLogic from "./BaseLogic";
-import EventType from "../../utils/EventType";
-import moosnowAdRow from "../../model/moosnowAdRow";
-import Common from "../../utils/Common";
-import { EntitysName } from "../../config/EntitysName";
-import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
+import BaseLogic from "../../engine/BaseLogic";
+import EventType from "../../../utils/EventType";
+import moosnowAdRow from "../../../model/moosnowAdRow";
+import Common from "../../../utils/Common";
+import { EntitysName } from "../../../config/EntitysName";
+import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
 
 export default class AdInviteBox extends BaseLogic {
 
@@ -62,7 +62,7 @@ export default class AdInviteBox extends BaseLogic {
         moosnow.platform.navigate2Mini(this.mCurrentAdRow);
     }
     public onCancel() {
-        moosnow.entity.hideAllEntity(EntitysName.INVITE_BOX, null)
+        
     }
 
 }
