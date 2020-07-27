@@ -29,7 +29,7 @@ export default class CocosBoxForm extends CocosBaseForm {
     public onShow(data) {
         console.log("this.mTryFromVideo 1 ", this.mTryFromVideo)
         super.onShow(data);
-
+        this.boxLayout.getComponent(cc.Layout).type = cc.Layout.Type.GRID;
         console.log("this.mTryFromVideo 2 ", this.mTryFromVideo)
 
         this.btnNext.active = !this.mTryFromVideo;

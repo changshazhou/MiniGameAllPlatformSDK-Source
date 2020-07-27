@@ -98,9 +98,7 @@ export default class CocosNodeHelper extends NodeHelper {
         layout.spacingX = layoutCfg.spacingX;
         layout.spacingY = layoutCfg.spacingY;
 
-        layout.type = cc.Layout.Type.VERTICAL;  //LayoutAttribute.convertType(layoutCfg.layoutType);
-        layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;//layoutCfg.resizeMode;
-        layout.startAxis = layoutCfg.startAxis;
+        // layout.startAxis = layoutCfg.startAxis;
 
         node.x = layoutCfg.x;
         node.y = layoutCfg.y;
@@ -161,7 +159,7 @@ export default class CocosNodeHelper extends NodeHelper {
         let mask = view.addComponent(cc.Mask);
         // mask.type = cc.Mask.Type.RECT;
 
-        this.createWidget(view, new WidgetAttribute(true, true, true, true));
+        // this.createWidget(view, new WidgetAttribute(true, true, true, true));
 
 
         view.width = this.convertWidth(viewCfg.scroll.width);
@@ -243,7 +241,7 @@ export default class CocosNodeHelper extends NodeHelper {
 
     public static changeText(text: cc.Node, msg: string) {
         if (!text) {
-            console.log('对象不存在,赋值失败')
+            // console.log('对象不存在,赋值失败')
             return;
         }
         let lab = text.getComponent(cc.Label)

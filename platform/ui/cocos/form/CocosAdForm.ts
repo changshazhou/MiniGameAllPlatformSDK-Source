@@ -29,9 +29,9 @@ export default class CocosAdForm extends CocosBaseForm {
     public floatContainer: any = null;
     public floatFull: any = null;
 
-    public bannerContainer: any = null;
-    public bannerContainer_view: any = null;
-    public bannerContainer_layout: any = null;
+    public bannerContainer: cc.Node = null;
+    public bannerContainer_view: cc.Node = null;
+    public bannerContainer_layout: cc.Node = null;
 
 
     public leftContainer: any = null;
@@ -450,7 +450,7 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public willShow(data) {
         this.addListener();
-        
+
         this.mAdItemList = [];
         this.mScrollVec = []
         // this.addEvent();
@@ -494,6 +494,14 @@ export default class CocosAdForm extends CocosBaseForm {
             this.FormData.callback();
         var param = {}
 
+        this.initBanner();
+    }
+
+    private initBanner() {
+        let layout = this.bannerContainer_layout.getComponent(cc.Layout);
+        
+        layout.type = cc.Layout.Type.HORIZONTAL;
+        layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
         this.initView(this.bannerContainer_view, this.bannerContainer_layout, "banner", "bannerAdItem");
         //控制显示广告  后续补充
     }

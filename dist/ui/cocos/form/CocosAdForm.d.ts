@@ -14,9 +14,9 @@ export default class CocosAdForm extends CocosBaseForm {
     btnBack: any;
     floatContainer: any;
     floatFull: any;
-    bannerContainer: any;
-    bannerContainer_view: any;
-    bannerContainer_layout: any;
+    bannerContainer: cc.Node;
+    bannerContainer_view: cc.Node;
+    bannerContainer_layout: cc.Node;
     leftContainer: any;
     leftView: any;
     leftLayout: any;
@@ -98,4 +98,5 @@ export default class CocosAdForm extends CocosBaseForm {
     displayChange(data: any, callback?: any): void;
     private displayAd;
     onShow(data: any): void;
+    private initBanner;
 }

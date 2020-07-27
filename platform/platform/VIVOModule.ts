@@ -360,6 +360,13 @@ export default class VIVOModule extends PlatformModule {
         adshow && adshow.then(() => {
             console.log("banner广告展示成功");
         }).catch((err) => {
+            moosnow.http.getAllConfig(res => {
+                if (res.bannerErrorShowInter == 1) {
+                    console.log('banner加载出错，用插屏代替')
+                    this.showInter();
+                }
+            })
+
             switch (err.code) {
                 case 30003:
                     console.log("新用户1天内不能曝光Banner，请将手机时间调整为1天后，退出游戏重新进入")
@@ -467,7 +474,7 @@ export default class VIVOModule extends PlatformModule {
             this.inter.offError();
             this.inter = null;
         }
-
+        console.log('创建插屏广告');
         this.inter = window[this.platformName].createInterstitialAd({
             posId: this.interId
         });
@@ -478,6 +485,7 @@ export default class VIVOModule extends PlatformModule {
     };
 
     public showInter() {
+
         this.prepareInter();
     }
     public _onInterLoad() {
@@ -544,8 +552,8 @@ export default class VIVOModule extends PlatformModule {
     public _onNativeError(err) {
         this.nativeLoading = false;
         this.nativeAdResult = null;
-        console.log('原生加载出错，用插屏代替')
-        this.showInter();
+
+
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
                 console.log(MSG.NATIVE_ERROR, err,)
@@ -606,6 +614,12 @@ export default class VIVOModule extends PlatformModule {
             ret && ret.then(() => {
                 console.log('加载完成')
             }).catch((err) => {
+                moosnow.http.getAllConfig(res => {
+                    if (res.nativeErrorShowInter == 1) {
+                        console.log('原生加载出错，用插屏代替')
+                        this.showInter();
+                    }
+                })
                 this.nativeCb(null);
             })
 

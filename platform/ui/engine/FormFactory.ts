@@ -93,14 +93,14 @@ export default class FormFactory {
                 break;
             }
         }
-        console.log('addForm2Quene 1 ', this._FormQuene)
+        // console.log('addForm2Quene 1 ', this._FormQuene)
         if (idx != -1) {
             this._FormQuene[idx].addForm(formNode, formLogic);
         }
         else
             this._FormQuene.push(new FormQuene(name, formNode, formLogic));
 
-        console.log('addForm2Quene 2 ', this._FormQuene)
+        // console.log('addForm2Quene 2 ', this._FormQuene)
     }
     /**
      * 根据逻辑类回收
