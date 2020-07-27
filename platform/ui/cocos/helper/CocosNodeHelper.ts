@@ -109,6 +109,7 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static createProgressBar(parent: cc.Node, progressBarCfg: ProgressBarAttribute): cc.Node {
+
         let node = this.createNode(progressBarCfg.name, progressBarCfg);
         let progressBar: cc.ProgressBar = node.addComponent(cc.ProgressBar);
         let sprite = node.addComponent(cc.Sprite);
@@ -117,17 +118,19 @@ export default class CocosNodeHelper extends NodeHelper {
         progressBar.totalLength = 300;
         progressBar.progress = 0.1;
 
+
         node.x = progressBarCfg.x;
         node.y = progressBarCfg.y;
         node.width = this.convertWidth(progressBarCfg.width);
         node.height = this.convertWidth(progressBarCfg.height);
-        parent.addChild(node)
+
 
         if (progressBarCfg.child && progressBarCfg.child.length > 0) {
             let bar = this.createImage(node, NodeAttribute.parse(progressBarCfg.child[0]));
             progressBar.barSprite = bar.getComponent(cc.Sprite);
+            
         }
-
+        parent.addChild(node)
         return node;
     }
 

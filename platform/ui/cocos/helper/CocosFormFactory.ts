@@ -6,6 +6,7 @@ import TextAttribute from "../../attribute/TextAttribute";
 import LayoutAttribute from "../../attribute/LayoutAttribute";
 import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
 import ViewScrollAttribute from "../../attribute/ViewScrollAttribute";
+import LayoutType from "../../../enum/LayoutType";
 
 
 
@@ -27,7 +28,7 @@ export default class CocosFormFactory extends FormFactory {
             let node = null;
             let nodeCfg: NodeAttribute = null;
 
-            if (jsonCfg.type == "progressBar") {
+            if (jsonCfg.type == LayoutType.progressBar) {
                 nodeCfg = ProgressBarAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createProgressBar(parent, nodeCfg as ProgressBarAttribute);
                 if (nodeCfg.child && nodeCfg.child.length > 1) {
@@ -36,15 +37,15 @@ export default class CocosFormFactory extends FormFactory {
                 }
             }
             else {
-                if (jsonCfg.type == 'text') {
+                if (jsonCfg.type == LayoutType.text) {
                     nodeCfg = TextAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
                 }
-                else if (jsonCfg.type == 'layout') {
+                else if (jsonCfg.type == LayoutType.layout) {
                     nodeCfg = LayoutAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
                 }
-                else if (jsonCfg.type == 'view') {
+                else if (jsonCfg.type == LayoutType.view) {
                     nodeCfg = ViewScrollAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createView(parent, nodeCfg as ViewScrollAttribute);
                 }

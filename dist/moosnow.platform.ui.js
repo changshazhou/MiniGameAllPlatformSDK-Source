@@ -1231,11 +1231,11 @@
             node.y = progressBarCfg.y;
             node.width = this.convertWidth(progressBarCfg.width);
             node.height = this.convertWidth(progressBarCfg.height);
-            parent.addChild(node);
             if (progressBarCfg.child && progressBarCfg.child.length > 0) {
                 var bar = this.createImage(node, NodeAttribute.parse(progressBarCfg.child[0]));
                 progressBar.barSprite = bar.getComponent(cc.Sprite);
             }
+            parent.addChild(node);
             return node;
         };
         CocosNodeHelper.createView = function (parent, viewCfg) {
@@ -1442,6 +1442,17 @@
         return ViewScrollAttribute;
     }(NodeAttribute));
 
+    var LayoutType = /** @class */ (function () {
+        function LayoutType() {
+        }
+        LayoutType.image = "image";
+        LayoutType.progressBar = "progressBar";
+        LayoutType.text = "text";
+        LayoutType.layout = "layout";
+        LayoutType.view = "view";
+        return LayoutType;
+    }());
+
     var CocosFormFactory = /** @class */ (function (_super) {
         __extends(CocosFormFactory, _super);
         function CocosFormFactory() {
@@ -1461,7 +1472,7 @@
                 var jsonCfg = children[i];
                 var node = null;
                 var nodeCfg = null;
-                if (jsonCfg.type == "progressBar") {
+                if (jsonCfg.type == LayoutType.progressBar) {
                     nodeCfg = ProgressBarAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createProgressBar(parent, nodeCfg);
                     if (nodeCfg.child && nodeCfg.child.length > 1) {
@@ -1470,15 +1481,15 @@
                     }
                 }
                 else {
-                    if (jsonCfg.type == 'text') {
+                    if (jsonCfg.type == LayoutType.text) {
                         nodeCfg = TextAttribute.parse(jsonCfg);
                         node = CocosNodeHelper.createText(parent, nodeCfg);
                     }
-                    else if (jsonCfg.type == 'layout') {
+                    else if (jsonCfg.type == LayoutType.layout) {
                         nodeCfg = LayoutAttribute.parse(jsonCfg);
                         node = CocosNodeHelper.createLayout(parent, nodeCfg);
                     }
-                    else if (jsonCfg.type == 'view') {
+                    else if (jsonCfg.type == LayoutType.view) {
                         nodeCfg = ViewScrollAttribute.parse(jsonCfg);
                         node = CocosNodeHelper.createView(parent, nodeCfg);
                     }
@@ -2597,8 +2608,9 @@
             this.unschedule(this.onFwUpdate);
         };
         CocosMistouchForm.prototype.subProgress = function () {
-            if (this.mCurrentNum > 0)
-                this.mCurrentNum -= 0.1;
+            this.mCurrentNum -= 0.1;
+            if (this.mCurrentNum < 0)
+                this.mCurrentNum = 0;
         };
         CocosMistouchForm.prototype.bannerClickCallback = function (isOpend) {
             if (isOpend) {
@@ -2649,7 +2661,7 @@
             moosnow.platform.hideBanner();
         };
         CocosMistouchForm.prototype.onFwUpdate = function () {
-            this.clickProgress.progress = this.mCurrentNum / this.mMaxNum;
+            this.clickProgress.getComponent(cc.ProgressBar).progress = this.mCurrentNum / this.mMaxNum;
         };
         return CocosMistouchForm;
     }(CocosBaseForm));

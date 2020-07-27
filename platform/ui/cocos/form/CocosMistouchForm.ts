@@ -7,7 +7,7 @@ import showMistouchOptions from "../../../model/showMistouchOptions";
 
 export default class CocosMistouchForm extends CocosBaseForm {
 
-    clickProgress: any = null;
+    clickProgress: cc.Node = null;
     btnReceive: any = null;
     logo: any = null;
 
@@ -66,8 +66,6 @@ export default class CocosMistouchForm extends CocosBaseForm {
         moosnow.http.getAllConfig(res => {
             this.mBannerClickType = res.bannerClickType
         })
-
-
         this.schedule(this.onFwUpdate, 0.1)
 
     }
@@ -79,8 +77,9 @@ export default class CocosMistouchForm extends CocosBaseForm {
     }
 
     public subProgress() {
-        if (this.mCurrentNum > 0)
-            this.mCurrentNum -= 0.1
+        this.mCurrentNum -= 0.1
+        if (this.mCurrentNum < 0)
+            this.mCurrentNum = 0;
     }
 
     public bannerClickCallback(isOpend) {
@@ -138,6 +137,6 @@ export default class CocosMistouchForm extends CocosBaseForm {
     }
 
     onFwUpdate() {
-        this.clickProgress.progress = this.mCurrentNum / this.mMaxNum
+        this.clickProgress.getComponent(cc.ProgressBar).progress = this.mCurrentNum / this.mMaxNum
     }
 }

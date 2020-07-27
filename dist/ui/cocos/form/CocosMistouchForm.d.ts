@@ -1,7 +1,7 @@
 import CocosBaseForm from "./CocosBaseForm";
 import showMistouchOptions from "../../../model/showMistouchOptions";
 export default class CocosMistouchForm extends CocosBaseForm {
-    clickProgress: any;
+    clickProgress: cc.Node;
     btnReceive: any;
     logo: any;
     mBeginPos: cc.Vec2;
