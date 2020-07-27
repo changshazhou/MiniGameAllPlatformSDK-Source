@@ -5,8 +5,9 @@ import BaseForm from "../../engine/BaseForm";
 import TextAttribute from "../../attribute/TextAttribute";
 import LayoutAttribute from "../../attribute/LayoutAttribute";
 import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
-import ViewScrollAttribute from "../../attribute/ViewScrollAttribute";
+import ViewAttribute from "../../attribute/ViewAttribute";
 import LayoutType from "../../../enum/LayoutType";
+import WidgetAttribute from "../../attribute/WidgetAttribute";
 
 
 
@@ -19,56 +20,61 @@ export default class CocosFormFactory extends FormFactory {
         return this.mInstance;
     }
 
-
-
-
     public _createChild(parent: cc.Node, children: Array<NodeAttribute>) {
         for (let i = 0; i < children.length; i++) {
             let jsonCfg = children[i];
-            let node = null;
-            let nodeCfg: NodeAttribute = null;
+            let node = this.createNode(parent, jsonCfg);
+        }
+    }
 
-            if (jsonCfg.type == LayoutType.progressBar) {
-                nodeCfg = ProgressBarAttribute.parse(jsonCfg);
-                node = CocosNodeHelper.createProgressBar(parent, nodeCfg as ProgressBarAttribute);
-                if (nodeCfg.child && nodeCfg.child.length > 1) {
-                    nodeCfg.child.splice(0, 1)
-                    this._createChild(node, nodeCfg.child);
-                }
+    private createNode(parent: cc.Node, jsonCfg: NodeAttribute) {
+        let node = null;
+        let nodeCfg: NodeAttribute = null;
+        if (jsonCfg.type == LayoutType.progressBar) {
+            nodeCfg = ProgressBarAttribute.parse(jsonCfg);
+            node = CocosNodeHelper.createProgressBar(parent, nodeCfg as ProgressBarAttribute);
+            if (nodeCfg.child && nodeCfg.child.length > 1) {
+                nodeCfg.child.splice(0, 1)
+                this._createChild(node, nodeCfg.child);
+            }
+        }
+        else {
+            if (jsonCfg.type == LayoutType.text) {
+                nodeCfg = TextAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
+            }
+            else if (jsonCfg.type == LayoutType.layout) {
+                nodeCfg = LayoutAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
+            }
+            else if (jsonCfg.type == LayoutType.view) {
+                nodeCfg = ViewAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createView(parent, nodeCfg as ViewAttribute);
+            }
+            else if (jsonCfg.type == LayoutType.widget) {
+                nodeCfg = WidgetAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createWidget(parent, nodeCfg as WidgetAttribute);
             }
             else {
-                if (jsonCfg.type == LayoutType.text) {
-                    nodeCfg = TextAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createText(parent, nodeCfg as TextAttribute);
-                }
-                else if (jsonCfg.type == LayoutType.layout) {
-                    nodeCfg = LayoutAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
-                }
-                else if (jsonCfg.type == LayoutType.view) {
-                    nodeCfg = ViewScrollAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createView(parent, nodeCfg as ViewScrollAttribute);
-                }
-                else {
-                    nodeCfg = NodeAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createImage(parent, nodeCfg);
-                }
-                if (nodeCfg.child && nodeCfg.child.length > 0) {
-                    this._createChild(node, nodeCfg.child);
-                }
+                nodeCfg = NodeAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createImage(parent, nodeCfg);
             }
-
+            if (nodeCfg.child && nodeCfg.child.length > 0) {
+                this._createChild(node, nodeCfg.child);
+            }
         }
+        return node;
     }
 
     private _createUINode(formCfg: NodeAttribute, formLogic: typeof BaseForm, formData?: any, parent?: any): cc.Node {
         if (!parent)
             parent = CocosNodeHelper.canvasNode
-        let formNode = CocosNodeHelper.createImage(parent, formCfg);
-        if (formCfg.isMask)
-            CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
+        let formNode = this.createNode(parent, formCfg);
 
-        this._createChild(formNode, formCfg.child);
+        // if (formCfg.isMask)
+        //     CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
+
+        // this._createChild(formNode, formCfg.child);
 
         let logic = new formLogic();
         logic.initForm(formNode);
@@ -115,7 +121,7 @@ export default class CocosFormFactory extends FormFactory {
     }
 
 
-    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
+    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: () => void, remoteLayout: boolean = true, layoutOptions: any = null) {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
 
@@ -132,15 +138,19 @@ export default class CocosFormFactory extends FormFactory {
             if (remoteLayout) {
                 this.getLayout(url, (res) => {
                     if (res[name]) {
-                        let formCfg = NodeAttribute.parse(res[name]);
+                        let formCfg = res[name];//NodeAttribute.parse(res[name]);
                         formCfg.name = name;
                         this._createUINode(formCfg, formLogic, formData, parent);
                         console.log('_createUINode ', Date.now())
+                        if (callback)
+                            callback()
                     }
                 })
             }
             else {
                 this._createUINode(layoutOptions, formLogic, formData);
+                if (callback)
+                    callback()
             }
         }
     }

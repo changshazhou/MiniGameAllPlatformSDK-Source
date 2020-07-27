@@ -1,11 +1,13 @@
 import NodeHelper from "../../engine/NodeHelper";
 import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
-import ViewAttribute from "../../attribute/ViewScrollAttribute";
+import ViewAttribute from "../../attribute/ViewAttribute";
 import NodeAttribute from "../../attribute/NodeAttribute";
 import TextAttribute from "../../attribute/TextAttribute";
 import LayoutAttribute from "../../attribute/LayoutAttribute";
 import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
+import ScrollAttribute from "../../attribute/ScrollAttribute";
+import WidgetAttribute from "../../attribute/WidgetAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -96,8 +98,8 @@ export default class CocosNodeHelper extends NodeHelper {
         layout.spacingX = layoutCfg.spacingX;
         layout.spacingY = layoutCfg.spacingY;
 
-        layout.type = layoutCfg.layoutType;
-        layout.resizeMode = layoutCfg.mode;
+        layout.type = cc.Layout.Type.VERTICAL;  //LayoutAttribute.convertType(layoutCfg.layoutType);
+        layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;//layoutCfg.resizeMode;
         layout.startAxis = layoutCfg.startAxis;
 
         node.x = layoutCfg.x;
@@ -128,43 +130,67 @@ export default class CocosNodeHelper extends NodeHelper {
         if (progressBarCfg.child && progressBarCfg.child.length > 0) {
             let bar = this.createImage(node, NodeAttribute.parse(progressBarCfg.child[0]));
             progressBar.barSprite = bar.getComponent(cc.Sprite);
-            
+
         }
         parent.addChild(node)
         return node;
     }
 
 
-    public static createView(parent: cc.Node, viewCfg: ViewAttribute) {
-        viewCfg.name = parent.name
-        let node = this.createNode(viewCfg.name + '_scroll', viewCfg);
-        parent.addChild(node);
+    public static createScroll(parent: cc.Node, scrollCfg: ScrollAttribute) {
 
+    }
+
+    public static createView(parent: cc.Node, viewCfg: ViewAttribute) {
+
+        let container = this.createNode(viewCfg.name, viewCfg);
+        parent.addChild(container);
+
+        let node = this.createNode(viewCfg.name + '_scroll', viewCfg);
         let scroll = node.addComponent(cc.ScrollView);
-        scroll.horizontal = true;
+        scroll.horizontal = viewCfg.scroll.horizontal;
         scroll.horizontalScrollBar = null;
+        scroll.verticalScrollBar = null;
+        scroll.vertical = !scroll.horizontal;
+        node.width = this.convertWidth(viewCfg.scroll.width);
+        node.height = this.convertHeight(viewCfg.scroll.height);
+        container.addChild(node);
 
 
         let view = this.createNode(viewCfg.name + "_view");
-        let mask = view.addComponent(cc.Mask)
+        let mask = view.addComponent(cc.Mask);
         // mask.type = cc.Mask.Type.RECT;
+
+        this.createWidget(view, new WidgetAttribute(true, true, true, true));
+
+
+        view.width = this.convertWidth(viewCfg.scroll.width);
+        view.height = this.convertHeight(viewCfg.scroll.height);
         node.addChild(view);
 
 
-        let widget = view.addComponent(cc.Widget);
-        widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom;
-        widget.left = widget.top = widget.right = widget.bottom = 0;
+        viewCfg.layout.name = viewCfg.name + '_layout';
 
-        viewCfg.layout.name = viewCfg.name + '_layout'
-        let layoutNode = this.createLayout(view, viewCfg.layout);
+        let layoutNode = this.createLayout(view, LayoutAttribute.parse(viewCfg.layout));
+        layoutNode.width = this.convertWidth(viewCfg.layout.width);
+        layoutNode.height = this.convertHeight(viewCfg.layout.height);
         return layoutNode;
 
     }
 
-    public static addWidget(view: cc.Node) {
+    public static createWidget(view: cc.Node, widgetCfg: WidgetAttribute) {
+
         let widget = view.addComponent(cc.Widget);
-        widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom;
-        widget.left = widget.top = widget.right = widget.bottom = 0;
+
+        widget.isAlignLeft = widgetCfg.isAlignRight;
+        widget.isAlignTop = widgetCfg.isAlignTop;
+        widget.isAlignRight = widgetCfg.isAlignRight;
+        widget.isAlignBottom = widgetCfg.isAlignBottom;
+
+        widget.left = widgetCfg.left;
+        widget.top = widgetCfg.top;
+        widget.right = widgetCfg.right;
+        widget.bottom = widgetCfg.bottom;
     }
 
 

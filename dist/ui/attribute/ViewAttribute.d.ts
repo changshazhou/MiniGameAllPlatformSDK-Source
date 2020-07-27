@@ -1,12 +1,8 @@
 import NodeAttribute from "./NodeAttribute";
+import LayoutAttribute from "./LayoutAttribute";
+import ScrollAttribute from "./ScrollAttribute";
 export default class ViewAttribute extends NodeAttribute {
     static parse(json: any): ViewAttribute;
-    /**
-    * 文本内容的水平对齐方式
-    */
-    horizontalAlign: string;
-    color: string;
-    fontSize: number;
-    lineHeight: number;
-    text: string;
+    scroll: ScrollAttribute;
+    layout: LayoutAttribute;
 }

@@ -2,7 +2,7 @@ import NodeAttribute from "./NodeAttribute";
 export default class LayoutAttribute extends NodeAttribute {
     static parse(json: any): LayoutAttribute;
     layoutType: cc.Layout.Type;
-    mode: cc.Layout.ResizeMode;
+    resizeMode: cc.Layout.ResizeMode;
     startAxis: cc.Layout.AxisDirection;
     left: number;
     top: number;
@@ -10,4 +10,5 @@ export default class LayoutAttribute extends NodeAttribute {
     bottom: number;
     spacingX: number;
     spacingY: number;
+    static convertType(type: number | string): any;
 }

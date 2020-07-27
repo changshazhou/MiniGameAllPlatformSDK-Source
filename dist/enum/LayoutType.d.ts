@@ -4,4 +4,5 @@ export default class LayoutType {
     static readonly text: string;
     static readonly layout: string;
     static readonly view: string;
+    static readonly widget: string;
 }

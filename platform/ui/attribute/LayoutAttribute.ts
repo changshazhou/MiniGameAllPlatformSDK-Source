@@ -1,4 +1,5 @@
 import NodeAttribute from "./NodeAttribute";
+import Common from "../../utils/Common";
 
 export default class LayoutAttribute extends NodeAttribute {
 
@@ -7,7 +8,7 @@ export default class LayoutAttribute extends NodeAttribute {
     }
 
     public layoutType: cc.Layout.Type = cc.Layout.Type.GRID;
-    public mode: cc.Layout.ResizeMode = cc.Layout.ResizeMode.CONTAINER;
+    public resizeMode: cc.Layout.ResizeMode = cc.Layout.ResizeMode.CONTAINER;
     public startAxis: cc.Layout.AxisDirection = cc.Layout.AxisDirection.HORIZONTAL;
 
     public left: number = 30;
@@ -16,4 +17,19 @@ export default class LayoutAttribute extends NodeAttribute {
     public bottom: number = 30;
     public spacingX: number = 30;
     public spacingY: number = 30;
+
+
+    public static convertType(type: number | string) {
+        if (Common.isString(type)) {
+            if (cc.Layout.Type[type]) {
+                return cc.Layout.Type[type]
+            }
+            else {
+                return cc.Layout.Type.GRID;
+            }
+        }
+        else
+            return type;
+
+    }
 }

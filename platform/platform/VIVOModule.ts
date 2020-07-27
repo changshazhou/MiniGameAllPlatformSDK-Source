@@ -89,7 +89,7 @@ export default class VIVOModule extends PlatformModule {
 
     public supportVersion(version: string | number) {
         let oppoSys = this.getSystemInfoSync();
-        return oppoSys.platformVersion >= version
+        return oppoSys.platformVersionCode >= version
     }
 
 
@@ -458,45 +458,37 @@ export default class VIVOModule extends PlatformModule {
             return;
 
 
-        if (this.supportVersion("1061")) {
-            if (typeof window[this.platformName].createInterstitialAd != "function")
-                return;
-            this.inter = window[this.platformName].createInterstitialAd({
-                adUnitId: this.interId
-            });
-            this.inter.onLoad(this._onInterLoad.bind(this));
-            this.inter.onClose(this._onInterClose.bind(this));
-            this.inter.load()
-        }
-        else {
-            if (typeof window[this.platformName].createInsertAd != "function")
-                return;
-            this.inter = window[this.platformName].createInsertAd({
-                adUnitId: this.interId
-            });
-            this.inter.onLoad(this._onInterLoad.bind(this));
-            this.inter.onShow(this._onInterOnShow.bind(this))
-            this.inter.load()
+        if (!window[this.platformName].createInterstitialAd)
+            return;
+
+        if (this.inter) {
+            this.inter.offLoad();
+            this.inter.offClose();
+            this.inter.offError();
+            this.inter = null;
         }
 
-
+        this.inter = window[this.platformName].createInterstitialAd({
+            posId: this.interId
+        });
+        this.inter.onLoad(this._onInterLoad.bind(this));
+        this.inter.onClose(this._onInterClose.bind(this));
+        this.inter.onError(this._onInterError.bind(this));
+        this.inter.load()
     };
 
     public showInter() {
-        if (this.inter)
-            this.inter.show();
-        else
-            this.interLoadedShow = true
+        this.prepareInter();
     }
     public _onInterLoad() {
-        if (this.interLoadedShow) {
-            if (this.inter) {
-                this.inter.show();
-            }
-            else
-                this.interLoadedShow = false;
+        if (this.inter) {
+            let t = this.inter.show();
+            t && t.then(() => {
+                console.log('插屏广告展示完成');
+            }).catch((err) => {
+                console.log('插屏广告展示失败', err);
+            })
         }
-
     }
     public _onInterOnShow() {
         if (this.inter)
@@ -552,6 +544,8 @@ export default class VIVOModule extends PlatformModule {
     public _onNativeError(err) {
         this.nativeLoading = false;
         this.nativeAdResult = null;
+        console.log('原生加载出错，用插屏代替')
+        this.showInter();
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
                 console.log(MSG.NATIVE_ERROR, err,)

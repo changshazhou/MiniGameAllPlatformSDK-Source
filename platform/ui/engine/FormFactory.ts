@@ -177,6 +177,7 @@ export default class FormFactory {
             if (this.mLayoutQuene.length == 1)
                 moosnow.http.request(url, {}, 'GET', (res) => {
                     this.mCachedLayout = res;
+                    console.log('getLayout call num ', this.mLayoutQuene.length)
                     this.mLayoutQuene.forEach(item => {
                         item(res)
                     })
@@ -207,7 +208,7 @@ export default class FormFactory {
             callback(this.mCachedTemplates);
     }
 
-    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
+    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: Function, remoteLayout: boolean = true, layoutOptions: any = null) {
 
     }
 

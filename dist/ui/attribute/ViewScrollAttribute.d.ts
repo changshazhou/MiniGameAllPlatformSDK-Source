@@ -1,6 +1,8 @@
 import NodeAttribute from "./NodeAttribute";
 import LayoutAttribute from "./LayoutAttribute";
-export default class ViewScrollAttribute extends NodeAttribute {
-    static parse(json: any): ViewScrollAttribute;
+import ScrollAttribute from "./ScrollAttribute";
+export default class ViewAttribute extends NodeAttribute {
+    static parse(json: any): ViewAttribute;
+    scroll: ScrollAttribute;
     layout: LayoutAttribute;
 }

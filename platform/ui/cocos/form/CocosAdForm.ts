@@ -8,6 +8,7 @@ import CocosAdViewItem from "../template/CocosAdViewItem";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
 import AdViewItem from "../../engine/AdViewItem";
+import EventType from "../../../utils/EventType";
 
 
 export default class CocosAdForm extends CocosBaseForm {
@@ -55,7 +56,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private mScrollVec = [];
     private mEndLogic = [];
 
-    public addListener() {
+    private addListener() {
         if (this.btnBack)
             this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
@@ -64,8 +65,11 @@ export default class CocosAdForm extends CocosBaseForm {
             this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
             this.btnSideHide.on(CocosNodeEvent.TOUCH_START, this.sideIn, this)
+
+
+        moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
     }
-    public removeListener() {
+    private removeListener() {
         if (this.btnBack)
             this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this)
         if (this.exportClose)
@@ -74,7 +78,23 @@ export default class CocosAdForm extends CocosBaseForm {
             this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this)
         if (this.btnSideHide)
             this.btnSideHide.off(CocosNodeEvent.TOUCH_START, this.sideIn, this)
+
+
+        moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
     }
+
+    private onAdChange(data) {
+
+        this.displayChange(data.showAd, data.callback)
+
+        if (!isNaN(data.zIndex)) {
+            this.node.zIndex = data.zIndex;
+        }
+        else {
+            this.node.zIndex = 9999;
+        }
+    }
+
     public onBack() {
         if (this.mBackCall) {
             this.mBackCall();
@@ -374,6 +394,8 @@ export default class CocosAdForm extends CocosBaseForm {
 
 
     public hideAllAdNode(templateName: string, node: cc.Node) {
+        if (!node)
+            return;
         for (let i = 0; i < node.childrenCount; i++) {
             CocosFormFactory.instance.hideNodeByTemplate(templateName, node.children[i]);
             i--
@@ -427,14 +449,19 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param data 
      */
     public willShow(data) {
-
+        this.addListener();
+        
         this.mAdItemList = [];
         this.mScrollVec = []
         // this.addEvent();
         this.displayChange(data.showAd, data.callback)
-
-
     }
+
+    public willHide() {
+        super.willShow();
+        this.removeListener();
+    }
+
     public displayChange(data, callback = null) {
         this.mShowAd = data;
         this.displayAd(true)

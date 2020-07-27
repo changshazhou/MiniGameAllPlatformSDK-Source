@@ -33,8 +33,9 @@ export default class CocosAdForm extends CocosBaseForm {
     private mBackCall;
     private mScrollVec;
     private mEndLogic;
-    addListener(): void;
-    removeListener(): void;
+    private addListener;
+    private removeListener;
+    private onAdChange;
     onBack(): void;
     get FormData(): showAdOptions;
     private mFloatIndex;
@@ -93,6 +94,7 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param data
      */
     willShow(data: any): void;
+    willHide(): void;
     displayChange(data: any, callback?: any): void;
     private displayAd;
     onShow(data: any): void;
