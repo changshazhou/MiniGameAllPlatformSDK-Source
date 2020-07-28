@@ -1,4 +1,5 @@
 import WidgetAttribute from "./WidgetAttribute";
+import GridAttribute from "./GridAttribute";
 
 export default class NodeAttribute {
 
@@ -23,5 +24,6 @@ export default class NodeAttribute {
     public type: string = "";
     public active: boolean = true;
     public widget: WidgetAttribute = null;
+    public grid: GridAttribute = null;
 
 }

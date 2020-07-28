@@ -1094,6 +1094,11 @@ export default class PlatformModule extends BaseModule {
     }
 
 
+    public exitApplication() {
+
+    }
+
+
     /**
      * 连续不断的显示和隐藏 banner
      */

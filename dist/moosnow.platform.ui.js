@@ -543,7 +543,7 @@
         };
         NodeHelper.createText = function (parent, textCfg) {
         };
-        NodeHelper.changeSrc = function (image, url) {
+        NodeHelper.changeSrc = function (image, imgCfg) {
         };
         NodeHelper.createMask = function (parent) {
         };
@@ -1121,6 +1121,7 @@
             this.type = "";
             this.active = true;
             this.widget = null;
+            this.grid = null;
         }
         NodeAttribute.parse = function (json) {
             var temp = __assign(__assign({}, new NodeAttribute()), json);
@@ -1221,13 +1222,15 @@
             return node;
         };
         CocosNodeHelper.createImage = function (parent, imgCfg) {
+            var _this = this;
             var node = this.createNode(imgCfg.name, imgCfg);
-            node.addComponent(cc.Sprite);
-            this.changeSrc(node, imgCfg.url);
+            var sprite = node.addComponent(cc.Sprite);
+            this.changeSrc(node, imgCfg, function () {
+                node.width = _this.convertWidth(imgCfg.width);
+                node.height = _this.convertHeight(imgCfg.height);
+            });
             node.x = imgCfg.x;
             node.y = imgCfg.y;
-            node.width = this.convertWidth(imgCfg.width);
-            node.height = this.convertHeight(imgCfg.height);
             parent.addChild(node);
             return node;
         };
@@ -1292,7 +1295,7 @@
             var node = this.createNode(progressBarCfg.name, progressBarCfg);
             var progressBar = node.addComponent(cc.ProgressBar);
             var sprite = node.addComponent(cc.Sprite);
-            this.changeSrc(node, progressBarCfg.url);
+            this.changeSrc(node, progressBarCfg);
             progressBar.mode = cc.ProgressBar.Mode.HORIZONTAL; // progressBarCfg.mode;
             progressBar.totalLength = 300;
             progressBar.progress = 0.1;
@@ -1310,8 +1313,7 @@
         CocosNodeHelper.createScroll = function (parent, scrollCfg) {
         };
         CocosNodeHelper.createView = function (parent, viewCfg) {
-            var container = this.createNode(viewCfg.name, viewCfg);
-            parent.addChild(container);
+            var container = this.createImage(parent, viewCfg);
             parent.width = this.convertWidth(viewCfg.scroll.width);
             parent.height = this.convertHeight(viewCfg.scroll.height);
             if (viewCfg.widget) {
@@ -1338,7 +1340,7 @@
             layoutNode.width = this.convertWidth(viewCfg.layout.width);
             layoutNode.height = this.convertHeight(viewCfg.layout.height);
             scroll.content = layoutNode;
-            return layoutNode;
+            return container;
         };
         CocosNodeHelper.createWidget = function (view, widgetCfg) {
             var widget = view.addComponent(cc.Widget);
@@ -1356,49 +1358,63 @@
             // }
             return view;
         };
-        CocosNodeHelper.changeSrc = function (image, url, callback) {
+        CocosNodeHelper.changeSrc = function (image, imgCfg, callback) {
+            var _this = this;
             var sprite;
             if (image instanceof cc.Node)
                 sprite = image.getComponent(cc.Sprite);
             else
                 sprite = image;
-            if (url) {
-                var isRemote = url.indexOf("http") != -1;
+            if (imgCfg.url) {
+                var isRemote = imgCfg.url.indexOf("http") != -1;
                 if (cc.resources)
                     if (!isRemote)
-                        cc.resources.load(url, cc.SpriteFrame, function (err, spriteFrame) {
+                        cc.resources.load(imgCfg.url, cc.SpriteFrame, function (err, spriteFrame) {
                             if (err) {
                                 console.log(' cc.resources.load ', err);
                                 return;
                             }
                             sprite.spriteFrame = spriteFrame;
+                            _this.setSpriteGrid(imgCfg, sprite);
                             if (callback)
                                 callback();
                         });
                     else {
-                        cc.assetManager.loadRemote(url, cc.SpriteFrame, function (err, tex) {
+                        cc.assetManager.loadRemote(imgCfg.url, cc.SpriteFrame, function (err, tex) {
                             if (err) {
                                 console.log(' cc.assetManager.loadRemote ', err);
                                 return;
                             }
                             var spriteFrame = new cc.SpriteFrame(tex);
                             sprite.spriteFrame = spriteFrame;
+                            _this.setSpriteGrid(imgCfg, sprite);
                             if (callback)
                                 callback();
                         });
                     }
                 else {
-                    cc.loader.load(url, function (err, tex) {
+                    cc.loader.load(imgCfg.url, function (err, tex) {
                         if (err) {
                             console.log(' cc.loader.load ', err);
                             return;
                         }
                         var spriteFrame = new cc.SpriteFrame(tex);
                         sprite.spriteFrame = spriteFrame;
+                        _this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
                     });
                 }
+            }
+        };
+        CocosNodeHelper.setSpriteGrid = function (imgCfg, sprite) {
+            if (imgCfg.grid) {
+                sprite.type = cc.Sprite.Type.SLICED;
+                sprite.spriteFrame.insetLeft = imgCfg.grid.left;
+                sprite.spriteFrame.insetTop = imgCfg.grid.top;
+                sprite.spriteFrame.insetRight = imgCfg.grid.right;
+                sprite.spriteFrame.insetBottom = imgCfg.grid.bottom;
+                // (sprite as any).markForUpdateRenderData(true);
             }
         };
         CocosNodeHelper.changeText = function (text, msg) {
@@ -1419,7 +1435,7 @@
             var widget = mask.addComponent(cc.Widget);
             widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
             widget.left = widget.top = widget.right = widget.bottom = 0;
-            this.changeSrc(mask, skin, function () {
+            this.changeSrc(mask, { url: skin }, function () {
                 sprite.type = cc.Sprite.Type.SLICED;
                 sprite.spriteFrame.insetBottom = 1;
                 sprite.spriteFrame.insetTop = 1;
@@ -1573,6 +1589,11 @@
             else if (jsonCfg.type == LayoutType.view) {
                 nodeCfg = ViewAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createView(parent, nodeCfg);
+                if (nodeCfg.child && nodeCfg.child.length > 0) {
+                    // debugger
+                    this._createChild(node, nodeCfg.child);
+                    console.log('');
+                }
             }
             else {
                 if (jsonCfg.type == LayoutType.text) {
@@ -2230,7 +2251,7 @@
         };
         CocosTryForm.prototype.onShow = function (data) {
             _super.prototype.onShow.call(this, data);
-            CocosNodeHelper.changeSrc(this.logo, this.FormData.skinUrl);
+            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl });
             this.addListener();
         };
         CocosTryForm.prototype.onHide = function (data) {
@@ -2804,7 +2825,7 @@
         CocosAdViewItem.prototype.updateUI = function () {
             var _this = this;
             var _a = this.logo, width = _a.width, height = _a.height;
-            CocosNodeHelper.changeSrc(this.logo, this.mAdItem.img, function () {
+            CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img }, function () {
                 // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
                 _this.logo.width = width;
                 _this.logo.height = height;

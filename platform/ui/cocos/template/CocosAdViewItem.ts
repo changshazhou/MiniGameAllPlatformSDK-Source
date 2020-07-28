@@ -3,6 +3,7 @@ import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "../form/CocosBaseForm";
 import EventType from "../../../utils/EventType";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
+import NodeAttribute from "../../attribute/NodeAttribute";
 
 export default class CocosAdViewItem extends CocosBaseForm {
 
@@ -46,7 +47,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
     private updateUI() {
         let { width, height } = this.logo;
-        CocosNodeHelper.changeSrc(this.logo, this.mAdItem.img, () => {
+        CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img } as NodeAttribute, () => {
             // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
             this.logo.width = width;
             this.logo.height = height;

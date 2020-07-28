@@ -42,6 +42,11 @@ export default class CocosFormFactory extends FormFactory {
         else if (jsonCfg.type == LayoutType.view) {
             nodeCfg = ViewAttribute.parse(jsonCfg);
             node = CocosNodeHelper.createView(parent, nodeCfg as ViewAttribute);
+            if (nodeCfg.child && nodeCfg.child.length > 0) {
+                // debugger
+                this._createChild(node, nodeCfg.child);
+                console.log('')
+            }
         }
         else {
             if (jsonCfg.type == LayoutType.text) {

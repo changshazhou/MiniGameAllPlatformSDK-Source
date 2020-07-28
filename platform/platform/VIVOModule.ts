@@ -618,18 +618,20 @@ export default class VIVOModule extends PlatformModule {
         if (this.native) {
             let ret = this.native.load();
             ret && ret.then(() => {
-                console.log('加载完成')
+                console.log('原生广告加载完成');
             }).catch((err) => {
-                console.log('加载失败')
-                // moosnow.http.getAllConfig(res => {
-                //     if (res.nativeErrorShowInter == 1) {
-                //         console.log('原生加载出错，用插屏代替')
-                //         this.showInter();
-                //     }
-                //     else {
-                //         this.nativeCb(null);
-                //     }
-                // })
+
+                console.log('原生广告加载失败');
+
+                moosnow.http.getAllConfig(res => {
+                    if (res.nativeErrorShowInter == 1) {
+                        console.log('原生加载出错，用插屏代替')
+                        this.showInter();
+                    }
+                    else {
+                        this.nativeCb(null);
+                    }
+                })
 
             })
         }
@@ -703,5 +705,11 @@ export default class VIVOModule extends PlatformModule {
                 console.log('创建成功')
             }
         })
+    }
+
+    public exitApplication() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].exitApplication) return;
+        window[this.platformName].exitApplication();
     }
 }

@@ -499,7 +499,6 @@ export default class CocosAdForm extends CocosBaseForm {
 
     private initBanner() {
         let layout = this.bannerContainer_layout.getComponent(cc.Layout);
-        
         layout.type = cc.Layout.Type.HORIZONTAL;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
         this.initView(this.bannerContainer_view, this.bannerContainer_layout, "banner", "bannerAdItem");

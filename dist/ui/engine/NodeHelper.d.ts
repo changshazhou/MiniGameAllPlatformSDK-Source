@@ -7,6 +7,6 @@ export default class NodeHelper {
     static createNode(): void;
     static createImage(parent: cc.Node, imgCfg: NodeAttribute): void;
     static createText(parent: cc.Node, textCfg: TextAttribute): void;
-    static changeSrc(image: any, url: string): void;
+    static changeSrc(image: any, imgCfg: NodeAttribute): void;
     static createMask(parent: any): void;
 }

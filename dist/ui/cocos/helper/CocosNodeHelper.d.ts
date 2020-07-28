@@ -21,7 +21,8 @@ export default class CocosNodeHelper extends NodeHelper {
     static createScroll(parent: cc.Node, scrollCfg: ScrollAttribute): void;
     static createView(parent: cc.Node, viewCfg: ViewAttribute): cc.Node;
     static createWidget(view: cc.Node, widgetCfg: WidgetAttribute): cc.Node;
-    static changeSrc(image: cc.Node | cc.Sprite, url: string, callback?: Function): void;
+    static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: Function): void;
+    static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite): void;
     static changeText(text: cc.Node, msg: string): void;
     static createMask(parent: cc.Node, maskUrl?: string): void;
     private static onMaskMouseDown;

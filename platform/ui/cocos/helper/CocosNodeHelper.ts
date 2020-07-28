@@ -29,12 +29,16 @@ export default class CocosNodeHelper extends NodeHelper {
     public static createImage(parent: cc.Node, imgCfg: NodeAttribute): cc.Node {
 
         let node = this.createNode(imgCfg.name, imgCfg);
-        node.addComponent(cc.Sprite);
-        this.changeSrc(node, imgCfg.url);
+        let sprite = node.addComponent(cc.Sprite);
+        this.changeSrc(node, imgCfg, () => {
+            node.width = this.convertWidth(imgCfg.width);
+            node.height = this.convertHeight(imgCfg.height);
+        });
         node.x = imgCfg.x;
         node.y = imgCfg.y;
-        node.width = this.convertWidth(imgCfg.width);
-        node.height = this.convertHeight(imgCfg.height);
+
+
+
         parent.addChild(node)
         return node;
     }
@@ -114,7 +118,7 @@ export default class CocosNodeHelper extends NodeHelper {
         let node = this.createNode(progressBarCfg.name, progressBarCfg);
         let progressBar: cc.ProgressBar = node.addComponent(cc.ProgressBar);
         let sprite = node.addComponent(cc.Sprite);
-        this.changeSrc(node, progressBarCfg.url);
+        this.changeSrc(node, progressBarCfg);
         progressBar.mode = cc.ProgressBar.Mode.HORIZONTAL;  // progressBarCfg.mode;
         progressBar.totalLength = 300;
         progressBar.progress = 0.1;
@@ -142,11 +146,10 @@ export default class CocosNodeHelper extends NodeHelper {
 
     public static createView(parent: cc.Node, viewCfg: ViewAttribute) {
 
-        let container = this.createNode(viewCfg.name, viewCfg);
-        parent.addChild(container);
-
+        let container = this.createImage(parent, viewCfg);
         parent.width = this.convertWidth(viewCfg.scroll.width);
         parent.height = this.convertHeight(viewCfg.scroll.height);
+
         if (viewCfg.widget) {
             this.createWidget(parent, WidgetAttribute.parse(viewCfg.widget))
         }
@@ -190,7 +193,11 @@ export default class CocosNodeHelper extends NodeHelper {
 
         scroll.content = layoutNode;
 
-        return layoutNode;
+
+
+        return container;
+
+
 
     }
 
@@ -217,50 +224,64 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
 
-    public static changeSrc(image: cc.Node | cc.Sprite, url: string, callback?: Function) {
+    public static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: Function) {
         let sprite;
         if (image instanceof cc.Node)
             sprite = image.getComponent(cc.Sprite);
         else
             sprite = image;
 
-        if (url) {
-            let isRemote = url.indexOf("http") != -1
+        if (imgCfg.url) {
+            let isRemote = imgCfg.url.indexOf("http") != -1
             if (cc.resources)
                 if (!isRemote)
-                    cc.resources.load(url, cc.SpriteFrame, (err, spriteFrame: cc.SpriteFrame) => {
+                    cc.resources.load(imgCfg.url, cc.SpriteFrame, (err, spriteFrame: cc.SpriteFrame) => {
                         if (err) {
                             console.log(' cc.resources.load ', err)
                             return;
                         }
                         sprite.spriteFrame = spriteFrame;
+                        this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
                     });
                 else {
-                    cc.assetManager.loadRemote(url, cc.SpriteFrame, (err, tex: cc.Texture2D) => {
+                    cc.assetManager.loadRemote(imgCfg.url, cc.SpriteFrame, (err, tex: cc.Texture2D) => {
                         if (err) {
                             console.log(' cc.assetManager.loadRemote ', err)
                             return;
                         }
                         let spriteFrame = new cc.SpriteFrame(tex)
                         sprite.spriteFrame = spriteFrame;
+                        this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
                     });
                 }
             else {
-                cc.loader.load(url, (err, tex) => {
+                cc.loader.load(imgCfg.url, (err, tex) => {
                     if (err) {
                         console.log(' cc.loader.load ', err)
                         return;
                     }
                     let spriteFrame = new cc.SpriteFrame(tex)
                     sprite.spriteFrame = spriteFrame;
+                    this.setSpriteGrid(imgCfg, sprite);
                     if (callback)
                         callback();
                 });
             }
+        }
+    }
+
+    public static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite) {
+        if (imgCfg.grid) {
+            sprite.type = cc.Sprite.Type.SLICED;
+            sprite.spriteFrame.insetLeft = imgCfg.grid.left;
+            sprite.spriteFrame.insetTop = imgCfg.grid.top;
+            sprite.spriteFrame.insetRight = imgCfg.grid.right;
+            sprite.spriteFrame.insetBottom = imgCfg.grid.bottom;
+            // (sprite as any).markForUpdateRenderData(true);
         }
     }
 
@@ -284,7 +305,7 @@ export default class CocosNodeHelper extends NodeHelper {
         widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
         widget.left = widget.top = widget.right = widget.bottom = 0;
 
-        this.changeSrc(mask, skin, () => {
+        this.changeSrc(mask, { url: skin } as NodeAttribute, () => {
             sprite.type = cc.Sprite.Type.SLICED;
             sprite.spriteFrame.insetBottom = 1;
             sprite.spriteFrame.insetTop = 1;

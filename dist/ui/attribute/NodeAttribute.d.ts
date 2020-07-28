@@ -1,4 +1,5 @@
 import WidgetAttribute from "./WidgetAttribute";
+import GridAttribute from "./GridAttribute";
 export default class NodeAttribute {
     static parse(json: any): NodeAttribute;
     name: string;
@@ -14,4 +15,5 @@ export default class NodeAttribute {
     type: string;
     active: boolean;
     widget: WidgetAttribute;
+    grid: GridAttribute;
 }

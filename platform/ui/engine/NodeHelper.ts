@@ -30,7 +30,7 @@ export default class NodeHelper {
 
     }
 
-    public static changeSrc(image: any, url: string) {
+    public static changeSrc(image: any, imgCfg: NodeAttribute) {
 
     }
 

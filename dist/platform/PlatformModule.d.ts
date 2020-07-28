@@ -235,6 +235,7 @@ export default class PlatformModule extends BaseModule {
      *
      */
     showAutoBanner(): void;
+    exitApplication(): void;
     /**
      * 连续不断的显示和隐藏 banner
      */

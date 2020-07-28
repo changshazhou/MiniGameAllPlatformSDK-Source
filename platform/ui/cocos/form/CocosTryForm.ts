@@ -5,6 +5,7 @@ import CocosFormFactory from "../helper/CocosFormFactory";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import CheckboxComponent from "../common/CheckboxComponent";
+import NodeAttribute from "../../attribute/NodeAttribute";
 
 export default class CocosTryForm extends CocosBaseForm {
 
@@ -47,7 +48,7 @@ export default class CocosTryForm extends CocosBaseForm {
 
     public onShow(data) {
         super.onShow(data);
-        CocosNodeHelper.changeSrc(this.logo, this.FormData.skinUrl);
+        CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl } as NodeAttribute);
         this.addListener();
     }
 
