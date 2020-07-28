@@ -30,7 +30,7 @@ export default class CocosAdForm extends CocosBaseForm {
     public floatFull: any = null;
 
     public bannerContainer: cc.Node = null;
-    public bannerContainer_view: cc.Node = null;
+    public bannerContainer_scroll: cc.Node = null;
     public bannerContainer_layout: cc.Node = null;
 
 
@@ -55,6 +55,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private mBackCall: Function
     private mScrollVec = [];
     private mEndLogic = [];
+    private mMoveSpeed: number = 2;
 
     private addListener() {
         if (this.btnBack)
@@ -183,7 +184,7 @@ export default class CocosAdForm extends CocosBaseForm {
             })
         ))
     }
-    public pushScroll(scrollView: any, layout: any) {
+    public pushScroll(scrollView: cc.ScrollView, layout: cc.Layout) {
         if (layout.type == cc.Layout.Type.GRID) {
             if (scrollView.vertical) {
                 this.mScrollVec.push({
@@ -380,7 +381,7 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param entityName  需要绑定的预制体
      * @param callback  跳转取消时的回调函数
      */
-    public initView(scrollView: any, layout: cc.Node, position: string, templateName: string, callback?: Function) {
+    public initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function) {
 
         this.loadAd((res) => {
             this.hideAllAdNode(templateName, layout);
@@ -388,7 +389,7 @@ export default class CocosAdForm extends CocosBaseForm {
             source.forEach((item, idx) => {
                 CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
             })
-            this.pushScroll(scrollView, layout);
+            this.pushScroll(scrollView, layout.getComponent(cc.Layout));
         })
     }
 
@@ -403,8 +404,6 @@ export default class CocosAdForm extends CocosBaseForm {
     }
 
 
-
-    private mMoveSpeed: number = 2;
     public onFwUpdate() {
         for (let i = 0; i < this.mScrollVec.length; i++) {
             let item = this.mScrollVec[i];
@@ -460,6 +459,7 @@ export default class CocosAdForm extends CocosBaseForm {
     public willHide() {
         super.willShow();
         this.removeListener();
+        this.unschedule(this.onFwUpdate);
     }
 
     public displayChange(data, callback = null) {
@@ -492,16 +492,25 @@ export default class CocosAdForm extends CocosBaseForm {
         super.onShow(data);
         if (this.FormData && this.FormData.callback)
             this.FormData.callback();
-        var param = {}
+        moosnow.http.getAllConfig(res => {
+            if (res) {
+                if (!isNaN(res.adScrollViewSpeed))
+                    this.mMoveSpeed = parseFloat(res.adScrollViewSpeed);
+            }
+        })
 
+        this.schedule(this.onFwUpdate, 0.016)
         this.initBanner();
+
+
     }
 
     private initBanner() {
         let layout = this.bannerContainer_layout.getComponent(cc.Layout);
+        let scrollView = this.bannerContainer_scroll.getComponent(cc.ScrollView);
         layout.type = cc.Layout.Type.HORIZONTAL;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-        this.initView(this.bannerContainer_view, this.bannerContainer_layout, "banner", "bannerAdItem");
+        this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
         //控制显示广告  后续补充
     }
 

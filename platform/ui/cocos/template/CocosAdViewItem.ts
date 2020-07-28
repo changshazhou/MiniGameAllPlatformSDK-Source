@@ -13,11 +13,11 @@ export default class CocosAdViewItem extends CocosBaseForm {
     public nameBg: cc.Node = null;
     public mAdItem: moosnowAdRow;
 
-    public addListener() {
+    private addListener() {
         this.logo.on(CocosNodeEvent.TOUCH_END, this.onClickAd, this)
     }
 
-    public removeListener() {
+    private removeListener() {
         this.logo.off(CocosNodeEvent.TOUCH_END, this.onClickAd, this)
     }
 
@@ -37,7 +37,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
         super.willShow(cell);
         this.mAdItem = cell;
         this.updateUI();
-
+        this.addListener();
     }
 
     public refreshImg(cell: moosnowAdRow) {

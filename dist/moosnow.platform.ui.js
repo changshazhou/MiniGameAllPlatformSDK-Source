@@ -2832,6 +2832,7 @@ var mx = (function () {
             _super.prototype.willShow.call(this, cell);
             this.mAdItem = cell;
             this.updateUI();
+            this.addListener();
         };
         CocosAdViewItem.prototype.refreshImg = function (cell) {
             this.mAdItem = cell;
@@ -3067,7 +3068,7 @@ var mx = (function () {
             _this.floatContainer = null;
             _this.floatFull = null;
             _this.bannerContainer = null;
-            _this.bannerContainer_view = null;
+            _this.bannerContainer_scroll = null;
             _this.bannerContainer_layout = null;
             _this.leftContainer = null;
             _this.leftView = null;
@@ -3083,12 +3084,12 @@ var mx = (function () {
             _this.mPrevShowAd = moosnow.AD_POSITION.NONE;
             _this.mScrollVec = [];
             _this.mEndLogic = [];
+            _this.mMoveSpeed = 2;
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
             _this.mFloatCache = {};
             _this.mSecond = 3;
             _this.mAdItemList = [];
-            _this.mMoveSpeed = 2;
             return _this;
         }
         CocosAdForm.prototype.addListener = function () {
@@ -3376,7 +3377,7 @@ var mx = (function () {
                 source.forEach(function (item, idx) {
                     CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
                 });
-                _this.pushScroll(scrollView, layout);
+                _this.pushScroll(scrollView, layout.getComponent(cc.Layout));
             });
         };
         CocosAdForm.prototype.hideAllAdNode = function (templateName, node) {
@@ -3437,6 +3438,7 @@ var mx = (function () {
         CocosAdForm.prototype.willHide = function () {
             _super.prototype.willShow.call(this);
             this.removeListener();
+            this.unschedule(this.onFwUpdate);
         };
         CocosAdForm.prototype.displayChange = function (data, callback) {
             if (callback === void 0) { callback = null; }
@@ -3459,17 +3461,25 @@ var mx = (function () {
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         };
         CocosAdForm.prototype.onShow = function (data) {
+            var _this = this;
             _super.prototype.onShow.call(this, data);
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
-            var param = {};
+            moosnow.http.getAllConfig(function (res) {
+                if (res) {
+                    if (!isNaN(res.adScrollViewSpeed))
+                        _this.mMoveSpeed = parseFloat(res.adScrollViewSpeed);
+                }
+            });
+            this.schedule(this.onFwUpdate, 0.016);
             this.initBanner();
         };
         CocosAdForm.prototype.initBanner = function () {
             var layout = this.bannerContainer_layout.getComponent(cc.Layout);
+            var scrollView = this.bannerContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.HORIZONTAL;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            this.initView(this.bannerContainer_view, this.bannerContainer_layout, "banner", "bannerAdItem");
+            this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
             //控制显示广告  后续补充
         };
         return CocosAdForm;

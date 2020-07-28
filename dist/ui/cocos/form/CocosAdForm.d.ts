@@ -15,7 +15,7 @@ export default class CocosAdForm extends CocosBaseForm {
     floatContainer: any;
     floatFull: any;
     bannerContainer: cc.Node;
-    bannerContainer_view: cc.Node;
+    bannerContainer_scroll: cc.Node;
     bannerContainer_layout: cc.Node;
     leftContainer: any;
     leftView: any;
@@ -33,6 +33,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private mBackCall;
     private mScrollVec;
     private mEndLogic;
+    private mMoveSpeed;
     private addListener;
     private removeListener;
     private onAdChange;
@@ -48,7 +49,7 @@ export default class CocosAdForm extends CocosBaseForm {
     floatAnim(floatNode: any): void;
     sideOut(): void;
     sideIn(): void;
-    pushScroll(scrollView: any, layout: any): void;
+    pushScroll(scrollView: cc.ScrollView, layout: cc.Layout): void;
     private addAd;
     private removeAd;
     private hasAd;
@@ -85,9 +86,8 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param entityName  需要绑定的预制体
      * @param callback  跳转取消时的回调函数
      */
-    initView(scrollView: any, layout: cc.Node, position: string, templateName: string, callback?: Function): void;
+    initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function): void;
     hideAllAdNode(templateName: string, node: cc.Node): void;
-    private mMoveSpeed;
     onFwUpdate(): void;
     /**
      *
