@@ -34,7 +34,7 @@ export default class CocosNodeHelper extends NodeHelper {
         node.x = imgCfg.x;
         node.y = imgCfg.y;
         node.width = this.convertWidth(imgCfg.width);
-        node.height = this.convertWidth(imgCfg.height);
+        node.height = this.convertHeight(imgCfg.height);
         parent.addChild(node)
         return node;
     }
@@ -105,6 +105,7 @@ export default class CocosNodeHelper extends NodeHelper {
         node.width = this.convertWidth(layoutCfg.width);
         node.height = this.convertWidth(layoutCfg.height);
         parent.addChild(node)
+
         return node;
     }
 
@@ -144,9 +145,16 @@ export default class CocosNodeHelper extends NodeHelper {
         let container = this.createNode(viewCfg.name, viewCfg);
         parent.addChild(container);
 
+        parent.width = this.convertWidth(viewCfg.scroll.width);
+        parent.height = this.convertHeight(viewCfg.scroll.height);
+        if (viewCfg.widget) {
+            this.createWidget(parent, WidgetAttribute.parse(viewCfg.widget))
+        }
+
+
         let node = this.createNode(viewCfg.name + '_scroll', viewCfg);
         let scroll = node.addComponent(cc.ScrollView);
-        scroll.horizontal = viewCfg.scroll.horizontal;
+        scroll.horizontal = !!viewCfg.scroll.horizontal;
         scroll.horizontalScrollBar = null;
         scroll.verticalScrollBar = null;
         scroll.vertical = !scroll.horizontal;
@@ -155,16 +163,23 @@ export default class CocosNodeHelper extends NodeHelper {
         container.addChild(node);
 
 
+
+
+
+
+
         let view = this.createNode(viewCfg.name + "_view");
-        let mask = view.addComponent(cc.Mask);
+        view.addComponent(cc.Mask);
         // mask.type = cc.Mask.Type.RECT;
 
         // this.createWidget(view, new WidgetAttribute(true, true, true, true));
 
-
         view.width = this.convertWidth(viewCfg.scroll.width);
         view.height = this.convertHeight(viewCfg.scroll.height);
+
         node.addChild(view);
+
+
 
 
         viewCfg.layout.name = viewCfg.name + '_layout';
@@ -172,6 +187,9 @@ export default class CocosNodeHelper extends NodeHelper {
         let layoutNode = this.createLayout(view, LayoutAttribute.parse(viewCfg.layout));
         layoutNode.width = this.convertWidth(viewCfg.layout.width);
         layoutNode.height = this.convertHeight(viewCfg.layout.height);
+
+        scroll.content = layoutNode;
+
         return layoutNode;
 
     }
@@ -184,11 +202,18 @@ export default class CocosNodeHelper extends NodeHelper {
         widget.isAlignTop = widgetCfg.isAlignTop;
         widget.isAlignRight = widgetCfg.isAlignRight;
         widget.isAlignBottom = widgetCfg.isAlignBottom;
+        widget.isAbsoluteLeft
 
         widget.left = widgetCfg.left;
         widget.top = widgetCfg.top;
         widget.right = widgetCfg.right;
         widget.bottom = widgetCfg.bottom;
+
+        // if (widgetCfg.isAlignBottom) {
+        //     view.y = -(view.parent.height - view.height) / 2 + widgetCfg.bottom
+        // }
+
+        return view;
     }
 
 

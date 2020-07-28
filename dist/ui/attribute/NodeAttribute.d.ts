@@ -1,3 +1,4 @@
+import WidgetAttribute from "./WidgetAttribute";
 export default class NodeAttribute {
     static parse(json: any): NodeAttribute;
     name: string;
@@ -12,4 +13,5 @@ export default class NodeAttribute {
     event: Array<string>;
     type: string;
     active: boolean;
+    widget: WidgetAttribute;
 }

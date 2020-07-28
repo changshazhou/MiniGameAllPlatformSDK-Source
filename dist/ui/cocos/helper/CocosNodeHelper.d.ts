@@ -20,7 +20,7 @@ export default class CocosNodeHelper extends NodeHelper {
     static createProgressBar(parent: cc.Node, progressBarCfg: ProgressBarAttribute): cc.Node;
     static createScroll(parent: cc.Node, scrollCfg: ScrollAttribute): void;
     static createView(parent: cc.Node, viewCfg: ViewAttribute): cc.Node;
-    static createWidget(view: cc.Node, widgetCfg: WidgetAttribute): void;
+    static createWidget(view: cc.Node, widgetCfg: WidgetAttribute): cc.Node;
     static changeSrc(image: cc.Node | cc.Sprite, url: string, callback?: Function): void;
     static changeText(text: cc.Node, msg: string): void;
     static createMask(parent: cc.Node, maskUrl?: string): void;

@@ -38,6 +38,11 @@ export default class CocosFormFactory extends FormFactory {
                 this._createChild(node, nodeCfg.child);
             }
         }
+
+        else if (jsonCfg.type == LayoutType.view) {
+            nodeCfg = ViewAttribute.parse(jsonCfg);
+            node = CocosNodeHelper.createView(parent, nodeCfg as ViewAttribute);
+        }
         else {
             if (jsonCfg.type == LayoutType.text) {
                 nodeCfg = TextAttribute.parse(jsonCfg);
@@ -47,10 +52,6 @@ export default class CocosFormFactory extends FormFactory {
                 nodeCfg = LayoutAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createLayout(parent, nodeCfg as LayoutAttribute);
             }
-            else if (jsonCfg.type == LayoutType.view) {
-                nodeCfg = ViewAttribute.parse(jsonCfg);
-                node = CocosNodeHelper.createView(parent, nodeCfg as ViewAttribute);
-            }
             else if (jsonCfg.type == LayoutType.widget) {
                 nodeCfg = WidgetAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createWidget(parent, nodeCfg as WidgetAttribute);
@@ -58,6 +59,9 @@ export default class CocosFormFactory extends FormFactory {
             else {
                 nodeCfg = NodeAttribute.parse(jsonCfg);
                 node = CocosNodeHelper.createImage(parent, nodeCfg);
+            }
+            if (jsonCfg.widget) {
+                CocosNodeHelper.createWidget(node, WidgetAttribute.parse(jsonCfg.widget));
             }
             if (nodeCfg.child && nodeCfg.child.length > 0) {
                 this._createChild(node, nodeCfg.child);
@@ -178,7 +182,7 @@ export default class CocosFormFactory extends FormFactory {
                         let formCfg = NodeAttribute.parse(tempCfg);
                         formCfg.name = name;
                         let node = this._createUINode(formCfg, tempLogic, tempData, parent);
-                        console.log('_createUINode ', Date.now())
+                        // console.log('_createUINode ', Date.now())
                     }
                 })
             }

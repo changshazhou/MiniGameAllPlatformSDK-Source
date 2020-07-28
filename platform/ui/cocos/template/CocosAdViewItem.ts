@@ -30,18 +30,28 @@ export default class CocosAdViewItem extends CocosBaseForm {
         }
     }
 
+
+
     public willShow(cell: moosnowAdRow) {
         super.willShow(cell);
         this.mAdItem = cell;
-        CocosNodeHelper.changeSrc(this.logo, cell.img);
-        CocosNodeHelper.changeText(this.title, cell.title);
+        this.updateUI();
 
     }
 
     public refreshImg(cell: moosnowAdRow) {
         this.mAdItem = cell;
-        CocosNodeHelper.changeSrc(this.logo, cell.img);
-        CocosNodeHelper.changeText(this.title, cell.title);
+        this.updateUI();
+    }
+
+    private updateUI() {
+        let { width, height } = this.logo;
+        CocosNodeHelper.changeSrc(this.logo, this.mAdItem.img, () => {
+            // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
+            this.logo.width = width;
+            this.logo.height = height;
+        });
+        CocosNodeHelper.changeText(this.title, this.mAdItem.title);
     }
 
     public onClickAd() {

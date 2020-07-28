@@ -11,6 +11,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
     initPosition(data: any): void;
     willShow(cell: moosnowAdRow): void;
     refreshImg(cell: moosnowAdRow): void;
+    private updateUI;
     onClickAd(): void;
     private findNextAd;
     private onAdViewChange;

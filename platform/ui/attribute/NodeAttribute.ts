@@ -1,3 +1,5 @@
+import WidgetAttribute from "./WidgetAttribute";
+
 export default class NodeAttribute {
 
     public static parse(json: any): NodeAttribute {
@@ -20,5 +22,6 @@ export default class NodeAttribute {
     public event: Array<string> = [];
     public type: string = "";
     public active: boolean = true;
+    public widget: WidgetAttribute = null;
 
 }

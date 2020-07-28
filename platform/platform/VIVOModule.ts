@@ -24,7 +24,7 @@ export default class VIVOModule extends PlatformModule {
     private initAdService() {
         // this.initBanner();
         // this.initInter();
-        // this._prepareNative();
+        this._prepareNative();
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
@@ -515,7 +515,7 @@ export default class VIVOModule extends PlatformModule {
 
     public _prepareNative(isLoad: boolean = false) {
         if (!window[this.platformName]) return;
-        if (typeof window[this.platformName].createNativeAd != "function") return;
+        if (!window[this.platformName].createNativeAd) return;
         this.native = window[this.platformName].createNativeAd({
             posId: this.nativeId[this.nativeIdIndex]
         })
@@ -530,7 +530,7 @@ export default class VIVOModule extends PlatformModule {
         this.nativeLoading = false;
         console.log(MSG.NATIVE_LOAD_COMPLETED, res)
         if (res && res.adList && res.adList.length > 0) {
-            this.nativeAdResult = res.adList[0];
+            this.nativeAdResult = res.adList[res.adList.length - 1];
             if (!Common.isEmpty(this.nativeAdResult.adId)) {
                 console.log(MSG.NATIVE_REPORT)
                 this.native.reportAdShow({
@@ -544,7 +544,16 @@ export default class VIVOModule extends PlatformModule {
         else {
             console.log(MSG.NATIVE_LIST_NULL)
             if (Common.isFunction(this.nativeCb)) {
-                this.nativeCb(null)
+                moosnow.http.getAllConfig(res => {
+                    if (res.nativeErrorShowInter == 1) {
+                        console.log('原生加载出错，用插屏代替')
+                        this.showInter();
+                    }
+                    else {
+                        this.nativeCb(null)
+                    }
+                })
+
             }
         }
     }
@@ -552,32 +561,29 @@ export default class VIVOModule extends PlatformModule {
     public _onNativeError(err) {
         this.nativeLoading = false;
         this.nativeAdResult = null;
-
-
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
                 console.log(MSG.NATIVE_ERROR, err,)
                 this.nativeIdIndex += 1;
                 this._destroyNative();
-                // this._prepareNative();
-                this.nativeCb(null)
             }
             else {
                 console.log(MSG.NATIVE_NOT_ID_USE)
                 this.nativeIdIndex = 0;
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(null)
-                }
-
             }
-
         }
         else {
             console.log(MSG.NATIVE_ERROR2, err)
-            if (Common.isFunction(this.nativeCb)) {
+        }
+        moosnow.http.getAllConfig(res => {
+            if (res.nativeErrorShowInter == 1) {
+                console.log('原生加载出错，用插屏代替')
+                this.showInter();
+            }
+            else {
                 this.nativeCb(null)
             }
-        }
+        })
     }
 
     public _destroyNative() {
@@ -614,25 +620,24 @@ export default class VIVOModule extends PlatformModule {
             ret && ret.then(() => {
                 console.log('加载完成')
             }).catch((err) => {
-                moosnow.http.getAllConfig(res => {
-                    if (res.nativeErrorShowInter == 1) {
-                        console.log('原生加载出错，用插屏代替')
-                        this.showInter();
-                    }
-                })
-                this.nativeCb(null);
-            })
+                console.log('加载失败')
+                // moosnow.http.getAllConfig(res => {
+                //     if (res.nativeErrorShowInter == 1) {
+                //         console.log('原生加载出错，用插屏代替')
+                //         this.showInter();
+                //     }
+                //     else {
+                //         this.nativeCb(null);
+                //     }
+                // })
 
+            })
         }
         else {
             this._prepareNative(true);
             // if (this.native)
             //     this.native.load();
         }
-        // if (!this.nativeLoading && !Common.isEmpty(this.nativeAdResult)) {
-        //     let nativeData = Common.deepCopy(this.nativeAdResult)
-        //     callback(nativeData)
-        // }
     }
 
     /**

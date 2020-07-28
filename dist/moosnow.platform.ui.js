@@ -395,13 +395,13 @@
                     break;
                 }
             }
-            console.log('addForm2Quene 1 ', this._FormQuene);
+            // console.log('addForm2Quene 1 ', this._FormQuene)
             if (idx != -1) {
                 this._FormQuene[idx].addForm(formNode, formLogic);
             }
             else
                 this._FormQuene.push(new FormQuene(name, formNode, formLogic));
-            console.log('addForm2Quene 2 ', this._FormQuene);
+            // console.log('addForm2Quene 2 ', this._FormQuene)
         };
         /**
          * 根据逻辑类回收
@@ -1120,6 +1120,7 @@
             this.event = [];
             this.type = "";
             this.active = true;
+            this.widget = null;
         }
         NodeAttribute.parse = function (json) {
             var temp = __assign(__assign({}, new NodeAttribute()), json);
@@ -1161,6 +1162,42 @@
         return LayoutAttribute;
     }(NodeAttribute));
 
+    var WidgetAttribute = /** @class */ (function (_super) {
+        __extends(WidgetAttribute, _super);
+        function WidgetAttribute(isAlignLeft, isAlignTop, isAlignRight, isAlignBottom, left, top, right, bottom) {
+            if (isAlignLeft === void 0) { isAlignLeft = false; }
+            if (isAlignTop === void 0) { isAlignTop = false; }
+            if (isAlignRight === void 0) { isAlignRight = false; }
+            if (isAlignBottom === void 0) { isAlignBottom = false; }
+            if (left === void 0) { left = 0; }
+            if (top === void 0) { top = 0; }
+            if (right === void 0) { right = 0; }
+            if (bottom === void 0) { bottom = 0; }
+            var _this = _super.call(this) || this;
+            _this.isAlignLeft = false;
+            _this.isAlignTop = false;
+            _this.isAlignRight = false;
+            _this.isAlignBottom = false;
+            _this.left = 0;
+            _this.top = 0;
+            _this.right = 0;
+            _this.bottom = 0;
+            _this.isAlignLeft = isAlignLeft;
+            _this.isAlignTop = isAlignTop;
+            _this.isAlignRight = isAlignRight;
+            _this.isAlignBottom = isAlignBottom;
+            _this.left = left;
+            _this.top = top;
+            _this.right = right;
+            _this.bottom = bottom;
+            return _this;
+        }
+        WidgetAttribute.parse = function (json) {
+            return __assign(__assign({}, new WidgetAttribute()), json);
+        };
+        return WidgetAttribute;
+    }(NodeAttribute));
+
     var CocosNodeHelper = /** @class */ (function (_super) {
         __extends(CocosNodeHelper, _super);
         function CocosNodeHelper() {
@@ -1190,7 +1227,7 @@
             node.x = imgCfg.x;
             node.y = imgCfg.y;
             node.width = this.convertWidth(imgCfg.width);
-            node.height = this.convertWidth(imgCfg.height);
+            node.height = this.convertHeight(imgCfg.height);
             parent.addChild(node);
             return node;
         };
@@ -1275,9 +1312,14 @@
         CocosNodeHelper.createView = function (parent, viewCfg) {
             var container = this.createNode(viewCfg.name, viewCfg);
             parent.addChild(container);
+            parent.width = this.convertWidth(viewCfg.scroll.width);
+            parent.height = this.convertHeight(viewCfg.scroll.height);
+            if (viewCfg.widget) {
+                this.createWidget(parent, WidgetAttribute.parse(viewCfg.widget));
+            }
             var node = this.createNode(viewCfg.name + '_scroll', viewCfg);
             var scroll = node.addComponent(cc.ScrollView);
-            scroll.horizontal = viewCfg.scroll.horizontal;
+            scroll.horizontal = !!viewCfg.scroll.horizontal;
             scroll.horizontalScrollBar = null;
             scroll.verticalScrollBar = null;
             scroll.vertical = !scroll.horizontal;
@@ -1285,7 +1327,7 @@
             node.height = this.convertHeight(viewCfg.scroll.height);
             container.addChild(node);
             var view = this.createNode(viewCfg.name + "_view");
-            var mask = view.addComponent(cc.Mask);
+            view.addComponent(cc.Mask);
             // mask.type = cc.Mask.Type.RECT;
             // this.createWidget(view, new WidgetAttribute(true, true, true, true));
             view.width = this.convertWidth(viewCfg.scroll.width);
@@ -1295,6 +1337,7 @@
             var layoutNode = this.createLayout(view, LayoutAttribute.parse(viewCfg.layout));
             layoutNode.width = this.convertWidth(viewCfg.layout.width);
             layoutNode.height = this.convertHeight(viewCfg.layout.height);
+            scroll.content = layoutNode;
             return layoutNode;
         };
         CocosNodeHelper.createWidget = function (view, widgetCfg) {
@@ -1303,10 +1346,15 @@
             widget.isAlignTop = widgetCfg.isAlignTop;
             widget.isAlignRight = widgetCfg.isAlignRight;
             widget.isAlignBottom = widgetCfg.isAlignBottom;
+            widget.isAbsoluteLeft;
             widget.left = widgetCfg.left;
             widget.top = widgetCfg.top;
             widget.right = widgetCfg.right;
             widget.bottom = widgetCfg.bottom;
+            // if (widgetCfg.isAlignBottom) {
+            //     view.y = -(view.parent.height - view.height) / 2 + widgetCfg.bottom
+            // }
+            return view;
         };
         CocosNodeHelper.changeSrc = function (image, url, callback) {
             var sprite;
@@ -1355,7 +1403,7 @@
         };
         CocosNodeHelper.changeText = function (text, msg) {
             if (!text) {
-                console.log('对象不存在,赋值失败');
+                // console.log('对象不存在,赋值失败')
                 return;
             }
             var lab = text.getComponent(cc.Label);
@@ -1491,42 +1539,6 @@
         return LayoutType;
     }());
 
-    var WidgetAttribute = /** @class */ (function (_super) {
-        __extends(WidgetAttribute, _super);
-        function WidgetAttribute(isAlignLeft, isAlignTop, isAlignRight, isAlignBottom, left, top, right, bottom) {
-            if (isAlignLeft === void 0) { isAlignLeft = false; }
-            if (isAlignTop === void 0) { isAlignTop = false; }
-            if (isAlignRight === void 0) { isAlignRight = false; }
-            if (isAlignBottom === void 0) { isAlignBottom = false; }
-            if (left === void 0) { left = 0; }
-            if (top === void 0) { top = 0; }
-            if (right === void 0) { right = 0; }
-            if (bottom === void 0) { bottom = 0; }
-            var _this = _super.call(this) || this;
-            _this.isAlignLeft = false;
-            _this.isAlignTop = false;
-            _this.isAlignRight = false;
-            _this.isAlignBottom = false;
-            _this.left = 0;
-            _this.top = 0;
-            _this.right = 0;
-            _this.bottom = 0;
-            _this.isAlignLeft = isAlignLeft;
-            _this.isAlignTop = isAlignTop;
-            _this.isAlignRight = isAlignRight;
-            _this.isAlignBottom = isAlignBottom;
-            _this.left = left;
-            _this.top = top;
-            _this.right = right;
-            _this.bottom = bottom;
-            return _this;
-        }
-        WidgetAttribute.parse = function (json) {
-            return __assign(__assign({}, new WidgetAttribute()), json);
-        };
-        return WidgetAttribute;
-    }(NodeAttribute));
-
     var CocosFormFactory = /** @class */ (function (_super) {
         __extends(CocosFormFactory, _super);
         function CocosFormFactory() {
@@ -1558,6 +1570,10 @@
                     this._createChild(node, nodeCfg.child);
                 }
             }
+            else if (jsonCfg.type == LayoutType.view) {
+                nodeCfg = ViewAttribute.parse(jsonCfg);
+                node = CocosNodeHelper.createView(parent, nodeCfg);
+            }
             else {
                 if (jsonCfg.type == LayoutType.text) {
                     nodeCfg = TextAttribute.parse(jsonCfg);
@@ -1567,10 +1583,6 @@
                     nodeCfg = LayoutAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createLayout(parent, nodeCfg);
                 }
-                else if (jsonCfg.type == LayoutType.view) {
-                    nodeCfg = ViewAttribute.parse(jsonCfg);
-                    node = CocosNodeHelper.createView(parent, nodeCfg);
-                }
                 else if (jsonCfg.type == LayoutType.widget) {
                     nodeCfg = WidgetAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createWidget(parent, nodeCfg);
@@ -1578,6 +1590,9 @@
                 else {
                     nodeCfg = NodeAttribute.parse(jsonCfg);
                     node = CocosNodeHelper.createImage(parent, nodeCfg);
+                }
+                if (jsonCfg.widget) {
+                    CocosNodeHelper.createWidget(node, WidgetAttribute.parse(jsonCfg.widget));
                 }
                 if (nodeCfg.child && nodeCfg.child.length > 0) {
                     this._createChild(node, nodeCfg.child);
@@ -1689,7 +1704,7 @@
                             var formCfg = NodeAttribute.parse(tempCfg);
                             formCfg.name = name;
                             var node = _this._createUINode(formCfg, tempLogic, tempData, parent);
-                            console.log('_createUINode ', Date.now());
+                            // console.log('_createUINode ', Date.now())
                         }
                     });
                 }
@@ -2780,13 +2795,21 @@
         CocosAdViewItem.prototype.willShow = function (cell) {
             _super.prototype.willShow.call(this, cell);
             this.mAdItem = cell;
-            CocosNodeHelper.changeSrc(this.logo, cell.img);
-            CocosNodeHelper.changeText(this.title, cell.title);
+            this.updateUI();
         };
         CocosAdViewItem.prototype.refreshImg = function (cell) {
             this.mAdItem = cell;
-            CocosNodeHelper.changeSrc(this.logo, cell.img);
-            CocosNodeHelper.changeText(this.title, cell.title);
+            this.updateUI();
+        };
+        CocosAdViewItem.prototype.updateUI = function () {
+            var _this = this;
+            var _a = this.logo, width = _a.width, height = _a.height;
+            CocosNodeHelper.changeSrc(this.logo, this.mAdItem.img, function () {
+                // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
+                _this.logo.width = width;
+                _this.logo.height = height;
+            });
+            CocosNodeHelper.changeText(this.title, this.mAdItem.title);
         };
         CocosAdViewItem.prototype.onClickAd = function () {
             var _this = this;
