@@ -19,7 +19,10 @@ export default class CocosNodeHelper extends NodeHelper {
     static createLayout(parent: cc.Node, layoutCfg: LayoutAttribute): cc.Node;
     static createProgressBar(parent: cc.Node, progressBarCfg: ProgressBarAttribute): cc.Node;
     static createScroll(parent: cc.Node, scrollCfg: ScrollAttribute): void;
-    static createView(parent: cc.Node, viewCfg: ViewAttribute): cc.Node;
+    static createView(parent: cc.Node, viewCfg: ViewAttribute): {
+        viewContainer: cc.Node;
+        layoutNode: cc.Node;
+    };
     static createWidget(view: cc.Node, widgetCfg: WidgetAttribute): cc.Node;
     static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: Function): void;
     static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite): void;
@@ -29,4 +32,5 @@ export default class CocosNodeHelper extends NodeHelper {
     static findNodeByName(node: cc.Node, attrName: string): cc.Node;
     static convertWidth(width: string | number): number;
     static convertHeight(height: string | number): number;
+    static convertIndex(zindex: string | number): number;
 }

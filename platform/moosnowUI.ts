@@ -8,7 +8,7 @@ import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showMistouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 
-class moosnowUI {
+export default class moosnowUI {
 
     public showOptions = {
         endOptions: showEndOptions,

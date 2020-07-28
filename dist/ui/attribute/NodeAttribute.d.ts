@@ -16,4 +16,5 @@ export default class NodeAttribute {
     active: boolean;
     widget: WidgetAttribute;
     grid: GridAttribute;
+    zIndex: number;
 }

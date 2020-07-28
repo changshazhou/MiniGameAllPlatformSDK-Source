@@ -28,7 +28,7 @@ import { AD_POSITION } from "./enum/AD_POSITION";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
 
-class moosnow {
+export default class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;

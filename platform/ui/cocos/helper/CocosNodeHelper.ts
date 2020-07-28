@@ -21,8 +21,10 @@ export default class CocosNodeHelper extends NodeHelper {
         }
         let node = new cc.Node();
         node.name = name;
-        if (nodeCfg)
+        if (nodeCfg) {
             node.active = nodeCfg.active;
+            node.zIndex = this.convertIndex(nodeCfg.zIndex);
+        }
         return node;
     }
 
@@ -34,6 +36,8 @@ export default class CocosNodeHelper extends NodeHelper {
             node.width = this.convertWidth(imgCfg.width);
             node.height = this.convertHeight(imgCfg.height);
         });
+        node.width = this.convertWidth(imgCfg.width);
+        node.height = this.convertHeight(imgCfg.height);
         node.x = imgCfg.x;
         node.y = imgCfg.y;
 
@@ -195,7 +199,10 @@ export default class CocosNodeHelper extends NodeHelper {
 
 
 
-        return container;
+        return {
+            viewContainer: container,
+            layoutNode
+        };
 
 
 
@@ -357,5 +364,11 @@ export default class CocosNodeHelper extends NodeHelper {
             return parseInt("" + height)
         }
         return retValue;
+    }
+    public static convertIndex(zindex: string | number): number {
+        if (!isNaN(zindex as number)) {
+            return parseInt("" + zindex)
+        }
+        return 0;
     }
 }
