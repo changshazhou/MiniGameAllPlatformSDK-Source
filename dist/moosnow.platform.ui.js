@@ -3122,16 +3122,15 @@ var mx = (function () {
             return (this.mShowAd & ad) == ad;
         };
         CocosAdForm.prototype.showClose = function (visible) {
-            return;
             this.exportClose.active = false;
             this.exportCloseTxt.active = false;
             this.btnBack.active = false;
-            this.unschedule(this.showExportClose);
+            this.unschedule(this.onWaitShow);
             if (visible && this.hasAd(AD_POSITION.BACK)) {
                 if (this.hasAd(AD_POSITION.WAIT)) {
                     this.mSecond = 3;
-                    this.showExportClose();
-                    this.schedule(this.showExportClose, 1);
+                    this.onWaitShow();
+                    this.schedule(this.onWaitShow, 1);
                 }
                 else {
                     this.exportClose.active = true;
@@ -3145,18 +3144,17 @@ var mx = (function () {
                 this.exportCloseTxt.active = false;
             }
         };
-        CocosAdForm.prototype.showExportClose = function () {
+        CocosAdForm.prototype.onWaitShow = function () {
             this.mSecond -= 1;
             this.exportCloseTxt.active = true;
-            var closeLabel = this.exportCloseTxt.getComponent(cc.Label);
             if (this.mSecond <= 0) {
                 this.exportClose.active = true;
                 this.btnBack.active = true;
                 this.exportCloseTxt.active = false;
-                this.unschedule(this.showExportClose);
+                this.unschedule(this.onWaitShow);
                 return;
             }
-            closeLabel.string = "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED";
+            CocosNodeHelper.changeText(this.exportCloseTxt, "\u5269\u4F59" + this.mSecond + "\u79D2\u53EF\u5173\u95ED");
         };
         CocosAdForm.prototype.setPosition = function (source, position, callback, refresh) {
             if (position === void 0) { position = ""; }
@@ -3337,6 +3335,11 @@ var mx = (function () {
         };
         CocosAdForm.prototype.displayAd = function (visible) {
             var _this = this;
+            this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
+            this.endContainer.active && this.initEnd();
+            this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+            this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
             this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
             if (visible && this.hasAd(AD_POSITION.EXPORT)) {
                 moosnow.http.getAllConfig(function (res) {
@@ -3344,14 +3347,11 @@ var mx = (function () {
                         moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
                     }
                 });
-                this.exportClose.active = false;
-                this.unschedule(this.showExportClose);
-                this.schedule(this.showExportClose, 1);
+                // this.exportClose.active = false;
+                // this.unschedule(this.onWaitShow)
+                // this.schedule(this.onWaitShow, 1)
             }
-            this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
-            this.endContainer.active && this.initEnd();
-            this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
-            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+            this.showClose(visible);
         };
         CocosAdForm.prototype.onShow = function (data) {
             var _this = this;

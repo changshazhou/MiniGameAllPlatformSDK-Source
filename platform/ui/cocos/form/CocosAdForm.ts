@@ -85,13 +85,21 @@ export default class CocosAdForm extends CocosBaseForm {
 
     private onAdChange(data) {
 
+        if (data.showAd != AD_POSITION.RECOVER) {
+            this.mPrevShowAd = this.mShowAd;
+            this.mPrevBackCall = this.mBackCall;
+        }
+        if (data.showAd == AD_POSITION.RECOVER) {
+            data.showAd = this.mPrevShowAd;
+            data.callback = this.mPrevBackCall;
+        }
         this.displayChange(data.showAd, data.callback)
 
         if (!isNaN(data.zIndex)) {
             this.node.zIndex = data.zIndex;
         }
         else {
-            this.node.zIndex = 9999;
+            this.node.zIndex = cc.macro.MAX_ZINDEX;
         }
     }
 
@@ -241,7 +249,7 @@ export default class CocosAdForm extends CocosBaseForm {
         return (this.mShowAd & ad) == ad;
     }
     public showClose(visible) {
-        return;
+
         this.exportClose.active = false;
         this.exportCloseTxt.active = false;
         this.btnBack.active = false;
@@ -497,11 +505,11 @@ export default class CocosAdForm extends CocosBaseForm {
                     moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
                 }
             })
-            this.exportClose.active = false;
-            this.unschedule(this.onWaitShow)
-            this.schedule(this.onWaitShow, 1)
+            // this.exportClose.active = false;
+            // this.unschedule(this.onWaitShow)
+            // this.schedule(this.onWaitShow, 1)
         }
-
+        this.showClose(visible);
 
     }
 
