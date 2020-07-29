@@ -19,11 +19,12 @@ export default class CocosAdForm extends CocosBaseForm {
     topContainer: cc.Node;
     topContainer_scroll: cc.Node;
     topContainer_layout: cc.Node;
-    leftContainer: any;
-    leftView: any;
-    leftLayout: any;
-    rightView: any;
-    rightLayout: any;
+    leftContainer: cc.Node;
+    leftContainer_scroll: cc.Node;
+    leftContainer_layout: cc.Node;
+    rightContainer: cc.Node;
+    rightContainer_scroll: cc.Node;
+    rightContainer_layout: cc.Node;
     sideContainer: any;
     sideView: any;
     sideLayout: any;
@@ -92,7 +93,7 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param entityName  需要绑定的预制体
      * @param callback  跳转取消时的回调函数
      */
-    initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function): void;
+    initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function, source?: Array<moosnowAdRow>): void;
     hideAllAdNode(templateName: string, node: cc.Node): void;
     onFwUpdate(): void;
     private scrollMove;
@@ -107,6 +108,7 @@ export default class CocosAdForm extends CocosBaseForm {
     onShow(data: any): void;
     private initBanner;
     private initTop;
+    private initLeftRight;
     private initEnd;
     private initExport;
 }

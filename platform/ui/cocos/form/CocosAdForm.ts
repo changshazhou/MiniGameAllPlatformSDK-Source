@@ -37,14 +37,15 @@ export default class CocosAdForm extends CocosBaseForm {
     public topContainer_layout: cc.Node = null;
 
 
-    public leftContainer: any = null;
-    public leftView: any = null;
-    public leftLayout: any = null;
+    public leftContainer: cc.Node = null;
+    public leftContainer_scroll: cc.Node = null;
+    public leftContainer_layout: cc.Node = null;
 
-    public rightView: any = null;
-    public rightLayout: any = null;
+    public rightContainer: cc.Node = null;
+    public rightContainer_scroll: cc.Node = null;
+    public rightContainer_layout: cc.Node = null;
+
     public sideContainer: any = null;
-
     public sideView: any = null;
     public sideLayout: any = null;
     public btnSideShow: any = null;
@@ -401,10 +402,11 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param entityName  需要绑定的预制体
      * @param callback  跳转取消时的回调函数
      */
-    public initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function) {
+    public initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function, source?: Array<moosnowAdRow>) {
 
         this.hideAllAdNode(templateName, layout);
-        let source = this.setPosition(this.mAdData.indexLeft, position, callback);
+        if (!source)
+            source = this.setPosition(this.mAdData.indexLeft, position, callback);
         source.forEach((item, idx) => {
             CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
         })
@@ -502,8 +504,8 @@ export default class CocosAdForm extends CocosBaseForm {
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
-        this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
-        this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+        this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
+        this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
         if (visible && this.hasAd(AD_POSITION.EXPORT)) {
             moosnow.http.getAllConfig(res => {
                 if (res.exportAutoNavigate == 1) {
@@ -534,6 +536,7 @@ export default class CocosAdForm extends CocosBaseForm {
             this.initFloatAd();
             this.initExport();
             this.initTop();
+            // this.initLeftRight();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
         })
@@ -556,14 +559,35 @@ export default class CocosAdForm extends CocosBaseForm {
         this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
         //控制显示广告  后续补充
     }
+    private initLeftRight() {
+        let source = this.mAdData.indexLeft;
+        let endNum = source.length / 2
+        let right = source.slice(0, endNum)
+        let left = source.slice(endNum, source.length)
+
+        let leftLayout = this.leftContainer_layout.getComponent(cc.Layout);
+        leftLayout.type = cc.Layout.Type.VERTICAL;
+        leftLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+
+        let rightLayout = this.rightContainer_layout.getComponent(cc.Layout);
+        rightLayout.type = cc.Layout.Type.VERTICAL;
+        rightLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+
+        let leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
+        let rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
+
+        this.initView(leftView, this.topContainer_layout, "left", "leftAdItem", () => { }, left);
+        this.initView(rightView, this.topContainer_layout, "right", "leftAdItem", () => { }, right);
+    }
 
     private initEnd() {
         let layout = this.endContainer_layout.getComponent(cc.Layout);
         layout.type = cc.Layout.Type.GRID;
         layout.resizeMode = cc.Layout.ResizeMode.NONE;
         this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
-
     }
+
+
 
     private initExport() {
         let layout = this.exportContainer_layout.getComponent(cc.Layout);

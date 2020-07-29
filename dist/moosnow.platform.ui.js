@@ -2948,10 +2948,11 @@ var mx = (function () {
             _this.topContainer_scroll = null;
             _this.topContainer_layout = null;
             _this.leftContainer = null;
-            _this.leftView = null;
-            _this.leftLayout = null;
-            _this.rightView = null;
-            _this.rightLayout = null;
+            _this.leftContainer_scroll = null;
+            _this.leftContainer_layout = null;
+            _this.rightContainer = null;
+            _this.rightContainer_scroll = null;
+            _this.rightContainer_layout = null;
             _this.sideContainer = null;
             _this.sideView = null;
             _this.sideLayout = null;
@@ -3264,9 +3265,10 @@ var mx = (function () {
          * @param entityName  需要绑定的预制体
          * @param callback  跳转取消时的回调函数
          */
-        CocosAdForm.prototype.initView = function (scrollView, layout, position, templateName, callback) {
+        CocosAdForm.prototype.initView = function (scrollView, layout, position, templateName, callback, source) {
             this.hideAllAdNode(templateName, layout);
-            var source = this.setPosition(this.mAdData.indexLeft, position, callback);
+            if (!source)
+                source = this.setPosition(this.mAdData.indexLeft, position, callback);
             source.forEach(function (item, idx) {
                 CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
             });
@@ -3351,8 +3353,8 @@ var mx = (function () {
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
             this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
-            this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
-            this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
+            this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
             if (visible && this.hasAd(AD_POSITION.EXPORT)) {
                 moosnow.http.getAllConfig(function (res) {
                     if (res.exportAutoNavigate == 1) {
@@ -3380,6 +3382,7 @@ var mx = (function () {
                 _this.initFloatAd();
                 _this.initExport();
                 _this.initTop();
+                // this.initLeftRight();
                 if (_this.FormData && _this.FormData.callback)
                     _this.FormData.callback();
             });
@@ -3399,6 +3402,22 @@ var mx = (function () {
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
             this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
             //控制显示广告  后续补充
+        };
+        CocosAdForm.prototype.initLeftRight = function () {
+            var source = this.mAdData.indexLeft;
+            var endNum = source.length / 2;
+            var right = source.slice(0, endNum);
+            var left = source.slice(endNum, source.length);
+            var leftLayout = this.leftContainer_layout.getComponent(cc.Layout);
+            leftLayout.type = cc.Layout.Type.VERTICAL;
+            leftLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+            var rightLayout = this.rightContainer_layout.getComponent(cc.Layout);
+            rightLayout.type = cc.Layout.Type.VERTICAL;
+            rightLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+            var leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
+            var rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
+            this.initView(leftView, this.topContainer_layout, "left", "leftAdItem", function () { }, left);
+            this.initView(rightView, this.topContainer_layout, "right", "leftAdItem", function () { }, right);
         };
         CocosAdForm.prototype.initEnd = function () {
             var layout = this.endContainer_layout.getComponent(cc.Layout);
