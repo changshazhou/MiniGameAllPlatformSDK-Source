@@ -17,4 +17,5 @@ export default class NodeAttribute {
     widget: WidgetAttribute;
     grid: GridAttribute;
     zIndex: number;
+    stopPropagation: boolean;
 }

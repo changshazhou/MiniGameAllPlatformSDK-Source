@@ -6,9 +6,17 @@ import vectory from "./Vectory";
  */
 export default class loadAdOptions extends showOptions {
 
-    zIndex?: number = 9999;
+    /**
+     * 浮动导出位置
+     */
     floatPositon?: Array<vectory> = [];
+    /**
+     * 浮动导出模板
+     */
     floatTempletes?: Array<string> = ["floatAdItem1"];
+    /**
+     * 加载完成回调
+     */
     callback?: Function
 
 }

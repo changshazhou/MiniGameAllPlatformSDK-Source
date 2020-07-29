@@ -24,6 +24,8 @@ export default class CocosNodeHelper extends NodeHelper {
         if (nodeCfg) {
             node.active = nodeCfg.active;
             node.zIndex = this.convertIndex(nodeCfg.zIndex);
+            if (nodeCfg.stopPropagation)
+                this.addStopPropagation(node);
         }
         return node;
     }
@@ -216,13 +218,11 @@ export default class CocosNodeHelper extends NodeHelper {
         widget.isAlignTop = widgetCfg.isAlignTop;
         widget.isAlignRight = widgetCfg.isAlignRight;
         widget.isAlignBottom = widgetCfg.isAlignBottom;
-        widget.isAbsoluteLeft
-
         widget.left = widgetCfg.left;
         widget.top = widgetCfg.top;
         widget.right = widgetCfg.right;
         widget.bottom = widgetCfg.bottom;
-
+        widget.updateAlignment();
         // if (widgetCfg.isAlignBottom) {
         //     view.y = -(view.parent.height - view.height) / 2 + widgetCfg.bottom
         // }
@@ -324,11 +324,16 @@ export default class CocosNodeHelper extends NodeHelper {
 
         parent.addChild(mask);
         mask.zIndex = -1;
-        mask.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
+        this.addStopPropagation(mask);
+    }
+
+    public static addStopPropagation(node: cc.Node) {
+        node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
     }
 
     private static onMaskMouseDown(e: cc.Event.EventTouch) {
         e.stopPropagation();
+        console.log('阻止事件传递, node name ', e.getCurrentTarget().name)
     }
 
 

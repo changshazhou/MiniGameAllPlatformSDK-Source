@@ -144,9 +144,8 @@ export default class CocosFormFactory extends FormFactory {
             FormFactory.addForm2Quene(name, formKV)
         }
         else {
-            let url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json'
             if (remoteLayout) {
-                this.getLayout(url, (res) => {
+                this.getLayout((res) => {
                     if (res[name]) {
                         let formCfg = res[name];//NodeAttribute.parse(res[name]);
                         formCfg.name = name;
@@ -170,7 +169,7 @@ export default class CocosFormFactory extends FormFactory {
     public createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
-
+ 
         let formKV = FormFactory.getFormFromCached(name);
         if (formKV) {
             parent.addChild(formKV.formNode);
@@ -180,9 +179,8 @@ export default class CocosFormFactory extends FormFactory {
             FormFactory.addForm2Quene(name, formKV);
         }
         else {
-            let url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json'
             if (remoteLayout) {
-                this.getTemplates(url, (res) => {
+                this.getTemplates((res) => {
                     let tempCfg = res[name]
                     if (tempCfg) {
                         let formCfg = NodeAttribute.parse(tempCfg);

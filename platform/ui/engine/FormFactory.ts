@@ -28,6 +28,9 @@ export class FormQuene {
 }
 export default class FormFactory {
 
+    public layoutUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json'
+    public templatesUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json'
+
     public static mInstance: FormFactory = null;
     public static get instance() {
         if (!this.mInstance)
@@ -171,11 +174,11 @@ export default class FormFactory {
     }
     private mLayoutQuene = [];
     private mCachedLayout: any;
-    public getLayout(url: string, callback: (attr) => void) {
+    public getLayout(callback: (attr) => void) {
         if (!this.mCachedLayout) {
             this.mLayoutQuene.push(callback);
             if (this.mLayoutQuene.length == 1)
-                moosnow.http.request(url, {}, 'GET', (res) => {
+                moosnow.http.request(this.layoutUrl, {}, 'GET', (res) => {
                     this.mCachedLayout = res;
                     console.log('getLayout call num ', this.mLayoutQuene.length)
                     this.mLayoutQuene.forEach(item => {
@@ -191,11 +194,11 @@ export default class FormFactory {
 
     private mTemplatesQuene = [];
     private mCachedTemplates: any;
-    public getTemplates(url: string, callback: (attr) => void) {
+    public getTemplates(callback: (attr) => void) {
         if (!this.mCachedTemplates) {
             this.mTemplatesQuene.push(callback);
             if (this.mTemplatesQuene.length == 1)
-                moosnow.http.request(url, {}, 'GET', (res) => {
+                moosnow.http.request(this.templatesUrl, {}, 'GET', (res) => {
                     this.mCachedTemplates = res;
                     this.mTemplatesQuene.forEach(item => {
                         item(res)

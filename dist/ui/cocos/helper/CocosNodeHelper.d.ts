@@ -28,6 +28,7 @@ export default class CocosNodeHelper extends NodeHelper {
     static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite): void;
     static changeText(text: cc.Node, msg: string): void;
     static createMask(parent: cc.Node, maskUrl?: string): void;
+    static addStopPropagation(node: cc.Node): void;
     private static onMaskMouseDown;
     static findNodeByName(node: cc.Node, attrName: string): cc.Node;
     static convertWidth(width: string | number): number;

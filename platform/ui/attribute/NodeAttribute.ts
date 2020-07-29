@@ -25,6 +25,7 @@ export default class NodeAttribute {
     public active: boolean = true;
     public widget: WidgetAttribute = null;
     public grid: GridAttribute = null;
-    public zIndex: number = 0
+    public zIndex: number = 0;
+    public stopPropagation: boolean = false;
 
 }

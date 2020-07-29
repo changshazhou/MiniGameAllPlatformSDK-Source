@@ -2,16 +2,15 @@ import CocosBaseForm from "./CocosBaseForm";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
 export default class CocosAdForm extends CocosBaseForm {
-    endContainer: any;
-    endContainer_view: any;
-    endContainer_layout: any;
-    exportContainer: any;
-    exportContainer_view: any;
-    exportContainer_layout: any;
-    exportClose: any;
-    exportMask: any;
-    exportCloseTxt: any;
-    btnBack: any;
+    endContainer: cc.Node;
+    endContainer_layout: cc.Node;
+    exportContainer: cc.Node;
+    exportContainer_scroll: cc.Node;
+    exportContainer_layout: cc.Node;
+    exportClose: cc.Node;
+    exportMask: cc.Node;
+    exportCloseTxt: cc.Node;
+    btnBack: cc.Node;
     floatContainer: cc.Node;
     floatFull: any;
     bannerContainer: cc.Node;
@@ -44,6 +43,9 @@ export default class CocosAdForm extends CocosBaseForm {
     private mFloatCache;
     private mAdData;
     private loadAd;
+    private loadNum;
+    private loadManNum;
+    private checkLoad;
     onRandomNavigate(): void;
     onNavigate(): void;
     private floatRuning;
@@ -56,7 +58,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private hasAd;
     showClose(visible: any): void;
     mSecond: number;
-    showExportClose(): void;
+    onWaitShow(): void;
     private mAdItemList;
     setPosition(source: Array<moosnowAdRow>, position?: string, callback?: Function, refresh?: boolean): Array<moosnowAdRow>;
     /**
@@ -77,7 +79,7 @@ export default class CocosAdForm extends CocosBaseForm {
        * @param entityName 需要绑定的预制体
        * @param callback 跳转取消时的回调函数
        */
-    initFiexdView(container: any, layout: any, position: string, templateName: string, callback?: Function): void;
+    initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function): void;
     /**
      * 绑定导出数据
      * @param container 列表容器节点，显示/隐藏  的核心节点
@@ -101,4 +103,6 @@ export default class CocosAdForm extends CocosBaseForm {
     private displayAd;
     onShow(data: any): void;
     private initBanner;
+    private initEnd;
+    private initExport;
 }

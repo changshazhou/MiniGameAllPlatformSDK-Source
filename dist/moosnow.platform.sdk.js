@@ -1749,14 +1749,15 @@ var mx = (function () {
         /**
          * 会自动隐藏的banner
          * 一般用游戏中
-         *
+         * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
          */
-        PlatformModule.prototype.showAutoBanner = function () {
+        PlatformModule.prototype.showAutoBanner = function (remoteOn) {
             var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
             console.log('执行自动显示和隐藏Banner功能');
             moosnow.http.getAllConfig(function (res) {
                 if (res && res.gameBanner == 1) {
-                    moosnow.platform.showBanner();
+                    moosnow.platform.showBanner(remoteOn);
                     var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');

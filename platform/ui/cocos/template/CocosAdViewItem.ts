@@ -23,12 +23,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
 
     public initPosition(data) {
-        if (data) {
-            // if (data.x)
-            //     this.mLogic.node.x = data.x
-            // if (data.y)
-            //     this.mLogic.node.y = data.y
-        }
+      
     }
 
 

@@ -326,6 +326,8 @@ var mx = (function () {
     }());
     var FormFactory = /** @class */ (function () {
         function FormFactory() {
+            this.layoutUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json';
+            this.templatesUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json';
             this.mLayoutQuene = [];
             this.mTemplatesQuene = [];
         }
@@ -470,12 +472,12 @@ var mx = (function () {
                 }
             }
         };
-        FormFactory.prototype.getLayout = function (url, callback) {
+        FormFactory.prototype.getLayout = function (callback) {
             var _this = this;
             if (!this.mCachedLayout) {
                 this.mLayoutQuene.push(callback);
                 if (this.mLayoutQuene.length == 1)
-                    moosnow.http.request(url, {}, 'GET', function (res) {
+                    moosnow.http.request(this.layoutUrl, {}, 'GET', function (res) {
                         _this.mCachedLayout = res;
                         console.log('getLayout call num ', _this.mLayoutQuene.length);
                         _this.mLayoutQuene.forEach(function (item) {
@@ -487,12 +489,12 @@ var mx = (function () {
             else
                 callback(this.mCachedLayout);
         };
-        FormFactory.prototype.getTemplates = function (url, callback) {
+        FormFactory.prototype.getTemplates = function (callback) {
             var _this = this;
             if (!this.mCachedTemplates) {
                 this.mTemplatesQuene.push(callback);
                 if (this.mTemplatesQuene.length == 1)
-                    moosnow.http.request(url, {}, 'GET', function (res) {
+                    moosnow.http.request(this.templatesUrl, {}, 'GET', function (res) {
                         _this.mCachedTemplates = res;
                         _this.mTemplatesQuene.forEach(function (item) {
                             item(res);
@@ -1034,6 +1036,12 @@ var mx = (function () {
         };
         BaseForm.prototype.willShow = function (data) {
             this.mFormData = data;
+            if (data && this.node) {
+                if (data.x)
+                    this.node.x = data.x;
+                if (data.y)
+                    this.node.y = data.y;
+            }
             this.formComponents.forEach(function (item) {
                 item.willShow(data);
             });
@@ -1123,6 +1131,7 @@ var mx = (function () {
             this.widget = null;
             this.grid = null;
             this.zIndex = 0;
+            this.stopPropagation = false;
         }
         NodeAttribute.parse = function (json) {
             var temp = __assign(__assign({}, new NodeAttribute()), json);
@@ -1221,6 +1230,8 @@ var mx = (function () {
             if (nodeCfg) {
                 node.active = nodeCfg.active;
                 node.zIndex = this.convertIndex(nodeCfg.zIndex);
+                if (nodeCfg.stopPropagation)
+                    this.addStopPropagation(node);
             }
             return node;
         };
@@ -1356,11 +1367,11 @@ var mx = (function () {
             widget.isAlignTop = widgetCfg.isAlignTop;
             widget.isAlignRight = widgetCfg.isAlignRight;
             widget.isAlignBottom = widgetCfg.isAlignBottom;
-            widget.isAbsoluteLeft;
             widget.left = widgetCfg.left;
             widget.top = widgetCfg.top;
             widget.right = widgetCfg.right;
             widget.bottom = widgetCfg.bottom;
+            widget.updateAlignment();
             // if (widgetCfg.isAlignBottom) {
             //     view.y = -(view.parent.height - view.height) / 2 + widgetCfg.bottom
             // }
@@ -1454,10 +1465,14 @@ var mx = (function () {
             });
             parent.addChild(mask);
             mask.zIndex = -1;
-            mask.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+            this.addStopPropagation(mask);
+        };
+        CocosNodeHelper.addStopPropagation = function (node) {
+            node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
         };
         CocosNodeHelper.onMaskMouseDown = function (e) {
             e.stopPropagation();
+            console.log('阻止事件传递, node name ', e.getCurrentTarget().name);
         };
         CocosNodeHelper.findNodeByName = function (node, attrName) {
             var targetNode = null;
@@ -1697,9 +1712,8 @@ var mx = (function () {
                 FormFactory.addForm2Quene(name, formKV);
             }
             else {
-                var url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json';
                 if (remoteLayout) {
-                    this.getLayout(url, function (res) {
+                    this.getLayout(function (res) {
                         if (res[name]) {
                             var formCfg = res[name]; //NodeAttribute.parse(res[name]);
                             formCfg.name = name;
@@ -1732,9 +1746,8 @@ var mx = (function () {
                 FormFactory.addForm2Quene(name, formKV);
             }
             else {
-                var url = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json';
                 if (remoteLayout) {
-                    this.getTemplates(url, function (res) {
+                    this.getTemplates(function (res) {
                         var tempCfg = res[name];
                         if (tempCfg) {
                             var formCfg = NodeAttribute.parse(tempCfg);
@@ -2821,12 +2834,6 @@ var mx = (function () {
             this.logo.off(CocosNodeEvent.TOUCH_END, this.onClickAd, this);
         };
         CocosAdViewItem.prototype.initPosition = function (data) {
-            if (data) {
-                // if (data.x)
-                //     this.mLogic.node.x = data.x
-                // if (data.y)
-                //     this.mLogic.node.y = data.y
-            }
         };
         CocosAdViewItem.prototype.willShow = function (cell) {
             _super.prototype.willShow.call(this, cell);
@@ -2924,10 +2931,9 @@ var mx = (function () {
         function CocosAdForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.endContainer = null;
-            _this.endContainer_view = null;
             _this.endContainer_layout = null;
             _this.exportContainer = null;
-            _this.exportContainer_view = null;
+            _this.exportContainer_scroll = null;
             _this.exportContainer_layout = null;
             _this.exportClose = null;
             _this.exportMask = null;
@@ -2956,6 +2962,8 @@ var mx = (function () {
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
             _this.mFloatCache = {};
+            _this.loadNum = 0;
+            _this.loadManNum = 3;
             _this.floatRuning = false;
             _this.mSecond = 3;
             _this.mAdItemList = [];
@@ -3008,19 +3016,29 @@ var mx = (function () {
             var _this = this;
             if (this.mAdData)
                 callback(this.mAdData.indexLeft);
-            else
+            else {
+                this.loadNum = 0;
+                CocosFormFactory.instance.getLayout(function () {
+                    _this.checkLoad(callback);
+                });
+                CocosFormFactory.instance.getTemplates(function () {
+                    _this.checkLoad(callback);
+                });
                 moosnow.ad.getAd(function (res) {
                     _this.mAdData = res;
-                    if (res.indexLeft.length == 0)
-                        return;
-                    callback(_this.mAdData.indexLeft);
+                    _this.checkLoad(callback);
                 });
+            }
+        };
+        CocosAdForm.prototype.checkLoad = function (callback) {
+            this.loadNum++;
+            if (this.loadNum == this.loadManNum) {
+                callback(this.mAdData.indexLeft);
+            }
         };
         CocosAdForm.prototype.onRandomNavigate = function () {
-            this.loadAd(function (res) {
-                var item = res[Common.randomNumBoth(0, res.length - 1)];
-                moosnow.platform.navigate2Mini(item, function () { }, function () {
-                });
+            var item = this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)];
+            moosnow.platform.navigate2Mini(item, function () { }, function () {
             });
         };
         CocosAdForm.prototype.onNavigate = function () {
@@ -3161,33 +3179,32 @@ var mx = (function () {
          */
         CocosAdForm.prototype.initFloatAd = function (callback) {
             var _this = this;
-            this.loadAd(function (res) {
-                if (res.length == 0)
-                    return;
-                var source = _this.setPosition(res, "浮动ICON", callback, true);
-                var showIds = [];
-                _this.FormData.floatTempletes.forEach(function (templateName, idx) {
-                    var showIndex = idx;
-                    if (showIndex > source.length - 1)
-                        showIndex = 0;
-                    var adRow = source[showIndex];
-                    showIds.push({
-                        appid: adRow.appid,
-                        position: adRow.position,
-                        index: idx
-                    });
-                    var point = _this.FormData.floatPositon.length - 1 > idx ? _this.FormData.floatPositon[idx] : _this.FormData.floatPositon[0];
-                    adRow.x = point.x;
-                    adRow.y = point.y;
-                    adRow.source = source;
-                    adRow.showIds = showIds;
-                    CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
+            if (this.mAdData.indexLeft.length == 0)
+                return;
+            var source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
+            var showIds = [];
+            this.FormData.floatPositon.forEach(function (point, idx) {
+                var showIndex = idx;
+                if (showIndex > source.length - 1)
+                    showIndex = 0;
+                var adRow = source[showIndex];
+                showIds.push({
+                    appid: adRow.appid,
+                    position: adRow.position,
+                    index: idx
                 });
-                _this.updateFloat(source);
-                _this.schedule(function () {
-                    _this.updateFloat(source);
-                }, _this.mFloatRefresh);
+                var templateName = _this.FormData.floatTempletes.length - 1 > idx ? _this.FormData.floatTempletes[idx] : _this.FormData.floatTempletes[0];
+                console.log('initFloatAd', point.x, point.y);
+                adRow.x = point.x;
+                adRow.y = point.y;
+                adRow.source = source;
+                adRow.showIds = showIds;
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
             });
+            this.updateFloat(source);
+            this.schedule(function () {
+                _this.updateFloat(source);
+            }, this.mFloatRefresh);
         };
         CocosAdForm.prototype.updateFloat = function (source) {
             for (var key in this.mFloatCache) {
@@ -3209,26 +3226,24 @@ var mx = (function () {
            * @param entityName 需要绑定的预制体
            * @param callback 跳转取消时的回调函数
            */
-        CocosAdForm.prototype.initFiexdView = function (container, layout, position, templateName, callback) {
-            var _this = this;
-            this.loadAd(function (res) {
-                CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
-                var banner = _this.setPosition(res, position, callback, true);
-                var endAd = [];
-                var showIds = [];
-                for (var i = 0; i < 6; i++) {
-                    var item = banner.length > i ? banner[i] : banner[0];
-                    showIds.push({
-                        appid: item.appid,
-                        position: item.position,
-                        index: i
-                    });
-                    endAd.push(item);
-                }
-                endAd.forEach(function (item) {
-                    var adRow = __assign(__assign({}, item), { showIds: showIds, source: banner });
-                    CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout);
+        CocosAdForm.prototype.initFiexdView = function (layout, position, templateName, callback) {
+            CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
+            layout.removeAllChildren();
+            var banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
+            var endAd = [];
+            var showIds = [];
+            for (var i = 0; i < 8; i++) {
+                var item = banner.length > i ? banner[i] : banner[0];
+                showIds.push({
+                    appid: item.appid,
+                    position: item.position,
+                    index: i
                 });
+                endAd.push(item);
+            }
+            endAd.forEach(function (item) {
+                var adRow = __assign(__assign({}, item), { showIds: showIds, source: banner });
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout);
             });
         };
         /**
@@ -3241,15 +3256,12 @@ var mx = (function () {
          * @param callback  跳转取消时的回调函数
          */
         CocosAdForm.prototype.initView = function (scrollView, layout, position, templateName, callback) {
-            var _this = this;
-            this.loadAd(function (res) {
-                _this.hideAllAdNode(templateName, layout);
-                var source = _this.setPosition(res, position, callback);
-                source.forEach(function (item, idx) {
-                    CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
-                });
-                _this.pushScroll(scrollView, layout.getComponent(cc.Layout));
+            this.hideAllAdNode(templateName, layout);
+            var source = this.setPosition(this.mAdData.indexLeft, position, callback);
+            source.forEach(function (item, idx) {
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
             });
+            this.pushScroll(scrollView, layout.getComponent(cc.Layout));
         };
         CocosAdForm.prototype.hideAllAdNode = function (templateName, node) {
             if (!node)
@@ -3324,34 +3336,40 @@ var mx = (function () {
             this.mBackCall = callback;
         };
         CocosAdForm.prototype.displayAd = function (visible) {
-            // this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-            // if (visible && this.hasAd(AD_POSITION.EXPORT)) {
-            //     moosnow.http.getAllConfig(res => {
-            //         if (res.exportAutoNavigate == 1) {
-            //             moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
-            //         }
-            //     })
-            //     this.exportClose.active = false;
-            //     this.unschedule(this.showExportClose)
-            //     this.schedule(this.showExportClose, 1)
-            // }
+            var _this = this;
+            this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+            if (visible && this.hasAd(AD_POSITION.EXPORT)) {
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.exportAutoNavigate == 1) {
+                        moosnow.platform.navigate2Mini(_this.mAdData.indexLeft[Common.randomNumBoth(0, _this.mAdData.indexLeft.length - 1)]);
+                    }
+                });
+                this.exportClose.active = false;
+                this.unschedule(this.showExportClose);
+                this.schedule(this.showExportClose, 1);
+            }
+            this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
+            this.endContainer.active && this.initEnd();
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
         };
         CocosAdForm.prototype.onShow = function (data) {
             var _this = this;
             _super.prototype.onShow.call(this, data);
-            if (this.FormData && this.FormData.callback)
-                this.FormData.callback();
             moosnow.http.getAllConfig(function (res) {
                 if (res) {
                     if (!isNaN(res.adScrollViewSpeed))
                         _this.mMoveSpeed = parseFloat(res.adScrollViewSpeed);
                 }
             });
-            this.schedule(this.onFwUpdate, 0.016);
-            this.initBanner();
-            this.initFloatAd();
+            this.loadAd(function () {
+                _this.schedule(_this.onFwUpdate, 0.016);
+                _this.initBanner();
+                _this.initFloatAd();
+                _this.initExport();
+                if (_this.FormData && _this.FormData.callback)
+                    _this.FormData.callback();
+            });
         };
         CocosAdForm.prototype.initBanner = function () {
             var layout = this.bannerContainer_layout.getComponent(cc.Layout);
@@ -3360,6 +3378,20 @@ var mx = (function () {
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
             this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
             //控制显示广告  后续补充
+        };
+        CocosAdForm.prototype.initEnd = function () {
+            var layout = this.endContainer_layout.getComponent(cc.Layout);
+            layout.type = cc.Layout.Type.GRID;
+            layout.resizeMode = cc.Layout.ResizeMode.NONE;
+            this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
+        };
+        CocosAdForm.prototype.initExport = function () {
+            var layout = this.exportContainer_layout.getComponent(cc.Layout);
+            var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
+            layout.type = cc.Layout.Type.GRID;
+            layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+            layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
+            this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
         };
         return CocosAdForm;
     }(CocosBaseForm));
@@ -3402,8 +3434,13 @@ var mx = (function () {
         __extends(loadAdOptions, _super);
         function loadAdOptions() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.zIndex = 9999;
+            /**
+             * 浮动导出位置
+             */
             _this.floatPositon = [];
+            /**
+             * 浮动导出模板
+             */
             _this.floatTempletes = ["floatAdItem1"];
             return _this;
         }
@@ -3430,7 +3467,9 @@ var mx = (function () {
             CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
         };
         FormUtil.prototype.loadAd = function (options) {
-            CocosFormFactory.instance.showForm("adForm", CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, options.callback);
+            CocosFormFactory.instance.showForm("adForm", CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
+                console.log('create ad form');
+            });
         };
         /**
          * 显示广告

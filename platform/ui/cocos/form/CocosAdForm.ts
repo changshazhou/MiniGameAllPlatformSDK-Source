@@ -8,23 +8,23 @@ import CocosAdViewItem from "../template/CocosAdViewItem";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
 import EventType from "../../../utils/EventType";
+import CocosNodeHelper from "../helper/CocosNodeHelper";
 
 
 export default class CocosAdForm extends CocosBaseForm {
 
-    public endContainer: any = null;
-    public endContainer_view: any = null;
-    public endContainer_layout: any = null;
+    public endContainer: cc.Node = null;
+    public endContainer_layout: cc.Node = null;
 
-    public exportContainer: any = null;
-    public exportContainer_view: any = null;
-    public exportContainer_layout: any = null;
+    public exportContainer: cc.Node = null;
+    public exportContainer_scroll: cc.Node = null;
+    public exportContainer_layout: cc.Node = null;
 
-    public exportClose: any = null;
-    public exportMask: any = null;
-    public exportCloseTxt: any = null;
+    public exportClose: cc.Node = null;
+    public exportMask: cc.Node = null;
+    public exportCloseTxt: cc.Node = null;
+    public btnBack: cc.Node = null;
 
-    public btnBack: any = null;
     public floatContainer: cc.Node = null;
     public floatFull: any = null;
 
@@ -115,21 +115,33 @@ export default class CocosAdForm extends CocosBaseForm {
     private loadAd(callback?: (res: Array<moosnowAdRow>) => void) {
         if (this.mAdData)
             callback(this.mAdData.indexLeft)
-        else
+        else {
+            this.loadNum = 0;
+            CocosFormFactory.instance.getLayout(() => {
+                this.checkLoad(callback);
+            })
+            CocosFormFactory.instance.getTemplates(() => {
+                this.checkLoad(callback);
+            })
             moosnow.ad.getAd((res) => {
                 this.mAdData = res;
-                if (res.indexLeft.length == 0)
-                    return;
-                callback(this.mAdData.indexLeft)
+                this.checkLoad(callback);
             })
+        }
+    }
+    private loadNum = 0;
+    private loadManNum = 3;
+    private checkLoad(callback?: Function) {
+        this.loadNum++
+        if (this.loadNum == this.loadManNum) {
+            callback(this.mAdData.indexLeft)
+        }
     }
 
     public onRandomNavigate() {
-        this.loadAd(res => {
-            let item = res[Common.randomNumBoth(0, res.length - 1)];
-            moosnow.platform.navigate2Mini(item, () => { }, () => {
+        let item = this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)];
+        moosnow.platform.navigate2Mini(item, () => { }, () => {
 
-            })
         })
 
     }
@@ -234,13 +246,13 @@ export default class CocosAdForm extends CocosBaseForm {
         this.exportCloseTxt.active = false;
         this.btnBack.active = false;
 
-        this.unschedule(this.showExportClose)
+        this.unschedule(this.onWaitShow)
 
         if (visible && this.hasAd(AD_POSITION.BACK)) {
             if (this.hasAd(AD_POSITION.WAIT)) {
                 this.mSecond = 3;
-                this.showExportClose();
-                this.schedule(this.showExportClose, 1);
+                this.onWaitShow();
+                this.schedule(this.onWaitShow, 1);
             }
             else {
                 this.exportClose.active = true;
@@ -255,18 +267,18 @@ export default class CocosAdForm extends CocosBaseForm {
         }
     }
     public mSecond: number = 3
-    public showExportClose() {
+    public onWaitShow() {
         this.mSecond -= 1;
         this.exportCloseTxt.active = true;
-        let closeLabel = this.exportCloseTxt.getComponent(cc.Label)
         if (this.mSecond <= 0) {
             this.exportClose.active = true;
             this.btnBack.active = true;
             this.exportCloseTxt.active = false;
-            this.unschedule(this.showExportClose)
+            this.unschedule(this.onWaitShow)
             return;
         }
-        closeLabel.string = `剩余${this.mSecond}秒可关闭`
+        CocosNodeHelper.changeText(this.exportCloseTxt, `剩余${this.mSecond}秒可关闭`)
+
     }
 
     private mAdItemList = [];
@@ -289,36 +301,35 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public initFloatAd(callback?: Function) {
 
-        this.loadAd((res) => {
-            if (res.length == 0)
-                return;
-            let source = this.setPosition(res, "浮动ICON", callback, true);
+        if (this.mAdData.indexLeft.length == 0)
+            return;
+        let source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
 
-            let showIds = [];
+        let showIds = [];
 
-            this.FormData.floatTempletes.forEach((templateName, idx) => {
-                let showIndex = idx;
-                if (showIndex > source.length - 1)
-                    showIndex = 0;
-                let adRow = source[showIndex] as any;
-                showIds.push({
-                    appid: adRow.appid,
-                    position: adRow.position,
-                    index: idx
-                })
-                let point = this.FormData.floatPositon.length - 1 > idx ? this.FormData.floatPositon[idx] as any : this.FormData.floatPositon[0];
-                adRow.x = point.x;
-                adRow.y = point.y;
-                adRow.source = source;
-                adRow.showIds = showIds;
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
-
+        this.FormData.floatPositon.forEach((point, idx) => {
+            let showIndex = idx;
+            if (showIndex > source.length - 1)
+                showIndex = 0;
+            let adRow = source[showIndex] as any;
+            showIds.push({
+                appid: adRow.appid,
+                position: adRow.position,
+                index: idx
             })
-            this.updateFloat(source);
-            this.schedule(() => {
-                this.updateFloat(source);
-            }, this.mFloatRefresh);
+            let templateName = this.FormData.floatTempletes.length - 1 > idx ? this.FormData.floatTempletes[idx] as any : this.FormData.floatTempletes[0];
+            console.log('initFloatAd', point.x, point.y)
+            adRow.x = point.x;
+            adRow.y = point.y;
+            adRow.source = source;
+            adRow.showIds = showIds;
+            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
+
         })
+        this.updateFloat(source);
+        this.schedule(() => {
+            this.updateFloat(source);
+        }, this.mFloatRefresh);
 
     }
 
@@ -347,31 +358,28 @@ export default class CocosAdForm extends CocosBaseForm {
        * @param entityName 需要绑定的预制体
        * @param callback 跳转取消时的回调函数
        */
-    public initFiexdView(container: any, layout: any, position: string, templateName: string, callback?: Function) {
+    public initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function) {
 
-        this.loadAd((res) => {
+        CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
+        layout.removeAllChildren();
 
-            CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
-
-            let banner = this.setPosition(res, position, callback, true);
-            let endAd: Array<moosnowAdRow> = [];
-            let showIds = [];
-            for (let i = 0; i < 6; i++) {
-                let item = banner.length > i ? banner[i] : banner[0];
-                showIds.push({
-                    appid: item.appid,
-                    position: item.position,
-                    index: i
-                })
-                endAd.push(item);
-            }
-            endAd.forEach(item => {
-                let adRow = { ...item, showIds, source: banner }
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout)
+        let banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
+        let endAd: Array<moosnowAdRow> = [];
+        let showIds = [];
+        for (let i = 0; i < 8; i++) {
+            let item = banner.length > i ? banner[i] : banner[0];
+            showIds.push({
+                appid: item.appid,
+                position: item.position,
+                index: i
             })
+            endAd.push(item);
+        }
+        endAd.forEach(item => {
+            let adRow = { ...item, showIds, source: banner }
+            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout)
         })
     }
-
     /**
      * 绑定导出数据
      * @param container 列表容器节点，显示/隐藏  的核心节点
@@ -383,14 +391,12 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function) {
 
-        this.loadAd((res) => {
-            this.hideAllAdNode(templateName, layout);
-            let source = this.setPosition(res, position, callback);
-            source.forEach((item, idx) => {
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
-            })
-            this.pushScroll(scrollView, layout.getComponent(cc.Layout));
+        this.hideAllAdNode(templateName, layout);
+        let source = this.setPosition(this.mAdData.indexLeft, position, callback);
+        source.forEach((item, idx) => {
+            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
         })
+        this.pushScroll(scrollView, layout.getComponent(cc.Layout));
     }
 
 
@@ -479,30 +485,29 @@ export default class CocosAdForm extends CocosBaseForm {
     }
 
     private displayAd(visible: boolean) {
-
-        // this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
-        // if (visible && this.hasAd(AD_POSITION.EXPORT)) {
-        //     moosnow.http.getAllConfig(res => {
-        //         if (res.exportAutoNavigate == 1) {
-        //             moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
-        //         }
-        //     })
-
-        //     this.exportClose.active = false;
-        //     this.unschedule(this.showExportClose)
-        //     this.schedule(this.showExportClose, 1)
-        // }
-
+        this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
+        this.endContainer.active && this.initEnd();
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+        this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
+        this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
+        if (visible && this.hasAd(AD_POSITION.EXPORT)) {
+            moosnow.http.getAllConfig(res => {
+                if (res.exportAutoNavigate == 1) {
+                    moosnow.platform.navigate2Mini(this.mAdData.indexLeft[Common.randomNumBoth(0, this.mAdData.indexLeft.length - 1)])
+                }
+            })
+            this.exportClose.active = false;
+            this.unschedule(this.onWaitShow)
+            this.schedule(this.onWaitShow, 1)
+        }
 
 
     }
 
     public onShow(data) {
         super.onShow(data);
-        if (this.FormData && this.FormData.callback)
-            this.FormData.callback();
+
         moosnow.http.getAllConfig(res => {
             if (res) {
                 if (!isNaN(res.adScrollViewSpeed))
@@ -510,10 +515,14 @@ export default class CocosAdForm extends CocosBaseForm {
             }
         })
 
-        this.schedule(this.onFwUpdate, 0.016)
-        this.initBanner();
-        this.initFloatAd();
-
+        this.loadAd(() => {
+            this.schedule(this.onFwUpdate, 0.016)
+            this.initBanner();
+            this.initFloatAd();
+            this.initExport();
+            if (this.FormData && this.FormData.callback)
+                this.FormData.callback();
+        })
     }
 
     private initBanner() {
@@ -523,5 +532,22 @@ export default class CocosAdForm extends CocosBaseForm {
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
         this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
         //控制显示广告  后续补充
+    }
+
+    private initEnd() {
+        let layout = this.endContainer_layout.getComponent(cc.Layout);
+        layout.type = cc.Layout.Type.GRID;
+        layout.resizeMode = cc.Layout.ResizeMode.NONE;
+        this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
+
+    }
+
+    private initExport() {
+        let layout = this.exportContainer_layout.getComponent(cc.Layout);
+        let scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
+        layout.type = cc.Layout.Type.GRID;
+        layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+        layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
+        this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
     }
 }

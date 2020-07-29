@@ -60,6 +60,12 @@ export default class BaseForm extends BaseModule {
 
     willShow(data?) {
         this.mFormData = data;
+        if (data && this.node) {
+            if (data.x)
+                this.node.x = data.x
+            if (data.y)
+                this.node.y = data.y
+        }
         this.formComponents.forEach(item => {
             item.willShow(data);
         })
