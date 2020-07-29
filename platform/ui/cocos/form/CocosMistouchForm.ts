@@ -4,6 +4,7 @@ import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "./CocosBaseForm";
 import Common from "../../../utils/Common";
 import showMistouchOptions from "../../../model/showMistouchOptions";
+import { AD_POSITION } from "../../../enum/AD_POSITION";
 
 export default class CocosMistouchForm extends CocosBaseForm {
 
@@ -58,7 +59,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
         this.mNavigateIndex = Common.randomNumBoth(3, this.mMaxNum - 2);
         this.addEvent();
         this.schedule(this.subProgress, 0.1)
-        moosnow.form.showAd(moosnow.AD_POSITION.NONE, null)
+        moosnow.form.showAd(AD_POSITION.NONE, null)
 
 
         this.mBannerShow = false;

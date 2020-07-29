@@ -16,6 +16,9 @@ export default class CocosAdForm extends CocosBaseForm {
     bannerContainer: cc.Node;
     bannerContainer_scroll: cc.Node;
     bannerContainer_layout: cc.Node;
+    topContainer: cc.Node;
+    topContainer_scroll: cc.Node;
+    topContainer_layout: cc.Node;
     leftContainer: any;
     leftView: any;
     leftLayout: any;
@@ -103,6 +106,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private displayAd;
     onShow(data: any): void;
     private initBanner;
+    private initTop;
     private initEnd;
     private initExport;
 }

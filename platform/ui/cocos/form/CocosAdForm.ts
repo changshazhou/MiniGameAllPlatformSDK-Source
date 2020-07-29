@@ -32,6 +32,10 @@ export default class CocosAdForm extends CocosBaseForm {
     public bannerContainer_scroll: cc.Node = null;
     public bannerContainer_layout: cc.Node = null;
 
+    public topContainer: cc.Node = null;
+    public topContainer_scroll: cc.Node = null;
+    public topContainer_layout: cc.Node = null;
+
 
     public leftContainer: any = null;
     public leftView: any = null;
@@ -48,8 +52,8 @@ export default class CocosAdForm extends CocosBaseForm {
 
 
 
-    private mShowAd = moosnow.AD_POSITION.NONE;
-    private mPrevShowAd = moosnow.AD_POSITION.NONE;
+    private mShowAd = AD_POSITION.NONE;
+    private mPrevShowAd = AD_POSITION.NONE;
     private mPrevBackCall: Function
     private mBackCall: Function
     private mScrollVec = [];
@@ -62,9 +66,9 @@ export default class CocosAdForm extends CocosBaseForm {
         if (this.exportClose)
             this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
         if (this.btnSideShow)
-            this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this)
+            this.btnSideShow.on(CocosNodeEvent.TOUCH_END, this.sideOut, this)
         if (this.btnSideHide)
-            this.btnSideHide.on(CocosNodeEvent.TOUCH_START, this.sideIn, this)
+            this.btnSideHide.on(CocosNodeEvent.TOUCH_END, this.sideIn, this)
 
 
         moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
@@ -75,9 +79,9 @@ export default class CocosAdForm extends CocosBaseForm {
         if (this.exportClose)
             this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
         if (this.btnSideShow)
-            this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this)
+            this.btnSideShow.off(CocosNodeEvent.TOUCH_END, this.sideOut, this)
         if (this.btnSideHide)
-            this.btnSideHide.off(CocosNodeEvent.TOUCH_START, this.sideIn, this)
+            this.btnSideHide.off(CocosNodeEvent.TOUCH_END, this.sideIn, this)
 
 
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
@@ -496,6 +500,7 @@ export default class CocosAdForm extends CocosBaseForm {
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
         this.endContainer.active && this.initEnd();
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+        this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
         this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
         this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
@@ -528,6 +533,7 @@ export default class CocosAdForm extends CocosBaseForm {
             this.initBanner();
             this.initFloatAd();
             this.initExport();
+            this.initTop();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
         })
@@ -539,6 +545,15 @@ export default class CocosAdForm extends CocosBaseForm {
         layout.type = cc.Layout.Type.HORIZONTAL;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
         this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
+        //控制显示广告  后续补充
+    }
+
+    private initTop() {
+        let layout = this.topContainer_layout.getComponent(cc.Layout);
+        let scrollView = this.topContainer_scroll.getComponent(cc.ScrollView);
+        layout.type = cc.Layout.Type.HORIZONTAL;
+        layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+        this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
         //控制显示广告  后续补充
     }
 

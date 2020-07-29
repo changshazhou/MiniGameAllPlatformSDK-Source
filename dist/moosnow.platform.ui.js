@@ -2745,7 +2745,7 @@ var mx = (function () {
             this.mNavigateIndex = Common.randomNumBoth(3, this.mMaxNum - 2);
             this.addEvent();
             this.schedule(this.subProgress, 0.1);
-            moosnow.form.showAd(moosnow.AD_POSITION.NONE, null);
+            moosnow.form.showAd(AD_POSITION.NONE, null);
             this.mBannerShow = false;
             moosnow.http.getAllConfig(function (res) {
                 _this.mBannerClickType = res.bannerClickType;
@@ -2944,6 +2944,9 @@ var mx = (function () {
             _this.bannerContainer = null;
             _this.bannerContainer_scroll = null;
             _this.bannerContainer_layout = null;
+            _this.topContainer = null;
+            _this.topContainer_scroll = null;
+            _this.topContainer_layout = null;
             _this.leftContainer = null;
             _this.leftView = null;
             _this.leftLayout = null;
@@ -2954,8 +2957,8 @@ var mx = (function () {
             _this.sideLayout = null;
             _this.btnSideShow = null;
             _this.btnSideHide = null;
-            _this.mShowAd = moosnow.AD_POSITION.NONE;
-            _this.mPrevShowAd = moosnow.AD_POSITION.NONE;
+            _this.mShowAd = AD_POSITION.NONE;
+            _this.mPrevShowAd = AD_POSITION.NONE;
             _this.mScrollVec = [];
             _this.mEndLogic = [];
             _this.mMoveSpeed = 2;
@@ -2975,9 +2978,9 @@ var mx = (function () {
             if (this.exportClose)
                 this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
             if (this.btnSideShow)
-                this.btnSideShow.on(CocosNodeEvent.TOUCH_START, this.sideOut, this);
+                this.btnSideShow.on(CocosNodeEvent.TOUCH_END, this.sideOut, this);
             if (this.btnSideHide)
-                this.btnSideHide.on(CocosNodeEvent.TOUCH_START, this.sideIn, this);
+                this.btnSideHide.on(CocosNodeEvent.TOUCH_END, this.sideIn, this);
             moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
         };
         CocosAdForm.prototype.removeListener = function () {
@@ -2986,18 +2989,26 @@ var mx = (function () {
             if (this.exportClose)
                 this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
             if (this.btnSideShow)
-                this.btnSideShow.off(CocosNodeEvent.TOUCH_START, this.sideOut, this);
+                this.btnSideShow.off(CocosNodeEvent.TOUCH_END, this.sideOut, this);
             if (this.btnSideHide)
-                this.btnSideHide.off(CocosNodeEvent.TOUCH_START, this.sideIn, this);
+                this.btnSideHide.off(CocosNodeEvent.TOUCH_END, this.sideIn, this);
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
         };
         CocosAdForm.prototype.onAdChange = function (data) {
+            if (data.showAd != AD_POSITION.RECOVER) {
+                this.mPrevShowAd = this.mShowAd;
+                this.mPrevBackCall = this.mBackCall;
+            }
+            if (data.showAd == AD_POSITION.RECOVER) {
+                data.showAd = this.mPrevShowAd;
+                data.callback = this.mPrevBackCall;
+            }
             this.displayChange(data.showAd, data.callback);
             if (!isNaN(data.zIndex)) {
                 this.node.zIndex = data.zIndex;
             }
             else {
-                this.node.zIndex = 9999;
+                this.node.zIndex = cc.macro.MAX_ZINDEX;
             }
         };
         CocosAdForm.prototype.onBack = function () {
@@ -3338,6 +3349,7 @@ var mx = (function () {
             this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
             this.endContainer.active && this.initEnd();
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+            this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
             this.btnBack.active = visible && this.hasAd(AD_POSITION.BACK);
             this.exportClose.active = this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
@@ -3367,6 +3379,7 @@ var mx = (function () {
                 _this.initBanner();
                 _this.initFloatAd();
                 _this.initExport();
+                _this.initTop();
                 if (_this.FormData && _this.FormData.callback)
                     _this.FormData.callback();
             });
@@ -3377,6 +3390,14 @@ var mx = (function () {
             layout.type = cc.Layout.Type.HORIZONTAL;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
             this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
+            //控制显示广告  后续补充
+        };
+        CocosAdForm.prototype.initTop = function () {
+            var layout = this.topContainer_layout.getComponent(cc.Layout);
+            var scrollView = this.topContainer_scroll.getComponent(cc.ScrollView);
+            layout.type = cc.Layout.Type.HORIZONTAL;
+            layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
+            this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
             //控制显示广告  后续补充
         };
         CocosAdForm.prototype.initEnd = function () {
