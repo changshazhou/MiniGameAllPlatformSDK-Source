@@ -30,6 +30,7 @@ import CocosMistouchForm from "./cocos/form/CocosMistouchForm";
 import CocosAdForm from "./cocos/form/CocosAdForm";
 import showAdOptions from "../model/loadAdOptions";
 import loadAdOptions from "../model/loadAdOptions";
+import CocosPrizeForm from "./cocos/form/CocosPrizeForm";
 
 /**
  * 广告结果
@@ -109,7 +110,9 @@ export default class FormUtil {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
+        CocosFormFactory.instance.showForm("prizeForm", CocosPrizeForm, options)
     }
+
 
 
     /**

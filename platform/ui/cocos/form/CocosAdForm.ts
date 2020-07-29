@@ -536,7 +536,7 @@ export default class CocosAdForm extends CocosBaseForm {
             this.initFloatAd();
             this.initExport();
             this.initTop();
-            // this.initLeftRight();
+            this.initLeftRight();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
         })
@@ -576,8 +576,8 @@ export default class CocosAdForm extends CocosBaseForm {
         let leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
         let rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
 
-        this.initView(leftView, this.topContainer_layout, "left", "leftAdItem", () => { }, left);
-        this.initView(rightView, this.topContainer_layout, "right", "leftAdItem", () => { }, right);
+        this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", () => { }, left);
+        this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", () => { }, right);
     }
 
     private initEnd() {

@@ -3382,7 +3382,7 @@ var mx = (function () {
                 _this.initFloatAd();
                 _this.initExport();
                 _this.initTop();
-                // this.initLeftRight();
+                _this.initLeftRight();
                 if (_this.FormData && _this.FormData.callback)
                     _this.FormData.callback();
             });
@@ -3416,8 +3416,8 @@ var mx = (function () {
             rightLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
             var leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
             var rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
-            this.initView(leftView, this.topContainer_layout, "left", "leftAdItem", function () { }, left);
-            this.initView(rightView, this.topContainer_layout, "right", "leftAdItem", function () { }, right);
+            this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", function () { }, left);
+            this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", function () { }, right);
         };
         CocosAdForm.prototype.initEnd = function () {
             var layout = this.endContainer_layout.getComponent(cc.Layout);
@@ -3487,6 +3487,109 @@ var mx = (function () {
         return loadAdOptions;
     }(showOptions));
 
+    var CocosPrizeForm = /** @class */ (function (_super) {
+        __extends(CocosPrizeForm, _super);
+        function CocosPrizeForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.btnCancel = null;
+            _this.txtCountdown = null;
+            _this.btnVideo = null;
+            _this.btnShare = null;
+            _this.btnReceive = null;
+            _this.mChecked = true;
+            _this.formComponents = [
+                new CheckboxComponent(_this.mChecked, function (isChecked) {
+                    _this.mChecked = isChecked;
+                })
+            ];
+            _this.mTotalSecond = 10;
+            _this.mCurrentSecond = 0;
+            return _this;
+        }
+        CocosPrizeForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.btnCancel, function () {
+                _this.hideForm();
+            });
+            this.applyClickAnim(this.btnVideo, function () {
+                _this.onVideo();
+            });
+            this.applyClickAnim(this.btnReceive, function () {
+                _this.onReceive();
+            });
+            this.applyClickAnim(this.btnShare, function () {
+                _this.onShare();
+            });
+        };
+        CocosPrizeForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.btnCancel);
+            this.removeClickAnim(this.btnVideo);
+            this.removeClickAnim(this.btnReceive);
+            this.removeClickAnim(this.btnShare);
+        };
+        CocosPrizeForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.addListener();
+            this.mTotalSecond = 10;
+            this.mCurrentSecond = 0;
+            this.resumeCountdown();
+            moosnow.platform.showBanner(false);
+        };
+        CocosPrizeForm.prototype.willHide = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.removeListener();
+        };
+        CocosPrizeForm.prototype.onCountdown = function () {
+            this.mCurrentSecond += 1;
+            var num = this.mTotalSecond - this.mCurrentSecond;
+            if (num < 0) {
+                this.unschedule(this.onCountdown);
+                this.hideForm();
+                return;
+            }
+            CocosNodeHelper.changeText(this.txtCountdown, num + "\u79D2");
+        };
+        CocosPrizeForm.prototype.stopCountdown = function () {
+            this.unschedule(this.onCountdown);
+        };
+        CocosPrizeForm.prototype.resumeCountdown = function () {
+            this.schedule(this.onCountdown, 1);
+        };
+        CocosPrizeForm.prototype.onShare = function () {
+            var _this = this;
+            this.stopCountdown();
+            moosnow.platform.share({
+                channel: ""
+            }, function (shared) {
+                _this.resumeCountdown();
+                if (shared) {
+                }
+            });
+        };
+        CocosPrizeForm.prototype.onVideo = function () {
+            var _this = this;
+            this.stopCountdown();
+            moosnow.platform.showVideo(function (res) {
+                if (res == VIDEO_STATUS.END) {
+                    return;
+                }
+                else if (res == moosnow.VIDEO_STATUS.ERR)
+                    moosnow.form.showToast(VIDEO_MSG.ERR);
+                else {
+                    moosnow.form.showToast(VIDEO_MSG.NOTEND);
+                }
+                _this.resumeCountdown();
+            });
+        };
+        CocosPrizeForm.prototype.onReceive = function () {
+            if (this.mChecked)
+                this.onVideo();
+            else {
+            }
+        };
+        return CocosPrizeForm;
+    }(CocosBaseForm));
+
     /**
      * 广告结果
      */
@@ -3551,6 +3654,7 @@ var mx = (function () {
          * @param callback
          */
         FormUtil.prototype.showPrize = function (options) {
+            CocosFormFactory.instance.showForm("prizeForm", CocosPrizeForm, options);
         };
         /**
          * 显示结算统计页
@@ -3796,20 +3900,6 @@ var mx = (function () {
         __extends(showPrizeOptions, _super);
         function showPrizeOptions() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            // /**
-            //  * 实例化参数
-            //  */
-            // public static create(): showPrizeOptions {
-            //     return new showPrizeOptions();
-            // }
-            /**
-             * 是否显示金币动画
-             */
-            _this.showCoinAnim = true;
-            /**
-             * 显示金币动画时，金币动画的参数
-             */
-            _this.coinOptions = null;
             /**
              *
              */

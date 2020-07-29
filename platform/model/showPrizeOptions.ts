@@ -4,20 +4,6 @@ import showOptions from "./showOptions";
  * 奖励页参数
  */
 export default class showPrizeOptions extends showOptions {
-    // /**
-    //  * 实例化参数
-    //  */
-    // public static create(): showPrizeOptions {
-    //     return new showPrizeOptions();
-    // }
-    /**
-     * 是否显示金币动画
-     */
-    showCoinAnim: boolean = true
-    /**
-     * 显示金币动画时，金币动画的参数
-     */
-    coinOptions?: showCoinOptions = null
     /**
      * 
      */

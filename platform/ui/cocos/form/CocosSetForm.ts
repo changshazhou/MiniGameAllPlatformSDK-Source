@@ -17,10 +17,10 @@ export default class CocosSetForm extends CocosBaseForm {
             this.musicSwitch(isChecked);
         }, "musicOn", "musicOff"),
     ];
-    public addListener() {
+    private addListener() {
         this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this)
     }
-    public removeListener() {
+    private removeListener() {
         this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this)
     }
 
