@@ -1,104 +1,19 @@
 var mx = (function () {
     'use strict';
 
-    var EventType = /** @class */ (function () {
-        function EventType() {
-        }
-        EventType.VIBRATESWITCH_CHANGED = "VIBRATESWITCH_CHANGED";
-        EventType.SOUNDSWITCH_CHANGED = "SOUNDSWITCH_CHANGED";
-        EventType.MUSICSWITCH_CHANGED = "MUSICSWITCH_CHANGED";
-        EventType.ON_PLATFORM_SHOW = "ON_PLATFORM_SHOW";
-        EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
-        EventType.ON_BANNER_ERROR = "ON_BANNER_ERROR";
-        EventType.ON_BANNER_HIDE = "ON_BANNER_HIDE";
-        EventType.ON_AD_SHOW = "ON_AD_SHOW";
-        EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
-        EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
-        EventType.COIN_CHANGED = "COIN_CHANGED";
-        EventType.RANDOWM_NAVIGATE = "RANDOWM_NAVIGATE";
-        EventType.COMPONENT_CHECKBOX_TOGGLE = "COMPONENT_CHECKBOX_TOGGLE";
-        EventType.PRIZE_BOX_UNLOCAK = "PRIZE_BOX_UNLOCAK";
-        return EventType;
-    }());
-
-    var AD_POSITION = {
-        /**
-         * 不显示
-         */
-        NONE: 0,
-        BANNER: 1,
-        FLOAT: 2,
-        /**
-         * 侧拉广告
-         */
-        SIDE: 4,
-        /**
-         * 中部大导出
-         */
-        CENTER: 8,
-        /**
-         * 导出
-         */
-        EXPORT: 16,
-        /**
-         * 返回按钮
-         */
-        BACK: 32,
-        /**
-         * 黑色半透明遮挡
-         */
-        MASK: 64,
-        /**
-         * 延迟显示
-         */
-        WAIT: 128,
-        /**
-         * 左右两侧
-         */
-        LEFTRIGHT: 256,
-        /**
-        * 固定的六个
-        */
-        EXPORT_FIXED: 512,
-        /**
-        * 扩展1
-        */
-        EXTEND1: 1024,
-        /**
-        * 扩展2
-        */
-        EXTEND2: 2048,
-        /**
-        * 扩展3
-        */
-        EXTEND3: 4096,
-        /**
-        * 扩展4
-        */
-        EXTEND4: 8192,
-        /**
-         * 顶部
-         */
-        TOP: 32768,
-        /**
-         * 恢复到上一个状态
-         */
-        RECOVER: 16384,
-    };
-
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
     /* global Reflect, Promise */
 
@@ -299,6 +214,91 @@ var mx = (function () {
         privateMap.set(receiver, value);
         return value;
     }
+
+    var EventType = /** @class */ (function () {
+        function EventType() {
+        }
+        EventType.VIBRATESWITCH_CHANGED = "VIBRATESWITCH_CHANGED";
+        EventType.SOUNDSWITCH_CHANGED = "SOUNDSWITCH_CHANGED";
+        EventType.MUSICSWITCH_CHANGED = "MUSICSWITCH_CHANGED";
+        EventType.ON_PLATFORM_SHOW = "ON_PLATFORM_SHOW";
+        EventType.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
+        EventType.ON_BANNER_ERROR = "ON_BANNER_ERROR";
+        EventType.ON_BANNER_HIDE = "ON_BANNER_HIDE";
+        EventType.ON_AD_SHOW = "ON_AD_SHOW";
+        EventType.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
+        EventType.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
+        EventType.COIN_CHANGED = "COIN_CHANGED";
+        EventType.RANDOWM_NAVIGATE = "RANDOWM_NAVIGATE";
+        EventType.COMPONENT_CHECKBOX_TOGGLE = "COMPONENT_CHECKBOX_TOGGLE";
+        EventType.PRIZE_BOX_UNLOCAK = "PRIZE_BOX_UNLOCAK";
+        return EventType;
+    }());
+
+    var AD_POSITION = {
+        /**
+         * 不显示
+         */
+        NONE: 0,
+        BANNER: 1,
+        FLOAT: 2,
+        /**
+         * 侧拉广告
+         */
+        SIDE: 4,
+        /**
+         * 中部大导出
+         */
+        CENTER: 8,
+        /**
+         * 导出
+         */
+        EXPORT: 16,
+        /**
+         * 返回按钮
+         */
+        BACK: 32,
+        /**
+         * 黑色半透明遮挡
+         */
+        MASK: 64,
+        /**
+         * 延迟显示
+         */
+        WAIT: 128,
+        /**
+         * 左右两侧
+         */
+        LEFTRIGHT: 256,
+        /**
+        * 固定的六个
+        */
+        EXPORT_FIXED: 512,
+        /**
+        * 扩展1
+        */
+        EXTEND1: 1024,
+        /**
+        * 扩展2
+        */
+        EXTEND2: 2048,
+        /**
+        * 扩展3
+        */
+        EXTEND3: 4096,
+        /**
+        * 扩展4
+        */
+        EXTEND4: 8192,
+        /**
+         * 顶部
+         */
+        TOP: 32768,
+        /**
+         * 恢复到上一个状态
+         */
+        RECOVER: 16384,
+    };
 
     var FormKeyValue = /** @class */ (function () {
         function FormKeyValue(formNode, formLogic) {
@@ -1319,10 +1319,10 @@ var mx = (function () {
         };
         CocosNodeHelper.createView = function (parent, viewCfg) {
             var container = this.createImage(parent, viewCfg);
-            parent.width = this.convertWidth(viewCfg.scroll.width);
-            parent.height = this.convertHeight(viewCfg.scroll.height);
+            container.width = this.convertWidth(viewCfg.scroll.width);
+            container.height = this.convertHeight(viewCfg.scroll.height);
             if (viewCfg.widget) {
-                this.createWidget(parent, WidgetAttribute.parse(viewCfg.widget));
+                this.createWidget(container, WidgetAttribute.parse(viewCfg.widget));
             }
             var node = this.createNode(viewCfg.name + '_scroll', viewCfg);
             var scroll = node.addComponent(cc.ScrollView);
@@ -2919,138 +2919,6 @@ var mx = (function () {
         return CocosAdViewItem;
     }(CocosBaseForm));
 
-    var BaseLogic = /** @class */ (function (_super) {
-        __extends(BaseLogic, _super);
-        function BaseLogic() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * 初始化
-         * @param logic
-         */
-        BaseLogic.prototype.initForm = function (logic) {
-            this.initProperty(logic);
-        };
-        Object.defineProperty(BaseLogic.prototype, "LogicData", {
-            /**
-            * 父类缓存willShow，onShow传递到实体的逻辑数据
-            */
-            get: function () {
-                return this.mLogicData;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BaseLogic.prototype.willShow = function (data) {
-            this.mLogicData = data;
-            this.initPosition(data);
-        };
-        BaseLogic.prototype.initPosition = function (data) {
-        };
-        BaseLogic.prototype.onShow = function (data) {
-        };
-        BaseLogic.prototype.willHide = function (data) {
-        };
-        BaseLogic.prototype.onHide = function (data) {
-        };
-        return BaseLogic;
-    }(BaseModule));
-
-    var AdViewItem = /** @class */ (function (_super) {
-        __extends(AdViewItem, _super);
-        function AdViewItem() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.logo = null;
-            _this.title = null;
-            _this.animLogo = null;
-            _this.nameBg = null;
-            _this.changeView = false;
-            return _this;
-            // update (dt) {}
-        }
-        // public get LogicData(): moosnowAdRow {
-        //     return this.mLogicData;
-        // }
-        AdViewItem.prototype.onClickAd = function () {
-            var _this = this;
-            var openAd = this.mAdItem;
-            if (this.LogicData.refresh) {
-                var nextAd = this.findNextAd();
-                if (nextAd.refresh)
-                    moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
-                        current: openAd,
-                        next: nextAd
-                    });
-                this.refreshImg(nextAd);
-            }
-            moosnow.platform.navigate2Mini(openAd, function () { }, function () {
-                if (_this.mAdItem.onCancel)
-                    _this.mAdItem.onCancel(openAd);
-            });
-        };
-        AdViewItem.prototype.findNextAd = function () {
-            if (!this.LogicData.source)
-                return null;
-            if (!this.LogicData.showIds)
-                return null;
-            for (var i = 0; i < this.LogicData.source.length; i++) {
-                var isShow = false;
-                for (var j = 0; j < this.LogicData.showIds.length; j++) {
-                    if (this.LogicData.showIds[j].appid == this.LogicData.source[i].appid
-                        && this.LogicData.showIds[j].position == this.LogicData.source[i].position) {
-                        isShow = true;
-                    }
-                }
-                if (!isShow) {
-                    return this.LogicData.source[i];
-                }
-            }
-            return null;
-        };
-        AdViewItem.prototype.onAdViewChange = function (e) {
-            if (!this.LogicData.showIds)
-                return;
-            if (!this.LogicData.source)
-                return;
-            var current = e.current, next = e.next;
-            var showApps = this.LogicData.showIds;
-            var sourceApps = this.LogicData.source;
-            for (var i = 0; i < showApps.length; i++) {
-                if (current.appid == showApps[i].appid && current.position == showApps[i].position) {
-                    this.LogicData.showIds[i] = next.appid;
-                }
-            }
-            for (var i = 0; i < sourceApps.length; i++) {
-                if (next.appid == sourceApps[i].appid) {
-                    this.LogicData.source.splice(i, 1);
-                    this.LogicData.source.push(current);
-                    break;
-                }
-            }
-        };
-        AdViewItem.prototype.onShow = function () {
-            if (this.LogicData && this.LogicData.refresh)
-                moosnow.event.addListener(EventType.AD_VIEW_REFRESH, this, this.onAdViewChange);
-        };
-        AdViewItem.prototype.onHide = function () {
-            if (this.mAdItem)
-                this.mAdItem.onCancel = null;
-            this.removeListener();
-            moosnow.event.removeListener(EventType.AD_VIEW_REFRESH, this);
-        };
-        AdViewItem.prototype.addListener = function () {
-        };
-        AdViewItem.prototype.removeListener = function () {
-        };
-        AdViewItem.prototype.willShow = function (cell) {
-            _super.prototype.willShow.call(this, cell);
-            this.addListener();
-        };
-        AdViewItem.prototype.refreshImg = function (cell) {
-        };
-        return AdViewItem;
-    }(BaseLogic));
-
     var CocosAdForm = /** @class */ (function (_super) {
         __extends(CocosAdForm, _super);
         function CocosAdForm() {
@@ -3088,6 +2956,7 @@ var mx = (function () {
             _this.mFloatIndex = 0;
             _this.mFloatRefresh = 3;
             _this.mFloatCache = {};
+            _this.floatRuning = false;
             _this.mSecond = 3;
             _this.mAdItemList = [];
             return _this;
@@ -3165,8 +3034,15 @@ var mx = (function () {
                 }
             });
         };
-        CocosAdForm.prototype.floatAnim = function (floatNode) {
-            floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
+        CocosAdForm.prototype.floatAnim = function () {
+            if (this.floatRuning)
+                return;
+            if (this.floatContainer.childrenCount >= this.FormData.floatPositon.length)
+                this.floatRuning = true;
+            this.floatContainer.children.forEach(function (floatNode) {
+                floatNode.stopAllActions();
+                floatNode.runAction(cc.sequence(cc.rotateTo(0.3, 10), cc.rotateTo(0.6, -10), cc.rotateTo(0.3, 0), cc.scaleTo(0.3, 0.8), cc.scaleTo(0.3, 1)).repeatForever());
+            });
         };
         CocosAdForm.prototype.sideOut = function () {
             var _this = this;
@@ -3305,12 +3181,7 @@ var mx = (function () {
                     adRow.y = point.y;
                     adRow.source = source;
                     adRow.showIds = showIds;
-                    var logic = CocosFormFactory.instance.createNodeByTemplate(templateName, AdViewItem, adRow);
-                    _this.mFloatCache[idx] = {
-                        index: showIndex,
-                        logic: logic,
-                    };
-                    _this.floatAnim(logic.node);
+                    CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
                 });
                 _this.updateFloat(source);
                 _this.schedule(function () {
@@ -3389,6 +3260,10 @@ var mx = (function () {
             }
         };
         CocosAdForm.prototype.onFwUpdate = function () {
+            this.floatAnim();
+            this.scrollMove();
+        };
+        CocosAdForm.prototype.scrollMove = function () {
             for (var i = 0; i < this.mScrollVec.length; i++) {
                 var item = this.mScrollVec[i];
                 var scrollView = item.scrollView;
@@ -3429,6 +3304,8 @@ var mx = (function () {
          * @param data
          */
         CocosAdForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
+            this.floatRuning = false;
             this.addListener();
             this.mAdItemList = [];
             this.mScrollVec = [];
@@ -3459,6 +3336,7 @@ var mx = (function () {
             //     this.schedule(this.showExportClose, 1)
             // }
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+            this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
         };
         CocosAdForm.prototype.onShow = function (data) {
             var _this = this;
@@ -3473,6 +3351,7 @@ var mx = (function () {
             });
             this.schedule(this.onFwUpdate, 0.016);
             this.initBanner();
+            this.initFloatAd();
         };
         CocosAdForm.prototype.initBanner = function () {
             var layout = this.bannerContainer_layout.getComponent(cc.Layout);
@@ -3484,6 +3363,52 @@ var mx = (function () {
         };
         return CocosAdForm;
     }(CocosBaseForm));
+
+    var showOptions = /** @class */ (function () {
+        function showOptions() {
+            this._hideForm = true;
+            /**
+             * 扩展参数
+             */
+            this.extraData = {};
+            this.zIndex = 0;
+        }
+        /**
+         * 实例化参数
+         */
+        showOptions.create = function (c) {
+            return new c();
+        };
+        Object.defineProperty(showOptions.prototype, "hideForm", {
+            /**
+             * 完成后是否隐藏 默认 true
+             */
+            get: function () {
+                return this._hideForm;
+            },
+            set: function (value) {
+                this._hideForm = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return showOptions;
+    }());
+
+    /**
+     * 金币飞入动画
+     */
+    var loadAdOptions = /** @class */ (function (_super) {
+        __extends(loadAdOptions, _super);
+        function loadAdOptions() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.zIndex = 9999;
+            _this.floatPositon = [];
+            _this.floatTempletes = ["floatAdItem1"];
+            return _this;
+        }
+        return loadAdOptions;
+    }(showOptions));
 
     /**
      * 广告结果
@@ -3505,7 +3430,7 @@ var mx = (function () {
             CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
         };
         FormUtil.prototype.loadAd = function (options) {
-            CocosFormFactory.instance.showForm("adForm", CocosAdForm, options, null, options.callback);
+            CocosFormFactory.instance.showForm("adForm", CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, options.callback);
         };
         /**
          * 显示广告
@@ -3773,37 +3698,6 @@ var mx = (function () {
         });
         return Delay;
     }(BaseModule));
-
-    var showOptions = /** @class */ (function () {
-        function showOptions() {
-            this._hideForm = true;
-            /**
-             * 扩展参数
-             */
-            this.extraData = {};
-            this.zIndex = 0;
-        }
-        /**
-         * 实例化参数
-         */
-        showOptions.create = function (c) {
-            return new c();
-        };
-        Object.defineProperty(showOptions.prototype, "hideForm", {
-            /**
-             * 完成后是否隐藏 默认 true
-             */
-            get: function () {
-                return this._hideForm;
-            },
-            set: function (value) {
-                this._hideForm = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return showOptions;
-    }());
 
     /**
      * 唤起结算页参数

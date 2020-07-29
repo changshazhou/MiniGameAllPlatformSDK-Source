@@ -59,7 +59,8 @@ export default class FormUtil {
     }
 
     public loadAd(options: loadAdOptions) {
-        CocosFormFactory.instance.showForm("adForm", CocosAdForm, options, null, options.callback)
+
+        CocosFormFactory.instance.showForm("adForm", CocosAdForm, { ...new loadAdOptions(), ...options }, null, options.callback)
     }
 
     /**

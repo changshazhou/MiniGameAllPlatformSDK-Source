@@ -12,7 +12,7 @@ export default class CocosAdForm extends CocosBaseForm {
     exportMask: any;
     exportCloseTxt: any;
     btnBack: any;
-    floatContainer: any;
+    floatContainer: cc.Node;
     floatFull: any;
     bannerContainer: cc.Node;
     bannerContainer_scroll: cc.Node;
@@ -46,7 +46,8 @@ export default class CocosAdForm extends CocosBaseForm {
     private loadAd;
     onRandomNavigate(): void;
     onNavigate(): void;
-    floatAnim(floatNode: any): void;
+    private floatRuning;
+    floatAnim(): void;
     sideOut(): void;
     sideIn(): void;
     pushScroll(scrollView: cc.ScrollView, layout: cc.Layout): void;
@@ -89,6 +90,7 @@ export default class CocosAdForm extends CocosBaseForm {
     initView(scrollView: cc.ScrollView, layout: cc.Node, position: string, templateName: string, callback?: Function): void;
     hideAllAdNode(templateName: string, node: cc.Node): void;
     onFwUpdate(): void;
+    private scrollMove;
     /**
      *
      * @param data

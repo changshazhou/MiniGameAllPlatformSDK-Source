@@ -7,7 +7,6 @@ import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosAdViewItem from "../template/CocosAdViewItem";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
-import AdViewItem from "../../engine/AdViewItem";
 import EventType from "../../../utils/EventType";
 
 
@@ -26,7 +25,7 @@ export default class CocosAdForm extends CocosBaseForm {
     public exportCloseTxt: any = null;
 
     public btnBack: any = null;
-    public floatContainer: any = null;
+    public floatContainer: cc.Node = null;
     public floatFull: any = null;
 
     public bannerContainer: cc.Node = null;
@@ -144,17 +143,24 @@ export default class CocosAdForm extends CocosBaseForm {
             }
         })
     }
-
-    public floatAnim(floatNode) {
-        floatNode.runAction(
-            cc.sequence(
-                cc.rotateTo(0.3, 10),
-                cc.rotateTo(0.6, -10),
-                cc.rotateTo(0.3, 0),
-                cc.scaleTo(0.3, 0.8),
-                cc.scaleTo(0.3, 1)
-            ).repeatForever()
-        )
+    private floatRuning = false;
+    public floatAnim() {
+        if (this.floatRuning)
+            return;
+        if (this.floatContainer.childrenCount >= this.FormData.floatPositon.length)
+            this.floatRuning = true;
+        this.floatContainer.children.forEach(floatNode => {
+            floatNode.stopAllActions();
+            floatNode.runAction(
+                cc.sequence(
+                    cc.rotateTo(0.3, 10),
+                    cc.rotateTo(0.6, -10),
+                    cc.rotateTo(0.3, 0),
+                    cc.scaleTo(0.3, 0.8),
+                    cc.scaleTo(0.3, 1)
+                ).repeatForever()
+            )
+        })
     }
 
     public sideOut() {
@@ -305,19 +311,13 @@ export default class CocosAdForm extends CocosBaseForm {
                 adRow.y = point.y;
                 adRow.source = source;
                 adRow.showIds = showIds;
-                let logic = CocosFormFactory.instance.createNodeByTemplate(templateName, AdViewItem, adRow);
-                this.mFloatCache[idx] = {
-                    index: showIndex,
-                    logic: logic,
-                };
-                this.floatAnim((logic as any).node);
+                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
+
             })
             this.updateFloat(source);
-
             this.schedule(() => {
                 this.updateFloat(source);
             }, this.mFloatRefresh);
-
         })
 
     }
@@ -405,6 +405,14 @@ export default class CocosAdForm extends CocosBaseForm {
 
 
     public onFwUpdate() {
+
+        this.floatAnim();
+
+        this.scrollMove();
+
+    }
+
+    private scrollMove() {
         for (let i = 0; i < this.mScrollVec.length; i++) {
             let item = this.mScrollVec[i];
             let scrollView = item.scrollView as cc.ScrollView;
@@ -440,14 +448,16 @@ export default class CocosAdForm extends CocosBaseForm {
                 item.scrollView.setContentPosition(new cc.Vec2(contentPos.x - this.mMoveSpeed, contentPos.y))
             }
         }
-
     }
+
 
     /**
      * 
      * @param data 
      */
     public willShow(data) {
+        super.willShow(data);
+        this.floatRuning = false;
         this.addListener();
 
         this.mAdItemList = [];
@@ -484,6 +494,7 @@ export default class CocosAdForm extends CocosBaseForm {
         // }
 
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
+        this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
 
 
     }
@@ -501,7 +512,7 @@ export default class CocosAdForm extends CocosBaseForm {
 
         this.schedule(this.onFwUpdate, 0.016)
         this.initBanner();
-
+        this.initFloatAd();
 
     }
 
@@ -513,5 +524,4 @@ export default class CocosAdForm extends CocosBaseForm {
         this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
         //控制显示广告  后续补充
     }
-
 }

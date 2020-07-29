@@ -1,5 +1,5 @@
-import BaseLogic from "../../engine/BaseLogic";
-export default class AdInviteBox extends BaseLogic {
+import CocosBaseForm from "../form/CocosBaseForm";
+export default class AdInviteBox extends CocosBaseForm {
     logo: any;
     gameName: any;
     userName: any;

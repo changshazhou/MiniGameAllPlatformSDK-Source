@@ -1,11 +1,12 @@
-import BaseLogic from "../../engine/BaseLogic";
+
 import EventType from "../../../utils/EventType";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import Common from "../../../utils/Common";
 import { EntitysName } from "../../../config/EntitysName";
 import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
+import CocosBaseForm from "../form/CocosBaseForm";
 
-export default class AdInviteBox extends BaseLogic {
+export default class AdInviteBox extends CocosBaseForm {
 
     public logo: any = null;
     public gameName: any = null;
@@ -62,7 +63,7 @@ export default class AdInviteBox extends BaseLogic {
         moosnow.platform.navigate2Mini(this.mCurrentAdRow);
     }
     public onCancel() {
-        
+
     }
 
 }

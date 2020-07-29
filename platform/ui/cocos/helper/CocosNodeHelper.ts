@@ -151,11 +151,11 @@ export default class CocosNodeHelper extends NodeHelper {
     public static createView(parent: cc.Node, viewCfg: ViewAttribute) {
 
         let container = this.createImage(parent, viewCfg);
-        parent.width = this.convertWidth(viewCfg.scroll.width);
-        parent.height = this.convertHeight(viewCfg.scroll.height);
+        container.width = this.convertWidth(viewCfg.scroll.width);
+        container.height = this.convertHeight(viewCfg.scroll.height);
 
         if (viewCfg.widget) {
-            this.createWidget(parent, WidgetAttribute.parse(viewCfg.widget))
+            this.createWidget(container, WidgetAttribute.parse(viewCfg.widget))
         }
 
 
