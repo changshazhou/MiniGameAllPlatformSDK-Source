@@ -76,8 +76,8 @@ export default class CocosFormFactory extends FormFactory {
             parent = CocosNodeHelper.canvasNode
         let formNode = this.createNode(parent, formCfg);
 
-        // if (formCfg.isMask)
-        //     CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
+        if (formCfg.isMask)
+            CocosNodeHelper.createMask(formNode, formCfg.maskUrl);
 
         // this._createChild(formNode, formCfg.child);
 

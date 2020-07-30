@@ -378,9 +378,9 @@ export default class CocosAdForm extends CocosBaseForm {
        * @param callback 跳转取消时的回调函数
        */
     public initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function) {
+        if (!this.mAdData) return;
 
         layout.removeAllChildren();
-
         let banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
         let endAd: Array<moosnowAdRow> = [];
         let showIds = [];
@@ -616,6 +616,8 @@ export default class CocosAdForm extends CocosBaseForm {
         moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
     }
     private initRotate(callback?: Function) {
+        if (!this.mAdData)
+            return;
         let source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
         let beginIdx = Common.randomNumBoth(0, source.length - 1);
         let tempName = "rotateAdItem"
@@ -640,6 +642,8 @@ export default class CocosAdForm extends CocosBaseForm {
                     adRow = source[i];
                 else
                     adRow = source[i - source.length - 1];
+                if (!pos[i - beginIdx])
+                    debugger
                 adRow.x = pos[i - beginIdx].x;
                 adRow.y = pos[i - beginIdx].y;
 
