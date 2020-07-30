@@ -1,11 +1,20 @@
 import BaseForm from "./BaseForm";
+/**
+ * UI节点和逻辑
+ */
 export declare class LayoutFormKeyValue {
-    formNode: any;
+    formNode: cc.Node | Laya.Node;
     formLogic: BaseForm;
 }
+/**
+ * 节点缓存
+ */
 export declare class LayoutFormQuene {
     formName: string;
     mQuene: Array<LayoutFormKeyValue>;
+    /**
+     * 节点队列
+     */
     get quene(): LayoutFormKeyValue[];
     set quene(value: LayoutFormKeyValue[]);
 }
@@ -30,7 +39,7 @@ export default class FormFactory {
      * @param formNode
      * @param formLogic
      */
-    addForm2Quene(name: string, formNode: any, formLogic?: BaseForm): void;
+    addForm2Quene(name: string, formNode: cc.Node | Laya.Node, formLogic?: BaseForm): void;
     /**
      * 根据逻辑类回收
      * @param item

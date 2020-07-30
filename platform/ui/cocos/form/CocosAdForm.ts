@@ -379,7 +379,6 @@ export default class CocosAdForm extends CocosBaseForm {
        */
     public initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function) {
 
-        moosnow.form.formFactory.hideNodeByTemplate(templateName, null);
         layout.removeAllChildren();
 
         let banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
@@ -507,6 +506,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private displayAd(visible: boolean) {
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
         this.endContainer.active && this.initEnd();
+        !this.endContainer.active && this.disableEnd();
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
@@ -514,6 +514,7 @@ export default class CocosAdForm extends CocosBaseForm {
         this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
         this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
         this.rotateContainer.active && this.initRotate();
+        !this.rotateContainer.active && this.disableRotate();
         this.formMask.active = visible && this.hasAd(AD_POSITION.MASK);
         if (visible && this.hasAd(AD_POSITION.EXPORT)) {
             moosnow.http.getAllConfig(res => {
@@ -595,6 +596,9 @@ export default class CocosAdForm extends CocosBaseForm {
         layout.resizeMode = cc.Layout.ResizeMode.NONE;
         this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
     }
+    private disableEnd() {
+        moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
+    }
 
 
 
@@ -607,12 +611,14 @@ export default class CocosAdForm extends CocosBaseForm {
         this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
     }
 
-
+    private disableRotate() {
+        let tempName = "rotateAdItem"
+        moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+    }
     private initRotate(callback?: Function) {
         let source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
         let beginIdx = Common.randomNumBoth(0, source.length - 1);
         let tempName = "rotateAdItem"
-        moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
         moosnow.form.formFactory.getTemplate(tempName, (tempCfg) => {
 
             let x = tempCfg.width / 2;
@@ -649,6 +655,18 @@ export default class CocosAdForm extends CocosBaseForm {
                 adRow.source = source;
                 adRow.showIds = showIds;
                 moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer);
+            })
+            let t = cc.Canvas.instance.node.width / 2 / 800
+            this.rotateContainer.children.forEach((item, idx) => {
+
+                item.x = pos[idx].x - cc.Canvas.instance.node.width / 2;
+                item.stopAllActions();
+                item.runAction(
+                    cc.spawn(
+                        cc.moveTo(t, new cc.Vec2(pos[idx].x, pos[idx].y)),
+                        cc.rotateBy(t, 360)
+                    )
+                )
             })
         })
 

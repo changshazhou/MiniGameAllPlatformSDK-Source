@@ -3,9 +3,12 @@ import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 import Common from "../../utils/Common";
 import NodeAttribute from "../attribute/NodeAttribute";
 
+/**
+ * UI节点和逻辑
+ */
 export class LayoutFormKeyValue {
 
-    public formNode: any = null;
+    public formNode: cc.Node | Laya.Node = null;
     public formLogic: BaseForm = null;
 
     // constructor(formNode, formLogic) {
@@ -13,7 +16,9 @@ export class LayoutFormKeyValue {
     //     this.formLogic = formLogic;
     // }
 }
-
+/**
+ * 节点缓存
+ */
 export class LayoutFormQuene {
     // constructor(name, formNode, formLogic) {
     //     this.formName = name;
@@ -21,6 +26,9 @@ export class LayoutFormQuene {
     // }
     formName: string = "";
     mQuene: Array<LayoutFormKeyValue> = [];
+    /**
+     * 节点队列
+     */
     public get quene() {
         return this.mQuene;
     }
@@ -59,12 +67,10 @@ export default class FormFactory {
     }
 
     private addFrom2Cached(name: string, formKV: LayoutFormKeyValue) {
-        let cacheQuene: LayoutFormQuene = null;
         let cacheIdx: number = -1;
         for (let i = 0; i < this.cachedLayoutQuene.length; i++) {
             let item = this.cachedLayoutQuene[i];
             if (item.formName == name) {
-                cacheQuene = item;
                 cacheIdx = i;
                 break;
             }
@@ -90,7 +96,10 @@ export default class FormFactory {
             let item = this.cachedLayoutQuene[i];
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
-                    item.quene.splice(j, 1)
+                    let cacheForm = item.quene.splice(j, 1);
+                    if (item.quene.length == 0) {
+                        this.cachedLayoutQuene.splice(i, 1)
+                    }
                     return item.quene[j];
                 }
                 break;
@@ -104,7 +113,7 @@ export default class FormFactory {
      * @param formNode 
      * @param formLogic 
      */
-    public addForm2Quene(name: string, formNode: any, formLogic?: BaseForm) {
+    public addForm2Quene(name: string, formNode: cc.Node | Laya.Node, formLogic?: BaseForm) {
 
         let idx = -1;
         for (let i = 0; i < this.layoutQuene.length; i++) {
@@ -142,6 +151,14 @@ export default class FormFactory {
      */
     private recoverFormLogic(item: LayoutFormQuene, idx, callback: (formKV: LayoutFormKeyValue | Array<LayoutFormKeyValue>) => void, num: number = 1) {
         let formKVs = item.quene.splice(idx, num);
+        if (item.quene.length == 0) {
+            for (let i = 0; i < this.layoutQuene.length; i++) {
+                if (item == this.layoutQuene[i]) {
+                    this.layoutQuene.splice(i, 1)
+                    break;
+                }
+            }
+        }
         formKVs.forEach(formKV => {
             this.addFrom2Cached(item.formName, formKV);
         })

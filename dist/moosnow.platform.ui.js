@@ -679,6 +679,9 @@ var mx = (function () {
         return NodeAttribute;
     }());
 
+    /**
+     * UI节点和逻辑
+     */
     var LayoutFormKeyValue = /** @class */ (function () {
         function LayoutFormKeyValue() {
             this.formNode = null;
@@ -690,6 +693,9 @@ var mx = (function () {
         }
         return LayoutFormKeyValue;
     }());
+    /**
+     * 节点缓存
+     */
     var LayoutFormQuene = /** @class */ (function () {
         function LayoutFormQuene() {
             // constructor(name, formNode, formLogic) {
@@ -706,6 +712,9 @@ var mx = (function () {
             // }
         }
         Object.defineProperty(LayoutFormQuene.prototype, "quene", {
+            /**
+             * 节点队列
+             */
             get: function () {
                 return this.mQuene;
             },
@@ -749,12 +758,10 @@ var mx = (function () {
             configurable: true
         });
         FormFactory.prototype.addFrom2Cached = function (name, formKV) {
-            var cacheQuene = null;
             var cacheIdx = -1;
             for (var i = 0; i < this.cachedLayoutQuene.length; i++) {
                 var item = this.cachedLayoutQuene[i];
                 if (item.formName == name) {
-                    cacheQuene = item;
                     cacheIdx = i;
                     break;
                 }
@@ -778,7 +785,10 @@ var mx = (function () {
                 var item = this.cachedLayoutQuene[i];
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
-                        item.quene.splice(j, 1);
+                        var cacheForm = item.quene.splice(j, 1);
+                        if (item.quene.length == 0) {
+                            this.cachedLayoutQuene.splice(i, 1);
+                        }
                         return item.quene[j];
                     }
                     break;
@@ -830,6 +840,14 @@ var mx = (function () {
             var _this = this;
             if (num === void 0) { num = 1; }
             var formKVs = item.quene.splice(idx, num);
+            if (item.quene.length == 0) {
+                for (var i = 0; i < this.layoutQuene.length; i++) {
+                    if (item == this.layoutQuene[i]) {
+                        this.layoutQuene.splice(i, 1);
+                        break;
+                    }
+                }
+            }
             formKVs.forEach(function (formKV) {
                 _this.addFrom2Cached(item.formName, formKV);
             });
@@ -1753,7 +1771,7 @@ var mx = (function () {
                 formKV.formLogic.willShow(formData);
                 formKV.formNode.active = true;
                 formKV.formLogic.onShow(formData);
-                this.addForm2Quene(name, formKV);
+                this.addForm2Quene(name, formKV.formNode, formKV.formLogic);
             }
             else {
                 if (remoteLayout) {
@@ -1787,7 +1805,7 @@ var mx = (function () {
                 formKV.formLogic.willShow(tempData);
                 formKV.formNode.active = true;
                 formKV.formLogic.onShow(tempData);
-                this.addForm2Quene(name, formKV);
+                this.addForm2Quene(name, formKV.formNode, formKV.formLogic);
             }
             else {
                 if (remoteLayout) {
@@ -1812,7 +1830,7 @@ var mx = (function () {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
-                    (formKV.formNode).removeFromParent();
+                    formKV.formNode.removeFromParent();
                 });
             }
             else
@@ -1820,7 +1838,7 @@ var mx = (function () {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
-                    (formKV.formNode).removeFromParent();
+                    formKV.formNode.removeFromParent();
                 });
         };
         CocosFormFactory.prototype.getTemplate = function (tempName, callback) {
@@ -3293,7 +3311,6 @@ var mx = (function () {
            * @param callback 跳转取消时的回调函数
            */
         CocosAdForm.prototype.initFiexdView = function (layout, position, templateName, callback) {
-            moosnow.form.formFactory.hideNodeByTemplate(templateName, null);
             layout.removeAllChildren();
             var banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
             var endAd = [];
@@ -3406,6 +3423,7 @@ var mx = (function () {
             var _this = this;
             this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
             this.endContainer.active && this.initEnd();
+            !this.endContainer.active && this.disableEnd();
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
             this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
@@ -3413,6 +3431,7 @@ var mx = (function () {
             this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
             this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
             this.rotateContainer.active && this.initRotate();
+            !this.rotateContainer.active && this.disableRotate();
             this.formMask.active = visible && this.hasAd(AD_POSITION.MASK);
             if (visible && this.hasAd(AD_POSITION.EXPORT)) {
                 moosnow.http.getAllConfig(function (res) {
@@ -3484,6 +3503,9 @@ var mx = (function () {
             layout.resizeMode = cc.Layout.ResizeMode.NONE;
             this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
         };
+        CocosAdForm.prototype.disableEnd = function () {
+            moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
+        };
         CocosAdForm.prototype.initExport = function () {
             var layout = this.exportContainer_layout.getComponent(cc.Layout);
             var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
@@ -3492,12 +3514,15 @@ var mx = (function () {
             layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
             this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
         };
+        CocosAdForm.prototype.disableRotate = function () {
+            var tempName = "rotateAdItem";
+            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+        };
         CocosAdForm.prototype.initRotate = function (callback) {
             var _this = this;
             var source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
             var beginIdx = Common.randomNumBoth(0, source.length - 1);
             var tempName = "rotateAdItem";
-            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
             moosnow.form.formFactory.getTemplate(tempName, function (tempCfg) {
                 var x = tempCfg.width / 2;
                 var y = tempCfg.height / 2;
@@ -3530,6 +3555,12 @@ var mx = (function () {
                     adRow.source = source;
                     adRow.showIds = showIds;
                     moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, _this.rotateContainer);
+                });
+                var t = cc.Canvas.instance.node.width / 2 / 800;
+                _this.rotateContainer.children.forEach(function (item, idx) {
+                    item.x = pos[idx].x - cc.Canvas.instance.node.width / 2;
+                    item.stopAllActions();
+                    item.runAction(cc.spawn(cc.moveTo(t, new cc.Vec2(pos[idx].x, pos[idx].y)), cc.rotateBy(t, 360)));
                 });
             });
         };

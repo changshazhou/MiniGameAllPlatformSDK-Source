@@ -1,4 +1,4 @@
-import FormFactory from "../../engine/FormFactory"
+import FormFactory, { LayoutFormKeyValue } from "../../engine/FormFactory"
 import CocosNodeHelper from "./CocosNodeHelper";
 import NodeAttribute from "../../attribute/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
@@ -115,7 +115,7 @@ export default class CocosFormFactory extends FormFactory {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
-                formKV.formNode.removeFromParent();
+                (formKV.formNode as cc.Node).removeFromParent();
             })
         }
         else
@@ -123,7 +123,7 @@ export default class CocosFormFactory extends FormFactory {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
-                formKV.formNode.removeFromParent();
+                (formKV.formNode as cc.Node).removeFromParent();
             })
     }
 
@@ -134,11 +134,11 @@ export default class CocosFormFactory extends FormFactory {
 
         let formKV = this.getFormFromCached(name);
         if (formKV) {
-            parent.addChild(formKV.formNode);
+            parent.addChild(formKV.formNode as cc.Node);
             formKV.formLogic.willShow(formData);
             formKV.formNode.active = true;
             formKV.formLogic.onShow(formData);
-            this.addForm2Quene(name, formKV)
+            this.addForm2Quene(name, formKV.formNode, formKV.formLogic)
         }
         else {
             if (remoteLayout) {
@@ -169,11 +169,11 @@ export default class CocosFormFactory extends FormFactory {
 
         let formKV = this.getFormFromCached(name);
         if (formKV) {
-            parent.addChild(formKV.formNode);
+            parent.addChild(formKV.formNode as cc.Node);
             formKV.formLogic.willShow(tempData);
             formKV.formNode.active = true;
             formKV.formLogic.onShow(tempData);
-            this.addForm2Quene(name, formKV);
+            this.addForm2Quene(name, formKV.formNode, formKV.formLogic);
         }
         else {
             if (remoteLayout) {
@@ -199,7 +199,7 @@ export default class CocosFormFactory extends FormFactory {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
-                (formKV.formNode).removeFromParent();
+                (formKV.formNode as cc.Node).removeFromParent();
             })
         }
         else
@@ -207,7 +207,7 @@ export default class CocosFormFactory extends FormFactory {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
-                (formKV.formNode).removeFromParent();
+                (formKV.formNode as cc.Node).removeFromParent();
             })
     }
 

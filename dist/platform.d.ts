@@ -2,12 +2,11 @@ import showEndOptions from "./model/showEndOptions";
 import showPrizeOptions from "./model/showPrizeOptions";
 import showShareOptions from "./model/showShareOptions";
 import showTotalOptions from "./model/showTotalOptions";
-import showTouchOptions from "./model/showTouchOptions";
+import showTouchOptions from "./model/showMistouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
 
 import Common from "./utils/Common";
 import EventType from "./utils/EventType";
-import PlatformModule from "./platform/PlatformModule";
 import { PlatformType } from "./enum/PlatformType";
 import { HttpModule } from "./http/HttpModule";
 import AdModule from "./ad/AdModule";
@@ -18,6 +17,7 @@ import FormUtil from "./ui/FormUtil";
 import Delay from "./framework/Delay";
 import AudioModule from "./framework/AudioModule";
 import ResourceModule from "./framework/ResourceModule";
+import PlatformModule from "./platform/PlatformModule";
 
 declare global {
     class moosnow {
