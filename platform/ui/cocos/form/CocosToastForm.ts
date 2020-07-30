@@ -1,6 +1,7 @@
 import CocosBaseForm from "./CocosBaseForm";
 import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
+import FormLayout from "../../FormLayout";
 export default class CocosToastForm extends CocosBaseForm {
 
     msgText: cc.Node = null;
@@ -27,6 +28,6 @@ export default class CocosToastForm extends CocosBaseForm {
     }
     hide() {
         // this.node.active = false;
-        CocosFormFactory.instance.hideForm("toastForm", null)
+        this.hideForm();
     }
 }

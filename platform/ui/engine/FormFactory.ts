@@ -1,6 +1,7 @@
 import BaseForm from "./BaseForm";
 import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 import Common from "../../utils/Common";
+import NodeAttribute from "../attribute/NodeAttribute";
 
 export class FormKeyValue {
 
@@ -210,10 +211,19 @@ export default class FormFactory {
                     })
                     this.mTemplatesQuene = [];
                 })
-
         }
         else
             callback(this.mCachedTemplates);
+    }
+
+    public getTemplate(tempName: string, callback?: Function) {
+        this.getTemplates((res) => {
+            let tempCfg = res[tempName]
+            if (tempCfg) {
+                let formCfg = NodeAttribute.parse(tempCfg);
+                callback(formCfg)
+            }
+        })
     }
 
     public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: Function, remoteLayout: boolean = true, layoutOptions: any = null) {

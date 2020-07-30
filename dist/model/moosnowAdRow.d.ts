@@ -33,4 +33,6 @@ export default class moosnowAdRow {
     * 点击后是否刷新
     */
     refresh: boolean;
+    showIds: Array<moosnowAdRow>;
+    source: Array<moosnowAdRow>;
 }

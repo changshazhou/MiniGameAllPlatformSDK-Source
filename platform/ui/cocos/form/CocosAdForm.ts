@@ -9,6 +9,7 @@ import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
 import EventType from "../../../utils/EventType";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
+import NodeAttribute from "../../attribute/NodeAttribute";
 
 
 export default class CocosAdForm extends CocosBaseForm {
@@ -21,7 +22,7 @@ export default class CocosAdForm extends CocosBaseForm {
     public exportContainer_layout: cc.Node = null;
 
     public exportClose: cc.Node = null;
-    public exportMask: cc.Node = null;
+    public formMask: cc.Node = null;
     public exportCloseTxt: cc.Node = null;
     public btnBack: cc.Node = null;
 
@@ -44,6 +45,11 @@ export default class CocosAdForm extends CocosBaseForm {
     public rightContainer: cc.Node = null;
     public rightContainer_scroll: cc.Node = null;
     public rightContainer_layout: cc.Node = null;
+
+    public rotateContainer: cc.Node = null;
+
+
+
 
     public sideContainer: any = null;
     public sideView: any = null;
@@ -506,6 +512,9 @@ export default class CocosAdForm extends CocosBaseForm {
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
         this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
         this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
+        this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
+        this.rotateContainer.active && this.initRotate();
+        this.formMask.active = visible && this.hasAd(AD_POSITION.MASK);
         if (visible && this.hasAd(AD_POSITION.EXPORT)) {
             moosnow.http.getAllConfig(res => {
                 if (res.exportAutoNavigate == 1) {
@@ -596,5 +605,51 @@ export default class CocosAdForm extends CocosBaseForm {
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
         layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
         this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
+    }
+
+
+    private initRotate(callback?: Function) {
+        let source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
+        let beginIdx = Common.randomNumBoth(0, source.length - 1);
+        let tempName = "rotateAdItem"
+        CocosFormFactory.instance.getTemplate(tempName, (tempCfg) => {
+
+            let x = tempCfg.width / 2;
+            let y = tempCfg.height / 2;
+            let spacingX: number = 15;
+            let spacingY: number = 15;
+
+            let pos = [
+                { x: -x - spacingX, y: y + spacingY },
+                { x: x + spacingX, y: y + spacingY },
+                { x: -x - spacingX, y: -y - spacingY },
+                { x: x + spacingX, y: -y - spacingY }
+            ];
+            let showIds = [];
+            let endAd: Array<moosnowAdRow> = [];
+            for (let i = beginIdx; i < beginIdx + 4; i++) {
+                let adRow
+                if (i <= source.length - 1)
+                    adRow = source[i];
+                else
+                    adRow = source[i - source.length - 1];
+                adRow.x = pos[i - beginIdx].x;
+                adRow.y = pos[i - beginIdx].y;
+
+                showIds.push({
+                    appid: adRow.appid,
+                    position: adRow.position,
+                    index: i
+                })
+                endAd.push(adRow);
+            }
+
+            endAd.forEach(adRow => {
+                adRow.source = source;
+                adRow.showIds = showIds;
+                CocosFormFactory.instance.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer);
+            })
+        })
+
     }
 }

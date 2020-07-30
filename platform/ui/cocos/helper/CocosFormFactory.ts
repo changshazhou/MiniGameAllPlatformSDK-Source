@@ -211,4 +211,14 @@ export default class CocosFormFactory extends FormFactory {
                 formKV.formLogic.onHide(formData);
             })
     }
+
+
+    public getTemplate(tempName: string, callback?: Function) {
+        super.getTemplate(tempName, (tempCfg) => {
+            tempCfg.width = CocosNodeHelper.convertWidth(tempCfg.width)
+            tempCfg.height = CocosNodeHelper.convertHeight(tempCfg.height)
+            if (callback)
+                callback(tempCfg)
+        })
+    }
 }

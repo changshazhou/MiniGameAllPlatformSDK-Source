@@ -30,10 +30,6 @@ export default class CheckboxComponent extends CocosBaseComponent {
         //     callback(isChecked)
     }
 
-    public initForm(node) {
-        super.initForm(node)
-    }
-
 
     private addListener() {
         if (!this[this.uncheckedName])
@@ -108,7 +104,6 @@ export default class CheckboxComponent extends CocosBaseComponent {
             this.mCheckBoxMistouch = res.checkBoxMistouch == 1
         })
         this.addListener();
-        this.mCheckedVideo = true;
         this[this.checkedName].active = this.mCheckedVideo
         this[this.uncheckedName].active = !this.mCheckedVideo;
         this.checkCallback();

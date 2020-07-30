@@ -42,9 +42,9 @@ export const AD_POSITION = {
     EXPORT_FIXED: 512,
 
     /**
-    * 扩展1
+    * 旋转入场
     */
-    EXTEND1: 1024,
+    ROTATE: 1024,
     /**
     * 扩展2
     */

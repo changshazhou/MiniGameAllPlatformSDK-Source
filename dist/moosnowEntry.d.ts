@@ -49,7 +49,7 @@ export default class moosnow {
         WAIT: number;
         LEFTRIGHT: number;
         EXPORT_FIXED: number;
-        EXTEND1: number;
+        ROTATE: number;
         EXTEND2: number;
         EXTEND3: number;
         EXTEND4: number;

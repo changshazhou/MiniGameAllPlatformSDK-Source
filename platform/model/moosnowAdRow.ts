@@ -36,5 +36,10 @@ export default class moosnowAdRow {
     */
     public refresh: boolean = false
 
+    
+    public showIds: Array<moosnowAdRow> = null;
+
+    public source: Array<moosnowAdRow> = null;
+
 
 }

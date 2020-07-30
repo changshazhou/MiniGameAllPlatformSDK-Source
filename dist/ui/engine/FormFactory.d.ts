@@ -59,6 +59,7 @@ export default class FormFactory {
     private mTemplatesQuene;
     private mCachedTemplates;
     getTemplates(callback: (attr: any) => void): void;
+    getTemplate(tempName: string, callback?: Function): void;
     showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: Function, remoteLayout?: boolean, layoutOptions?: any): void;
     hideFormByLogic(logic: BaseForm, callback?: (formKV: any) => void): void;
     hideForm(name: string, formNode: any, formData?: any): void;

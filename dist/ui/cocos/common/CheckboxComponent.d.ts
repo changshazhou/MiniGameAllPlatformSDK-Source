@@ -10,7 +10,6 @@ export default class CheckboxComponent extends CocosBaseComponent {
      * @param callback
      */
     constructor(isChecked: any, callback: (isChecked: any) => void, checkedName?: string, uncheckedName?: string);
-    initForm(node: any): void;
     private addListener;
     private removeListener;
     onReceive(): void;

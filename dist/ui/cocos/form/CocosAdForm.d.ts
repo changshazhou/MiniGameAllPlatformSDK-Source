@@ -8,7 +8,7 @@ export default class CocosAdForm extends CocosBaseForm {
     exportContainer_scroll: cc.Node;
     exportContainer_layout: cc.Node;
     exportClose: cc.Node;
-    exportMask: cc.Node;
+    formMask: cc.Node;
     exportCloseTxt: cc.Node;
     btnBack: cc.Node;
     floatContainer: cc.Node;
@@ -25,6 +25,7 @@ export default class CocosAdForm extends CocosBaseForm {
     rightContainer: cc.Node;
     rightContainer_scroll: cc.Node;
     rightContainer_layout: cc.Node;
+    rotateContainer: cc.Node;
     sideContainer: any;
     sideView: any;
     sideLayout: any;
@@ -111,4 +112,5 @@ export default class CocosAdForm extends CocosBaseForm {
     private initLeftRight;
     private initEnd;
     private initExport;
+    private initRotate;
 }

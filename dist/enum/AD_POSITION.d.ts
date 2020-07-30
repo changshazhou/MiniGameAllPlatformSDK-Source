@@ -38,9 +38,9 @@ export declare const AD_POSITION: {
     */
     EXPORT_FIXED: number;
     /**
-    * 扩展1
+    * 旋转入场
     */
-    EXTEND1: number;
+    ROTATE: number;
     /**
     * 扩展2
     */
