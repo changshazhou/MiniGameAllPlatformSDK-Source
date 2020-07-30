@@ -87,10 +87,6 @@ export default class CocosBaseForm extends BaseForm {
         return CocosNodeHelper.findNodeByName(node, attrName)
     }
 
-    public hideForm() {
-        if (this.FormData.hideForm) {
-            CocosFormFactory.instance.hideFormByLogic(this)
-        }
-    }
+   
 
 }

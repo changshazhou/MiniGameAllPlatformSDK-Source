@@ -1,4 +1,4 @@
-import FormFactory, { FormQuene, FormKeyValue } from "../../engine/FormFactory"
+import FormFactory from "../../engine/FormFactory"
 import CocosNodeHelper from "./CocosNodeHelper";
 import NodeAttribute from "../../attribute/NodeAttribute";
 import BaseForm from "../../engine/BaseForm";
@@ -14,11 +14,6 @@ import WidgetAttribute from "../../attribute/WidgetAttribute";
 
 export default class CocosFormFactory extends FormFactory {
 
-    public static get instance() {
-        if (!this.mInstance)
-            this.mInstance = new CocosFormFactory()
-        return this.mInstance;
-    }
 
     public _createChild(parent: cc.Node, children: Array<NodeAttribute>) {
         for (let i = 0; i < children.length; i++) {
@@ -92,12 +87,12 @@ export default class CocosFormFactory extends FormFactory {
         formNode.active = true;
         logic.onShow(formNode);
 
-        FormFactory.addForm2Quene(formCfg.name, formNode, logic);
+        this.addForm2Quene(formCfg.name, formNode, logic);
         return formNode;
     }
 
-    public hideFormByLogic(logic: BaseForm, formData?: any) {
-        FormFactory.removeFormByLogic(logic, (formKV) => {
+    public hideFormByLogic(logic: any, formData?: any) {
+        this.removeFormByLogic(logic, (formKV) => {
             if (formKV instanceof Array) {
                 formKV.forEach(item => {
                     item.formLogic.willHide(formData);
@@ -116,17 +111,19 @@ export default class CocosFormFactory extends FormFactory {
 
     public hideForm(name: string, formNode: any, formData?: any) {
         if (formNode) {
-            FormFactory.removeFormFromQuene(name, formNode, (formKV) => {
+            this.removeFormFromQuene(name, formNode, (formKV) => {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
+                formKV.formNode.removeFromParent();
             })
         }
         else
-            FormFactory.removeAllFormFromQuene(name, (formKV) => {
+            this.removeAllFormFromQuene(name, (formKV) => {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
+                formKV.formNode.removeFromParent();
             })
     }
 
@@ -135,13 +132,13 @@ export default class CocosFormFactory extends FormFactory {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
 
-        let formKV = FormFactory.getFormFromCached(name);
+        let formKV = this.getFormFromCached(name);
         if (formKV) {
             parent.addChild(formKV.formNode);
             formKV.formLogic.willShow(formData);
             formKV.formNode.active = true;
             formKV.formLogic.onShow(formData);
-            FormFactory.addForm2Quene(name, formKV)
+            this.addForm2Quene(name, formKV)
         }
         else {
             if (remoteLayout) {
@@ -170,13 +167,13 @@ export default class CocosFormFactory extends FormFactory {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
 
-        let formKV = FormFactory.getFormFromCached(name);
+        let formKV = this.getFormFromCached(name);
         if (formKV) {
             parent.addChild(formKV.formNode);
             formKV.formLogic.willShow(tempData);
             formKV.formNode.active = true;
             formKV.formLogic.onShow(tempData);
-            FormFactory.addForm2Quene(name, formKV);
+            this.addForm2Quene(name, formKV);
         }
         else {
             if (remoteLayout) {
@@ -198,17 +195,19 @@ export default class CocosFormFactory extends FormFactory {
 
     public hideNodeByTemplate(name: string, formNode: any, formData?: any) {
         if (formNode) {
-            FormFactory.removeFormFromQuene(name, formNode, (formKV) => {
+            this.removeFormFromQuene(name, formNode, (formKV) => {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
+                (formKV.formNode).removeFromParent();
             })
         }
         else
-            FormFactory.removeAllFormFromQuene(name, (formKV) => {
+            this.removeAllFormFromQuene(name, (formKV) => {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
+                (formKV.formNode).removeFromParent();
             })
     }
 

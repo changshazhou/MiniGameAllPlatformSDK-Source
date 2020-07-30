@@ -136,10 +136,10 @@ export default class CocosAdForm extends CocosBaseForm {
             callback(this.mAdData.indexLeft)
         else {
             this.loadNum = 0;
-            CocosFormFactory.instance.getLayout(() => {
+            moosnow.form.formFactory.getLayout(() => {
                 this.checkLoad(callback);
             })
-            CocosFormFactory.instance.getTemplates(() => {
+            moosnow.form.formFactory.getTemplates(() => {
                 this.checkLoad(callback);
             })
             moosnow.ad.getAd((res) => {
@@ -342,7 +342,7 @@ export default class CocosAdForm extends CocosBaseForm {
             adRow.y = point.y;
             adRow.source = source;
             adRow.showIds = showIds;
-            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
+            moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
 
         })
         this.updateFloat(source);
@@ -379,7 +379,7 @@ export default class CocosAdForm extends CocosBaseForm {
        */
     public initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function) {
 
-        CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
+        moosnow.form.formFactory.hideNodeByTemplate(templateName, null);
         layout.removeAllChildren();
 
         let banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
@@ -396,7 +396,7 @@ export default class CocosAdForm extends CocosBaseForm {
         }
         endAd.forEach(item => {
             let adRow = { ...item, showIds, source: banner }
-            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout)
+            moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout)
         })
     }
     /**
@@ -414,7 +414,7 @@ export default class CocosAdForm extends CocosBaseForm {
         if (!source)
             source = this.setPosition(this.mAdData.indexLeft, position, callback);
         source.forEach((item, idx) => {
-            CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
+            moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, item, layout)
         })
         this.pushScroll(scrollView, layout.getComponent(cc.Layout));
     }
@@ -424,7 +424,7 @@ export default class CocosAdForm extends CocosBaseForm {
         if (!node)
             return;
         for (let i = 0; i < node.childrenCount; i++) {
-            CocosFormFactory.instance.hideNodeByTemplate(templateName, node.children[i]);
+            moosnow.form.formFactory.hideNodeByTemplate(templateName, node.children[i]);
             i--
         }
     }
@@ -612,7 +612,8 @@ export default class CocosAdForm extends CocosBaseForm {
         let source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
         let beginIdx = Common.randomNumBoth(0, source.length - 1);
         let tempName = "rotateAdItem"
-        CocosFormFactory.instance.getTemplate(tempName, (tempCfg) => {
+        moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+        moosnow.form.formFactory.getTemplate(tempName, (tempCfg) => {
 
             let x = tempCfg.width / 2;
             let y = tempCfg.height / 2;
@@ -647,7 +648,7 @@ export default class CocosAdForm extends CocosBaseForm {
             endAd.forEach(adRow => {
                 adRow.source = source;
                 adRow.showIds = showIds;
-                CocosFormFactory.instance.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer);
+                moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer);
             })
         })
 

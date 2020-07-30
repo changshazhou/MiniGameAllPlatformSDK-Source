@@ -43,7 +43,7 @@ export default class CocosBoxForm extends CocosBaseForm {
                 let coinNum = Common.randomNumBoth(this.FormData.coinNum[0], this.FormData.coinNum[1]);
                 let videoCoinNum = Common.randomNumBoth(this.FormData.videoCoinNum[0], this.FormData.videoCoinNum[1]);
                 let isVideo = this.FormData.videoNum && this.FormData.videoNum.indexOf(idx) != -1;
-                CocosFormFactory.instance.createNodeByTemplate("boxItem", CocosBoxItem, {
+                moosnow.form.formFactory.createNodeByTemplate("boxItem", CocosBoxItem, {
                     coinNum,
                     videoCoinNum,
                     isVideo,
@@ -58,7 +58,7 @@ export default class CocosBoxForm extends CocosBaseForm {
     }
     public onHide(data) {
         super.onHide(data);
-        CocosFormFactory.instance.hideNodeByTemplate("boxItem", null);
+        moosnow.form.formFactory.hideNodeByTemplate("boxItem", null);
         this.removeListener();
     }
     private addListener() {

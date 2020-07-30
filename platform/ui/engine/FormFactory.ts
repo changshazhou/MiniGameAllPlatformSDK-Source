@@ -3,79 +3,91 @@ import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 import Common from "../../utils/Common";
 import NodeAttribute from "../attribute/NodeAttribute";
 
-export class FormKeyValue {
+export class LayoutFormKeyValue {
 
     public formNode: any = null;
     public formLogic: BaseForm = null;
 
-    constructor(formNode, formLogic) {
-        this.formNode = formNode;
-        this.formLogic = formLogic;
-    }
+    // constructor(formNode, formLogic) {
+    //     this.formNode = formNode;
+    //     this.formLogic = formLogic;
+    // }
 }
 
-export class FormQuene {
-    constructor(name, formNode, formLogic) {
-        this.formName = name;
-        this.quene.push(new FormKeyValue(formNode, formLogic))
-    }
+export class LayoutFormQuene {
+    // constructor(name, formNode, formLogic) {
+    //     this.formName = name;
+    //     // this.quene.push(new LayoutFormKeyValue(formNode, formLogic))
+    // }
     formName: string = "";
-    quene: Array<FormKeyValue> = [];
-    public addForm(formNode, formLogic) {
-        this.quene.push(new FormKeyValue(formNode, formLogic));
+    mQuene: Array<LayoutFormKeyValue> = [];
+    public get quene() {
+        return this.mQuene;
     }
-    public addFormKV(kv: FormKeyValue) {
-        this.quene.push(kv);
-
+    public set quene(value) {
+        // debugger
+        this.mQuene = value
     }
+    // public addForm(formNode, formLogic) {
+    //     this.quene.push(new LayoutFormKeyValue(formNode, formLogic));
+    // }
+    // public addFormKV(kv: LayoutFormKeyValue) {
+    //     this.quene.push(kv);
+    // }
 }
 export default class FormFactory {
 
     public layoutUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/layout.json`;
     public templatesUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/templates.json`;
 
-    public static mInstance: FormFactory = null;
-    public static get instance() {
-        if (!this.mInstance) {
-            this.mInstance = new FormFactory()
-        }
-        return this.mInstance;
-    }
 
-
-
-    private static _FormQuene: Array<FormQuene> = [];
-    public static get formQuene() {
-        return this._FormQuene;
+    private mFormQuene: Array<LayoutFormQuene> = [];
+    public get layoutQuene() {
+        return this.mFormQuene;
     };
 
-    private static _CachedQuene: Array<FormQuene> = [];
-    public static cachedQuene() {
-        return this._CachedQuene;
+    public set layoutQuene(value) {
+        this.mFormQuene = value;
     }
 
-    private static addFrom2Cached(name: string, formKV: FormKeyValue) {
-        let cacheQuene: FormQuene = null;
-        for (let i = 0; i < this._CachedQuene.length; i++) {
-            let item = this._CachedQuene[i];
+    private mCachedLayoutQuene: Array<LayoutFormQuene> = [];
+    public get cachedLayoutQuene() {
+        return this.mCachedLayoutQuene;
+    }
+    public set cachedLayoutQuene(value) {
+        this.mCachedLayoutQuene = value;
+    }
+
+    private addFrom2Cached(name: string, formKV: LayoutFormKeyValue) {
+        let cacheQuene: LayoutFormQuene = null;
+        let cacheIdx: number = -1;
+        for (let i = 0; i < this.cachedLayoutQuene.length; i++) {
+            let item = this.cachedLayoutQuene[i];
             if (item.formName == name) {
                 cacheQuene = item;
+                cacheIdx = i;
                 break;
             }
         }
-        if (cacheQuene)
-            cacheQuene.addFormKV(formKV)
-        else
-            this._CachedQuene.push(new FormQuene(name, formKV.formNode, formKV.formLogic));
+        if (cacheIdx != -1) {
+            this.cachedLayoutQuene[cacheIdx].quene.push(formKV);
+        }
+        else {
+            let item = new LayoutFormQuene()
+            item.formName = name;
+            item.quene.push(formKV)
+            this.cachedLayoutQuene.push(item);
+        }
+
     }
 
     /**
      * 从缓存中取form
      * @param name 
      */
-    public static getFormFromCached(name) {
-        for (let i = 0; i < this.formQuene.length; i++) {
-            let item = this.formQuene[i];
+    public getFormFromCached(name) {
+        for (let i = 0; i < this.cachedLayoutQuene.length; i++) {
+            let item = this.cachedLayoutQuene[i];
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
                     item.quene.splice(j, 1)
@@ -92,11 +104,11 @@ export default class FormFactory {
      * @param formNode 
      * @param formLogic 
      */
-    public static addForm2Quene(name: string, formNode: any, formLogic?: BaseForm) {
+    public addForm2Quene(name: string, formNode: any, formLogic?: BaseForm) {
 
         let idx = -1;
-        for (let i = 0; i < this._FormQuene.length; i++) {
-            let item = this._FormQuene[i];
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
             if (item.formName == name) {
                 idx = i
                 break;
@@ -104,10 +116,20 @@ export default class FormFactory {
         }
         // console.log('addForm2Quene 1 ', this._FormQuene)
         if (idx != -1) {
-            this._FormQuene[idx].addForm(formNode, formLogic);
+            let kv = new LayoutFormKeyValue();
+            kv.formNode = formNode;
+            kv.formLogic = formLogic;
+            this.layoutQuene[idx].quene.push(kv);
         }
-        else
-            this._FormQuene.push(new FormQuene(name, formNode, formLogic));
+        else {
+            let quene = new LayoutFormQuene();
+            quene.formName = name;
+            let kv = new LayoutFormKeyValue();
+            kv.formNode = formNode;
+            kv.formLogic = formLogic;
+            quene.quene.push(kv)
+            this.layoutQuene.push(quene);
+        }
 
         // console.log('addForm2Quene 2 ', this._FormQuene)
     }
@@ -118,7 +140,7 @@ export default class FormFactory {
      * @param callback 
      * @param num 
      */
-    private static recoverFormLogic(item: FormQuene, idx, callback: (formKV: FormKeyValue | Array<FormKeyValue>) => void, num: number = 1) {
+    private recoverFormLogic(item: LayoutFormQuene, idx, callback: (formKV: LayoutFormKeyValue | Array<LayoutFormKeyValue>) => void, num: number = 1) {
         let formKVs = item.quene.splice(idx, num);
         formKVs.forEach(formKV => {
             this.addFrom2Cached(item.formName, formKV);
@@ -131,9 +153,9 @@ export default class FormFactory {
         }
     }
 
-    public static removeFormByLogic(logic: BaseForm, callback: (formKV: FormKeyValue) => void) {
-        for (let i = 0; i < this.formQuene.length; i++) {
-            let item = this.formQuene[i];
+    public removeFormByLogic(logic: BaseForm, callback: (formKV: LayoutFormKeyValue) => void) {
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
             for (let j = 0; j < item.quene.length; j++) {
                 if (item.quene[j].formLogic == logic) {
                     this.recoverFormLogic(item, j, callback);
@@ -148,9 +170,9 @@ export default class FormFactory {
      * @param name 
      * @param formNode 
      */
-    public static removeFormFromQuene(name: string, formKV: FormKeyValue, callback?: (formKV: FormKeyValue) => void) {
-        for (let i = 0; i < this.formQuene.length; i++) {
-            let item = this.formQuene[i];
+    public removeFormFromQuene(name: string, formKV: LayoutFormKeyValue, callback?: (formKV: LayoutFormKeyValue) => void) {
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
                     if (item.quene[j] == formKV) {
@@ -166,9 +188,9 @@ export default class FormFactory {
      * 从队列里移除所有
      * @param name 
      */
-    public static removeAllFormFromQuene(name: string, callback?: (formKV: FormKeyValue) => void) {
-        for (let i = 0; i < this.formQuene.length; i++) {
-            let item = this.formQuene[i];
+    public removeAllFormFromQuene(name: string, callback?: (formKV: LayoutFormKeyValue) => void) {
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
             if (item.formName == name) {
                 for (let j = 0; j < item.quene.length; j++) {
                     this.recoverFormLogic(item, j, callback);
@@ -230,7 +252,7 @@ export default class FormFactory {
 
     }
 
-    public hideFormByLogic(logic: BaseForm, callback?: (formKV) => void) {
+    public hideFormByLogic(logic: any, callback?: (formKV) => void) {
 
     }
 

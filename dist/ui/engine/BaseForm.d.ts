@@ -20,4 +20,5 @@ export default class BaseForm extends BaseModule {
     onShow(data: any): void;
     willHide(data: any): void;
     onHide(data: any): void;
+    hideForm(): void;
 }

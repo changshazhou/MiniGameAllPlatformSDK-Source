@@ -33,30 +33,31 @@ import loadAdOptions from "../model/loadAdOptions";
 import CocosPrizeForm from "./cocos/form/CocosPrizeForm";
 import FormLayout from "./FormLayout";
 import CocosBaseForm from "./cocos/form/CocosBaseForm";
+import FormFactory from "./engine/FormFactory";
 
 /**
  * 广告结果
  */
 export default class FormUtil {
 
+
+
+    public formFactory: FormFactory;
     constructor() {
-
+        this.formFactory = new CocosFormFactory();
     }
-
-
-
 
     /**
      * Toast消息
      * @param msg  消息内容
      */
     public showToast(msg: string) {
-        CocosFormFactory.instance.showForm(FormLayout.ToastForm, CocosToastForm, msg)
+        this.formFactory.showForm(FormLayout.ToastForm, CocosToastForm, msg)
     }
 
     public loadAd(options: loadAdOptions) {
 
-        CocosFormFactory.instance.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, () => {
+        this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, () => {
             console.log('create ad form')
         })
     }
@@ -95,7 +96,7 @@ export default class FormUtil {
      * @param options 
      */
     public showMistouch(options: showMistouchOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.MistouchForm, CocosMistouchForm, options)
+        this.formFactory.showForm(FormLayout.MistouchForm, CocosMistouchForm, options)
     }
     /**
      * 显示奖励
@@ -105,7 +106,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.PrizeForm, CocosPrizeForm, options)
+        this.formFactory.showForm(FormLayout.PrizeForm, CocosPrizeForm, options)
     }
 
 
@@ -116,7 +117,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showTotal(options: showTotalOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.TotalForm, CocosTotalForm, options)
+        this.formFactory.showForm(FormLayout.TotalForm, CocosTotalForm, options)
     }
 
 
@@ -126,7 +127,7 @@ export default class FormUtil {
     * @param callback 
     */
     public showEnd(options: showEndOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.EndForm, CocosEndForm, options)
+        this.formFactory.showForm(FormLayout.EndForm, CocosEndForm, options)
     }
 
     /**
@@ -135,35 +136,35 @@ export default class FormUtil {
       * @param callback 
       */
     public showPause(options: showPauseOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.PauseForm, CocosPauseForm, options)
+        this.formFactory.showForm(FormLayout.PauseForm, CocosPauseForm, options)
     }
 
     /**
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.ShareForm, CocosShareForm, options)
+        this.formFactory.showForm(FormLayout.ShareForm, CocosShareForm, options)
     }
 
     /**
     *  showShare
     */
     public showTry(options: showTryOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.TryForm, CocosTryForm, options)
+        this.formFactory.showForm(FormLayout.TryForm, CocosTryForm, options)
     }
 
     /**
      *  showShare
      */
     public showSet(options: showSetOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.SetForm, CocosSetForm, options)
+        this.formFactory.showForm(FormLayout.SetForm, CocosSetForm, options)
     }
 
     /**
         *  showShare
         */
     public showBox(options: showBoxOptions) {
-        CocosFormFactory.instance.showForm(FormLayout.BoxForm, CocosBoxForm, options)
+        this.formFactory.showForm(FormLayout.BoxForm, CocosBoxForm, options)
     }
 
     /**
@@ -171,14 +172,14 @@ export default class FormUtil {
      * @param formName FormLayout 中的枚举值或者 字符串
      */
     public createForm(formName: string) {
-        CocosFormFactory.instance.showForm(formName, CocosBaseForm, {})
+        this.formFactory.showForm(formName, CocosBaseForm, {})
     }
     /**
      * 隐藏窗体  
      * @param formName FormLayout 中的枚举值或者 字符串
      */
     public hideForm(formName: string) {
-        CocosFormFactory.instance.hideForm(formName, null);
+        this.formFactory.hideForm(formName, null);
     }
 
 }

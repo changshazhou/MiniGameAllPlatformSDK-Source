@@ -10,5 +10,4 @@ export default class CocosBaseForm extends BaseForm {
     applyClickAnim(node: cc.Node, callback?: Function, stopPropagation?: boolean): void;
     removeClickAnim(node: cc.Node): void;
     findNodeByName(node: cc.Node, attrName: string): cc.Node;
-    hideForm(): void;
 }

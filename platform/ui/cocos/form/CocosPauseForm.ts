@@ -40,7 +40,7 @@ export default class CocosPauseForm extends CocosBaseForm {
 
     }
     public onContinue() {
-        CocosFormFactory.instance.hideForm("pauseForm", null, null)
+        this.hideForm();
     }
     public onToHome() {
         moosnow.platform.stopRecord();

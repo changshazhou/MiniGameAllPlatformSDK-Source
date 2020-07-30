@@ -9,10 +9,12 @@ import showTryOptions from "../model/showTryOptions";
 import showSetOptions from "../model/showSetOptions";
 import showBoxOptions from "../model/showBoxOptions";
 import loadAdOptions from "../model/loadAdOptions";
+import FormFactory from "./engine/FormFactory";
 /**
  * 广告结果
  */
 export default class FormUtil {
+    formFactory: FormFactory;
     constructor();
     /**
      * Toast消息

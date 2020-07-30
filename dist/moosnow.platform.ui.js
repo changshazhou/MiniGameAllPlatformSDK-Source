@@ -679,79 +679,103 @@ var mx = (function () {
         return NodeAttribute;
     }());
 
-    var FormKeyValue = /** @class */ (function () {
-        function FormKeyValue(formNode, formLogic) {
+    var LayoutFormKeyValue = /** @class */ (function () {
+        function LayoutFormKeyValue() {
             this.formNode = null;
             this.formLogic = null;
-            this.formNode = formNode;
-            this.formLogic = formLogic;
+            // constructor(formNode, formLogic) {
+            //     this.formNode = formNode;
+            //     this.formLogic = formLogic;
+            // }
         }
-        return FormKeyValue;
+        return LayoutFormKeyValue;
     }());
-    var FormQuene = /** @class */ (function () {
-        function FormQuene(name, formNode, formLogic) {
+    var LayoutFormQuene = /** @class */ (function () {
+        function LayoutFormQuene() {
+            // constructor(name, formNode, formLogic) {
+            //     this.formName = name;
+            //     // this.quene.push(new LayoutFormKeyValue(formNode, formLogic))
+            // }
             this.formName = "";
-            this.quene = [];
-            this.formName = name;
-            this.quene.push(new FormKeyValue(formNode, formLogic));
+            this.mQuene = [];
+            // public addForm(formNode, formLogic) {
+            //     this.quene.push(new LayoutFormKeyValue(formNode, formLogic));
+            // }
+            // public addFormKV(kv: LayoutFormKeyValue) {
+            //     this.quene.push(kv);
+            // }
         }
-        FormQuene.prototype.addForm = function (formNode, formLogic) {
-            this.quene.push(new FormKeyValue(formNode, formLogic));
-        };
-        FormQuene.prototype.addFormKV = function (kv) {
-            this.quene.push(kv);
-        };
-        return FormQuene;
+        Object.defineProperty(LayoutFormQuene.prototype, "quene", {
+            get: function () {
+                return this.mQuene;
+            },
+            set: function (value) {
+                // debugger
+                this.mQuene = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return LayoutFormQuene;
     }());
     var FormFactory = /** @class */ (function () {
         function FormFactory() {
             this.layoutUrl = ROOT_CONFIG.HTTP_ROOT + "/layout/" + Common.config.moosnowAppId + "/layout.json";
             this.templatesUrl = ROOT_CONFIG.HTTP_ROOT + "/layout/" + Common.config.moosnowAppId + "/templates.json";
+            this.mFormQuene = [];
+            this.mCachedLayoutQuene = [];
             this.mLayoutQuene = [];
             this.mTemplatesQuene = [];
         }
-        Object.defineProperty(FormFactory, "instance", {
+        Object.defineProperty(FormFactory.prototype, "layoutQuene", {
             get: function () {
-                if (!this.mInstance) {
-                    this.mInstance = new FormFactory();
-                }
-                return this.mInstance;
+                return this.mFormQuene;
             },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(FormFactory, "formQuene", {
-            get: function () {
-                return this._FormQuene;
+            set: function (value) {
+                this.mFormQuene = value;
             },
             enumerable: true,
             configurable: true
         });
         ;
-        FormFactory.cachedQuene = function () {
-            return this._CachedQuene;
-        };
-        FormFactory.addFrom2Cached = function (name, formKV) {
+        Object.defineProperty(FormFactory.prototype, "cachedLayoutQuene", {
+            get: function () {
+                return this.mCachedLayoutQuene;
+            },
+            set: function (value) {
+                this.mCachedLayoutQuene = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        FormFactory.prototype.addFrom2Cached = function (name, formKV) {
             var cacheQuene = null;
-            for (var i = 0; i < this._CachedQuene.length; i++) {
-                var item = this._CachedQuene[i];
+            var cacheIdx = -1;
+            for (var i = 0; i < this.cachedLayoutQuene.length; i++) {
+                var item = this.cachedLayoutQuene[i];
                 if (item.formName == name) {
                     cacheQuene = item;
+                    cacheIdx = i;
                     break;
                 }
             }
-            if (cacheQuene)
-                cacheQuene.addFormKV(formKV);
-            else
-                this._CachedQuene.push(new FormQuene(name, formKV.formNode, formKV.formLogic));
+            if (cacheIdx != -1) {
+                this.cachedLayoutQuene[cacheIdx].quene.push(formKV);
+            }
+            else {
+                var item = new LayoutFormQuene();
+                item.formName = name;
+                item.quene.push(formKV);
+                this.cachedLayoutQuene.push(item);
+            }
         };
         /**
          * 从缓存中取form
          * @param name
          */
-        FormFactory.getFormFromCached = function (name) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
+        FormFactory.prototype.getFormFromCached = function (name) {
+            for (var i = 0; i < this.cachedLayoutQuene.length; i++) {
+                var item = this.cachedLayoutQuene[i];
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
                         item.quene.splice(j, 1);
@@ -768,10 +792,10 @@ var mx = (function () {
          * @param formNode
          * @param formLogic
          */
-        FormFactory.addForm2Quene = function (name, formNode, formLogic) {
+        FormFactory.prototype.addForm2Quene = function (name, formNode, formLogic) {
             var idx = -1;
-            for (var i = 0; i < this._FormQuene.length; i++) {
-                var item = this._FormQuene[i];
+            for (var i = 0; i < this.layoutQuene.length; i++) {
+                var item = this.layoutQuene[i];
                 if (item.formName == name) {
                     idx = i;
                     break;
@@ -779,10 +803,20 @@ var mx = (function () {
             }
             // console.log('addForm2Quene 1 ', this._FormQuene)
             if (idx != -1) {
-                this._FormQuene[idx].addForm(formNode, formLogic);
+                var kv = new LayoutFormKeyValue();
+                kv.formNode = formNode;
+                kv.formLogic = formLogic;
+                this.layoutQuene[idx].quene.push(kv);
             }
-            else
-                this._FormQuene.push(new FormQuene(name, formNode, formLogic));
+            else {
+                var quene = new LayoutFormQuene();
+                quene.formName = name;
+                var kv = new LayoutFormKeyValue();
+                kv.formNode = formNode;
+                kv.formLogic = formLogic;
+                quene.quene.push(kv);
+                this.layoutQuene.push(quene);
+            }
             // console.log('addForm2Quene 2 ', this._FormQuene)
         };
         /**
@@ -792,7 +826,7 @@ var mx = (function () {
          * @param callback
          * @param num
          */
-        FormFactory.recoverFormLogic = function (item, idx, callback, num) {
+        FormFactory.prototype.recoverFormLogic = function (item, idx, callback, num) {
             var _this = this;
             if (num === void 0) { num = 1; }
             var formKVs = item.quene.splice(idx, num);
@@ -806,9 +840,9 @@ var mx = (function () {
                     callback(formKVs);
             }
         };
-        FormFactory.removeFormByLogic = function (logic, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
+        FormFactory.prototype.removeFormByLogic = function (logic, callback) {
+            for (var i = 0; i < this.layoutQuene.length; i++) {
+                var item = this.layoutQuene[i];
                 for (var j = 0; j < item.quene.length; j++) {
                     if (item.quene[j].formLogic == logic) {
                         this.recoverFormLogic(item, j, callback);
@@ -822,9 +856,9 @@ var mx = (function () {
          * @param name
          * @param formNode
          */
-        FormFactory.removeFormFromQuene = function (name, formKV, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
+        FormFactory.prototype.removeFormFromQuene = function (name, formKV, callback) {
+            for (var i = 0; i < this.layoutQuene.length; i++) {
+                var item = this.layoutQuene[i];
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
                         if (item.quene[j] == formKV) {
@@ -840,9 +874,9 @@ var mx = (function () {
          * 从队列里移除所有
          * @param name
          */
-        FormFactory.removeAllFormFromQuene = function (name, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
+        FormFactory.prototype.removeAllFormFromQuene = function (name, callback) {
+            for (var i = 0; i < this.layoutQuene.length; i++) {
+                var item = this.layoutQuene[i];
                 if (item.formName == name) {
                     for (var j = 0; j < item.quene.length; j++) {
                         this.recoverFormLogic(item, j, callback);
@@ -908,9 +942,6 @@ var mx = (function () {
         };
         FormFactory.prototype.hideNodeByTemplate = function (name, formNode, formData) {
         };
-        FormFactory.mInstance = null;
-        FormFactory._FormQuene = [];
-        FormFactory._CachedQuene = [];
         return FormFactory;
     }());
 
@@ -1095,6 +1126,11 @@ var mx = (function () {
             this.formComponents.forEach(function (item) {
                 item.onHide(data);
             });
+        };
+        BaseForm.prototype.hideForm = function () {
+            if (this.FormData.hideForm) {
+                moosnow.form.formFactory.hideFormByLogic(this);
+            }
         };
         return BaseForm;
     }(BaseModule));
@@ -1604,15 +1640,6 @@ var mx = (function () {
         function CocosFormFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(CocosFormFactory, "instance", {
-            get: function () {
-                if (!this.mInstance)
-                    this.mInstance = new CocosFormFactory();
-                return this.mInstance;
-            },
-            enumerable: true,
-            configurable: true
-        });
         CocosFormFactory.prototype._createChild = function (parent, children) {
             for (var i = 0; i < children.length; i++) {
                 var jsonCfg = children[i];
@@ -1678,11 +1705,11 @@ var mx = (function () {
             logic.willShow(formData);
             formNode.active = true;
             logic.onShow(formNode);
-            FormFactory.addForm2Quene(formCfg.name, formNode, logic);
+            this.addForm2Quene(formCfg.name, formNode, logic);
             return formNode;
         };
         CocosFormFactory.prototype.hideFormByLogic = function (logic, formData) {
-            FormFactory.removeFormByLogic(logic, function (formKV) {
+            this.removeFormByLogic(logic, function (formKV) {
                 if (formKV instanceof Array) {
                     formKV.forEach(function (item) {
                         item.formLogic.willHide(formData);
@@ -1699,17 +1726,19 @@ var mx = (function () {
         };
         CocosFormFactory.prototype.hideForm = function (name, formNode, formData) {
             if (formNode) {
-                FormFactory.removeFormFromQuene(name, formNode, function (formKV) {
+                this.removeFormFromQuene(name, formNode, function (formKV) {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
+                    formKV.formNode.removeFromParent();
                 });
             }
             else
-                FormFactory.removeAllFormFromQuene(name, function (formKV) {
+                this.removeAllFormFromQuene(name, function (formKV) {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
+                    formKV.formNode.removeFromParent();
                 });
         };
         CocosFormFactory.prototype.showForm = function (name, formLogic, formData, parent, callback, remoteLayout, layoutOptions) {
@@ -1718,13 +1747,13 @@ var mx = (function () {
             if (layoutOptions === void 0) { layoutOptions = null; }
             if (!parent)
                 parent = CocosNodeHelper.canvasNode;
-            var formKV = FormFactory.getFormFromCached(name);
+            var formKV = this.getFormFromCached(name);
             if (formKV) {
                 parent.addChild(formKV.formNode);
                 formKV.formLogic.willShow(formData);
                 formKV.formNode.active = true;
                 formKV.formLogic.onShow(formData);
-                FormFactory.addForm2Quene(name, formKV);
+                this.addForm2Quene(name, formKV);
             }
             else {
                 if (remoteLayout) {
@@ -1752,13 +1781,13 @@ var mx = (function () {
             if (layoutOptions === void 0) { layoutOptions = null; }
             if (!parent)
                 parent = CocosNodeHelper.canvasNode;
-            var formKV = FormFactory.getFormFromCached(name);
+            var formKV = this.getFormFromCached(name);
             if (formKV) {
                 parent.addChild(formKV.formNode);
                 formKV.formLogic.willShow(tempData);
                 formKV.formNode.active = true;
                 formKV.formLogic.onShow(tempData);
-                FormFactory.addForm2Quene(name, formKV);
+                this.addForm2Quene(name, formKV);
             }
             else {
                 if (remoteLayout) {
@@ -1779,17 +1808,19 @@ var mx = (function () {
         };
         CocosFormFactory.prototype.hideNodeByTemplate = function (name, formNode, formData) {
             if (formNode) {
-                FormFactory.removeFormFromQuene(name, formNode, function (formKV) {
+                this.removeFormFromQuene(name, formNode, function (formKV) {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
+                    (formKV.formNode).removeFromParent();
                 });
             }
             else
-                FormFactory.removeAllFormFromQuene(name, function (formKV) {
+                this.removeAllFormFromQuene(name, function (formKV) {
                     formKV.formLogic.willHide(formData);
                     formKV.formNode.active = false;
                     formKV.formLogic.onHide(formData);
+                    (formKV.formNode).removeFromParent();
                 });
         };
         CocosFormFactory.prototype.getTemplate = function (tempName, callback) {
@@ -1874,11 +1905,6 @@ var mx = (function () {
         };
         CocosBaseForm.prototype.findNodeByName = function (node, attrName) {
             return CocosNodeHelper.findNodeByName(node, attrName);
-        };
-        CocosBaseForm.prototype.hideForm = function () {
-            if (this.FormData.hideForm) {
-                CocosFormFactory.instance.hideFormByLogic(this);
-            }
         };
         return CocosBaseForm;
     }(BaseForm));
@@ -1976,7 +2002,7 @@ var mx = (function () {
             moosnow.platform.pauseRecord();
         };
         CocosPauseForm.prototype.onContinue = function () {
-            CocosFormFactory.instance.hideForm("pauseForm", null, null);
+            this.hideForm();
         };
         CocosPauseForm.prototype.onToHome = function () {
             moosnow.platform.stopRecord();
@@ -2543,7 +2569,7 @@ var mx = (function () {
                     var coinNum = Common.randomNumBoth(this.FormData.coinNum[0], this.FormData.coinNum[1]);
                     var videoCoinNum = Common.randomNumBoth(this.FormData.videoCoinNum[0], this.FormData.videoCoinNum[1]);
                     var isVideo = this.FormData.videoNum && this.FormData.videoNum.indexOf(idx) != -1;
-                    CocosFormFactory.instance.createNodeByTemplate("boxItem", CocosBoxItem, {
+                    moosnow.form.formFactory.createNodeByTemplate("boxItem", CocosBoxItem, {
                         coinNum: coinNum,
                         videoCoinNum: videoCoinNum,
                         isVideo: isVideo,
@@ -2557,7 +2583,7 @@ var mx = (function () {
         };
         CocosBoxForm.prototype.onHide = function (data) {
             _super.prototype.onHide.call(this, data);
-            CocosFormFactory.instance.hideNodeByTemplate("boxItem", null);
+            moosnow.form.formFactory.hideNodeByTemplate("boxItem", null);
             this.removeListener();
         };
         CocosBoxForm.prototype.addListener = function () {
@@ -3060,10 +3086,10 @@ var mx = (function () {
                 callback(this.mAdData.indexLeft);
             else {
                 this.loadNum = 0;
-                CocosFormFactory.instance.getLayout(function () {
+                moosnow.form.formFactory.getLayout(function () {
                     _this.checkLoad(callback);
                 });
-                CocosFormFactory.instance.getTemplates(function () {
+                moosnow.form.formFactory.getTemplates(function () {
                     _this.checkLoad(callback);
                 });
                 moosnow.ad.getAd(function (res) {
@@ -3239,7 +3265,7 @@ var mx = (function () {
                 adRow.y = point.y;
                 adRow.source = source;
                 adRow.showIds = showIds;
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
+                moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
             });
             this.updateFloat(source);
             this.schedule(function () {
@@ -3267,7 +3293,7 @@ var mx = (function () {
            * @param callback 跳转取消时的回调函数
            */
         CocosAdForm.prototype.initFiexdView = function (layout, position, templateName, callback) {
-            CocosFormFactory.instance.hideNodeByTemplate(templateName, null);
+            moosnow.form.formFactory.hideNodeByTemplate(templateName, null);
             layout.removeAllChildren();
             var banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
             var endAd = [];
@@ -3283,7 +3309,7 @@ var mx = (function () {
             }
             endAd.forEach(function (item) {
                 var adRow = __assign(__assign({}, item), { showIds: showIds, source: banner });
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout);
+                moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, layout);
             });
         };
         /**
@@ -3300,7 +3326,7 @@ var mx = (function () {
             if (!source)
                 source = this.setPosition(this.mAdData.indexLeft, position, callback);
             source.forEach(function (item, idx) {
-                CocosFormFactory.instance.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
+                moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, item, layout);
             });
             this.pushScroll(scrollView, layout.getComponent(cc.Layout));
         };
@@ -3308,7 +3334,7 @@ var mx = (function () {
             if (!node)
                 return;
             for (var i = 0; i < node.childrenCount; i++) {
-                CocosFormFactory.instance.hideNodeByTemplate(templateName, node.children[i]);
+                moosnow.form.formFactory.hideNodeByTemplate(templateName, node.children[i]);
                 i--;
             }
         };
@@ -3471,7 +3497,8 @@ var mx = (function () {
             var source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
             var beginIdx = Common.randomNumBoth(0, source.length - 1);
             var tempName = "rotateAdItem";
-            CocosFormFactory.instance.getTemplate(tempName, function (tempCfg) {
+            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+            moosnow.form.formFactory.getTemplate(tempName, function (tempCfg) {
                 var x = tempCfg.width / 2;
                 var y = tempCfg.height / 2;
                 var spacingX = 15;
@@ -3502,7 +3529,7 @@ var mx = (function () {
                 endAd.forEach(function (adRow) {
                     adRow.source = source;
                     adRow.showIds = showIds;
-                    CocosFormFactory.instance.createNodeByTemplate(tempName, CocosAdViewItem, adRow, _this.rotateContainer);
+                    moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, _this.rotateContainer);
                 });
             });
         };
@@ -3695,16 +3722,17 @@ var mx = (function () {
      */
     var FormUtil = /** @class */ (function () {
         function FormUtil() {
+            this.formFactory = new CocosFormFactory();
         }
         /**
          * Toast消息
          * @param msg  消息内容
          */
         FormUtil.prototype.showToast = function (msg) {
-            CocosFormFactory.instance.showForm(FormLayout.ToastForm, CocosToastForm, msg);
+            this.formFactory.showForm(FormLayout.ToastForm, CocosToastForm, msg);
         };
         FormUtil.prototype.loadAd = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
+            this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
                 console.log('create ad form');
             });
         };
@@ -3738,7 +3766,7 @@ var mx = (function () {
          * @param options
          */
         FormUtil.prototype.showMistouch = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.MistouchForm, CocosMistouchForm, options);
+            this.formFactory.showForm(FormLayout.MistouchForm, CocosMistouchForm, options);
         };
         /**
          * 显示奖励
@@ -3748,7 +3776,7 @@ var mx = (function () {
          * @param callback
          */
         FormUtil.prototype.showPrize = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.PrizeForm, CocosPrizeForm, options);
+            this.formFactory.showForm(FormLayout.PrizeForm, CocosPrizeForm, options);
         };
         /**
          * 显示结算统计页
@@ -3756,7 +3784,7 @@ var mx = (function () {
          * @param callback
          */
         FormUtil.prototype.showTotal = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.TotalForm, CocosTotalForm, options);
+            this.formFactory.showForm(FormLayout.TotalForm, CocosTotalForm, options);
         };
         /**
         * 显示结算统计页
@@ -3764,7 +3792,7 @@ var mx = (function () {
         * @param callback
         */
         FormUtil.prototype.showEnd = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.EndForm, CocosEndForm, options);
+            this.formFactory.showForm(FormLayout.EndForm, CocosEndForm, options);
         };
         /**
           * 显示结算统计页
@@ -3772,45 +3800,45 @@ var mx = (function () {
           * @param callback
           */
         FormUtil.prototype.showPause = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.PauseForm, CocosPauseForm, options);
+            this.formFactory.showForm(FormLayout.PauseForm, CocosPauseForm, options);
         };
         /**
          *  showShare
          */
         FormUtil.prototype.showShare = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.ShareForm, CocosShareForm, options);
+            this.formFactory.showForm(FormLayout.ShareForm, CocosShareForm, options);
         };
         /**
         *  showShare
         */
         FormUtil.prototype.showTry = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.TryForm, CocosTryForm, options);
+            this.formFactory.showForm(FormLayout.TryForm, CocosTryForm, options);
         };
         /**
          *  showShare
          */
         FormUtil.prototype.showSet = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.SetForm, CocosSetForm, options);
+            this.formFactory.showForm(FormLayout.SetForm, CocosSetForm, options);
         };
         /**
             *  showShare
             */
         FormUtil.prototype.showBox = function (options) {
-            CocosFormFactory.instance.showForm(FormLayout.BoxForm, CocosBoxForm, options);
+            this.formFactory.showForm(FormLayout.BoxForm, CocosBoxForm, options);
         };
         /**
          * 显示窗体  此方法只会显示UI内容，不包含任何逻辑,一般用于自定义窗体
          * @param formName FormLayout 中的枚举值或者 字符串
          */
         FormUtil.prototype.createForm = function (formName) {
-            CocosFormFactory.instance.showForm(formName, CocosBaseForm, {});
+            this.formFactory.showForm(formName, CocosBaseForm, {});
         };
         /**
          * 隐藏窗体
          * @param formName FormLayout 中的枚举值或者 字符串
          */
         FormUtil.prototype.hideForm = function (formName) {
-            CocosFormFactory.instance.hideForm(formName, null);
+            this.formFactory.hideForm(formName, null);
         };
         return FormUtil;
     }());

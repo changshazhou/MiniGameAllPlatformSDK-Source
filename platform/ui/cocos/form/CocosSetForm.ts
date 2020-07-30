@@ -3,7 +3,6 @@ import CheckboxComponent from "../common/CheckboxComponent";
 import showSetOptions from "../../../model/showSetOptions";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
-import CocosPrizeForm from "../../../../dist/ui/cocos/CocosPrizeForm";
 
 export default class CocosSetForm extends CocosBaseForm {
 
