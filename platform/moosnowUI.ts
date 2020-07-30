@@ -25,9 +25,7 @@ export default class moosnowUI {
             return;
         }
         window["moosnow"].form = this.formUtil
-        window["moosnow"].delay = this.delay
-
-
+        // window["moosnow"].delay = this.delay
     }
     /**
      * form UI 操作

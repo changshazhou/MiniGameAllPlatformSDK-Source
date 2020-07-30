@@ -169,7 +169,7 @@ export default class CocosFormFactory extends FormFactory {
     public createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
- 
+
         let formKV = FormFactory.getFormFromCached(name);
         if (formKV) {
             parent.addChild(formKV.formNode);

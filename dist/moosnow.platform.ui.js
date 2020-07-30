@@ -300,259 +300,6 @@ var mx = (function () {
         RECOVER: 16384,
     };
 
-    var FormKeyValue = /** @class */ (function () {
-        function FormKeyValue(formNode, formLogic) {
-            this.formNode = null;
-            this.formLogic = null;
-            this.formNode = formNode;
-            this.formLogic = formLogic;
-        }
-        return FormKeyValue;
-    }());
-    var FormQuene = /** @class */ (function () {
-        function FormQuene(name, formNode, formLogic) {
-            this.formName = "";
-            this.quene = [];
-            this.formName = name;
-            this.quene.push(new FormKeyValue(formNode, formLogic));
-        }
-        FormQuene.prototype.addForm = function (formNode, formLogic) {
-            this.quene.push(new FormKeyValue(formNode, formLogic));
-        };
-        FormQuene.prototype.addFormKV = function (kv) {
-            this.quene.push(kv);
-        };
-        return FormQuene;
-    }());
-    var FormFactory = /** @class */ (function () {
-        function FormFactory() {
-            this.layoutUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json';
-            this.templatesUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json';
-            this.mLayoutQuene = [];
-            this.mTemplatesQuene = [];
-        }
-        Object.defineProperty(FormFactory, "instance", {
-            get: function () {
-                if (!this.mInstance)
-                    this.mInstance = new FormFactory();
-                return this.mInstance;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(FormFactory, "formQuene", {
-            get: function () {
-                return this._FormQuene;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        FormFactory.cachedQuene = function () {
-            return this._CachedQuene;
-        };
-        FormFactory.addFrom2Cached = function (name, formKV) {
-            var cacheQuene = null;
-            for (var i = 0; i < this._CachedQuene.length; i++) {
-                var item = this._CachedQuene[i];
-                if (item.formName == name) {
-                    cacheQuene = item;
-                    break;
-                }
-            }
-            if (cacheQuene)
-                cacheQuene.addFormKV(formKV);
-            else
-                this._CachedQuene.push(new FormQuene(name, formKV.formNode, formKV.formLogic));
-        };
-        /**
-         * 从缓存中取form
-         * @param name
-         */
-        FormFactory.getFormFromCached = function (name) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
-                if (item.formName == name) {
-                    for (var j = 0; j < item.quene.length; j++) {
-                        item.quene.splice(j, 1);
-                        return item.quene[j];
-                    }
-                    break;
-                }
-            }
-            return null;
-        };
-        /**
-         * 添加Form节点到队列
-         * @param name
-         * @param formNode
-         * @param formLogic
-         */
-        FormFactory.addForm2Quene = function (name, formNode, formLogic) {
-            var idx = -1;
-            for (var i = 0; i < this._FormQuene.length; i++) {
-                var item = this._FormQuene[i];
-                if (item.formName == name) {
-                    idx = i;
-                    break;
-                }
-            }
-            // console.log('addForm2Quene 1 ', this._FormQuene)
-            if (idx != -1) {
-                this._FormQuene[idx].addForm(formNode, formLogic);
-            }
-            else
-                this._FormQuene.push(new FormQuene(name, formNode, formLogic));
-            // console.log('addForm2Quene 2 ', this._FormQuene)
-        };
-        /**
-         * 根据逻辑类回收
-         * @param item
-         * @param idx
-         * @param callback
-         * @param num
-         */
-        FormFactory.recoverFormLogic = function (item, idx, callback, num) {
-            var _this = this;
-            if (num === void 0) { num = 1; }
-            var formKVs = item.quene.splice(idx, num);
-            formKVs.forEach(function (formKV) {
-                _this.addFrom2Cached(item.formName, formKV);
-            });
-            if (callback) {
-                if (formKVs.length == 1)
-                    callback(formKVs[0]);
-                else
-                    callback(formKVs);
-            }
-        };
-        FormFactory.removeFormByLogic = function (logic, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
-                for (var j = 0; j < item.quene.length; j++) {
-                    if (item.quene[j].formLogic == logic) {
-                        this.recoverFormLogic(item, j, callback);
-                        break;
-                    }
-                }
-            }
-        };
-        /**
-         * 从队列里移除Form
-         * @param name
-         * @param formNode
-         */
-        FormFactory.removeFormFromQuene = function (name, formKV, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
-                if (item.formName == name) {
-                    for (var j = 0; j < item.quene.length; j++) {
-                        if (item.quene[j] == formKV) {
-                            this.recoverFormLogic(item, j, callback);
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-        };
-        /**
-         * 从队列里移除所有
-         * @param name
-         */
-        FormFactory.removeAllFormFromQuene = function (name, callback) {
-            for (var i = 0; i < this.formQuene.length; i++) {
-                var item = this.formQuene[i];
-                if (item.formName == name) {
-                    for (var j = 0; j < item.quene.length; j++) {
-                        this.recoverFormLogic(item, j, callback);
-                        j--;
-                    }
-                    break;
-                }
-            }
-        };
-        FormFactory.prototype.getLayout = function (callback) {
-            var _this = this;
-            if (!this.mCachedLayout) {
-                this.mLayoutQuene.push(callback);
-                if (this.mLayoutQuene.length == 1)
-                    moosnow.http.request(this.layoutUrl, {}, 'GET', function (res) {
-                        _this.mCachedLayout = res;
-                        console.log('getLayout call num ', _this.mLayoutQuene.length);
-                        _this.mLayoutQuene.forEach(function (item) {
-                            item(res);
-                        });
-                        _this.mLayoutQuene = [];
-                    });
-            }
-            else
-                callback(this.mCachedLayout);
-        };
-        FormFactory.prototype.getTemplates = function (callback) {
-            var _this = this;
-            if (!this.mCachedTemplates) {
-                this.mTemplatesQuene.push(callback);
-                if (this.mTemplatesQuene.length == 1)
-                    moosnow.http.request(this.templatesUrl, {}, 'GET', function (res) {
-                        _this.mCachedTemplates = res;
-                        _this.mTemplatesQuene.forEach(function (item) {
-                            item(res);
-                        });
-                        _this.mTemplatesQuene = [];
-                    });
-            }
-            else
-                callback(this.mCachedTemplates);
-        };
-        FormFactory.prototype.showForm = function (name, formLogic, formData, parent, callback, remoteLayout, layoutOptions) {
-            if (remoteLayout === void 0) { remoteLayout = true; }
-            if (layoutOptions === void 0) { layoutOptions = null; }
-        };
-        FormFactory.prototype.hideFormByLogic = function (logic, callback) {
-        };
-        FormFactory.prototype.hideForm = function (name, formNode, formData) {
-        };
-        FormFactory.prototype.createNodeByTemplate = function (name, tempLogic, tempData, parent, remoteLayout, layoutOptions) {
-            if (remoteLayout === void 0) { remoteLayout = true; }
-            if (layoutOptions === void 0) { layoutOptions = null; }
-        };
-        FormFactory.prototype.hideNodeByTemplate = function (name, formNode, formData) {
-        };
-        FormFactory.mInstance = null;
-        FormFactory._FormQuene = [];
-        FormFactory._CachedQuene = [];
-        return FormFactory;
-    }());
-
-    var NodeHelper = /** @class */ (function () {
-        function NodeHelper() {
-        }
-        Object.defineProperty(NodeHelper, "canvasNode", {
-            get: function () {
-                return cc.Canvas.instance.node;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NodeHelper.getNodeName = function () {
-            this.nodeNum++;
-            return 'createNode' + this.nodeNum;
-        };
-        NodeHelper.createNode = function () {
-        };
-        NodeHelper.createImage = function (parent, imgCfg) {
-        };
-        NodeHelper.createText = function (parent, textCfg) {
-        };
-        NodeHelper.changeSrc = function (image, imgCfg) {
-        };
-        NodeHelper.createMask = function (parent) {
-        };
-        NodeHelper.nodeNum = 0;
-        return NodeHelper;
-    }());
-
     var ROOT_CONFIG = {
         UI_ROOT: "moosnow/prefab/ui/",
         ENTITY_ROOT: "moosnow/prefab/entity/",
@@ -905,6 +652,260 @@ var mx = (function () {
             return retValue;
         };
         return Common;
+    }());
+
+    var FormKeyValue = /** @class */ (function () {
+        function FormKeyValue(formNode, formLogic) {
+            this.formNode = null;
+            this.formLogic = null;
+            this.formNode = formNode;
+            this.formLogic = formLogic;
+        }
+        return FormKeyValue;
+    }());
+    var FormQuene = /** @class */ (function () {
+        function FormQuene(name, formNode, formLogic) {
+            this.formName = "";
+            this.quene = [];
+            this.formName = name;
+            this.quene.push(new FormKeyValue(formNode, formLogic));
+        }
+        FormQuene.prototype.addForm = function (formNode, formLogic) {
+            this.quene.push(new FormKeyValue(formNode, formLogic));
+        };
+        FormQuene.prototype.addFormKV = function (kv) {
+            this.quene.push(kv);
+        };
+        return FormQuene;
+    }());
+    var FormFactory = /** @class */ (function () {
+        function FormFactory() {
+            this.layoutUrl = ROOT_CONFIG.HTTP_ROOT + "/layout/" + Common.config.moosnowAppId + "/layout.json";
+            this.templatesUrl = ROOT_CONFIG.HTTP_ROOT + "/layout/" + Common.config.moosnowAppId + "/templates.json";
+            this.mLayoutQuene = [];
+            this.mTemplatesQuene = [];
+        }
+        Object.defineProperty(FormFactory, "instance", {
+            get: function () {
+                if (!this.mInstance) {
+                    this.mInstance = new FormFactory();
+                }
+                return this.mInstance;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FormFactory, "formQuene", {
+            get: function () {
+                return this._FormQuene;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        FormFactory.cachedQuene = function () {
+            return this._CachedQuene;
+        };
+        FormFactory.addFrom2Cached = function (name, formKV) {
+            var cacheQuene = null;
+            for (var i = 0; i < this._CachedQuene.length; i++) {
+                var item = this._CachedQuene[i];
+                if (item.formName == name) {
+                    cacheQuene = item;
+                    break;
+                }
+            }
+            if (cacheQuene)
+                cacheQuene.addFormKV(formKV);
+            else
+                this._CachedQuene.push(new FormQuene(name, formKV.formNode, formKV.formLogic));
+        };
+        /**
+         * 从缓存中取form
+         * @param name
+         */
+        FormFactory.getFormFromCached = function (name) {
+            for (var i = 0; i < this.formQuene.length; i++) {
+                var item = this.formQuene[i];
+                if (item.formName == name) {
+                    for (var j = 0; j < item.quene.length; j++) {
+                        item.quene.splice(j, 1);
+                        return item.quene[j];
+                    }
+                    break;
+                }
+            }
+            return null;
+        };
+        /**
+         * 添加Form节点到队列
+         * @param name
+         * @param formNode
+         * @param formLogic
+         */
+        FormFactory.addForm2Quene = function (name, formNode, formLogic) {
+            var idx = -1;
+            for (var i = 0; i < this._FormQuene.length; i++) {
+                var item = this._FormQuene[i];
+                if (item.formName == name) {
+                    idx = i;
+                    break;
+                }
+            }
+            // console.log('addForm2Quene 1 ', this._FormQuene)
+            if (idx != -1) {
+                this._FormQuene[idx].addForm(formNode, formLogic);
+            }
+            else
+                this._FormQuene.push(new FormQuene(name, formNode, formLogic));
+            // console.log('addForm2Quene 2 ', this._FormQuene)
+        };
+        /**
+         * 根据逻辑类回收
+         * @param item
+         * @param idx
+         * @param callback
+         * @param num
+         */
+        FormFactory.recoverFormLogic = function (item, idx, callback, num) {
+            var _this = this;
+            if (num === void 0) { num = 1; }
+            var formKVs = item.quene.splice(idx, num);
+            formKVs.forEach(function (formKV) {
+                _this.addFrom2Cached(item.formName, formKV);
+            });
+            if (callback) {
+                if (formKVs.length == 1)
+                    callback(formKVs[0]);
+                else
+                    callback(formKVs);
+            }
+        };
+        FormFactory.removeFormByLogic = function (logic, callback) {
+            for (var i = 0; i < this.formQuene.length; i++) {
+                var item = this.formQuene[i];
+                for (var j = 0; j < item.quene.length; j++) {
+                    if (item.quene[j].formLogic == logic) {
+                        this.recoverFormLogic(item, j, callback);
+                        break;
+                    }
+                }
+            }
+        };
+        /**
+         * 从队列里移除Form
+         * @param name
+         * @param formNode
+         */
+        FormFactory.removeFormFromQuene = function (name, formKV, callback) {
+            for (var i = 0; i < this.formQuene.length; i++) {
+                var item = this.formQuene[i];
+                if (item.formName == name) {
+                    for (var j = 0; j < item.quene.length; j++) {
+                        if (item.quene[j] == formKV) {
+                            this.recoverFormLogic(item, j, callback);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        };
+        /**
+         * 从队列里移除所有
+         * @param name
+         */
+        FormFactory.removeAllFormFromQuene = function (name, callback) {
+            for (var i = 0; i < this.formQuene.length; i++) {
+                var item = this.formQuene[i];
+                if (item.formName == name) {
+                    for (var j = 0; j < item.quene.length; j++) {
+                        this.recoverFormLogic(item, j, callback);
+                        j--;
+                    }
+                    break;
+                }
+            }
+        };
+        FormFactory.prototype.getLayout = function (callback) {
+            var _this = this;
+            if (!this.mCachedLayout) {
+                this.mLayoutQuene.push(callback);
+                if (this.mLayoutQuene.length == 1)
+                    moosnow.http.request(this.layoutUrl, {}, 'GET', function (res) {
+                        _this.mCachedLayout = res;
+                        console.log('getLayout call num ', _this.mLayoutQuene.length);
+                        _this.mLayoutQuene.forEach(function (item) {
+                            item(res);
+                        });
+                        _this.mLayoutQuene = [];
+                    });
+            }
+            else
+                callback(this.mCachedLayout);
+        };
+        FormFactory.prototype.getTemplates = function (callback) {
+            var _this = this;
+            if (!this.mCachedTemplates) {
+                this.mTemplatesQuene.push(callback);
+                if (this.mTemplatesQuene.length == 1)
+                    moosnow.http.request(this.templatesUrl, {}, 'GET', function (res) {
+                        _this.mCachedTemplates = res;
+                        _this.mTemplatesQuene.forEach(function (item) {
+                            item(res);
+                        });
+                        _this.mTemplatesQuene = [];
+                    });
+            }
+            else
+                callback(this.mCachedTemplates);
+        };
+        FormFactory.prototype.showForm = function (name, formLogic, formData, parent, callback, remoteLayout, layoutOptions) {
+            if (remoteLayout === void 0) { remoteLayout = true; }
+            if (layoutOptions === void 0) { layoutOptions = null; }
+        };
+        FormFactory.prototype.hideFormByLogic = function (logic, callback) {
+        };
+        FormFactory.prototype.hideForm = function (name, formNode, formData) {
+        };
+        FormFactory.prototype.createNodeByTemplate = function (name, tempLogic, tempData, parent, remoteLayout, layoutOptions) {
+            if (remoteLayout === void 0) { remoteLayout = true; }
+            if (layoutOptions === void 0) { layoutOptions = null; }
+        };
+        FormFactory.prototype.hideNodeByTemplate = function (name, formNode, formData) {
+        };
+        FormFactory.mInstance = null;
+        FormFactory._FormQuene = [];
+        FormFactory._CachedQuene = [];
+        return FormFactory;
+    }());
+
+    var NodeHelper = /** @class */ (function () {
+        function NodeHelper() {
+        }
+        Object.defineProperty(NodeHelper, "canvasNode", {
+            get: function () {
+                return cc.Canvas.instance.node;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NodeHelper.getNodeName = function () {
+            this.nodeNum++;
+            return 'createNode' + this.nodeNum;
+        };
+        NodeHelper.createNode = function () {
+        };
+        NodeHelper.createImage = function (parent, imgCfg) {
+        };
+        NodeHelper.createText = function (parent, textCfg) {
+        };
+        NodeHelper.changeSrc = function (image, imgCfg) {
+        };
+        NodeHelper.createMask = function (parent) {
+        };
+        NodeHelper.nodeNum = 0;
+        return NodeHelper;
     }());
 
     var BaseModule = /** @class */ (function () {
@@ -4079,7 +4080,7 @@ var mx = (function () {
                 return;
             }
             window["moosnow"].form = this.formUtil;
-            window["moosnow"].delay = this.delay;
+            // window["moosnow"].delay = this.delay
         }
         Object.defineProperty(moosnowUI.prototype, "formUtil", {
             get: function () {

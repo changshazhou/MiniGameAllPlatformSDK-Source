@@ -1,4 +1,6 @@
 import BaseForm from "./BaseForm";
+import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
+import Common from "../../utils/Common";
 
 export class FormKeyValue {
 
@@ -28,15 +30,18 @@ export class FormQuene {
 }
 export default class FormFactory {
 
-    public layoutUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/layout.json'
-    public templatesUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/Game/demo/templates.json'
+    public layoutUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/layout.json`;
+    public templatesUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/templates.json`;
 
     public static mInstance: FormFactory = null;
     public static get instance() {
-        if (!this.mInstance)
+        if (!this.mInstance) {
             this.mInstance = new FormFactory()
+        }
         return this.mInstance;
     }
+
+
 
     private static _FormQuene: Array<FormQuene> = [];
     public static get formQuene() {
