@@ -1468,7 +1468,12 @@ var mx = (function () {
             this.addStopPropagation(mask);
         };
         CocosNodeHelper.addStopPropagation = function (node) {
-            node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+            if (node)
+                node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
+        };
+        CocosNodeHelper.removeStopPropagation = function (node) {
+            if (node)
+                node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
         };
         CocosNodeHelper.onMaskMouseDown = function (e) {
             e.stopPropagation();
@@ -1814,17 +1819,24 @@ var mx = (function () {
         CocosBaseForm.prototype.onTouchEnd = function (e) {
             var _this = this;
             console.log('onMouseUp');
+            var queneId = e.getCurrentTarget().uuid;
             this.upAnim(e.getCurrentTarget(), function () {
-                if (_this.mClickQuene[e.getCurrentTarget().uuid])
-                    _this.mClickQuene[e.getCurrentTarget().uuid]();
+                if (_this.mClickQuene[queneId] && _this.mClickQuene[queneId].callback)
+                    _this.mClickQuene[queneId].callback();
             });
+            if (this.mClickQuene[queneId] && this.mClickQuene[queneId].stopPropagation)
+                e.stopPropagation();
         };
         CocosBaseForm.prototype.onTouchCancel = function (e) {
             this.upAnim(e.getCurrentTarget());
         };
-        CocosBaseForm.prototype.applyClickAnim = function (node, callback) {
+        CocosBaseForm.prototype.applyClickAnim = function (node, callback, stopPropagation) {
+            if (stopPropagation === void 0) { stopPropagation = false; }
             if (node && node.uuid) {
-                this.mClickQuene[node.uuid] = callback;
+                this.mClickQuene[node.uuid] = {
+                    stopPropagation: stopPropagation,
+                    callback: callback
+                };
                 node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
                 node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
                 node.on(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);
@@ -2320,6 +2332,7 @@ var mx = (function () {
         __extends(CocosSetForm, _super);
         function CocosSetForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.bg = null;
             _this.formComponents = [
                 new CheckboxComponent(moosnow.data.getVibrateSetting(), function (isChecked) {
                     _this.vibrateSwitch(isChecked);
@@ -2338,10 +2351,12 @@ var mx = (function () {
             configurable: true
         });
         CocosSetForm.prototype.addListener = function () {
-            this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+            this.node.on(CocosNodeEvent.TOUCH_START, this.hideForm, this);
+            CocosNodeHelper.addStopPropagation(this.bg);
         };
         CocosSetForm.prototype.removeListener = function () {
-            this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this);
+            this.node.off(CocosNodeEvent.TOUCH_START, this.hideForm, this);
+            CocosNodeHelper.removeStopPropagation(this.bg);
         };
         CocosSetForm.prototype.willShow = function (data) {
             _super.prototype.willShow.call(this, data);
@@ -3496,6 +3511,7 @@ var mx = (function () {
             _this.btnVideo = null;
             _this.btnShare = null;
             _this.btnReceive = null;
+            _this.logo = null;
             _this.mChecked = true;
             _this.formComponents = [
                 new CheckboxComponent(_this.mChecked, function (isChecked) {
@@ -3506,6 +3522,13 @@ var mx = (function () {
             _this.mCurrentSecond = 0;
             return _this;
         }
+        Object.defineProperty(CocosPrizeForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CocosPrizeForm.prototype.addListener = function () {
             var _this = this;
             this.applyClickAnim(this.btnCancel, function () {
@@ -3532,6 +3555,8 @@ var mx = (function () {
             this.addListener();
             this.mTotalSecond = 10;
             this.mCurrentSecond = 0;
+            if (this.FormData && this.FormData.logo)
+                CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo });
             this.resumeCountdown();
             moosnow.platform.showBanner(false);
         };
@@ -3590,27 +3615,38 @@ var mx = (function () {
         return CocosPrizeForm;
     }(CocosBaseForm));
 
+    var FormLayout = /** @class */ (function () {
+        function FormLayout() {
+        }
+        FormLayout.ToastForm = "toastForm";
+        FormLayout.AdForm = "adForm";
+        FormLayout.MistouchForm = "mistouchForm";
+        FormLayout.PrizeForm = "prizeForm";
+        FormLayout.TotalForm = "totalForm";
+        FormLayout.EndForm = "endForm";
+        FormLayout.PauseForm = "pauseForm";
+        FormLayout.ShareForm = "shareForm";
+        FormLayout.TryForm = "tryForm";
+        FormLayout.SetForm = "setForm";
+        FormLayout.BoxForm = "boxForm";
+        return FormLayout;
+    }());
+
     /**
      * 广告结果
      */
     var FormUtil = /** @class */ (function () {
         function FormUtil() {
-            // showOptions.create(showTotalOptions)
-            // console.log('showTotalOptions', showOptions.create(showTotalOptions))
-            // showOptions.create(showEndOptions)
-            // showOptions.create(showTouchOptions)
-            // showOptions.create(showPrizeOptions)
-            // showOptions.create(showShareOptions)
         }
         /**
          * Toast消息
          * @param msg  消息内容
          */
         FormUtil.prototype.showToast = function (msg) {
-            CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg);
+            CocosFormFactory.instance.showForm(FormLayout.ToastForm, CocosToastForm, msg);
         };
         FormUtil.prototype.loadAd = function (options) {
-            CocosFormFactory.instance.showForm("adForm", CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
+            CocosFormFactory.instance.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
                 console.log('create ad form');
             });
         };
@@ -3644,7 +3680,7 @@ var mx = (function () {
          * @param options
          */
         FormUtil.prototype.showMistouch = function (options) {
-            CocosFormFactory.instance.showForm("mistouchForm", CocosMistouchForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.MistouchForm, CocosMistouchForm, options);
         };
         /**
          * 显示奖励
@@ -3654,7 +3690,7 @@ var mx = (function () {
          * @param callback
          */
         FormUtil.prototype.showPrize = function (options) {
-            CocosFormFactory.instance.showForm("prizeForm", CocosPrizeForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.PrizeForm, CocosPrizeForm, options);
         };
         /**
          * 显示结算统计页
@@ -3662,7 +3698,7 @@ var mx = (function () {
          * @param callback
          */
         FormUtil.prototype.showTotal = function (options) {
-            CocosFormFactory.instance.showForm("totalForm", CocosTotalForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.TotalForm, CocosTotalForm, options);
         };
         /**
         * 显示结算统计页
@@ -3670,7 +3706,7 @@ var mx = (function () {
         * @param callback
         */
         FormUtil.prototype.showEnd = function (options) {
-            CocosFormFactory.instance.showForm("endForm", CocosEndForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.EndForm, CocosEndForm, options);
         };
         /**
           * 显示结算统计页
@@ -3678,34 +3714,45 @@ var mx = (function () {
           * @param callback
           */
         FormUtil.prototype.showPause = function (options) {
-            CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.PauseForm, CocosPauseForm, options);
         };
         /**
          *  showShare
          */
         FormUtil.prototype.showShare = function (options) {
-            CocosFormFactory.instance.showForm("shareForm", CocosShareForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.ShareForm, CocosShareForm, options);
         };
         /**
         *  showShare
         */
         FormUtil.prototype.showTry = function (options) {
-            CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.TryForm, CocosTryForm, options);
         };
         /**
          *  showShare
          */
         FormUtil.prototype.showSet = function (options) {
-            CocosFormFactory.instance.showForm("setForm", CocosSetForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.SetForm, CocosSetForm, options);
         };
         /**
             *  showShare
             */
         FormUtil.prototype.showBox = function (options) {
-            CocosFormFactory.instance.showForm("boxForm", CocosBoxForm, options);
+            CocosFormFactory.instance.showForm(FormLayout.BoxForm, CocosBoxForm, options);
         };
+        /**
+         * 显示窗体  此方法只会显示UI内容，不包含任何逻辑,一般用于自定义窗体
+         * @param formName FormLayout 中的枚举值或者 字符串
+         */
         FormUtil.prototype.createForm = function (formName) {
-            CocosFormFactory.instance.showForm(formName, CocosEndForm, {});
+            CocosFormFactory.instance.showForm(formName, CocosBaseForm, {});
+        };
+        /**
+         * 隐藏窗体
+         * @param formName FormLayout 中的枚举值或者 字符串
+         */
+        FormUtil.prototype.hideForm = function (formName) {
+            CocosFormFactory.instance.hideForm(formName, null);
         };
         return FormUtil;
     }());
@@ -3903,7 +3950,7 @@ var mx = (function () {
             /**
              *
              */
-            _this.baseNum = 1;
+            _this.logo = null;
             /**
              * 点击完成回调
              */

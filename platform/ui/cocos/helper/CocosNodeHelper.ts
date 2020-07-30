@@ -328,7 +328,13 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static addStopPropagation(node: cc.Node) {
-        node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
+        if (node)
+            node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
+    }
+
+    public static removeStopPropagation(node: cc.Node) {
+        if (node)
+            node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
     }
 
     private static onMaskMouseDown(e: cc.Event.EventTouch) {

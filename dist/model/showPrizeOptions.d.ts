@@ -6,7 +6,7 @@ export default class showPrizeOptions extends showOptions {
     /**
      *
      */
-    baseNum: number;
+    logo: string;
     /**
      * 点击完成回调
      */

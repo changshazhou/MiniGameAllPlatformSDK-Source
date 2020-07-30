@@ -31,6 +31,8 @@ import CocosAdForm from "./cocos/form/CocosAdForm";
 import showAdOptions from "../model/loadAdOptions";
 import loadAdOptions from "../model/loadAdOptions";
 import CocosPrizeForm from "./cocos/form/CocosPrizeForm";
+import FormLayout from "./FormLayout";
+import CocosBaseForm from "./cocos/form/CocosBaseForm";
 
 /**
  * 广告结果
@@ -39,29 +41,22 @@ export default class FormUtil {
 
     constructor() {
 
-        // showOptions.create(showTotalOptions)
-        // console.log('showTotalOptions', showOptions.create(showTotalOptions))
-
-        // showOptions.create(showEndOptions)
-        // showOptions.create(showTouchOptions)
-        // showOptions.create(showPrizeOptions)
-        // showOptions.create(showShareOptions)
     }
 
 
-    public optionsFactory: typeof showOptions
+
 
     /**
      * Toast消息
      * @param msg  消息内容
      */
     public showToast(msg: string) {
-        CocosFormFactory.instance.showForm("toastForm", CocosToastForm, msg)
+        CocosFormFactory.instance.showForm(FormLayout.ToastForm, CocosToastForm, msg)
     }
 
     public loadAd(options: loadAdOptions) {
 
-        CocosFormFactory.instance.showForm("adForm", CocosAdForm, { ...new loadAdOptions(), ...options }, null, () => {
+        CocosFormFactory.instance.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, () => {
             console.log('create ad form')
         })
     }
@@ -100,7 +95,7 @@ export default class FormUtil {
      * @param options 
      */
     public showMistouch(options: showMistouchOptions) {
-        CocosFormFactory.instance.showForm("mistouchForm", CocosMistouchForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.MistouchForm, CocosMistouchForm, options)
     }
     /**
      * 显示奖励
@@ -110,7 +105,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
-        CocosFormFactory.instance.showForm("prizeForm", CocosPrizeForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.PrizeForm, CocosPrizeForm, options)
     }
 
 
@@ -121,7 +116,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showTotal(options: showTotalOptions) {
-        CocosFormFactory.instance.showForm("totalForm", CocosTotalForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.TotalForm, CocosTotalForm, options)
     }
 
 
@@ -131,7 +126,7 @@ export default class FormUtil {
     * @param callback 
     */
     public showEnd(options: showEndOptions) {
-        CocosFormFactory.instance.showForm("endForm", CocosEndForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.EndForm, CocosEndForm, options)
     }
 
     /**
@@ -140,43 +135,50 @@ export default class FormUtil {
       * @param callback 
       */
     public showPause(options: showPauseOptions) {
-        CocosFormFactory.instance.showForm("pauseForm", CocosPauseForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.PauseForm, CocosPauseForm, options)
     }
 
     /**
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        CocosFormFactory.instance.showForm("shareForm", CocosShareForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.ShareForm, CocosShareForm, options)
     }
 
     /**
     *  showShare
     */
     public showTry(options: showTryOptions) {
-        CocosFormFactory.instance.showForm("tryForm", CocosTryForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.TryForm, CocosTryForm, options)
     }
 
     /**
      *  showShare
      */
     public showSet(options: showSetOptions) {
-        CocosFormFactory.instance.showForm("setForm", CocosSetForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.SetForm, CocosSetForm, options)
     }
 
     /**
         *  showShare
         */
     public showBox(options: showBoxOptions) {
-        CocosFormFactory.instance.showForm("boxForm", CocosBoxForm, options)
+        CocosFormFactory.instance.showForm(FormLayout.BoxForm, CocosBoxForm, options)
     }
 
-
-
-
+    /**
+     * 显示窗体  此方法只会显示UI内容，不包含任何逻辑,一般用于自定义窗体
+     * @param formName FormLayout 中的枚举值或者 字符串
+     */
     public createForm(formName: string) {
-        CocosFormFactory.instance.showForm(formName, CocosEndForm, {})
+        CocosFormFactory.instance.showForm(formName, CocosBaseForm, {})
     }
-
+    /**
+     * 隐藏窗体  
+     * @param formName FormLayout 中的枚举值或者 字符串
+     */
+    public hideForm(formName: string) {
+        CocosFormFactory.instance.hideForm(formName, null);
+    }
 
 }

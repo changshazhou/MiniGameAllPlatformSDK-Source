@@ -4,6 +4,8 @@ import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import Common from "../../../utils/Common";
+import showPrizeOptions from "../../../model/showPrizeOptions";
+import NodeAttribute from "../../attribute/NodeAttribute";
 
 export default class CocosPrizeForm extends CocosBaseForm {
 
@@ -12,6 +14,7 @@ export default class CocosPrizeForm extends CocosBaseForm {
     btnVideo: cc.Node = null;
     btnShare: cc.Node = null;
     btnReceive: cc.Node = null;
+    logo: cc.Node = null;
 
 
     private mChecked: boolean = true;
@@ -20,6 +23,11 @@ export default class CocosPrizeForm extends CocosBaseForm {
             this.mChecked = isChecked;
         })
     ]
+
+
+    public get FormData(): showPrizeOptions {
+        return this.mFormData;
+    }
 
     private addListener() {
         this.applyClickAnim(this.btnCancel, () => {
@@ -46,10 +54,12 @@ export default class CocosPrizeForm extends CocosBaseForm {
     willShow(data) {
         super.willShow(data)
         this.addListener();
-
-
         this.mTotalSecond = 10;
         this.mCurrentSecond = 0;
+
+        if (this.FormData && this.FormData.logo)
+            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo } as NodeAttribute)
+
         this.resumeCountdown();
         moosnow.platform.showBanner(false);
     }

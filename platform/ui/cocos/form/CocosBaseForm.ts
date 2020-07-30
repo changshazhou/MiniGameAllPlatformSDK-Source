@@ -1,9 +1,9 @@
 import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
-import CocosBaseComponent from "../common/CocosBaseComponent";
-import FormFactory from "../../engine/FormFactory";
 import CocosFormFactory from "../helper/CocosFormFactory";
+
+
 
 export default class CocosBaseForm extends BaseForm {
 
@@ -45,19 +45,26 @@ export default class CocosBaseForm extends BaseForm {
     }
     private onTouchEnd(e: cc.Event.EventTouch) {
         console.log('onMouseUp')
+        let queneId = e.getCurrentTarget().uuid
         this.upAnim(e.getCurrentTarget(), () => {
-            if (this.mClickQuene[e.getCurrentTarget().uuid])
-                this.mClickQuene[e.getCurrentTarget().uuid]();
+
+            if (this.mClickQuene[queneId] && this.mClickQuene[queneId].callback)
+                this.mClickQuene[queneId].callback();
         })
+        if (this.mClickQuene[queneId] && this.mClickQuene[queneId].stopPropagation)
+            e.stopPropagation();
     }
 
     private onTouchCancel(e: cc.Event.EventTouch) {
         this.upAnim(e.getCurrentTarget())
     }
 
-    public applyClickAnim(node: cc.Node, callback?: Function) {
+    public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false) {
         if (node && node.uuid) {
-            this.mClickQuene[node.uuid] = callback;
+            this.mClickQuene[node.uuid] = {
+                stopPropagation,
+                callback
+            };
             node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
             node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
             node.on(CocosNodeEvent.TOUCH_CANCEL, this.onTouchCancel, this);

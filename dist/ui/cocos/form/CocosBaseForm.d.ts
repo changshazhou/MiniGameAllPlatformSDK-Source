@@ -7,7 +7,7 @@ export default class CocosBaseForm extends BaseForm {
     private onTouchStart;
     private onTouchEnd;
     private onTouchCancel;
-    applyClickAnim(node: cc.Node, callback?: Function): void;
+    applyClickAnim(node: cc.Node, callback?: Function, stopPropagation?: boolean): void;
     removeClickAnim(node: cc.Node): void;
     findNodeByName(node: cc.Node, attrName: string): cc.Node;
     hideForm(): void;

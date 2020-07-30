@@ -2,8 +2,12 @@ import CocosBaseForm from "./CocosBaseForm";
 import CheckboxComponent from "../common/CheckboxComponent";
 import showSetOptions from "../../../model/showSetOptions";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
+import CocosNodeHelper from "../helper/CocosNodeHelper";
+import CocosPrizeForm from "../../../../dist/ui/cocos/CocosPrizeForm";
 
 export default class CocosSetForm extends CocosBaseForm {
+
+    public bg: cc.Node = null;
 
     public get FormData(): showSetOptions {
         return this.mFormData;
@@ -18,10 +22,12 @@ export default class CocosSetForm extends CocosBaseForm {
         }, "musicOn", "musicOff"),
     ];
     private addListener() {
-        this.node.on(CocosNodeEvent.TOUCH_END, this.hideForm, this)
+        this.node.on(CocosNodeEvent.TOUCH_START, this.hideForm, this)
+        CocosNodeHelper.addStopPropagation(this.bg)
     }
     private removeListener() {
-        this.node.off(CocosNodeEvent.TOUCH_END, this.hideForm, this)
+        this.node.off(CocosNodeEvent.TOUCH_START, this.hideForm, this)
+        CocosNodeHelper.removeStopPropagation(this.bg)
     }
 
     willShow(data) {
