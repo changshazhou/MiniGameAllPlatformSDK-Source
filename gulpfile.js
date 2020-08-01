@@ -78,7 +78,7 @@ gulp.task('ui', () => {
 				compress: false
 			}),
 			// terser.terser(),
-			uglify.uglify(),
+			// uglify.uglify(),
 			/*terser({
 				output: {
 				},

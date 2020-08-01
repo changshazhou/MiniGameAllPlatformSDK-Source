@@ -10,10 +10,6 @@ window.moosnowConfig = {
         nativeId: "",
         moosnowAppId: "wxeea828178bcda2e9", //请填写你自己的APP id
         version: "1.1.0",
-        layout: {
-            src: 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/ui/layout.json',
-            templates: 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/ui/templates.json'
-        },
         url: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/config/tp_hzyx_config_wx.json",//游戏的配置json，如果用到了getMistouchNum,后台必须配置mistouchNum字段
     },
     oppo: {

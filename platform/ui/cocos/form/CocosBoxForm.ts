@@ -90,14 +90,13 @@ export default class CocosBoxForm extends CocosBaseForm {
             return;
         this._Receiveing = true;
         if (this.mTryFromVideo) {
+            this._Receiveing = false;
             moosnow.platform.showVideo(res => {
                 switch (res) {
                     case moosnow.VIDEO_STATUS.NOTEND:
-                        this._Receiveing = false;
                         moosnow.form.showToast(moosnow.VIDEO_MSG.NOTEND);
                         break;
                     case moosnow.VIDEO_STATUS.ERR:
-                        this._Receiveing = false;
                         moosnow.form.showToast(moosnow.VIDEO_MSG.ERR);
                         break;
                     case moosnow.VIDEO_STATUS.END:

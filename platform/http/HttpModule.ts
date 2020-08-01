@@ -328,6 +328,8 @@ export class HttpModule extends BaseModule {
                         })
                     }
                     else {
+                        if (res.exportAutoNavigate == 1)
+                            exportAutoNavigate = 1
                         if (res.exportAutoNavigate == 2)
                             exportAutoNavigate = 1;
                         callback({
