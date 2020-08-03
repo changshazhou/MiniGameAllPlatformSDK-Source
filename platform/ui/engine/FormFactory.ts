@@ -217,6 +217,39 @@ export default class FormFactory {
             }
         }
     }
+
+    /**
+     * 根据名称和节点获取 FormKeyValue
+     * @param name 
+     * @param formNode 
+     */
+    public getKVByName(name: string, formNode: cc.Node | Laya.Node) {
+        let kvs = this.getKVsByName(name);
+        if (kvs) {
+            for (let i = 0; i < kvs.length; i++) {
+                if (kvs[i].formNode == formNode) {
+                    return kvs[i];
+                }
+            }
+        }
+    }
+
+    public getKVsByName(name: string) {
+        let idx = -1;
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
+            if (item.formName == name) {
+                idx = i
+                break;
+            }
+        }
+        // console.log('addForm2Quene 1 ', this._FormQuene)
+        if (idx != -1) {
+            return this.layoutQuene[idx].quene
+        }
+        return [];
+    }
+
     private mLayoutQuene = [];
     private mCachedLayout: any;
     public getLayout(callback: (attr) => void) {

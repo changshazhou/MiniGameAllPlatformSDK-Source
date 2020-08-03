@@ -5,12 +5,12 @@ export default class BaseModule {
 
     private mIntervalArr: Object = {};
     private mTimeoutArr: Object = {};
-    public schedule(callback: Function, time: number) {
+    public schedule(callback: Function, time: number, ...arg) {
 
         let self = this;
         let id = setInterval(() => {
             if (callback)
-                callback.apply(self)
+                callback.apply(self, ...arg);
         }, time * 1000)
         console.log('BaseModule schedule ', id)
         this.mIntervalArr[id] = callback;

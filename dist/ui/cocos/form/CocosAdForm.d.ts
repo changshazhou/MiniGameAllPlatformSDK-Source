@@ -54,7 +54,7 @@ export default class CocosAdForm extends CocosBaseForm {
     onRandomNavigate(): void;
     onNavigate(): void;
     private floatRuning;
-    floatAnim(): void;
+    private floatAnim;
     sideOut(): void;
     sideIn(): void;
     pushScroll(scrollView: cc.ScrollView, layout: cc.Layout): void;

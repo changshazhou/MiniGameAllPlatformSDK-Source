@@ -5,6 +5,8 @@ import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosBoxItem from "../template/CocosBoxItem";
 import Common from "../../../utils/Common";
 import EventType from "../../../utils/EventType";
+import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
+import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 
 export default class CocosBoxForm extends CocosBaseForm {
 
@@ -93,13 +95,13 @@ export default class CocosBoxForm extends CocosBaseForm {
             this._Receiveing = false;
             moosnow.platform.showVideo(res => {
                 switch (res) {
-                    case moosnow.VIDEO_STATUS.NOTEND:
-                        moosnow.form.showToast(moosnow.VIDEO_MSG.NOTEND);
+                    case VIDEO_STATUS.NOTEND:
+                        moosnow.form.showToast(VIDEO_MSG.NOTEND);
                         break;
-                    case moosnow.VIDEO_STATUS.ERR:
-                        moosnow.form.showToast(moosnow.VIDEO_MSG.ERR);
+                    case VIDEO_STATUS.ERR:
+                        moosnow.form.showToast(VIDEO_MSG.ERR);
                         break;
-                    case moosnow.VIDEO_STATUS.END:
+                    case VIDEO_STATUS.END:
                         moosnow.data.addPrizeKey(3);
                         this.updateKeyNum();
                     default:

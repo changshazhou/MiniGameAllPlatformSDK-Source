@@ -60,6 +60,13 @@ export default class FormFactory {
      * @param name
      */
     removeAllFormFromQuene(name: string, callback?: (formKV: LayoutFormKeyValue) => void): void;
+    /**
+     * 根据名称和节点获取 FormKeyValue
+     * @param name
+     * @param formNode
+     */
+    getKVByName(name: string, formNode: cc.Node | Laya.Node): LayoutFormKeyValue;
+    getKVsByName(name: string): LayoutFormKeyValue[];
     private mLayoutQuene;
     private mCachedLayout;
     getLayout(callback: (attr: any) => void): void;

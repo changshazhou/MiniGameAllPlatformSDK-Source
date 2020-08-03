@@ -175,7 +175,7 @@ export default class CocosAdForm extends CocosBaseForm {
         })
     }
     private floatRuning = false;
-    public floatAnim() {
+    private floatAnim() {
         if (this.floatRuning)
             return;
         if (this.floatContainer.childrenCount >= this.FormData.floatPositon.length)
@@ -342,6 +342,7 @@ export default class CocosAdForm extends CocosBaseForm {
             adRow.y = point.y;
             adRow.source = source;
             adRow.showIds = showIds;
+            adRow.index = idx;
             moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, this.floatContainer);
 
         })
@@ -353,20 +354,20 @@ export default class CocosAdForm extends CocosBaseForm {
     }
 
     private updateFloat(source) {
+        this.floatContainer.children.forEach(floatNode => {
+            this.FormData.floatTempletes.forEach(templeteName => {
+                moosnow.form.formFactory.getKVsByName(templeteName).forEach(kv => {
+                    if (kv.formNode == floatNode) {
+                        if (kv.formLogic.FormData.index < this.mAdData.indexLeft.length - 1)
+                            kv.formLogic.FormData.index++;
+                        else
+                            kv.formLogic.FormData.index = 0;
+                        (kv.formLogic as any).refreshImg({ ...this.mAdData.indexLeft[kv.formLogic.FormData.index], onCancel: kv.formLogic.FormData.onCancel });
+                    }
+                })
+            })
 
-        for (let key in this.mFloatCache) {
-            let showIndex = this.mFloatCache[key].index;
-            let logic = this.mFloatCache[key].logic;
-            if (showIndex < this.mAdData.indexLeft.length - 1)
-                showIndex++;
-            else
-                showIndex = 0;
-            this.mFloatCache[key].index = showIndex;
-
-            logic.refreshImg({ ...this.mAdData.indexLeft[showIndex], onCancel: this.mFloatCache[key].onCancel });
-
-        }
-
+        })
     }
 
     /**

@@ -12,7 +12,7 @@ export default class VIVOModule extends PlatformModule {
     public platformName: string = "qg";
     public appSid: string = "";
 
-    public bannerWidth: number = 1080;
+    public bannerWidth: number = 720;
     public bannerHeight: number = 114;
 
     private interLoadedShow: boolean = false;
@@ -248,7 +248,7 @@ export default class VIVOModule extends PlatformModule {
         let pixelRatio = wxsys.pixelRatio;
         let notchHeight = this.getNotchHeight();
 
-        let left = (screenWidth - this.bannerWidth) / pixelRatio / 2;
+        let left = (screenWidth - this.bannerWidth) / 2;
         if (Common.isEmpty(this.bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
@@ -256,10 +256,10 @@ export default class VIVOModule extends PlatformModule {
 
         let styleTop = 0;
         if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = (screenHeight - this.bannerHeight) / pixelRatio;
+            styleTop = (screenHeight - this.bannerHeight);
         }
         else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (screenHeight - this.bannerHeight) / pixelRatio / 2;
+            styleTop = (screenHeight - this.bannerHeight) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP) {
             if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
                 styleTop = 0

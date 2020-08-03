@@ -178,7 +178,7 @@ export default class CocosFormFactory extends FormFactory {
         else {
             if (remoteLayout) {
                 this.getTemplates((res) => {
-                    let tempCfg = res[name]
+                    let tempCfg = res[name];
                     if (tempCfg) {
                         let formCfg = NodeAttribute.parse(tempCfg);
                         formCfg.name = name;

@@ -232,14 +232,15 @@ export default class PlatformModule extends BaseModule {
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
-     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+     * @param position banner的位置，默认底部
      */
-    showAutoBanner(remoteOn?: boolean): void;
+    showAutoBanner(position?: string): void;
     exitApplication(): void;
     /**
      * 连续不断的显示和隐藏 banner
+     * @param position
      */
-    showIntervalBanner(): void;
+    showIntervalBanner(position?: string): void;
     /**
      * 取消banner
      */

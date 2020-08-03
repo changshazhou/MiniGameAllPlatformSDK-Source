@@ -1070,13 +1070,13 @@ export default class PlatformModule extends BaseModule {
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
-     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+     * @param position banner的位置，默认底部
      */
-    public showAutoBanner(remoteOn: boolean = true) {
+    public showAutoBanner(position: string = BANNER_POSITION.BOTTOM) {
         console.log('执行自动显示和隐藏Banner功能')
         moosnow.http.getAllConfig(res => {
             if (res && res.gameBanner == 1) {
-                moosnow.platform.showBanner(remoteOn);
+                moosnow.platform.showBanner(true, () => { }, position);
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
 
                 this.mTimeoutId = setTimeout(() => {
@@ -1101,12 +1101,14 @@ export default class PlatformModule extends BaseModule {
 
     /**
      * 连续不断的显示和隐藏 banner
+     * @param position 
      */
-    public showIntervalBanner() {
+    public showIntervalBanner(position: string = BANNER_POSITION.BOTTOM) {
         console.log('执行 showIntervalBanner')
         moosnow.http.getAllConfig(res => {
             let gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
-            this.schedule(this.showAutoBanner, gameBannerInterval)
+            this.showAutoBanner(position);
+            this.schedule(this.showAutoBanner, gameBannerInterval, [position])
         })
     }
     /**

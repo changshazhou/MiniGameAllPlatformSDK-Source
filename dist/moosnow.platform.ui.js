@@ -904,6 +904,36 @@ var mx = (function () {
                 }
             }
         };
+        /**
+         * 根据名称和节点获取 FormKeyValue
+         * @param name
+         * @param formNode
+         */
+        FormFactory.prototype.getKVByName = function (name, formNode) {
+            var kvs = this.getKVsByName(name);
+            if (kvs) {
+                for (var i = 0; i < kvs.length; i++) {
+                    if (kvs[i].formNode == formNode) {
+                        return kvs[i];
+                    }
+                }
+            }
+        };
+        FormFactory.prototype.getKVsByName = function (name) {
+            var idx = -1;
+            for (var i = 0; i < this.layoutQuene.length; i++) {
+                var item = this.layoutQuene[i];
+                if (item.formName == name) {
+                    idx = i;
+                    break;
+                }
+            }
+            // console.log('addForm2Quene 1 ', this._FormQuene)
+            if (idx != -1) {
+                return this.layoutQuene[idx].quene;
+            }
+            return [];
+        };
         FormFactory.prototype.getLayout = function (callback) {
             var _this = this;
             if (!this.mCachedLayout) {
@@ -998,10 +1028,14 @@ var mx = (function () {
             this.mTimeoutArr = {};
         }
         BaseModule.prototype.schedule = function (callback, time) {
+            var arg = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                arg[_i - 2] = arguments[_i];
+            }
             var self = this;
             var id = setInterval(function () {
                 if (callback)
-                    callback.apply(self);
+                    callback.apply.apply(callback, __spreadArrays([self], arg));
             }, time * 1000);
             console.log('BaseModule schedule ', id);
             this.mIntervalArr[id] = callback;
@@ -2634,13 +2668,13 @@ var mx = (function () {
                 this._Receiveing = false;
                 moosnow.platform.showVideo(function (res) {
                     switch (res) {
-                        case moosnow.VIDEO_STATUS.NOTEND:
-                            moosnow.form.showToast(moosnow.VIDEO_MSG.NOTEND);
+                        case VIDEO_STATUS.NOTEND:
+                            moosnow.form.showToast(VIDEO_MSG.NOTEND);
                             break;
-                        case moosnow.VIDEO_STATUS.ERR:
-                            moosnow.form.showToast(moosnow.VIDEO_MSG.ERR);
+                        case VIDEO_STATUS.ERR:
+                            moosnow.form.showToast(VIDEO_MSG.ERR);
                             break;
-                        case moosnow.VIDEO_STATUS.END:
+                        case VIDEO_STATUS.END:
                             moosnow.data.addPrizeKey(3);
                             _this.updateKeyNum();
                         default:
@@ -3282,6 +3316,7 @@ var mx = (function () {
                 adRow.y = point.y;
                 adRow.source = source;
                 adRow.showIds = showIds;
+                adRow.index = idx;
                 moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
             });
             this.updateFloat(source);
@@ -3290,16 +3325,20 @@ var mx = (function () {
             }, this.mFloatRefresh);
         };
         CocosAdForm.prototype.updateFloat = function (source) {
-            for (var key in this.mFloatCache) {
-                var showIndex = this.mFloatCache[key].index;
-                var logic = this.mFloatCache[key].logic;
-                if (showIndex < this.mAdData.indexLeft.length - 1)
-                    showIndex++;
-                else
-                    showIndex = 0;
-                this.mFloatCache[key].index = showIndex;
-                logic.refreshImg(__assign(__assign({}, this.mAdData.indexLeft[showIndex]), { onCancel: this.mFloatCache[key].onCancel }));
-            }
+            var _this = this;
+            this.floatContainer.children.forEach(function (floatNode) {
+                _this.FormData.floatTempletes.forEach(function (templeteName) {
+                    moosnow.form.formFactory.getKVsByName(templeteName).forEach(function (kv) {
+                        if (kv.formNode == floatNode) {
+                            if (kv.formLogic.FormData.index < _this.mAdData.indexLeft.length - 1)
+                                kv.formLogic.FormData.index++;
+                            else
+                                kv.formLogic.FormData.index = 0;
+                            kv.formLogic.refreshImg(__assign(__assign({}, _this.mAdData.indexLeft[kv.formLogic.FormData.index]), { onCancel: kv.formLogic.FormData.onCancel }));
+                        }
+                    });
+                });
+            });
         };
         /**
            * 绑定广告数据-固定显示6个导出

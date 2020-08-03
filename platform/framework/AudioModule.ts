@@ -11,16 +11,16 @@ export default class AudioModule extends BaseModule {
     constructor() {
         super();
 
-        moosnow.event.addListener(EventType.ON_PLATFORM_HIDE, this, (res) => {
-            console.log('game state  ON_PLATFORM_HIDE ', res)
-            this.stopMusic();
+        // moosnow.event.addListener(EventType.ON_PLATFORM_HIDE, this, (res) => {
+        //     console.log('game state  ON_PLATFORM_HIDE ', res)
+        //     this.stopMusic();
 
-        })
-        moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, (res) => {
-            console.log('game state  ON_PLATFORM_SHOW ', res)
-            if (!moosnow.platform.videoPlaying)
-                this._replayMusic();
-        })
+        // })
+        // moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, (res) => {
+        //     console.log('game state  ON_PLATFORM_SHOW ', res)
+        //     if (!moosnow.platform.videoPlaying)
+        //         this._replayMusic();
+        // })
     }
     /**
         * 存储在本地声音有关的设置key（字段字符串）
