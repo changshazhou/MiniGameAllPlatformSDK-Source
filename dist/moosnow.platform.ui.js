@@ -1180,9 +1180,7 @@ var mx = (function () {
             });
         };
         BaseForm.prototype.hideForm = function () {
-            if (this.FormData.hideForm) {
-                moosnow.form.formFactory.hideFormByLogic(this);
-            }
+            moosnow.form.formFactory.hideFormByLogic(this);
         };
         return BaseForm;
     }(BaseModule));
@@ -1334,15 +1332,19 @@ var mx = (function () {
             return node;
         };
         CocosNodeHelper.createImage = function (parent, imgCfg) {
-            var _this = this;
             var node = this.createNode(imgCfg.name, imgCfg);
             var sprite = node.addComponent(cc.Sprite);
-            this.changeSrc(node, imgCfg, function () {
-                node.width = _this.convertWidth(imgCfg.width);
-                node.height = _this.convertHeight(imgCfg.height);
-            });
+            sprite.type = cc.Sprite.Type.SIMPLE;
+            sprite.sizeMode = cc.Sprite.SizeMode.TRIMMED;
+            sprite.trim = true;
             node.width = this.convertWidth(imgCfg.width);
             node.height = this.convertHeight(imgCfg.height);
+            // console.log('createImage  1 ', node.width, node.height)
+            this.changeSrc(node, imgCfg, function () {
+                // node.width = this.convertWidth(imgCfg.width);
+                // node.height = this.convertHeight(imgCfg.height);
+                // console.log('createImage  2 ', node.width, node.height);
+            });
             node.x = imgCfg.x;
             node.y = imgCfg.y;
             parent.addChild(node);
@@ -1482,28 +1484,29 @@ var mx = (function () {
                 sprite = image.getComponent(cc.Sprite);
             else
                 sprite = image;
+            if (imgCfg.name == "bg")
+                debugger;
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
                 if (cc.resources)
                     if (!isRemote)
-                        cc.resources.load(imgCfg.url, cc.SpriteFrame, function (err, spriteFrame) {
+                        cc.resources.load(imgCfg.url, cc.Texture2D, function (err, tex) {
                             if (err) {
                                 console.log(' cc.resources.load ', err);
                                 return;
                             }
-                            sprite.spriteFrame = spriteFrame;
+                            _this.updateSprite(sprite, tex);
                             _this.setSpriteGrid(imgCfg, sprite);
                             if (callback)
                                 callback();
                         });
                     else {
-                        cc.assetManager.loadRemote(imgCfg.url, cc.SpriteFrame, function (err, tex) {
+                        cc.loader.load(imgCfg.url, function (err, tex) {
                             if (err) {
                                 console.log(' cc.assetManager.loadRemote ', err);
                                 return;
                             }
-                            var spriteFrame = new cc.SpriteFrame(tex);
-                            sprite.spriteFrame = spriteFrame;
+                            _this.updateSprite(sprite, tex);
                             _this.setSpriteGrid(imgCfg, sprite);
                             if (callback)
                                 callback();
@@ -1515,14 +1518,20 @@ var mx = (function () {
                             console.log(' cc.loader.load ', err);
                             return;
                         }
-                        var spriteFrame = new cc.SpriteFrame(tex);
-                        sprite.spriteFrame = spriteFrame;
+                        _this.updateSprite(sprite, tex);
                         _this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
                     });
                 }
             }
+        };
+        CocosNodeHelper.updateSprite = function (sprite, tex) {
+            var _a = sprite.node, width = _a.width, height = _a.height;
+            var spriteFrame = new cc.SpriteFrame(tex);
+            sprite.spriteFrame = spriteFrame;
+            sprite.node.width = width;
+            sprite.node.height = height;
         };
         CocosNodeHelper.setSpriteGrid = function (imgCfg, sprite) {
             if (imgCfg.grid) {
@@ -1561,6 +1570,8 @@ var mx = (function () {
                 mask.width = parent.width;
                 mask.height = parent.height;
             });
+            mask.width = parent.width;
+            mask.height = parent.height;
             parent.addChild(mask);
             mask.zIndex = -1;
             this.addStopPropagation(mask);
@@ -1714,9 +1725,7 @@ var mx = (function () {
                 var viewRet = CocosNodeHelper.createView(parent, nodeCfg);
                 node = viewRet.viewContainer;
                 if (nodeCfg.child && nodeCfg.child.length > 0) {
-                    // debugger
                     this._createChild(node, nodeCfg.child);
-                    console.log('');
                 }
             }
             else {
@@ -1849,7 +1858,7 @@ var mx = (function () {
                             var formCfg = NodeAttribute.parse(tempCfg);
                             formCfg.name = name;
                             var node = _this._createUINode(formCfg, tempLogic, tempData, parent);
-                            // console.log('_createUINode ', Date.now())
+                            console.log('createNodeByTemplate ', formCfg);
                         }
                     });
                 }
@@ -1935,6 +1944,7 @@ var mx = (function () {
             if (stopPropagation === void 0) { stopPropagation = false; }
             if (node && node.uuid) {
                 this.mClickQuene[node.uuid] = {
+                    node: node,
                     stopPropagation: stopPropagation,
                     callback: callback
                 };
@@ -2944,7 +2954,6 @@ var mx = (function () {
         CocosAdViewItem.prototype.willShow = function (cell) {
             _super.prototype.willShow.call(this, cell);
             this.mAdItem = cell;
-            this.updateUI();
             this.addListener();
         };
         CocosAdViewItem.prototype.refreshImg = function (cell) {
@@ -2954,10 +2963,12 @@ var mx = (function () {
         CocosAdViewItem.prototype.updateUI = function () {
             var _this = this;
             var _a = this.logo, width = _a.width, height = _a.height;
+            console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height);
             CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img }, function () {
-                // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
+                console.log('logo complete 2 ', _this.mAdItem.title, "logo ", _this.logo.width, _this.logo.height, "node ", _this.node.width, _this.node.height);
                 _this.logo.width = width;
                 _this.logo.height = height;
+                console.log('logo complete 3 ', _this.mAdItem.title, "logo ", _this.logo.width, _this.logo.height, "node ", _this.node.width, _this.node.height);
             });
             CocosNodeHelper.changeText(this.title, this.mAdItem.title);
         };
@@ -3020,6 +3031,7 @@ var mx = (function () {
         };
         CocosAdViewItem.prototype.onShow = function (data) {
             _super.prototype.onShow.call(this, data);
+            this.updateUI();
             moosnow.event.addListener(EventType.AD_VIEW_REFRESH, this, this.onAdViewChange);
         };
         CocosAdViewItem.prototype.onHide = function (data) {
@@ -3496,10 +3508,10 @@ var mx = (function () {
             });
             this.loadAd(function () {
                 _this.schedule(_this.onFwUpdate, 0.016);
-                _this.initBanner();
-                _this.initFloatAd();
-                _this.initExport();
-                _this.initTop();
+                // this.initBanner();
+                // this.initFloatAd();
+                // this.initExport();
+                // this.initTop();
                 _this.initLeftRight();
                 if (_this.FormData && _this.FormData.callback)
                     _this.FormData.callback();
@@ -3533,7 +3545,11 @@ var mx = (function () {
             rightLayout.type = cc.Layout.Type.VERTICAL;
             rightLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
             var leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
+            leftView.horizontal = false;
+            leftView.vertical = true;
             var rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
+            rightView.horizontal = false;
+            rightView.vertical = true;
             this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", function () { }, left);
             this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", function () { }, right);
         };
@@ -3789,8 +3805,108 @@ var mx = (function () {
         FormLayout.TryForm = "tryForm";
         FormLayout.SetForm = "setForm";
         FormLayout.BoxForm = "boxForm";
+        FormLayout.NativeForm = "nativeForm";
         return FormLayout;
     }());
+
+    var CocosNativeForm = /** @class */ (function (_super) {
+        __extends(CocosNativeForm, _super);
+        function CocosNativeForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.baseBox = null;
+            _this.logo = null;
+            _this.btnTopClose = null;
+            _this.btnClose = null;
+            _this.btnOpen = null;
+            _this.txtMemo = null;
+            return _this;
+        }
+        Object.defineProperty(CocosNativeForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosNativeForm.prototype.onShow = function (data) {
+            var _this = this;
+            _super.prototype.onShow.call(this, data);
+            this.node.zIndex = cc.macro.MAX_ZINDEX;
+            this.addListener();
+            console.log('显示原生广告');
+            moosnow.platform.hideBanner();
+            // this.node.active = false;
+            moosnow.platform.showNativeAd(function (row) {
+                console.log('原生广告', row);
+                if (row && row.imgUrlList && row.imgUrlList.length > 0) {
+                    _this.node.active = true;
+                    if (row.creativeType == 6) {
+                        _this.baseBox.height = _this.baseBox.width / 2;
+                    }
+                    else {
+                        _this.baseBox.height = _this.baseBox.width * (210 / 320);
+                    }
+                    CocosNodeHelper.changeText(_this.txtMemo, row.desc);
+                    CocosNodeHelper.changeSrc(_this.logo, { url: row.imgUrlList[0] });
+                }
+                else {
+                    if (_this.FormData && _this.FormData.nullCallback)
+                        _this.FormData.nullCallback();
+                    moosnow.platform.showBanner(false);
+                }
+            });
+            moosnow.http.getAllConfig(function (res) {
+                if (res && res.smallNativeAdClose == 1) {
+                    _this.btnTopClose.scale = 0.7;
+                }
+                if (res && res.zs_native_click_switch == 1) {
+                    _this.btnOpen.active = true;
+                    _this.btnClose.active = false;
+                }
+                else {
+                    _this.btnOpen.active = false;
+                    _this.btnClose.active = true;
+                }
+            });
+        };
+        CocosNativeForm.prototype.willHide = function (data) {
+            this.remoteListener();
+            _super.prototype.willHide.call(this, data);
+        };
+        CocosNativeForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.logo, function () {
+                _this.onOpenAd();
+            });
+            this.applyClickAnim(this.btnOpen, function () {
+                _this.onOpenAd();
+            });
+            this.applyClickAnim(this.btnTopClose, function () {
+                _this.onCloseAd();
+            });
+            this.applyClickAnim(this.btnClose, function () {
+                _this.onCloseAd();
+            });
+        };
+        CocosNativeForm.prototype.remoteListener = function () {
+            this.removeClickAnim(this.logo);
+            this.removeClickAnim(this.btnOpen);
+            this.removeClickAnim(this.btnTopClose);
+            this.removeClickAnim(this.btnClose);
+        };
+        CocosNativeForm.prototype.onCloseAd = function () {
+            if (this.FormData && this.FormData.callback)
+                this.FormData.callback();
+            this.hideForm();
+        };
+        CocosNativeForm.prototype.onOpenAd = function () {
+            var _this = this;
+            moosnow.platform.clickNative(function () {
+                _this.hideForm();
+            });
+        };
+        return CocosNativeForm;
+    }(CocosBaseForm));
 
     /**
      * 广告结果
@@ -3805,6 +3921,9 @@ var mx = (function () {
          */
         FormUtil.prototype.showToast = function (msg) {
             this.formFactory.showForm(FormLayout.ToastForm, CocosToastForm, msg);
+        };
+        FormUtil.prototype.showNativeAd = function (options) {
+            this.formFactory.showForm(FormLayout.NativeForm, CocosNativeForm, options);
         };
         FormUtil.prototype.loadAd = function (options) {
             this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {

@@ -34,17 +34,19 @@ export default class CocosNodeHelper extends NodeHelper {
 
         let node = this.createNode(imgCfg.name, imgCfg);
         let sprite = node.addComponent(cc.Sprite);
-        this.changeSrc(node, imgCfg, () => {
-            node.width = this.convertWidth(imgCfg.width);
-            node.height = this.convertHeight(imgCfg.height);
-        });
+        sprite.type = cc.Sprite.Type.SIMPLE;
+        sprite.sizeMode = cc.Sprite.SizeMode.TRIMMED;
+        sprite.trim = true;
         node.width = this.convertWidth(imgCfg.width);
         node.height = this.convertHeight(imgCfg.height);
+        // console.log('createImage  1 ', node.width, node.height)
+        this.changeSrc(node, imgCfg, () => {
+            // node.width = this.convertWidth(imgCfg.width);
+            // node.height = this.convertHeight(imgCfg.height);
+            // console.log('createImage  2 ', node.width, node.height);
+        });
         node.x = imgCfg.x;
         node.y = imgCfg.y;
-
-
-
         parent.addChild(node)
         return node;
     }
@@ -237,29 +239,30 @@ export default class CocosNodeHelper extends NodeHelper {
             sprite = image.getComponent(cc.Sprite);
         else
             sprite = image;
-
+        if (imgCfg.name == "bg")
+            debugger
         if (imgCfg.url) {
             let isRemote = imgCfg.url.indexOf("http") != -1
             if (cc.resources)
                 if (!isRemote)
-                    cc.resources.load(imgCfg.url, cc.SpriteFrame, (err, spriteFrame: cc.SpriteFrame) => {
+                    cc.resources.load(imgCfg.url, cc.Texture2D, (err, tex: cc.Texture2D) => {
                         if (err) {
                             console.log(' cc.resources.load ', err)
                             return;
                         }
-                        sprite.spriteFrame = spriteFrame;
+                        this.updateSprite(sprite, tex);
                         this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
                     });
                 else {
-                    cc.assetManager.loadRemote(imgCfg.url, cc.SpriteFrame, (err, tex: cc.Texture2D) => {
+                    cc.loader.load(imgCfg.url, (err, tex: cc.Texture2D) => {
                         if (err) {
                             console.log(' cc.assetManager.loadRemote ', err)
                             return;
                         }
-                        let spriteFrame = new cc.SpriteFrame(tex)
-                        sprite.spriteFrame = spriteFrame;
+
+                        this.updateSprite(sprite, tex);
                         this.setSpriteGrid(imgCfg, sprite);
                         if (callback)
                             callback();
@@ -271,14 +274,20 @@ export default class CocosNodeHelper extends NodeHelper {
                         console.log(' cc.loader.load ', err)
                         return;
                     }
-                    let spriteFrame = new cc.SpriteFrame(tex)
-                    sprite.spriteFrame = spriteFrame;
+                    this.updateSprite(sprite, tex);
                     this.setSpriteGrid(imgCfg, sprite);
                     if (callback)
                         callback();
                 });
             }
         }
+    }
+    private static updateSprite(sprite: cc.Sprite, tex: cc.Texture2D) {
+        let { width, height } = sprite.node
+        let spriteFrame = new cc.SpriteFrame(tex)
+        sprite.spriteFrame = spriteFrame;
+        sprite.node.width = width;
+        sprite.node.height = height;
     }
 
     public static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite) {
@@ -321,6 +330,8 @@ export default class CocosNodeHelper extends NodeHelper {
             mask.width = parent.width
             mask.height = parent.height
         })
+        mask.width = parent.width
+        mask.height = parent.height
 
         parent.addChild(mask);
         mask.zIndex = -1;

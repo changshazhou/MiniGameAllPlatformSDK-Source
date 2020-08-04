@@ -6,6 +6,8 @@ export default class CocosAdViewItem extends CocosBaseForm {
     animLogo: cc.Node;
     nameBg: cc.Node;
     mAdItem: moosnowAdRow;
+    private mLogoWidth;
+    private mLogoHeight;
     private addListener;
     private removeListener;
     initPosition(data: any): void;

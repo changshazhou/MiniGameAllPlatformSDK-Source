@@ -13,6 +13,10 @@ export default class CocosAdViewItem extends CocosBaseForm {
     public nameBg: cc.Node = null;
     public mAdItem: moosnowAdRow;
 
+
+    private mLogoWidth: number
+    private mLogoHeight: number
+
     private addListener() {
         this.logo.on(CocosNodeEvent.TOUCH_END, this.onClickAd, this)
     }
@@ -23,7 +27,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
 
     public initPosition(data) {
-      
+
     }
 
 
@@ -31,9 +35,10 @@ export default class CocosAdViewItem extends CocosBaseForm {
     public willShow(cell: moosnowAdRow) {
         super.willShow(cell);
         this.mAdItem = cell;
-        this.updateUI();
         this.addListener();
     }
+
+
 
     public refreshImg(cell: moosnowAdRow) {
         this.mAdItem = cell;
@@ -42,11 +47,16 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
     private updateUI() {
         let { width, height } = this.logo;
+        console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
         CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img } as NodeAttribute, () => {
-            // console.log('logo complete 2', cell.title, this.logo.width, this.logo.height, this.node.width, this.node.height, this.node.x, this.node.y)
+            console.log('logo complete 2 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
             this.logo.width = width;
             this.logo.height = height;
+            console.log('logo complete 3 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
         });
+
+
+
         CocosNodeHelper.changeText(this.title, this.mAdItem.title);
     }
 
@@ -111,6 +121,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
     public onShow(data) {
         super.onShow(data)
+        this.updateUI();
         moosnow.event.addListener(EventType.AD_VIEW_REFRESH, this, this.onAdViewChange)
     }
 

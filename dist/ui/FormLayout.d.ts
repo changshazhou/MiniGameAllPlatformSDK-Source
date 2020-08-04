@@ -10,4 +10,5 @@ export default class FormLayout {
     static readonly TryForm: string;
     static readonly SetForm: string;
     static readonly BoxForm: string;
+    static readonly NativeForm: string;
 }

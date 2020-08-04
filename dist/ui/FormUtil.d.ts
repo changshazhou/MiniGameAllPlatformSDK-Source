@@ -10,6 +10,7 @@ import showSetOptions from "../model/showSetOptions";
 import showBoxOptions from "../model/showBoxOptions";
 import loadAdOptions from "../model/loadAdOptions";
 import FormFactory from "./engine/FormFactory";
+import showNativeOptions from "../model/showNativeOptions";
 /**
  * 广告结果
  */
@@ -21,6 +22,7 @@ export default class FormUtil {
      * @param msg  消息内容
      */
     showToast(msg: string): void;
+    showNativeAd(options: showNativeOptions): void;
     loadAd(options: loadAdOptions): void;
     /**
      * 显示广告

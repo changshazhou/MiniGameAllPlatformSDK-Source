@@ -90,9 +90,7 @@ export default class BaseForm extends BaseModule {
     }
 
     public hideForm() {
-        if (this.FormData.hideForm) {
-            moosnow.form.formFactory.hideFormByLogic(this)
-        }
+        moosnow.form.formFactory.hideFormByLogic(this)
     }
 
 }

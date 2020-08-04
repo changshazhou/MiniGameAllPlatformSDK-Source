@@ -543,10 +543,10 @@ export default class CocosAdForm extends CocosBaseForm {
 
         this.loadAd(() => {
             this.schedule(this.onFwUpdate, 0.016)
-            this.initBanner();
-            this.initFloatAd();
-            this.initExport();
-            this.initTop();
+            // this.initBanner();
+            // this.initFloatAd();
+            // this.initExport();
+            // this.initTop();
             this.initLeftRight();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
@@ -585,8 +585,11 @@ export default class CocosAdForm extends CocosBaseForm {
         rightLayout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
 
         let leftView = this.leftContainer_scroll.getComponent(cc.ScrollView);
+        leftView.horizontal = false;
+        leftView.vertical = true;
         let rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
-
+        rightView.horizontal = false;
+        rightView.vertical = true;
         this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", () => { }, left);
         this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", () => { }, right);
     }

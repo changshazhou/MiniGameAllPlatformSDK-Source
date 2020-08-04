@@ -62,6 +62,7 @@ export default class CocosBaseForm extends BaseForm {
     public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false) {
         if (node && node.uuid) {
             this.mClickQuene[node.uuid] = {
+                node,
                 stopPropagation,
                 callback
             };
@@ -87,6 +88,6 @@ export default class CocosBaseForm extends BaseForm {
         return CocosNodeHelper.findNodeByName(node, attrName)
     }
 
-   
+
 
 }

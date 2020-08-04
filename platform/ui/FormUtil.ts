@@ -34,6 +34,8 @@ import CocosPrizeForm from "./cocos/form/CocosPrizeForm";
 import FormLayout from "./FormLayout";
 import CocosBaseForm from "./cocos/form/CocosBaseForm";
 import FormFactory from "./engine/FormFactory";
+import CocosNativeForm from "./cocos/form/CocosNativeForm";
+import showNativeOptions from "../model/showNativeOptions";
 
 /**
  * 广告结果
@@ -53,6 +55,11 @@ export default class FormUtil {
      */
     public showToast(msg: string) {
         this.formFactory.showForm(FormLayout.ToastForm, CocosToastForm, msg)
+    }
+
+
+    public showNativeAd(options: showNativeOptions) {
+        this.formFactory.showForm(FormLayout.NativeForm, CocosNativeForm, options)
     }
 
     public loadAd(options: loadAdOptions) {

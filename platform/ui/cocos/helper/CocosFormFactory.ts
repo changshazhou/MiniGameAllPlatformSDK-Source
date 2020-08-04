@@ -39,9 +39,7 @@ export default class CocosFormFactory extends FormFactory {
             let viewRet = CocosNodeHelper.createView(parent, nodeCfg as ViewAttribute);
             node = viewRet.viewContainer;
             if (nodeCfg.child && nodeCfg.child.length > 0) {
-                // debugger
                 this._createChild(node, nodeCfg.child);
-                console.log('')
             }
         }
         else {
@@ -183,7 +181,7 @@ export default class CocosFormFactory extends FormFactory {
                         let formCfg = NodeAttribute.parse(tempCfg);
                         formCfg.name = name;
                         let node = this._createUINode(formCfg, tempLogic, tempData, parent);
-                        // console.log('_createUINode ', Date.now())
+                        console.log('createNodeByTemplate ', formCfg)
                     }
                 })
             }
