@@ -507,7 +507,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private displayAd(visible: boolean) {
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
         this.endContainer.active && this.initEnd();
-        !this.endContainer.active && this.disableEnd();
+        // !this.endContainer.active && this.disableEnd();
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
@@ -543,10 +543,10 @@ export default class CocosAdForm extends CocosBaseForm {
 
         this.loadAd(() => {
             this.schedule(this.onFwUpdate, 0.016)
-            // this.initBanner();
-            // this.initFloatAd();
-            // this.initExport();
-            // this.initTop();
+            this.initBanner();
+            this.initFloatAd();
+            this.initExport();
+            this.initTop();
             this.initLeftRight();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
@@ -600,9 +600,9 @@ export default class CocosAdForm extends CocosBaseForm {
         layout.resizeMode = cc.Layout.ResizeMode.NONE;
         this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
     }
-    private disableEnd() {
-        moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
-    }
+    // private disableEnd() {
+    //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
+    // }
 
 
 

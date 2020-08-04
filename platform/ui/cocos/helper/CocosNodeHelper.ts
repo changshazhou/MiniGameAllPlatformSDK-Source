@@ -239,8 +239,8 @@ export default class CocosNodeHelper extends NodeHelper {
             sprite = image.getComponent(cc.Sprite);
         else
             sprite = image;
-        if (imgCfg.name == "bg")
-            debugger
+        // if (imgCfg.name == "bg")
+        //     debugger
         if (imgCfg.url) {
             let isRemote = imgCfg.url.indexOf("http") != -1
             if (cc.resources)

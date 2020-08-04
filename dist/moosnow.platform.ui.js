@@ -1484,8 +1484,8 @@ var mx = (function () {
                 sprite = image.getComponent(cc.Sprite);
             else
                 sprite = image;
-            if (imgCfg.name == "bg")
-                debugger;
+            // if (imgCfg.name == "bg")
+            //     debugger
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
                 if (cc.resources)
@@ -3475,7 +3475,7 @@ var mx = (function () {
             var _this = this;
             this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
             this.endContainer.active && this.initEnd();
-            !this.endContainer.active && this.disableEnd();
+            // !this.endContainer.active && this.disableEnd();
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
             this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
@@ -3508,10 +3508,10 @@ var mx = (function () {
             });
             this.loadAd(function () {
                 _this.schedule(_this.onFwUpdate, 0.016);
-                // this.initBanner();
-                // this.initFloatAd();
-                // this.initExport();
-                // this.initTop();
+                _this.initBanner();
+                _this.initFloatAd();
+                _this.initExport();
+                _this.initTop();
                 _this.initLeftRight();
                 if (_this.FormData && _this.FormData.callback)
                     _this.FormData.callback();
@@ -3559,9 +3559,9 @@ var mx = (function () {
             layout.resizeMode = cc.Layout.ResizeMode.NONE;
             this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
         };
-        CocosAdForm.prototype.disableEnd = function () {
-            moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
-        };
+        // private disableEnd() {
+        //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
+        // }
         CocosAdForm.prototype.initExport = function () {
             var layout = this.exportContainer_layout.getComponent(cc.Layout);
             var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
