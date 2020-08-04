@@ -27,7 +27,7 @@ export default class TTModule extends PlatformModule {
         this._registerTTCallback();
         this.initBanner();
         this.initRecord();
-        this.initInter();
+        // this.initInter();
         this.bannerWidth = 208;
     }
 
@@ -52,22 +52,28 @@ export default class TTModule extends PlatformModule {
             })
     }
 
-    public prepareInter() {
+    public showInter() {
         if (!window[this.platformName]) return;
-        if (typeof window[this.platformName].createInterstitialAd != "function") return;
+        if (!window[this.platformName].createInterstitialAd) return;
 
         if (Common.isEmpty(this.interId)) {
             console.warn(MSG.INTER_KEY_IS_NULL);
             return;
         }
+        if (this.inter) {
+            this.inter.destroy();
+        }
         this.inter = window[this.platformName].createInterstitialAd({
             adUnitId: this.interId
         });
-        this.inter.onLoad(this._onInterLoad.bind(this));
-        this.inter.onClose(this._onInterClose.bind(this));
-        this.inter.load();
+        let p = this.inter.load()
+        p && p.then(() => {
+            this.inter.show();
+        })
+            .catch((err) => {
+                console.log(err);
+            });
     }
-
 
     public _bottomCenterBanner(size) {
         // if (this.bannerWidth != size.width) {

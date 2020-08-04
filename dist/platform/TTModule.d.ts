@@ -9,7 +9,7 @@ export default class TTModule extends PlatformModule {
     moreGameCb: Function;
     constructor();
     private _registerTTCallback;
-    prepareInter(): void;
+    showInter(): void;
     _bottomCenterBanner(size: any): void;
     initRecord(): void;
     clipRecord(): void;
