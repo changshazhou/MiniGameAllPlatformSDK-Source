@@ -128,7 +128,8 @@ export default class WXModule extends PlatformModule {
                 // stop 事件的回调函数的执行表示录制完成
                 this.recordObj.on('stop', (res) => {
                     console.log(`对局回放时长: `, res)
-                    this.recordCb(res)
+                    if (this.recordCb)
+                        this.recordCb(res)
                 })
             })
 

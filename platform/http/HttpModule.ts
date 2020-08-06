@@ -24,7 +24,7 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "2.0.6";
+    public version: string = "2.1.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
 
     constructor() {
