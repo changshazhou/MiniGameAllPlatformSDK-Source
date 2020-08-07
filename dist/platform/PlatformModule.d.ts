@@ -9,6 +9,7 @@ export default class PlatformModule extends BaseModule {
     moosnowConfig: moosnowAppConfig;
     share_clickTime: number;
     currentShareCallback: Function;
+    currentShortCall: Function;
     shareFail: boolean;
     vibrateOn: boolean;
     systemInfo: any;
@@ -18,8 +19,12 @@ export default class PlatformModule extends BaseModule {
     native: any;
     box: any;
     platformName: string;
-    bannerId: string;
-    videoId: string;
+    mBannerId: string;
+    mBannerIndex: number;
+    get bannerId(): any;
+    mVideoId: string;
+    mVideoIndex: number;
+    get videoId(): any;
     interId: string;
     boxId: string;
     /**
@@ -31,19 +36,23 @@ export default class PlatformModule extends BaseModule {
     bannerHeigth: number;
     bannerShowCount: number;
     bannerShowCountLimit: number;
+    bannerShowTime: number;
+    bannerShowTimeLimit: number;
+    bannerLimitType: number;
     bannerCb: Function;
     bannerPosition: string;
     bannerStyle: bannerStyle;
     isBannerShow: boolean;
     videoCb: Function;
     videoLoading: boolean;
+    videoPlaying: boolean;
     interShowCount: number;
     interShowCountLimit: number;
     isInterLoaded: boolean;
     nativeAdResult: nativeAdRow;
     nativeCb: Function;
     nativeLoading: boolean;
-    record: any;
+    recordObj: any;
     shareInfoArr: {
         img: string;
         title: string;
@@ -51,7 +60,14 @@ export default class PlatformModule extends BaseModule {
     onEnable(): void;
     private vibrateSwitch;
     initAppConfig(): void;
+    /***
+     * 检测IphoneX
+     */
     isIphoneXModel(): boolean;
+    /***
+     * 检测Iphone
+     */
+    isIphone(): boolean;
     isIphoneX(): boolean;
     private compareVersion;
     /**
@@ -60,12 +76,21 @@ export default class PlatformModule extends BaseModule {
     */
     supportVersion(version: string): boolean;
     /**
+     * 是否支持函数
+     * @param name
+     */
+    supportFunction(name: string): boolean;
+    private versionRet;
+    /**
      * 检查当前版本的导出广告是否开启
      * @param {string} version 版本号 为了兼容旧版本SDK的参数，目前已无作用，SDK会取moosnowConfig 中的version 来判断
      * @param {*} callback
      * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
      */
-    checkVersion(version: string, callback: any): void;
+    checkVersion(version: string, callback: Function): void;
+    private _checkRemoteVersion;
+    private _checkConfigVersion;
+    checkLog(remoteVersion: any): boolean;
     isSmallWidth(): boolean;
     login(success?: Function, fail?: Function): void;
     postMessage(data: {
@@ -85,7 +110,13 @@ export default class PlatformModule extends BaseModule {
      * 更新版本
      */
     private updateProgram;
+    /**
+     * 短震动
+     */
     vibrateShort(): void;
+    /**
+     * 长震动
+     */
     vibrateLong(): void;
     showLoading(title: string): void;
     hideLoading(): void;
@@ -138,8 +169,9 @@ export default class PlatformModule extends BaseModule {
      * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
      * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
      * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+     * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
      */
-    share(query?: Object, callback?: (shared: boolean) => void): void;
+    share(query?: Object, callback?: (shared: boolean) => void, shortCall?: (err: any) => void): void;
     shareWithoutCheck(query?: Object, callback?: (shared: boolean) => void): void;
     private _share;
     _buildShareInfo(query?: any): {
@@ -165,6 +197,14 @@ export default class PlatformModule extends BaseModule {
     pauseRecord(): void;
     resumeRecord(): void;
     /**
+     *
+     * @param style
+     * @param timeRange
+     * @param callback
+     */
+    showShareButton(style: object, timeRange?: Array<Array<number>>, callback?: Function): void;
+    hideShareButton(): void;
+    /**
      * 注册微信各种回调
      */
     _regisiterWXCallback(): void;
@@ -180,25 +220,44 @@ export default class PlatformModule extends BaseModule {
     _bottomCenterBanner(size: any): void;
     _resetBanenrStyle(size: any): void;
     /**
-     *
-     * @param callback 点击回调
-     * @param position banner的位置，默认底部
-     * @param style 自定义样式
-     */
-    showBanner(callback?: Function, position?: string, style?: bannerStyle): void;
+      * 显示平台的banner广告
+      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+      * @param callback 点击回调
+      * @param position banner的位置，默认底部
+      * @param style 自定义样式
+      */
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    _showBanner(): void;
     private mTimeoutId;
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
-     *
+     * @param position banner的位置，默认底部
      */
-    showAutoBanner(): void;
+    showAutoBanner(position?: string): void;
+    exitApplication(): void;
+    /**
+     * 连续不断的显示和隐藏 banner
+     * @param position
+     */
+    showIntervalBanner(position?: string): void;
+    /**
+     * 取消banner
+     */
+    clearIntervalBanner(): void;
+    /**
+     * 隐藏banner
+     */
     hideBanner(): void;
     initVideo(): void;
     createRewardAD(show: any): void;
     _onVideoError(msg: any, code: any): void;
     _onVideoClose(isEnd: any): void;
     _onVideoLoad(): void;
+    /**
+     * 唤起视频
+     * @param completeCallback
+     */
     showVideo(completeCallback?: any): void;
     initInter(): void;
     prepareInter(): void;
@@ -263,9 +322,30 @@ export default class PlatformModule extends BaseModule {
      * @param value
      */
     reportMonitor(name?: string, value?: string): void;
+    /**
+     * 更多游戏按钮
+     * @param url
+     * @param callback
+     * @param style
+     */
+    showMoreGameButton(url: string, callback?: Function, style?: any): void;
     initRank(): void;
     showRank(): void;
     updateUserScore(score: any): void;
     hideRank(): void;
+    /**
+     * 用户是否关注抖音号
+     * @param success
+     * @param fail
+     */
+    checkFollowAwemeSate(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
+    /**
+     * 调用后跳转个人主页，并且回调关注成功/失败回调，异步回调接口
+     * @param success
+     * @param fail
+     */
+    openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
+    hasShortcutInstalled(success: (has: any) => void): void;
+    installShortcut(success: () => void, message?: string): void;
     onDisable(): void;
 }

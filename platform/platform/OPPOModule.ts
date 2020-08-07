@@ -5,13 +5,12 @@ import bannerStyle from "../model/bannerStyle";
 import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
+import { MSG } from "../config/MSG";
 
 export default class OPPOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
-    public baseUrl = "https://api.liteplay.com.cn/";
-    private versionRet: boolean = null;
     public bannerWidth: number = 760;
     public bannerHeight: number = 96;
 
@@ -22,38 +21,7 @@ export default class OPPOModule extends PlatformModule {
         this.initAdService();
     }
 
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version 
-    * @param {*} callback 
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    public checkVersion(version: string, callback) {
-        if (this.versionRet != null) {
-            callback(this.versionRet);
-            return;
-        } else {
-            var url = this.baseUrl + 'admin/wx_list/getAppConfig';
-            var signParams = {
-                appid: this.moosnowConfig.moosnowAppId,
-            };
-            let data = signParams;
-            moosnow.http.request(url, data, 'POST',
-                (res) => {
-                    this.versionRet = res.data.version == moosnow.platform.moosnowConfig.version;
-                    console.log(`版本检查 后台版本${res.data.version} 配置文件版本${moosnow.platform.moosnowConfig.version}`)
-                    console.log("获取广告开关：", this.versionRet);
-                    callback(this.versionRet);
-                },
-                () => {
-                    console.log('checkVersion fail');
-                },
-                () => {
-                    console.log('checkVersion complete');
-                }
-            );
-        }
-    }
+
     private initAdService() {
         if (!window[this.platformName])
             return;
@@ -99,9 +67,9 @@ export default class OPPOModule extends PlatformModule {
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
 
-        console.log('跳转数据：', row)
+        console.log(MSG.NAVIGATE_DATA, row)
         if (Date.now() - this.prevNavigate < 300) {
-            console.log(' 跳转太频繁 >>>>>>>>>>>>>>>>>>>>> ')
+            console.log(MSG.NAVIGATE_FAST)
             return;
         }
         this.prevNavigate = Date.now();
@@ -115,7 +83,7 @@ export default class OPPOModule extends PlatformModule {
         extraData = extraData || {};
         // 跳转小游戏按钮，支持最低平台版本号'1044' (minPlatformVersion>='1044')
         if (!this.supportVersion(1044)) {
-            console.log('版本过低 平台不支持跳转')
+            console.log(MSG.PLATFORM_UNSUPPORT)
             return
         }
         window[this.platformName].navigateToMiniGame({
@@ -296,7 +264,7 @@ export default class OPPOModule extends PlatformModule {
         let windowHeight = wxsys.windowHeight;
         let left = (windowWidth - this.bannerWidth) / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
 
@@ -388,47 +356,37 @@ export default class OPPOModule extends PlatformModule {
     }
 
     /**
-     * 
+     * 显示平台的banner广告
+     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
      * @param callback 点击回调
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
-        console.log('显示banner')
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
-        // this.bannerPosition = position;
-        // if (this.banner) {
-        //     if (this.bannerPosition != position) {
-        //         this.bannerPosition = position;
-        //         this.bannerStyle = style;
-        //         this.destroyBanner();
-        //         this._prepareBanner();
-        //         console.log('位置要更换,销毁重建');
-        //     }
-        // }
-        // else {
-        //     this.bannerPosition = position;
-        //     this.bannerStyle = style;
-        //     this.initBanner();
-        // }
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
+    }
+
+    public _showBanner() {
 
         if (this.banner) {
-            // let wxsys = this.getSystemInfoSync();
-            // let windowWidth = wxsys.windowWidth;
-            // let windowHeight = wxsys.windowHeight;
-            // if (position == BannerPosition.Bottom) {
-
-            // }
-            // this.banner.top = 1
-            // this.banner.hide();
-            // console.log('show banner style 1', this.banner.style)
-
-            // console.log('show banner style 2', this.banner.style)
-            // this.banner.hide();
 
             this._resetBanenrStyle({
                 width: this.banner.style.width,
@@ -441,20 +399,14 @@ export default class OPPOModule extends PlatformModule {
                     height: this.banner.style.height
                 });
             }, 500)
-
-            // .then(() => {
-            //     this._resetBanenrStyle({
-            //         width: this.banner.style.width,
-            //         height: this.banner.style.height
-            //     });
-            // })
         }
         else {
             this.initBanner();
         }
     }
+
     public hideBanner() {
-        console.log('隐藏banner')
+        console.log(MSG.HIDE_BANNER)
         if (!this.isBannerShow)
             return;
         if (!window[this.platformName]) {
@@ -500,7 +452,7 @@ export default class OPPOModule extends PlatformModule {
             this.video.offLoad(this._onVideoLoad);
         } else {
             if (Common.isEmpty(this.videoId)) {
-                console.warn(' video id is null')
+                console.warn(MSG.VIDEO_KEY_IS_NULL)
                 return;
             }
             this.video = window[this.platformName].createRewardedVideoAd({
@@ -515,7 +467,7 @@ export default class OPPOModule extends PlatformModule {
 
     }
     public _onVideoLoad() {
-        console.log('加载video成功回调')
+        console.log(MSG.VIDEO_LOAD_COMPLETED)
         moosnow.platform.videoLoading = false;
         if (this.video) {
             this.video.show();
@@ -524,7 +476,7 @@ export default class OPPOModule extends PlatformModule {
 
     public prepareInter() {
         if (Common.isEmpty(this.interId)) {
-            console.warn('插屏广告ID为空，系统不加载');
+            console.warn(MSG.INTER_KEY_IS_NULL);
             return;
         }
         if (!window[this.platformName])
@@ -602,11 +554,11 @@ export default class OPPOModule extends PlatformModule {
 
     public _onNativeLoad(res) {
         this.nativeLoading = false;
-        console.log(`加载原生广告成功`, res)
+        console.log(MSG.NATIVE_LOAD_COMPLETED, res)
         if (res && res.adList && res.adList.length > 0) {
             this.nativeAdResult = res.adList[0];
             if (!Common.isEmpty(this.nativeAdResult.adId)) {
-                console.log(`上报原生广告`)
+                console.log(MSG.NATIVE_REPORT)
                 this.native.reportAdShow({
                     adId: this.nativeAdResult.adId
                 });
@@ -616,7 +568,7 @@ export default class OPPOModule extends PlatformModule {
             }
         }
         else {
-            console.log(`原生广告数据没有，回调Null`)
+            console.log(MSG.NATIVE_LIST_NULL)
             if (Common.isFunction(this.nativeCb)) {
                 this.nativeCb(null)
             }
@@ -628,13 +580,14 @@ export default class OPPOModule extends PlatformModule {
         this.nativeAdResult = null;
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
-                console.log(`原生广告加载出错 `, err, '使用新ID加载原生广告')
+                console.log(MSG.NATIVE_ERROR, err,)
                 this.nativeIdIndex += 1;
                 this._destroyNative();
                 this._prepareNative();
+                this.nativeCb(null)
             }
             else {
-                console.log(`原生广告ID已经用完，本次没有广告`)
+                console.log(MSG.NATIVE_NOT_ID_USE)
                 this.nativeIdIndex = 0;
                 if (Common.isFunction(this.nativeCb)) {
                     this.nativeCb(null)
@@ -644,7 +597,7 @@ export default class OPPOModule extends PlatformModule {
 
         }
         else {
-            console.log(`原生广告加载出错，本次没有广告`, err)
+            console.log(MSG.NATIVE_ERROR2, err)
             if (Common.isFunction(this.nativeCb)) {
                 this.nativeCb(null)
             }
@@ -656,7 +609,7 @@ export default class OPPOModule extends PlatformModule {
         this.native.offLoad() // 移除原生广告加载成功回调
         this.native.offError() // 移除失败回调
         this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
-        console.log('原生广告销毁')
+        console.log(MSG.NATIVE_DESTROY)
     }
 
     /**
@@ -692,7 +645,7 @@ export default class OPPOModule extends PlatformModule {
      * 目前只有OPPO平台有此功能 
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
-     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     * this.node.on(CocosNodeEvent.TOUCH_END, () => {
      *     moosnow.platform.clickNative();
      * }, this)
      * 
@@ -708,7 +661,7 @@ export default class OPPOModule extends PlatformModule {
         if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
             this.mClickedNativeCallback = callback;
             this.mIsClickedNative = true;
-            console.log('点击了原生广告', this.nativeAdResult.adId)
+            console.log(MSG.NATIVE_NOT_ID_USE, this.nativeAdResult.adId)
             this.native.reportAdClick({
                 adId: this.nativeAdResult.adId
             })

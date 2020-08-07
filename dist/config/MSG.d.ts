@@ -1,0 +1,25 @@
+export declare const MSG: {
+    HIDE_BANNER: string;
+    INVITE_PLAY_USER: string;
+    BANNER_KEY_IS_NULL: string;
+    BANNER_SHOW: string;
+    BANNER_RESIZE: string;
+    NAVIGATE_FAST: string;
+    NAVIGATE_DATA: string;
+    SYSTEM_INFO: string;
+    VIDEO_KEY_IS_NULL: string;
+    VIDEO_LOAD_COMPLETED: string;
+    VIDEO_CLOSE_COMPLETED: string;
+    VIDEO_ERROR_COMPLETED: string;
+    NATIVE_LOAD_COMPLETED: string;
+    NATIVE_ERROR: string;
+    NATIVE_ERROR2: string;
+    NATIVE_NOT_ID_USE: string;
+    NATIVE_CLICK: string;
+    NATIVE_REPORT: string;
+    NATIVE_LIST_NULL: string;
+    NATIVE_DESTROY: string;
+    INTER_KEY_IS_NULL: string;
+    ALD_FILE_NO_IMPORT: string;
+    PLATFORM_UNSUPPORT: string;
+};

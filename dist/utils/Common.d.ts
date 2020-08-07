@@ -1,11 +1,10 @@
 import { PlatformType } from "../enum/PlatformType";
+import moosnowAppConfig from "../model/moosnowAppConfig";
 export default class Common {
     static titleCase(s: any): any;
     static numFixed(num: any, len: any): number;
     static parseMoney(value: any): number;
     static objKeySort(obj: any): {};
-    static isWeChat(): boolean;
-    static isQQPlay(): boolean;
     static isObject(x: any): boolean;
     static object2Query(obj: any): string;
     static isFunction(fun: any): boolean;
@@ -32,8 +31,12 @@ export default class Common {
      * debug没有时 默认返回微信平台
      */
     static get platform(): PlatformType;
+    static get config(): moosnowAppConfig;
+    static colorRGB2Hex(color: any): string;
     static deepCopy(obj: any): object | [];
+    static getEngine(): string;
     static popOpenAnim(node: cc.Node, callback?: Function): void;
     static popCloseAnim(node: cc.Node, callback?: Function): void;
+    static format(str: string, ...rep: string[]): string;
     static formatMoney(value: number): any;
 }

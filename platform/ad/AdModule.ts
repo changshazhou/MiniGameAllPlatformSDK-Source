@@ -110,7 +110,7 @@ export default class AdModule extends BaseModule {
     public getRemoteAd(cb) {
         cb([])
 
-      
+
     }
 
     private cacheImage = null;

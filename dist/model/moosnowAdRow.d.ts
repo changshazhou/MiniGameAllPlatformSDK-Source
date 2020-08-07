@@ -21,4 +21,18 @@ export default class moosnowAdRow {
      * 位置描述
      */
     position: string;
+    /**
+     * 取消时的回调
+     */
+    onCancel: Function;
+    /**
+     * 显示的顺序
+     */
+    index: number;
+    /**
+    * 点击后是否刷新
+    */
+    refresh: boolean;
+    showIds: Array<moosnowAdRow>;
+    source: Array<moosnowAdRow>;
 }

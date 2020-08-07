@@ -5,8 +5,9 @@ export declare class HttpModule extends BaseModule {
     private versionNumber;
     version: string;
     baseUrl: string;
-    private mLaunchOptions;
     constructor();
+    private mLaunchOptions;
+    private get appLaunchOptions();
     /**
      * 请求服务
      * @param {*} url
@@ -36,6 +37,17 @@ export declare class HttpModule extends BaseModule {
      */
     exportUser(): void;
     /**
+     * 跳转记录
+     * @param jump_appid
+     * @param callback
+     */
+    navigate(jump_appid: string, callback: Function): void;
+    /**
+     * 跳转完成
+     * @param code
+     */
+    navigateEnd(code: string): void;
+    /**
      *
      * @param url
      */
@@ -44,25 +56,25 @@ export declare class HttpModule extends BaseModule {
      * 数据打点
      * @param name  打点名称
      */
-    point(name: any, data?: any): void;
+    point(name: string, data?: any): void;
     /**
     * 统计开始游戏
     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
     */
-    startGame(level: any): void;
+    startGame(level: string): void;
     /**
      * 统计结束游戏
      * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
      * @param {boolean} isWin 是否成功
      */
-    endGame(level: any, isWin: any): void;
+    endGame(level: string, isWin: boolean): void;
     /**
      * 视频统计
      * @param {number} type 0：视频点击 1：视频观看完成
      * @param {string} info 信息 ex:“领取三倍金币”
      * @param {string} level 关卡数
      */
-    videoPoint(type: any, info: any, level: any): void;
+    videoPoint(type: any, info: string, level: string): void;
     /**
      *
      * @param callback
@@ -70,7 +82,9 @@ export declare class HttpModule extends BaseModule {
     getAllConfig(callback: Function): void;
     cfgData: any;
     areaData: any;
+    _cfgQuene: any[];
     loadCfg(callback: any): void;
+    private _localQuene;
     loadArea(callback: any): void;
     getForceExport(callback: any): void;
     disabledForceExport(res: any, res2: any, callback: any): void;

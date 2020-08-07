@@ -1,6 +1,8 @@
 import PlatformModule from './PlatformModule';
 import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
+import bannerStyle from '../model/bannerStyle';
+import { MSG } from '../config/MSG';
 
 
 export default class QQModule extends PlatformModule {
@@ -22,7 +24,7 @@ export default class QQModule extends PlatformModule {
         let centerPos = (windowWidth - this.bannerWidth) / 2;
         let top = windowHeight - height / 2;
         if (Common.isEmpty(this.bannerId)) {
-            console.warn('banner id is null')
+            console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         console.log('create banner by banner id ', this.bannerId)
@@ -41,13 +43,14 @@ export default class QQModule extends PlatformModule {
     }
 
     /**
-       * 
-       * @param callback 点击回调
-       * @param position banner的位置，默认底部
-       * @param style 自定义样式
-       */
-    public showBanner(callback?: Function, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
-        console.log('显示banner')
+      * 显示平台的banner广告
+      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+      * @param callback 点击回调
+      * @param position banner的位置，默认底部
+      * @param style 自定义样式
+      */
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+        console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
@@ -56,9 +59,23 @@ export default class QQModule extends PlatformModule {
         this.bannerPosition = position;
         this.bannerStyle = style;
 
-        this._resetBanenrStyle({
+        if (remoteOn)
+            moosnow.http.getAllConfig(res => {
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner，不执行显示')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this._showBanner();
+                }
+            })
+        else
+            this._showBanner();
 
-        });
+    }
+
+    public _showBanner() {
         if (this.banner) {
             let t = this.banner.show();
             if (t)
@@ -69,6 +86,7 @@ export default class QQModule extends PlatformModule {
                 })
         }
     }
+
     public _bottomCenterBanner(size) {
         // 尺寸调整时会触发回调         
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  

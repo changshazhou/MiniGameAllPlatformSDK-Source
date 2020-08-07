@@ -4,16 +4,7 @@ import PlatformModule from './PlatformModule';
  */
 export default class WXModule extends PlatformModule {
     platformName: string;
-    baseUrl: string;
-    private versionRet;
     constructor();
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version
-    * @param {*} callback
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    checkVersion(version: string, callback: any): void;
     /**
      * 游戏登录
      * @param callback
@@ -27,4 +18,23 @@ export default class WXModule extends PlatformModule {
      * @param callback
      */
     private getUserToken;
+    initRecord(): void;
+    /**
+     * 开始录屏
+     * @param duration 录屏时长
+     * @param callback 如果不是抖音回调参数=false
+     */
+    startRecord(duration?: number, callback?: any): void;
+    writeTime: number;
+    recordCb: any;
+    /**
+    * 停止录屏
+    * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
+    */
+    stopRecord(callback?: any): void;
+    pauseRecord(): void;
+    resumeRecord(): void;
+    private mShareButton;
+    showShareButton(style: any, timeRange?: Array<Array<number>>, callback?: Function): void;
+    hideShareButton(): void;
 }

@@ -4,19 +4,10 @@ import bannerStyle from "../model/bannerStyle";
 export default class OPPOModule extends PlatformModule {
     platformName: string;
     appSid: string;
-    baseUrl: string;
-    private versionRet;
     bannerWidth: number;
     bannerHeight: number;
     private interLoadedShow;
     constructor();
-    /**
-    * 检查当前版本的导出广告是否开启
-    * @param {string} version
-    * @param {*} callback
-    * @returns callback回调函数的参数为boolean，true：打开广告，false：关闭广告
-    */
-    checkVersion(version: string, callback: any): void;
     private initAdService;
     prevNavigate: number;
     /**
@@ -47,12 +38,14 @@ export default class OPPOModule extends PlatformModule {
     _onBannerHide(): void;
     destroyBanner(): void;
     /**
-     *
+     * 显示平台的banner广告
+     * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
      * @param callback 点击回调
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    showBanner(callback?: Function, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    _showBanner(): void;
     hideBanner(): void;
     createRewardAD(show: any): void;
     _onVideoLoad(): void;
@@ -90,7 +83,7 @@ export default class OPPOModule extends PlatformModule {
      * 目前只有OPPO平台有此功能
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
-     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     * this.node.on(CocosNodeEvent.TOUCH_END, () => {
      *     moosnow.platform.clickNative();
      * }, this)
      *

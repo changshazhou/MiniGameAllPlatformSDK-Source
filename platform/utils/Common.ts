@@ -1,4 +1,7 @@
 import { PlatformType } from "../enum/PlatformType";
+import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
+import { moosnowConfig } from "../../window";
+import moosnowAppConfig from "../model/moosnowAppConfig";
 
 export default class Common {
     //
@@ -27,12 +30,6 @@ export default class Common {
             newObj[newkey[i]] = obj[newkey[i]];//向新创建的对象中按照排好的顺序依次增加键值对
         }
         return newObj;//返回排好序的新对象
-    }
-    static isWeChat() {
-        return !!window["wx"];
-    }
-    static isQQPlay() {
-        return false
     }
     static isObject(x) {
         var type = typeof x;
@@ -151,6 +148,11 @@ export default class Common {
                 if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
                     this.mPlatform = PlatformType.VIVO;
                 }
+                else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                    this.mPlatform = PlatformType.OPPO_ZS
+                else {
+                    this.mPlatform = PlatformType.OPPO
+                }
             }
             else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                 this.mPlatform = PlatformType.OPPO_ZS
@@ -187,6 +189,37 @@ export default class Common {
         return this.mPlatform;
 
     }
+
+    static get config(): moosnowAppConfig {
+        let winCfg = window["moosnowConfig"];
+        let config;
+        if (Common.platform == PlatformType.WX)
+            config = winCfg.wx;
+        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
+            config = winCfg.oppo;
+        else if (Common.platform == PlatformType.VIVO)
+            config = winCfg.vivo;
+        else if (Common.platform == PlatformType.QQ)
+            config = winCfg.qq;
+        else if (Common.platform == PlatformType.BAIDU)
+            config = winCfg.bd;
+        else if (Common.platform == PlatformType.BYTEDANCE)
+            config = winCfg.byte;
+        else
+            config = winCfg.wx;
+        return config;
+    }
+    static colorRGB2Hex(color) {
+        var rgb = color.split(',');
+        var r = parseInt(rgb[0].split('(')[1]);
+        var g = parseInt(rgb[1]);
+        var b = parseInt(rgb[2].split(')')[0]);
+
+        var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        return hex;
+    }
+
+
     static deepCopy(obj): object | [] {
         //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝
         var objClone = Array.isArray(obj) ? [] : {};
@@ -205,32 +238,60 @@ export default class Common {
         return objClone;
     }
 
-    static popOpenAnim(node: cc.Node, callback?: Function) {
+    static getEngine() {
+        if (window[ENGINE_TYPE.COCOS]) {
+            return ENGINE_TYPE.COCOS
+        }
+        else if (window[ENGINE_TYPE.LAYA]) {
+            return ENGINE_TYPE.LAYA
+        }
+        else
+            return ENGINE_TYPE.NONE;
+    }
 
-        node.scale = 0.8;
-        node.runAction(
-            cc.sequence(
-                cc.scaleTo(0.1, 1.2, 1.2),
-                cc.scaleTo(0.1, 1, 1),
+
+    static popOpenAnim(node: cc.Node, callback?: Function) {
+        if (this.getEngine() == ENGINE_TYPE.COCOS) {
+            node.scale = 0.8;
+            node.runAction(
+                cc.sequence(
+                    cc.scaleTo(0.1, 1.2, 1.2),
+                    cc.scaleTo(0.1, 1, 1),
+                    cc.callFunc(() => {
+                        if (callback)
+                            callback();
+                    }, this)
+                )
+            )
+            return;
+        }
+        callback();
+
+    }
+
+    static popCloseAnim(node: cc.Node, callback?: Function) {
+        if (this.getEngine() == ENGINE_TYPE.COCOS) {
+            node.scale = 1;
+            node.runAction(cc.sequence(
+                cc.scaleTo(0.1, 0, 0),
                 cc.callFunc(() => {
                     if (callback)
                         callback();
                 }, this)
-            )
-        )
+            ))
+            return;
+        }
+        callback();
     }
-
-    static popCloseAnim(node: cc.Node, callback?: Function) {
-        node.scale = 1;
-        node.runAction(cc.sequence(
-            cc.scaleTo(0.1, 0, 0),
-            cc.callFunc(() => {
-                if (callback)
-                    callback();
-            }, this)
-        ))
+    /*格式化字符，类似于C# String.Format */
+    static format(str: string, ...rep: string[]) {
+        if (typeof (str) == "undefined" || str == null || str == '' || str == 'undefined') return str;
+        for (var i = 0; i < rep.length; i++) {
+            var re = new RegExp('\\{' + (i) + '\\}', 'gm');
+            str = str.replace(re, rep[i]);
+        }
+        return str;
     }
-
     static formatMoney(value: number) {
         let retValue: any = "0";
         if (isNaN(value))

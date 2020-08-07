@@ -1,6 +1,9 @@
 import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
 import { PlatformType } from "../enum/PlatformType";
+import { MSG } from "../config/MSG";
+import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
+import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 
 
 let ErrorType = {
@@ -21,30 +24,55 @@ export class HttpModule extends BaseModule {
     private appid: string = "";
     private secret: string = "";
     private versionNumber: string = "";
-    public version: string = "1.2.4";
+    public version: string = "2.1.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
 
-    private mLaunchOptions: any
     constructor() {
         super();
 
 
 
+        let versionUrl = `${ROOT_CONFIG.HTTP_ROOT}/SDK/version.json?t=` + Date.now();
         if (Common.platform == PlatformType.PC) {
-            let versionUrl = 'https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/SDK/version.json?t=' + Date.now();
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
                     console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]  下载地址：${res.download}`)
                     if (!Common.isEmpty(res.memo))
                         console.warn(`${res.memo}`)
                 }
+
             })
         }
-        this.mLaunchOptions = moosnow.platform.getLaunchOption();
+        else if (Common.platform == PlatformType.WX && window["wx"]) {
+            this.request(versionUrl, {}, 'GET', (res) => {
+                let aldVersion = window["wx"]["aldVersion"]
+                if (!aldVersion || (aldVersion && aldVersion < res.aldVersion))
+                    console.warn(`阿拉丁文件错误，请重新下载${res.aldUrl}`)
+            })
+        }
+
+
+
+        this.getShareInfo((data) => {
+            moosnow.platform.initShare(data);
+        });
+
+        this.loadCfg((res) => {
+            console.log('remote config ', res)
+        })
 
     }
 
 
+    private mLaunchOptions: any = {};
+    private get appLaunchOptions() {
+        if (!this.mLaunchOptions) {
+            if (moosnow.platform && moosnow.platform.getLaunchOption)
+                this.mLaunchOptions = moosnow.platform.getLaunchOption();
+        }
+
+        return this.mLaunchOptions;
+    }
 
 
 
@@ -59,14 +87,13 @@ export class HttpModule extends BaseModule {
      * @param {*} complete 
      */
     public request(url: string, data: any, method: 'POST' | 'GET', success?: Function, fail?: Function, complete?: Function) {
+        let newUrl = "";
+        newUrl = url;
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 var response = xhr.responseText;
                 if (xhr.status >= 200 && xhr.status < 400) {
-                    // if (method1 == "JSON") {
-                    //     var result = response;
-                    // } else {
                     var result = {};
                     try {
                         result = JSON.parse(response)
@@ -97,16 +124,16 @@ export class HttpModule extends BaseModule {
             if (fail)
                 fail(event);
         }
-        xhr.open(method, url, true);
+
         if (method == "POST") {
-            xhr.open('POST', url);
+            xhr.open('POST', newUrl);
             xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
             xhr.send(this._object2Query(data));
         }
         else {
+            xhr.open(method, newUrl, true);
             xhr.send();
         }
-
     }
     public _object2Query(obj) {
         var args = []
@@ -146,7 +173,36 @@ export class HttpModule extends BaseModule {
         this.postData('api/channel/exportUser.html')
     }
 
+    /**
+     * 跳转记录
+     * @param jump_appid 
+     * @param callback 
+     */
+    public navigate(jump_appid: string, callback: Function) {
+        let userToken = moosnow.data.getToken();
+        this.request(`${this.baseUrl}api/jump/record`, {
+            appid: Common.config.moosnowAppId,
+            uid: userToken,
+            jump_appid,
+        }, "POST", (respone) => {
+            console.log('navigate', respone)
+            if (callback)
+                callback(respone.data)
+        });
+    }
 
+
+    /**
+     * 跳转完成
+     * @param code 
+     */
+    public navigateEnd(code: string) {
+        this.request(`${this.baseUrl}api/jump/status`, {
+            code
+        }, "POST", (respone) => {
+            console.log('navigateEnd code ', code, respone)
+        });
+    }
 
 
     /**
@@ -159,7 +215,7 @@ export class HttpModule extends BaseModule {
         if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
             try {
                 this.request(`${this.baseUrl}${url}`, {
-                    appid: moosnow.platform.moosnowConfig.moosnowAppId,
+                    appid: Common.config.moosnowAppId,
                     user_id: userToken,
                     channel_id: moosnow.data.getChannelId(),
                     channel_appid: moosnow.data.getChannelAppId()
@@ -180,7 +236,7 @@ export class HttpModule extends BaseModule {
      * 数据打点
      * @param name  打点名称
      */
-    public point(name, data: any = null) {
+    public point(name: string, data: any = null) {
         if (Common.platform == PlatformType.WX) {
             if (window['wx'] && window['wx'].aldSendEvent)
                 (window['wx'] as any).aldSendEvent(name, data);
@@ -191,31 +247,31 @@ export class HttpModule extends BaseModule {
     * 统计开始游戏
     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
     */
-    public startGame(level) {
+    public startGame(level: string) {
         if (Common.platform == PlatformType.WX)
             if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onStart({
-                    stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                    stageName: level,//关卡名称，该字段必传
+                    stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                    stageName: "" + level,//关卡名称，该字段必传
                     userId: moosnow.data.getToken() //用户ID
                 });
             else
-                console.warn('阿拉丁文件未引入')
+                console.warn(MSG.ALD_FILE_NO_IMPORT)
     }
     /**
      * 统计结束游戏
      * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
      * @param {boolean} isWin 是否成功
      */
-    public endGame(level, isWin) {
+    public endGame(level: string, isWin: boolean) {
         if (Common.platform != PlatformType.WX) return;
 
         var event = isWin ? "complete" : "fail";
         var desc = isWin ? "关卡完成" : "关卡失败";
         if (window['wx'] && window['wx'].aldStage)
             window['wx'].aldStage.onEnd({
-                stageId: level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                stageName: level,//关卡名称，该字段必传
+                stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                stageName: "" + level,//关卡名称，该字段必传
                 userId: moosnow.data.getToken(), //用户ID
                 event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
                 params: {
@@ -223,7 +279,7 @@ export class HttpModule extends BaseModule {
                 }
             });
         else
-            console.warn('阿拉丁文件未引入')
+            console.warn(MSG.ALD_FILE_NO_IMPORT)
     }
     /**
      * 视频统计
@@ -231,13 +287,14 @@ export class HttpModule extends BaseModule {
      * @param {string} info 信息 ex:“领取三倍金币”
      * @param {string} level 关卡数
      */
-    public videoPoint(type, info, level) {
+    public videoPoint(type, info: string, level: string) {
         if (Common.platform != PlatformType.WX) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
         if (window['wx'] && window['wx'].aldSendEvent)
             window['wx'].aldSendEvent(name, { info, level: level + "" });
         else
-            console.warn('阿拉丁文件未引入')
+            console.warn(MSG.ALD_FILE_NO_IMPORT)
+
     }
 
     /**
@@ -248,16 +305,38 @@ export class HttpModule extends BaseModule {
         this.loadCfg(res => {
             this.loadArea(res2 => {
                 this.disableAd(res, res2, (disable) => {
+                    let exportAutoNavigate = 0;
                     if (disable) {
+                        //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
+
+                        if (res.exportAutoNavigate == 1)
+                            exportAutoNavigate = 0
+                        if (res.exportAutoNavigate == 2)
+                            exportAutoNavigate = 1
                         callback({
                             ...res,
                             mistouchNum: 0,
                             mistouchPosNum: 0,
-                            bannerShowCountLimit: 1
+                            mistouchInterval: 0,
+                            exportBtnNavigate: 0,
+                            checkBoxMistouch: 0,
+                            exportAutoNavigate,
+                            bannerShowCountLimit: 1,
+                            isLimitArea: 1,
+                            nativeErrorShowInter: 0,
+                            bannerErrorShowInter: 0
                         })
                     }
                     else {
-                        callback(res)
+                        if (res.exportAutoNavigate == 1)
+                            exportAutoNavigate = 1
+                        if (res.exportAutoNavigate == 2)
+                            exportAutoNavigate = 1;
+                        callback({
+                            ...res,
+                            exportAutoNavigate,
+                            isLimitArea: 0
+                        })
                     }
                 })
             })
@@ -267,49 +346,100 @@ export class HttpModule extends BaseModule {
 
     public cfgData = null;
     public areaData = null;
+    public _cfgQuene = [];
     public loadCfg(callback) {
         if (!Common.isEmpty(this.cfgData)) {
             callback(this.cfgData);
         }
         else {
-            var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
+            this._cfgQuene.push(callback);
+            if (this._cfgQuene.length > 1)
+                return
+
+            var url = "";
+            if (Common.config.url)
+                url = Common.config.url + "?t=" + Date.now();
+            else
+                url = `${ROOT_CONFIG.HTTP_ROOT}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
+
+
             this.request(url, {}, 'GET',
                 (res) => {
+                    //总开关控制
+                    let mistouchOn = res && res.mistouchOn == 1 ? true : false;
+                    if (!mistouchOn)
+                        console.log('总开关已关闭----------------')
                     this.cfgData = {
                         ...Common.deepCopy(res),
-                        zs_native_click_switch: res && res.lureNative ? res.lureNative : 0,
-                        zs_jump_switch: res && res.lureExportAd ? res.lureExportAd : 0,
+                        zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
+                        zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
+                        mistouchNum: mistouchOn ? res.mistouchNum : 0,
+                        mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0,
+                        mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
+                        exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0,
+                        exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0,
+                        checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0,
+                        nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0,
+                        bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0,
+                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
                     };
                     if (moosnow.platform) {
-                        moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                        if (res) {
+                            if (!isNaN(res.bannerShowCountLimit))
+                                moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                            if (!isNaN(res.bannerLimitType))
+                                moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
+                            if (!isNaN(res.bannerShowTimeLimit))
+                                moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+                        }
+
                     }
-                    callback(this.cfgData);
+                    this._cfgQuene.forEach(item => {
+                        item(this.cfgData);
+                    })
+                    this._cfgQuene = [];
                 },
                 () => {
-                    callback({
-                        mistouchNum: 0,
-                        mistouchPosNum: 0,
-                        bannerShowCountLimit: 1
-                    });
+                    this._cfgQuene.forEach(item => {
+                        item({
+                            checkBoxMistouch: 0,
+                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                            mistouchNum: 0,
+                            mistouchPosNum: 0,
+                            bannerShowCountLimit: 1,
+                            exportAutoNavigate: 0
+                        });
+                    })
+                    this._cfgQuene = [];
                     console.log('load config json fail');
                 }
             );
         }
 
     }
-
+    private _localQuene = [];
     public loadArea(callback) {
         if (this.areaData) {
             callback(this.areaData)
         }
         else {
-            let ipUrl = 'https://api.liteplay.com.cn/admin/wx_config/getLocation';
+
+            this._localQuene.push(callback);
+            if (this._localQuene.length > 1)
+                return;
+
+            let ipUrl = `${this.baseUrl}admin/wx_config/getLocation`;
             this.request(ipUrl, {}, 'GET', (res2) => {
                 this.areaData = res2;
-                callback(this.areaData)
-
+                this._localQuene.forEach(item => {
+                    item(this.areaData)
+                })
+                this._localQuene = [];
             }, () => {
-                callback(null);
+                this._localQuene.forEach(item => {
+                    item(this.areaData)
+                })
+                this._localQuene = [];
             })
         }
 
@@ -428,10 +558,15 @@ export class HttpModule extends BaseModule {
                 }
             }
         }
-        if (this.mLaunchOptions) {
-            if ([1005, 1007, 1008, 1044].indexOf(this.mLaunchOptions.scene) != -1) {
+        if (this.appLaunchOptions && res) {
+
+            console.log('后台禁止场景 1 ', res.seachEntryScene);
+            console.log('后台禁止场景 2 ', res.shareEntryScene);
+
+            if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
+                || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                 callback(true)
-                console.log('mLaunchOptions', this.mLaunchOptions);
+                console.log('后台禁止场景 ', this.appLaunchOptions.scene);
                 return;
             }
         }
@@ -456,12 +591,19 @@ export class HttpModule extends BaseModule {
     }
 
     public getShareInfo(cb) {
-        this.request(`${this.baseUrl}admin/wx_share/getShare`, {
-            appid: moosnow.platform.moosnowConfig.moosnowAppId
-        }, "POST", (res) => {
-            console.log('分享数据', res.data)
-            cb(res.data);
-            moosnow.platform.initShare(res.data);
+        this.request(`${ROOT_CONFIG.HTTP_ROOT}/share/${Common.config.moosnowAppId}.json`, {
+            appid: Common.config.moosnowAppId
+        }, "GET", (res) => {
+            cb(res);
+            moosnow.platform.initShare(res);
+        }, () => {
+            this.request(`${this.baseUrl}admin/wx_share/getShare`, {
+                appid: Common.config.moosnowAppId
+            }, "POST", (res) => {
+                console.log('分享数据', res.data)
+                cb(res.data);
+                moosnow.platform.initShare(res.data);
+            });
         });
     }
 }
