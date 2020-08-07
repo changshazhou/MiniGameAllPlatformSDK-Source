@@ -37,6 +37,8 @@ import FormFactory from "./engine/FormFactory";
 import CocosNativeForm from "./cocos/form/CocosNativeForm";
 import showNativeOptions from "../model/showNativeOptions";
 import vectory from "../../dist/model/Vectory";
+import CocosRespawnForm from "./cocos/form/CocosRespawnForm";
+import showRespawnOptions from "../model/showRespawnOptions";
 
 /**
  * 广告结果
@@ -138,6 +140,15 @@ export default class FormUtil {
     */
     public showEnd(options: showEndOptions) {
         this.formFactory.showForm(FormLayout.EndForm, CocosEndForm, options)
+    }
+
+    /**
+        * 显示复活页面
+        * @param coinNum 
+        * @param callback 
+        */
+    public showRespawn(options: showRespawnOptions) {
+        this.formFactory.showForm(FormLayout.RespawnForm, CocosRespawnForm, options)
     }
 
     /**

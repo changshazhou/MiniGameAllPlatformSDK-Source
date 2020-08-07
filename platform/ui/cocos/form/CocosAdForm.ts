@@ -68,28 +68,26 @@ export default class CocosAdForm extends CocosBaseForm {
     private mMoveSpeed: number = 2;
 
     private addListener() {
-        if (this.btnBack)
-            this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this)
-        if (this.exportClose)
-            this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
-        if (this.btnSideShow)
-            this.btnSideShow.on(CocosNodeEvent.TOUCH_END, this.sideOut, this)
-        if (this.btnSideHide)
-            this.btnSideHide.on(CocosNodeEvent.TOUCH_END, this.sideIn, this)
-
-
+        this.applyClickAnim(this.btnBack, () => {
+            this.onBack();
+        })
+        this.applyClickAnim(this.exportClose, () => {
+            this.onNavigate();
+        })
+        this.applyClickAnim(this.btnSideShow, () => {
+            this.sideOut();
+        })
+        this.applyClickAnim(this.btnSideHide, () => {
+            this.sideIn();
+        })
         moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange)
     }
     private removeListener() {
-        if (this.btnBack)
-            this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this)
-        if (this.exportClose)
-            this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this)
-        if (this.btnSideShow)
-            this.btnSideShow.off(CocosNodeEvent.TOUCH_END, this.sideOut, this)
-        if (this.btnSideHide)
-            this.btnSideHide.off(CocosNodeEvent.TOUCH_END, this.sideIn, this)
 
+        this.removeClickAnim(this.btnBack)
+        this.removeClickAnim(this.exportClose)
+        this.removeClickAnim(this.btnSideShow)
+        this.removeClickAnim(this.btnSideHide)
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
     }
     private mTempPoints: Array<cc.Vec2>;

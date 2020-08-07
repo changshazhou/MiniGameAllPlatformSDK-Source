@@ -54,6 +54,7 @@ export default class PlatformModule extends BaseModule {
         if (id instanceof Array) {
             if (this.mBannerIndex > id.length - 1)
                 this.mBannerIndex = 0;
+            // this.mBannerIndex = Common.randomNumBoth(0, id.length - 1);
             let retValue = id[this.mBannerIndex];
             this.mBannerIndex++;
             console.log('使用banner id ', retValue)

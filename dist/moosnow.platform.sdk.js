@@ -643,6 +643,42 @@ var mx = (function () {
                 }
             }
         };
+        BaseModule.schedule = function (callback, time) {
+            var arg = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                arg[_i - 2] = arguments[_i];
+            }
+            var self = this;
+            var id = setInterval(function () {
+                if (callback)
+                    callback.apply.apply(callback, __spreadArrays([self], arg));
+            }, time * 1000);
+            console.log('BaseModule schedule ', id);
+            this.mIntervalArr[id] = callback;
+        };
+        BaseModule.unschedule = function (callback) {
+            for (var key in this.mIntervalArr) {
+                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
+                    clearInterval(parseInt(key));
+                }
+            }
+        };
+        BaseModule.scheduleOnce = function (callback, time) {
+            var self = this;
+            var id = setTimeout(function () {
+                clearTimeout(id);
+                if (callback)
+                    callback.apply(self);
+            }, time * 1000);
+            this.mTimeoutArr[id] = callback;
+        };
+        BaseModule.unscheduleOnce = function (callback) {
+            for (var key in this.mTimeoutArr) {
+                if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
+                    clearTimeout(parseInt(key));
+                }
+            }
+        };
         BaseModule.prototype.initProperty = function (form) {
             for (var v in form) {
                 if (this.hasOwnProperty(v)) {
@@ -677,6 +713,8 @@ var mx = (function () {
             }
             return false;
         };
+        BaseModule.mIntervalArr = {};
+        BaseModule.mTimeoutArr = {};
         return BaseModule;
     }());
 
@@ -807,6 +845,7 @@ var mx = (function () {
                 if (id instanceof Array) {
                     if (this.mBannerIndex > id.length - 1)
                         this.mBannerIndex = 0;
+                    // this.mBannerIndex = Common.randomNumBoth(0, id.length - 1);
                     var retValue = id[this.mBannerIndex];
                     this.mBannerIndex++;
                     console.log('使用banner id ', retValue);

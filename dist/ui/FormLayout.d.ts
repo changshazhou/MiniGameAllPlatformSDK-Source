@@ -5,6 +5,7 @@ export default class FormLayout {
     static readonly PrizeForm: string;
     static readonly TotalForm: string;
     static readonly EndForm: string;
+    static readonly RespawnForm: string;
     static readonly PauseForm: string;
     static readonly ShareForm: string;
     static readonly TryForm: string;

@@ -15,4 +15,8 @@ export default class showPauseOptions extends showOptions {
      * 重新开始回调
      */
     replayCallback?: Function
+    /**
+    * 回到首页
+    */
+    homeCallback?: Function
 }

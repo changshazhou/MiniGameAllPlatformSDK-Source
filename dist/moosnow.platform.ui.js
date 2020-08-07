@@ -2095,6 +2095,13 @@ var mx = (function () {
             return _this;
             // update (dt) {}
         }
+        Object.defineProperty(CocosPauseForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CocosPauseForm.prototype.addListener = function () {
             var _this = this;
             this.applyClickAnim(this.btnContinue, function () {
@@ -2124,14 +2131,20 @@ var mx = (function () {
         };
         CocosPauseForm.prototype.onContinue = function () {
             this.hideForm();
+            if (this.FormData.callback)
+                this.FormData.callback();
         };
         CocosPauseForm.prototype.onToHome = function () {
             moosnow.platform.stopRecord();
+            if (this.FormData.homeCallback)
+                this.FormData.homeCallback();
         };
         CocosPauseForm.prototype.onReplay = function () {
             moosnow.platform.stopRecord(function () {
                 moosnow.platform.startRecord();
             });
+            if (this.FormData.replayCallback)
+                this.FormData.replayCallback();
         };
         return CocosPauseForm;
     }(CocosBaseForm));
@@ -3022,12 +3035,12 @@ var mx = (function () {
         CocosAdViewItem.prototype.updateUI = function () {
             var _this = this;
             var _a = this.logo, width = _a.width, height = _a.height;
-            console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height);
+            // console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
             CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img }, function () {
-                console.log('logo complete 2 ', _this.mAdItem.title, "logo ", _this.logo.width, _this.logo.height, "node ", _this.node.width, _this.node.height);
+                // console.log('logo complete 2 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
                 _this.logo.width = width;
                 _this.logo.height = height;
-                console.log('logo complete 3 ', _this.mAdItem.title, "logo ", _this.logo.width, _this.logo.height, "node ", _this.node.width, _this.node.height);
+                // console.log('logo complete 3 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
             });
             CocosNodeHelper.changeText(this.title, this.mAdItem.title);
         };
@@ -3152,25 +3165,26 @@ var mx = (function () {
             return _this;
         }
         CocosAdForm.prototype.addListener = function () {
-            if (this.btnBack)
-                this.btnBack.on(CocosNodeEvent.TOUCH_END, this.onBack, this);
-            if (this.exportClose)
-                this.exportClose.on(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
-            if (this.btnSideShow)
-                this.btnSideShow.on(CocosNodeEvent.TOUCH_END, this.sideOut, this);
-            if (this.btnSideHide)
-                this.btnSideHide.on(CocosNodeEvent.TOUCH_END, this.sideIn, this);
+            var _this = this;
+            this.applyClickAnim(this.btnBack, function () {
+                _this.onBack();
+            });
+            this.applyClickAnim(this.exportClose, function () {
+                _this.onNavigate();
+            });
+            this.applyClickAnim(this.btnSideShow, function () {
+                _this.sideOut();
+            });
+            this.applyClickAnim(this.btnSideHide, function () {
+                _this.sideIn();
+            });
             moosnow.event.addListener(EventType.AD_VIEW_CHANGE, this, this.onAdChange);
         };
         CocosAdForm.prototype.removeListener = function () {
-            if (this.btnBack)
-                this.btnBack.off(CocosNodeEvent.TOUCH_END, this.onBack, this);
-            if (this.exportClose)
-                this.exportClose.off(CocosNodeEvent.TOUCH_END, this.onNavigate, this);
-            if (this.btnSideShow)
-                this.btnSideShow.off(CocosNodeEvent.TOUCH_END, this.sideOut, this);
-            if (this.btnSideHide)
-                this.btnSideHide.off(CocosNodeEvent.TOUCH_END, this.sideIn, this);
+            this.removeClickAnim(this.btnBack);
+            this.removeClickAnim(this.exportClose);
+            this.removeClickAnim(this.btnSideShow);
+            this.removeClickAnim(this.btnSideHide);
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
         };
         CocosAdForm.prototype.onAdChange = function (data) {
@@ -3885,6 +3899,7 @@ var mx = (function () {
         FormLayout.PrizeForm = "prizeForm";
         FormLayout.TotalForm = "totalForm";
         FormLayout.EndForm = "endForm";
+        FormLayout.RespawnForm = "respawnForm";
         FormLayout.PauseForm = "pauseForm";
         FormLayout.ShareForm = "shareForm";
         FormLayout.TryForm = "tryForm";
@@ -3993,6 +4008,66 @@ var mx = (function () {
         return CocosNativeForm;
     }(CocosBaseForm));
 
+    var CocosRespawnForm = /** @class */ (function (_super) {
+        __extends(CocosRespawnForm, _super);
+        function CocosRespawnForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.btnVideo = null;
+            _this.btnHome = null;
+            return _this;
+        }
+        Object.defineProperty(CocosRespawnForm.prototype, "FormData", {
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosRespawnForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.btnVideo, function () {
+                _this.onVideoTry();
+            });
+            this.applyClickAnim(this.btnHome, function () {
+                _this.onHome();
+            });
+        };
+        CocosRespawnForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.btnVideo);
+            this.removeClickAnim(this.btnHome);
+        };
+        CocosRespawnForm.prototype.onShow = function (data) {
+            _super.prototype.onShow.call(this, data);
+            this.addListener();
+        };
+        CocosRespawnForm.prototype.onHide = function (data) {
+            _super.prototype.onHide.call(this, data);
+            this.removeListener();
+        };
+        CocosRespawnForm.prototype.onVideoTry = function () {
+            var _this = this;
+            moosnow.platform.showVideo(function (res) {
+                if (res == VIDEO_STATUS.END) {
+                    _this.hideForm();
+                    if (_this.FormData.videoCallback)
+                        _this.FormData.videoCallback();
+                }
+                else if (res == VIDEO_STATUS.ERR) {
+                    moosnow.form.showToast(VIDEO_MSG.ERR);
+                }
+                else if (res == VIDEO_STATUS.NOTEND) {
+                    moosnow.form.showToast(VIDEO_MSG.NOTEND);
+                }
+            });
+        };
+        CocosRespawnForm.prototype.onHome = function () {
+            this.hideForm();
+            if (this.FormData.callback)
+                this.FormData.callback();
+        };
+        return CocosRespawnForm;
+    }(CocosBaseForm));
+
     /**
      * 广告结果
      */
@@ -4074,6 +4149,14 @@ var mx = (function () {
         */
         FormUtil.prototype.showEnd = function (options) {
             this.formFactory.showForm(FormLayout.EndForm, CocosEndForm, options);
+        };
+        /**
+            * 显示复活页面
+            * @param coinNum
+            * @param callback
+            */
+        FormUtil.prototype.showRespawn = function (options) {
+            this.formFactory.showForm(FormLayout.RespawnForm, CocosRespawnForm, options);
         };
         /**
           * 显示结算统计页
