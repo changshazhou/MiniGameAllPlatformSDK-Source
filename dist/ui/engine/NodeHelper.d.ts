@@ -1,6 +1,7 @@
 import NodeAttribute from "../attribute/NodeAttribute";
 import TextAttribute from "../attribute/TextAttribute";
-export default class NodeHelper {
+import BaseModule from "../../framework/BaseModule";
+export default class NodeHelper extends BaseModule {
     static get canvasNode(): cc.Node;
     private static nodeNum;
     static getNodeName(): string;

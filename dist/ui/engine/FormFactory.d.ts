@@ -21,6 +21,7 @@ export declare class LayoutFormQuene {
 export default class FormFactory {
     layoutUrl: string;
     templatesUrl: string;
+    maskUrl: string;
     private mFormQuene;
     get layoutQuene(): LayoutFormQuene[];
     set layoutQuene(value: LayoutFormQuene[]);

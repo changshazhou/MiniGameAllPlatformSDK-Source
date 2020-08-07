@@ -40,6 +40,8 @@ export default class CocosAdForm extends CocosBaseForm {
     private mMoveSpeed;
     private addListener;
     private removeListener;
+    private mTempPoints;
+    private mTempTempletes;
     private onAdChange;
     onBack(): void;
     get FormData(): showAdOptions;
@@ -53,8 +55,6 @@ export default class CocosAdForm extends CocosBaseForm {
     private checkLoad;
     onRandomNavigate(): void;
     onNavigate(): void;
-    private floatRuning;
-    private floatAnim;
     sideOut(): void;
     sideIn(): void;
     pushScroll(scrollView: cc.ScrollView, layout: cc.Layout): void;
@@ -75,6 +75,9 @@ export default class CocosAdForm extends CocosBaseForm {
      * @param callback  跳转取消时的回调函数
      */
     initFloatAd(callback?: Function): void;
+    private removeFloatAd;
+    private floatRuning;
+    private floatAnim;
     private updateFloat;
     /**
        * 绑定广告数据-固定显示6个导出

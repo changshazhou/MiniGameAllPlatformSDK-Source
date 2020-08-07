@@ -28,7 +28,7 @@ import { PlatformType } from "../enum/PlatformType";
 import Common from "../utils/Common";
 import CocosMistouchForm from "./cocos/form/CocosMistouchForm";
 import CocosAdForm from "./cocos/form/CocosAdForm";
-import showAdOptions from "../model/loadAdOptions";
+import showAdOptions from "../model/showAdOptions";
 import loadAdOptions from "../model/loadAdOptions";
 import CocosPrizeForm from "./cocos/form/CocosPrizeForm";
 import FormLayout from "./FormLayout";
@@ -36,6 +36,7 @@ import CocosBaseForm from "./cocos/form/CocosBaseForm";
 import FormFactory from "./engine/FormFactory";
 import CocosNativeForm from "./cocos/form/CocosNativeForm";
 import showNativeOptions from "../model/showNativeOptions";
+import vectory from "../../dist/model/Vectory";
 
 /**
  * 广告结果
@@ -73,15 +74,17 @@ export default class FormUtil {
      * 显示广告
      * @param adType 广告类型
      * @param callback  有返回按钮时的回调
+     * @param points  层级
+     * @param templetes  层级
      * @param zIndex  层级
      */
-    public showAd(adType: number = AD_POSITION.NONE, callback: Function, zIndex: number = 999) {
+    public showAd(adType: number = AD_POSITION.NONE, callback: Function, points?: Array<cc.Vec2>, templetes?: Array<string>, zIndex: number = cc.macro.MAX_ZINDEX) {
         //
         if (Common.platform == PlatformType.BYTEDANCE && moosnow.platform.isIphone()) {
             console.log('头条iphone 不显示广告')
             return;
         }
-        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex })
+        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex, points, templetes })
 
     }
 

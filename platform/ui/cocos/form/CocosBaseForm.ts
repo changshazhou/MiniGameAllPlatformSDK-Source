@@ -47,7 +47,6 @@ export default class CocosBaseForm extends BaseForm {
         console.log('onMouseUp')
         let queneId = e.getCurrentTarget().uuid
         this.upAnim(e.getCurrentTarget(), () => {
-
             if (this.mClickQuene[queneId] && this.mClickQuene[queneId].callback)
                 this.mClickQuene[queneId].callback();
         })
@@ -59,12 +58,20 @@ export default class CocosBaseForm extends BaseForm {
         this.upAnim(e.getCurrentTarget())
     }
 
-    public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false) {
+    /**
+     * 应用点击动画
+     * @param node 
+     * @param callback 
+     * @param stopPropagation 
+     * @param once 
+     */
+    public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false, once: boolean = true) {
         if (node && node.uuid) {
             this.mClickQuene[node.uuid] = {
                 node,
                 stopPropagation,
-                callback
+                callback,
+                once
             };
             node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
             node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);

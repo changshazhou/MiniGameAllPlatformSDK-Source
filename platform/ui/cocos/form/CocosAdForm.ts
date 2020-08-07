@@ -90,11 +90,17 @@ export default class CocosAdForm extends CocosBaseForm {
         if (this.btnSideHide)
             this.btnSideHide.off(CocosNodeEvent.TOUCH_END, this.sideIn, this)
 
-
         moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this)
     }
-
+    private mTempPoints: Array<cc.Vec2>;
+    private mTempTempletes: Array<string>;
     private onAdChange(data) {
+
+        this.mShowAd = AD_POSITION.NONE;
+        this.displayAd(false)
+
+        this.mTempPoints = data.points;
+        this.mTempTempletes = data.templetes;
 
         if (data.showAd != AD_POSITION.RECOVER) {
             this.mPrevShowAd = this.mShowAd;
@@ -174,26 +180,6 @@ export default class CocosAdForm extends CocosBaseForm {
             }
         })
     }
-    private floatRuning = false;
-    private floatAnim() {
-        if (this.floatRuning)
-            return;
-        if (this.floatContainer.childrenCount >= this.FormData.floatPositon.length)
-            this.floatRuning = true;
-        this.floatContainer.children.forEach(floatNode => {
-            floatNode.stopAllActions();
-            floatNode.runAction(
-                cc.sequence(
-                    cc.rotateTo(0.3, 10),
-                    cc.rotateTo(0.6, -10),
-                    cc.rotateTo(0.3, 0),
-                    cc.scaleTo(0.3, 0.8),
-                    cc.scaleTo(0.3, 1)
-                ).repeatForever()
-            )
-        })
-    }
-
     public sideOut() {
         let wxsys = moosnow.platform.getSystemInfoSync();
         let statusBarHeight = 0;
@@ -326,7 +312,10 @@ export default class CocosAdForm extends CocosBaseForm {
 
         let showIds = [];
 
-        this.FormData.floatPositon.forEach((point, idx) => {
+        let points = this.mTempPoints || this.FormData.floatPositon;
+        let templetes = this.mTempTempletes || this.FormData.floatTempletes;
+
+        points.forEach((point, idx) => {
             let showIndex = idx;
             if (showIndex > source.length - 1)
                 showIndex = 0;
@@ -336,7 +325,7 @@ export default class CocosAdForm extends CocosBaseForm {
                 position: adRow.position,
                 index: idx
             })
-            let templateName = this.FormData.floatTempletes.length - 1 > idx ? this.FormData.floatTempletes[idx] as any : this.FormData.floatTempletes[0];
+            let templateName = templetes.length - 1 > idx ? templetes[idx] as any : templetes[0];
             console.log('initFloatAd', point.x, point.y)
             adRow.x = point.x;
             adRow.y = point.y;
@@ -350,12 +339,52 @@ export default class CocosAdForm extends CocosBaseForm {
         this.schedule(() => {
             this.updateFloat(source);
         }, this.mFloatRefresh);
+        this.floatRuning = false;
 
     }
+    private removeFloatAd() {
+        this.floatContainer.children.forEach(floatNode => {
+            floatNode.stopAllActions();
+        })
+
+        let templetes = this.FormData.floatTempletes;
+        if (this.mTempTempletes) {
+            templetes = templetes.concat(this.mTempTempletes)
+        }
+        templetes.forEach(tempName => {
+            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+        })
+        this.mTempPoints = null;
+        this.mTempTempletes = null;
+    }
+
+
+    private floatRuning = false;
+    private floatAnim() {
+        if (this.floatRuning)
+            return;
+        let templetes = this.mTempTempletes || this.FormData.floatTempletes;
+        if (this.floatContainer.childrenCount >= templetes.length)
+            this.floatRuning = true;
+        this.floatContainer.children.forEach(floatNode => {
+            floatNode.stopAllActions();
+            floatNode.runAction(
+                cc.sequence(
+                    cc.rotateTo(0.3, 10),
+                    cc.rotateTo(0.6, -10),
+                    cc.rotateTo(0.3, 0),
+                    cc.scaleTo(0.3, 0.8),
+                    cc.scaleTo(0.3, 1)
+                ).repeatForever()
+            )
+        })
+    }
+
 
     private updateFloat(source) {
+        let templetes = this.mTempTempletes || this.FormData.floatTempletes;
         this.floatContainer.children.forEach(floatNode => {
-            this.FormData.floatTempletes.forEach(templeteName => {
+            templetes.forEach(templeteName => {
                 moosnow.form.formFactory.getKVsByName(templeteName).forEach(kv => {
                     if (kv.formNode == floatNode) {
                         if (kv.formLogic.FormData.index < this.mAdData.indexLeft.length - 1)
@@ -507,10 +536,17 @@ export default class CocosAdForm extends CocosBaseForm {
     private displayAd(visible: boolean) {
         this.endContainer.active = visible && this.hasAd(AD_POSITION.EXPORT_FIXED);
         this.endContainer.active && this.initEnd();
+
         // !this.endContainer.active && this.disableEnd();
         this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
+
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+        this.floatContainer.active && this.initFloatAd();
+        if (!this.floatContainer.active) {
+            this.removeFloatAd();
+        }
+
         this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
         this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
         this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
@@ -544,7 +580,6 @@ export default class CocosAdForm extends CocosBaseForm {
         this.loadAd(() => {
             this.schedule(this.onFwUpdate, 0.016)
             this.initBanner();
-            this.initFloatAd();
             this.initExport();
             this.initTop();
             this.initLeftRight();

@@ -28,9 +28,11 @@ export default class FormUtil {
      * 显示广告
      * @param adType 广告类型
      * @param callback  有返回按钮时的回调
+     * @param points  层级
+     * @param templetes  层级
      * @param zIndex  层级
      */
-    showAd(adType: number, callback: Function, zIndex?: number): void;
+    showAd(adType: number, callback: Function, points?: Array<cc.Vec2>, templetes?: Array<string>, zIndex?: number): void;
     hideAd(callback: Function): void;
     /**
      * 金币动画

@@ -96,12 +96,14 @@ export default class CocosFormFactory extends FormFactory {
                     item.formLogic.willHide(formData);
                     item.formNode.active = false;
                     item.formLogic.onHide(formData);
+                    (item.formNode as cc.Node).removeFromParent();
                 })
             }
             else {
                 formKV.formLogic.willHide(formData);
                 formKV.formNode.active = false;
                 formKV.formLogic.onHide(formData);
+                (formKV.formNode as cc.Node).removeFromParent();
             }
         })
     }

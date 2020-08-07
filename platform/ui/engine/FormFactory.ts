@@ -47,7 +47,7 @@ export default class FormFactory {
 
     public layoutUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/layout.json`;
     public templatesUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/templates.json`;
-
+    public maskUrl = `${ROOT_CONFIG.HTTP_ROOT}/layout/${Common.config.moosnowAppId}/img_mask.png`;
 
     private mFormQuene: Array<LayoutFormQuene> = [];
     public get layoutQuene() {
