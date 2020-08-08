@@ -1476,22 +1476,22 @@ var mx = (function () {
             if (viewCfg.widget) {
                 this.createWidget(container, WidgetAttribute.parse(viewCfg.widget));
             }
-            var node = this.createNode(viewCfg.name + '_scroll', viewCfg);
-            var scroll = node.addComponent(cc.ScrollView);
+            var scrollNode = this.createNode(viewCfg.name + '_scroll', viewCfg);
+            var scroll = scrollNode.addComponent(cc.ScrollView);
             scroll.horizontal = !!viewCfg.scroll.horizontal;
             scroll.vertical = !!viewCfg.scroll.vertical;
             scroll.horizontalScrollBar = null;
             scroll.verticalScrollBar = null;
-            node.width = this.convertWidth(viewCfg.scroll.width);
-            node.height = this.convertHeight(viewCfg.scroll.height);
-            container.addChild(node);
+            scrollNode.width = this.convertWidth(viewCfg.scroll.width);
+            scrollNode.height = this.convertHeight(viewCfg.scroll.height);
+            container.addChild(scrollNode);
+            if (viewCfg.layout.widget) {
+                this.createWidget(scrollNode, viewCfg.layout.widget);
+            }
             var view = this.createNode(viewCfg.name + "_view");
             view.addComponent(cc.Mask);
-            // mask.type = cc.Mask.Type.RECT;
-            // this.createWidget(view, new WidgetAttribute(true, true, true, true));
-            view.width = this.convertWidth(viewCfg.scroll.width);
-            view.height = this.convertHeight(viewCfg.scroll.height);
-            node.addChild(view);
+            this.createWidget(view, new WidgetAttribute(true, true, true, true, 0, 0, 0, 0));
+            scrollNode.addChild(view);
             viewCfg.layout.name = viewCfg.name + '_layout';
             var layoutNode = this.createLayout(view, LayoutAttribute.parse(viewCfg.layout));
             layoutNode.width = this.convertWidth(viewCfg.layout.width);
