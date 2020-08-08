@@ -109,7 +109,7 @@ export default class CocosNodeHelper extends NodeHelper {
 
         layout.spacingX = layoutCfg.spacingX;
         layout.spacingY = layoutCfg.spacingY;
-
+        layout.startAxis = layoutCfg.startAxis;
 
 
         node.x = layoutCfg.x;
