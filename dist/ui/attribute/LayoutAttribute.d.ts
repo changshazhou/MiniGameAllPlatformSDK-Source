@@ -10,5 +10,4 @@ export default class LayoutAttribute extends NodeAttribute {
     bottom: number;
     spacingX: number;
     spacingY: number;
-    static convertType(type: number | string): any;
 }

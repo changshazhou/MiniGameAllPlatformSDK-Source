@@ -1,6 +1,10 @@
 import BaseModule from "./BaseModule";
 export default class AudioModule extends BaseModule {
+    private mBtnSound;
+    get btnSound(): cc.AudioClip;
+    set btnSound(value: cc.AudioClip);
     constructor();
+    playClickEffect(): void;
     /**
         * 存储在本地声音有关的设置key（字段字符串）
         * IS_MUTE 是否所有都静音{boolean}

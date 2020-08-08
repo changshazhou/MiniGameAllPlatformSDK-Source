@@ -2,6 +2,7 @@ import WidgetAttribute from "./WidgetAttribute";
 import GridAttribute from "./GridAttribute";
 export default class NodeAttribute {
     static parse(json: any): NodeAttribute;
+    static convertStr2Enum(ev: any, key: any, def: any): any;
     name: string;
     x: number;
     y: number;

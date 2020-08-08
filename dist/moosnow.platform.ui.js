@@ -676,6 +676,12 @@ var mx = (function () {
             var temp = __assign(__assign({}, new NodeAttribute()), json);
             return temp;
         };
+        NodeAttribute.convertStr2Enum = function (ev, key, def) {
+            if (ev.hasOwnProperty(key)) {
+                return ev[key];
+            }
+            return def;
+        };
         return NodeAttribute;
     }());
 
@@ -1281,9 +1287,6 @@ var mx = (function () {
         __extends(LayoutAttribute, _super);
         function LayoutAttribute() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.layoutType = cc.Layout.Type.GRID;
-            _this.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            _this.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
             _this.left = 30;
             _this.top = 30;
             _this.right = 30;
@@ -1293,19 +1296,11 @@ var mx = (function () {
             return _this;
         }
         LayoutAttribute.parse = function (json) {
-            return __assign(__assign({}, new LayoutAttribute()), json);
-        };
-        LayoutAttribute.convertType = function (type) {
-            if (Common.isString(type)) {
-                if (cc.Layout.Type[type]) {
-                    return cc.Layout.Type[type];
-                }
-                else {
-                    return cc.Layout.Type.GRID;
-                }
-            }
-            else
-                return type;
+            var retValue = __assign(__assign({}, new LayoutAttribute()), json);
+            retValue.resizeMode = NodeAttribute.convertStr2Enum(cc.Layout.ResizeMode, json.resizeMode, cc.Layout.ResizeMode.CONTAINER);
+            retValue.startAxis = NodeAttribute.convertStr2Enum(cc.Layout.AxisDirection, json.startAxis, cc.Layout.AxisDirection.HORIZONTAL);
+            retValue.layoutType = NodeAttribute.convertStr2Enum(cc.Layout.Type, json.layoutType, cc.Layout.Type.HORIZONTAL);
+            return retValue;
         };
         return LayoutAttribute;
     }(NodeAttribute));
@@ -1440,7 +1435,6 @@ var mx = (function () {
             layout.paddingBottom = layoutCfg.bottom;
             layout.spacingX = layoutCfg.spacingX;
             layout.spacingY = layoutCfg.spacingY;
-            // layout.startAxis = layoutCfg.startAxis;
             node.x = layoutCfg.x;
             node.y = layoutCfg.y;
             node.width = this.convertWidth(layoutCfg.width);
@@ -3667,7 +3661,7 @@ var mx = (function () {
             var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.GRID;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            layout.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
+            layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
             this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
         };
         CocosAdForm.prototype.disableRotate = function () {

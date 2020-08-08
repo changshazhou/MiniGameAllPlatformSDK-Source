@@ -2947,7 +2947,7 @@ var mx = (function () {
                     var mistouchOn = res && res.mistouchOn == 1 ? true : false;
                     if (!mistouchOn)
                         console.log('总开关已关闭----------------');
-                    _this.cfgData = __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0, exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0, exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0, checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0, nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0, bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0, checkBoxProbabilitys: [100, 0, 0, 0, 0] });
+                    _this.cfgData = __assign(__assign({ checkBoxProbabilitys: [100, 0, 0, 0, 0] }, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0, exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0, exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0, checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0, nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0, bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0 });
                     if (moosnow.platform) {
                         if (res) {
                             if (!isNaN(res.bannerShowCountLimit))
@@ -6304,6 +6304,7 @@ var mx = (function () {
         __extends(AudioModule, _super);
         function AudioModule() {
             var _this = _super.call(this) || this;
+            _this.mBtnSound = null;
             /**
                 * 存储在本地声音有关的设置key（字段字符串）
                 * IS_MUTE 是否所有都静音{boolean}
@@ -6323,16 +6324,24 @@ var mx = (function () {
             _this._isMuteSound = false;
             _this._isMute = false;
             return _this;
-            // moosnow.event.addListener(EventType.ON_PLATFORM_HIDE, this, (res) => {
-            //     console.log('game state  ON_PLATFORM_HIDE ', res)
-            //     this.stopMusic();
-            // })
-            // moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, (res) => {
-            //     console.log('game state  ON_PLATFORM_SHOW ', res)
-            //     if (!moosnow.platform.videoPlaying)
-            //         this._replayMusic();
-            // })
         }
+        Object.defineProperty(AudioModule.prototype, "btnSound", {
+            get: function () {
+                return this.mBtnSound;
+            },
+            set: function (value) {
+                this.mBtnSound = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        AudioModule.prototype.playClickEffect = function () {
+            if (this.mBtnSound)
+                this.playSound(this.mBtnSound);
+            else {
+                console.log('没有点击音效');
+            }
+        };
         Object.defineProperty(AudioModule.prototype, "isMuteSound", {
             /**
                 * 设置获取是否静音音效音乐
