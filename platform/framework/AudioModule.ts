@@ -7,21 +7,26 @@ import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 export default class AudioModule extends BaseModule {
 
 
-
+    private mBtnSound: cc.AudioClip = null;
+    public get btnSound() {
+        return this.mBtnSound
+    }
+    public set btnSound(value) {
+        this.mBtnSound = value
+    }
     constructor() {
         super();
 
-        // moosnow.event.addListener(EventType.ON_PLATFORM_HIDE, this, (res) => {
-        //     console.log('game state  ON_PLATFORM_HIDE ', res)
-        //     this.stopMusic();
-
-        // })
-        // moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, (res) => {
-        //     console.log('game state  ON_PLATFORM_SHOW ', res)
-        //     if (!moosnow.platform.videoPlaying)
-        //         this._replayMusic();
-        // })
     }
+
+    public playClickEffect() {
+        if (this.mBtnSound)
+            this.playSound(this.mBtnSound);
+        else {
+            console.log('没有点击音效')
+        }
+    }
+
     /**
         * 存储在本地声音有关的设置key（字段字符串）
         * IS_MUTE 是否所有都静音{boolean}

@@ -110,7 +110,7 @@ export default class CocosNodeHelper extends NodeHelper {
         layout.spacingX = layoutCfg.spacingX;
         layout.spacingY = layoutCfg.spacingY;
 
-        // layout.startAxis = layoutCfg.startAxis;
+
 
         node.x = layoutCfg.x;
         node.y = layoutCfg.y;
@@ -181,7 +181,6 @@ export default class CocosNodeHelper extends NodeHelper {
         let view = this.createNode(viewCfg.name + "_view");
         view.addComponent(cc.Mask);
         this.createWidget(view, new WidgetAttribute(true, true, true, true, 0, 0, 0, 0))
-
         scrollNode.addChild(view);
 
 

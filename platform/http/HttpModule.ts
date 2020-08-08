@@ -370,6 +370,7 @@ export class HttpModule extends BaseModule {
                     if (!mistouchOn)
                         console.log('总开关已关闭----------------')
                     this.cfgData = {
+                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
                         ...Common.deepCopy(res),
                         zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
                         zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
@@ -381,7 +382,6 @@ export class HttpModule extends BaseModule {
                         checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0,
                         nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0,
                         bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0,
-                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
                     };
                     if (moosnow.platform) {
                         if (res) {

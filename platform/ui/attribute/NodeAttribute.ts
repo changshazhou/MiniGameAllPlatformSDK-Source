@@ -9,7 +9,12 @@ export default class NodeAttribute {
     }
 
 
-
+    public static convertStr2Enum(ev, key, def) {
+        if (ev.hasOwnProperty(key)) {
+            return ev[key];
+        }
+        return def;
+    }
 
     public name: string;
     public x: number = 0;

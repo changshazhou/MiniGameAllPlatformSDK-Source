@@ -644,7 +644,7 @@ export default class CocosAdForm extends CocosBaseForm {
         let scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
         layout.type = cc.Layout.Type.GRID;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-        layout.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
+        layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
         this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
     }
 

@@ -37,6 +37,7 @@ export default class CocosBaseForm extends BaseForm {
     private mClickQuene = {};
     private onTouchStart(e: cc.Event.EventTouch) {
         console.log('onMouseDown')
+        
         this.downAnim(e.getCurrentTarget())
         if (this.mDowning)
             return;
