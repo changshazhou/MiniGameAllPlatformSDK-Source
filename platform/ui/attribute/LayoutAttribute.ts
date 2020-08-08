@@ -3,6 +3,10 @@ import Common from "../../utils/Common";
 
 export default class LayoutAttribute extends NodeAttribute {
 
+    public layoutType: cc.Layout.Type;
+    public resizeMode: cc.Layout.ResizeMode;
+    public startAxis: cc.Layout.AxisDirection;
+
     public static parse(json: any): LayoutAttribute {
         let retValue = {
             ...new LayoutAttribute(),
@@ -14,9 +18,6 @@ export default class LayoutAttribute extends NodeAttribute {
         return retValue
     }
 
-    public layoutType: cc.Layout.Type;
-    public resizeMode: cc.Layout.ResizeMode;
-    public startAxis: cc.Layout.AxisDirection;
 
     public left: number = 30;
     public top: number = 30;

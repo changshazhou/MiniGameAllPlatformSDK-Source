@@ -1,15 +1,12 @@
 import { AD_POSITION } from "../../../enum/AD_POSITION";
-import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "./CocosBaseForm";
 import moosnowResult from "../../../model/moosnowResult";
 import Common from "../../../utils/Common";
-import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosAdViewItem from "../template/CocosAdViewItem";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
 import EventType from "../../../utils/EventType";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
-import NodeAttribute from "../../attribute/NodeAttribute";
 
 
 export default class CocosAdForm extends CocosBaseForm {
@@ -655,7 +652,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private initRotate(callback?: Function) {
         if (!this.mAdData)
             return;
-        let source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
+        let source = this.setPosition(this.mAdData.indexLeft, "旋转导出", callback, true);
         let beginIdx = Common.randomNumBoth(0, source.length - 1);
         let tempName = "rotateAdItem"
         moosnow.form.formFactory.getTemplate(tempName, (tempCfg) => {
@@ -673,16 +670,13 @@ export default class CocosAdForm extends CocosBaseForm {
             ];
             let showIds = [];
             let endAd: Array<moosnowAdRow> = [];
-            for (let i = beginIdx; i < beginIdx + 4; i++) {
-                let adRow
-                if (i <= source.length - 1)
-                    adRow = source[i];
-                else
-                    adRow = source[i - source.length - 1];
-                if (!pos[i - beginIdx])
-                    debugger
-                adRow.x = pos[i - beginIdx].x;
-                adRow.y = pos[i - beginIdx].y;
+            for (let i = 0; i < 4; i++) {
+                if (source.length == 0)
+                    break;
+                let rowIndex = Common.randomNumBoth(0, source.length - 1);
+                let adRow = source.splice(rowIndex, 1)[0] as any;
+                adRow.x = pos[i].x;
+                adRow.y = pos[i].y;
 
                 showIds.push({
                     appid: adRow.appid,

@@ -1299,7 +1299,7 @@ var mx = (function () {
             var retValue = __assign(__assign({}, new LayoutAttribute()), json);
             retValue.resizeMode = NodeAttribute.convertStr2Enum(cc.Layout.ResizeMode, json.resizeMode, cc.Layout.ResizeMode.CONTAINER);
             retValue.startAxis = NodeAttribute.convertStr2Enum(cc.Layout.AxisDirection, json.startAxis, cc.Layout.AxisDirection.HORIZONTAL);
-            retValue.layoutType = NodeAttribute.convertStr2Enum(cc.Layout.Type, json.layoutType, cc.Layout.Type.HORIZONTAL);
+            retValue.layoutType = NodeAttribute.convertStr2Enum(cc.Layout.Type, json.layoutType, cc.Layout.Type.GRID);
             return retValue;
         };
         return LayoutAttribute;
@@ -3672,7 +3672,7 @@ var mx = (function () {
             var _this = this;
             if (!this.mAdData)
                 return;
-            var source = this.setPosition(this.mAdData.indexLeft, "结束浮动", callback, true);
+            var source = this.setPosition(this.mAdData.indexLeft, "旋转导出", callback, true);
             var beginIdx = Common.randomNumBoth(0, source.length - 1);
             var tempName = "rotateAdItem";
             moosnow.form.formFactory.getTemplate(tempName, function (tempCfg) {
@@ -3688,16 +3688,13 @@ var mx = (function () {
                 ];
                 var showIds = [];
                 var endAd = [];
-                for (var i = beginIdx; i < beginIdx + 4; i++) {
-                    var adRow = void 0;
-                    if (i <= source.length - 1)
-                        adRow = source[i];
-                    else
-                        adRow = source[i - source.length - 1];
-                    if (!pos[i - beginIdx])
-                        debugger;
-                    adRow.x = pos[i - beginIdx].x;
-                    adRow.y = pos[i - beginIdx].y;
+                for (var i = 0; i < 4; i++) {
+                    if (source.length == 0)
+                        break;
+                    var rowIndex = Common.randomNumBoth(0, source.length - 1);
+                    var adRow = source.splice(rowIndex, 1)[0];
+                    adRow.x = pos[i].x;
+                    adRow.y = pos[i].y;
                     showIds.push({
                         appid: adRow.appid,
                         position: adRow.position,
