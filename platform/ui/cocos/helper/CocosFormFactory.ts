@@ -183,7 +183,7 @@ export default class CocosFormFactory extends FormFactory {
                         let formCfg = NodeAttribute.parse(tempCfg);
                         formCfg.name = name;
                         let node = this._createUINode(formCfg, tempLogic, tempData, parent);
-                        console.log('createNodeByTemplate ', formCfg)
+                        // console.log('createNodeByTemplate ', formCfg)
                     }
                 })
             }

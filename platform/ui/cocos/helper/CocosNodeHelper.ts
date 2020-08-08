@@ -166,17 +166,12 @@ export default class CocosNodeHelper extends NodeHelper {
         let node = this.createNode(viewCfg.name + '_scroll', viewCfg);
         let scroll = node.addComponent(cc.ScrollView);
         scroll.horizontal = !!viewCfg.scroll.horizontal;
+        scroll.vertical = !!viewCfg.scroll.vertical;
         scroll.horizontalScrollBar = null;
         scroll.verticalScrollBar = null;
-        scroll.vertical = !scroll.horizontal;
         node.width = this.convertWidth(viewCfg.scroll.width);
         node.height = this.convertHeight(viewCfg.scroll.height);
         container.addChild(node);
-
-
-
-
-
 
 
         let view = this.createNode(viewCfg.name + "_view");
@@ -216,7 +211,7 @@ export default class CocosNodeHelper extends NodeHelper {
 
         let widget = view.addComponent(cc.Widget);
 
-        widget.isAlignLeft = widgetCfg.isAlignRight;
+        widget.isAlignLeft = widgetCfg.isAlignLeft;
         widget.isAlignTop = widgetCfg.isAlignTop;
         widget.isAlignRight = widgetCfg.isAlignRight;
         widget.isAlignBottom = widgetCfg.isAlignBottom;
@@ -228,6 +223,7 @@ export default class CocosNodeHelper extends NodeHelper {
         // if (widgetCfg.isAlignBottom) {
         //     view.y = -(view.parent.height - view.height) / 2 + widgetCfg.bottom
         // }
+        
 
         return view;
     }

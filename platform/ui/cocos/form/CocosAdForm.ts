@@ -631,7 +631,7 @@ export default class CocosAdForm extends CocosBaseForm {
         let layout = this.endContainer_layout.getComponent(cc.Layout);
         layout.type = cc.Layout.Type.GRID;
         layout.resizeMode = cc.Layout.ResizeMode.NONE;
-        this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
+        this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem");
     }
     // private disableEnd() {
     //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
@@ -644,7 +644,7 @@ export default class CocosAdForm extends CocosBaseForm {
         let scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
         layout.type = cc.Layout.Type.GRID;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-        layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
+        layout.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
         this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
     }
 

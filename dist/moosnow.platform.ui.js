@@ -1479,9 +1479,9 @@ var mx = (function () {
             var node = this.createNode(viewCfg.name + '_scroll', viewCfg);
             var scroll = node.addComponent(cc.ScrollView);
             scroll.horizontal = !!viewCfg.scroll.horizontal;
+            scroll.vertical = !!viewCfg.scroll.vertical;
             scroll.horizontalScrollBar = null;
             scroll.verticalScrollBar = null;
-            scroll.vertical = !scroll.horizontal;
             node.width = this.convertWidth(viewCfg.scroll.width);
             node.height = this.convertHeight(viewCfg.scroll.height);
             container.addChild(node);
@@ -1504,7 +1504,7 @@ var mx = (function () {
         };
         CocosNodeHelper.createWidget = function (view, widgetCfg) {
             var widget = view.addComponent(cc.Widget);
-            widget.isAlignLeft = widgetCfg.isAlignRight;
+            widget.isAlignLeft = widgetCfg.isAlignLeft;
             widget.isAlignTop = widgetCfg.isAlignTop;
             widget.isAlignRight = widgetCfg.isAlignRight;
             widget.isAlignBottom = widgetCfg.isAlignBottom;
@@ -1715,6 +1715,7 @@ var mx = (function () {
         function ScrollAttribute() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.horizontal = true;
+            _this.vertical = true;
             return _this;
         }
         return ScrollAttribute;
@@ -1908,7 +1909,7 @@ var mx = (function () {
                             var formCfg = NodeAttribute.parse(tempCfg);
                             formCfg.name = name;
                             var node = _this._createUINode(formCfg, tempLogic, tempData, parent);
-                            console.log('createNodeByTemplate ', formCfg);
+                            // console.log('createNodeByTemplate ', formCfg)
                         }
                     });
                 }
@@ -3656,7 +3657,7 @@ var mx = (function () {
             var layout = this.endContainer_layout.getComponent(cc.Layout);
             layout.type = cc.Layout.Type.GRID;
             layout.resizeMode = cc.Layout.ResizeMode.NONE;
-            this.initFiexdView(this.endContainer_layout, "8个固定大导出", "exportAdItem");
+            this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem");
         };
         // private disableEnd() {
         //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
@@ -3666,7 +3667,7 @@ var mx = (function () {
             var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.GRID;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
+            layout.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
             this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
         };
         CocosAdForm.prototype.disableRotate = function () {
