@@ -44,6 +44,7 @@ export default class CocosAdForm extends CocosBaseForm {
     public rightContainer_layout: cc.Node = null;
 
     public rotateContainer: cc.Node = null;
+    public rotateContainer_layout: cc.Node = null;
 
 
 
@@ -404,7 +405,6 @@ export default class CocosAdForm extends CocosBaseForm {
        */
     public initFiexdView(layout: cc.Node, position: string, templateName: string, callback?: Function) {
         if (!this.mAdData) return;
-
         layout.removeAllChildren();
         let banner = this.setPosition(this.mAdData.indexLeft, position, callback, true);
         let endAd: Array<moosnowAdRow> = [];
@@ -689,10 +689,10 @@ export default class CocosAdForm extends CocosBaseForm {
             endAd.forEach(adRow => {
                 adRow.source = source;
                 adRow.showIds = showIds;
-                moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer);
+                moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer_layout);
             })
             let t = cc.Canvas.instance.node.width / 2 / 800
-            this.rotateContainer.children.forEach((item, idx) => {
+            this.rotateContainer_layout.children.forEach((item, idx) => {
 
                 item.x = pos[idx].x - cc.Canvas.instance.node.width / 2;
                 item.stopAllActions();

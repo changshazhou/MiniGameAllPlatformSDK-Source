@@ -2,18 +2,18 @@ var mx = (function () {
     'use strict';
 
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
     /* global Reflect, Promise */
 
@@ -1438,6 +1438,7 @@ var mx = (function () {
             layout.paddingBottom = layoutCfg.bottom;
             layout.spacingX = layoutCfg.spacingX;
             layout.spacingY = layoutCfg.spacingY;
+            layout.startAxis = layoutCfg.startAxis;
             node.x = layoutCfg.x;
             node.y = layoutCfg.y;
             node.width = this.convertWidth(layoutCfg.width);
@@ -3142,6 +3143,7 @@ var mx = (function () {
             _this.rightContainer_scroll = null;
             _this.rightContainer_layout = null;
             _this.rotateContainer = null;
+            _this.rotateContainer_layout = null;
             _this.sideContainer = null;
             _this.sideView = null;
             _this.sideLayout = null;
@@ -3664,7 +3666,7 @@ var mx = (function () {
             var scrollView = this.exportContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.GRID;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            // layout.startAxis = cc.Layout.AxisDirection.HORIZONTAL;
+            // layout.startAxis = cc.Layout.AxisDirection.VERTICAL;
             this.initView(scrollView, this.exportContainer_layout, "大导出", "exportAdItem");
         };
         CocosAdForm.prototype.disableRotate = function () {
@@ -3708,10 +3710,10 @@ var mx = (function () {
                 endAd.forEach(function (adRow) {
                     adRow.source = source;
                     adRow.showIds = showIds;
-                    moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, _this.rotateContainer);
+                    moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, _this.rotateContainer_layout);
                 });
                 var t = cc.Canvas.instance.node.width / 2 / 800;
-                _this.rotateContainer.children.forEach(function (item, idx) {
+                _this.rotateContainer_layout.children.forEach(function (item, idx) {
                     item.x = pos[idx].x - cc.Canvas.instance.node.width / 2;
                     item.stopAllActions();
                     item.runAction(cc.spawn(cc.moveTo(t, new cc.Vec2(pos[idx].x, pos[idx].y)), cc.rotateBy(t, 360)));
@@ -4524,6 +4526,7 @@ var mx = (function () {
                 return;
             }
             window["moosnow"].form = this.formUtil;
+            window["moosnow"].nodeHelper = new CocosNodeHelper();
             // window["moosnow"].delay = this.delay
         }
         Object.defineProperty(moosnowUI.prototype, "formUtil", {

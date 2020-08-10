@@ -7,6 +7,7 @@ import showShareOptions from "./model/showShareOptions";
 import showTotalOptions from "./model/showTotalOptions";
 import showTouchOptions from "./model/showMistouchOptions";
 import showCoinOptions from "./model/showCoinOptions";
+import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
 
 export default class moosnowUI {
 
@@ -25,6 +26,7 @@ export default class moosnowUI {
             return;
         }
         window["moosnow"].form = this.formUtil
+        window["moosnow"].nodeHelper = new CocosNodeHelper();
         // window["moosnow"].delay = this.delay
     }
     /**

@@ -26,6 +26,7 @@ export default class CocosAdForm extends CocosBaseForm {
     rightContainer_scroll: cc.Node;
     rightContainer_layout: cc.Node;
     rotateContainer: cc.Node;
+    rotateContainer_layout: cc.Node;
     sideContainer: any;
     sideView: any;
     sideLayout: any;
