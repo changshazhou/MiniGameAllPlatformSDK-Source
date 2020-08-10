@@ -1968,26 +1968,47 @@ var mx = (function () {
                     callback();
             }, this)));
         };
+        CocosBaseForm.prototype.getClickQueneItem = function (e) {
+            var queneId = e.getCurrentTarget().uuid;
+            var retVal = this.mClickQuene[queneId];
+            if (retVal)
+                return retVal;
+            else
+                return null;
+        };
         CocosBaseForm.prototype.onTouchStart = function (e) {
+            var quene = this.getClickQueneItem(e);
+            if (!quene)
+                return;
+            if (quene.once && quene.clicking)
+                return;
             console.log('onMouseDown');
-            this.downAnim(e.getCurrentTarget());
+            this.downAnim(quene.node);
             if (this.mDowning)
                 return;
             this.mDowning = true;
         };
         CocosBaseForm.prototype.onTouchEnd = function (e) {
-            var _this = this;
+            var quene = this.getClickQueneItem(e);
+            if (!quene)
+                return;
+            if (quene.once && quene.clicking)
+                return;
             console.log('onMouseUp');
-            var queneId = e.getCurrentTarget().uuid;
-            this.upAnim(e.getCurrentTarget(), function () {
-                if (_this.mClickQuene[queneId] && _this.mClickQuene[queneId].callback)
-                    _this.mClickQuene[queneId].callback();
+            this.upAnim(quene.node, function () {
+                if (quene && quene.callback)
+                    quene.callback();
             });
-            if (this.mClickQuene[queneId] && this.mClickQuene[queneId].stopPropagation)
+            if (quene && quene.stopPropagation)
                 e.stopPropagation();
         };
         CocosBaseForm.prototype.onTouchCancel = function (e) {
-            this.upAnim(e.getCurrentTarget());
+            var quene = this.getClickQueneItem(e);
+            if (!quene)
+                return;
+            if (quene.once && quene.clicking)
+                return;
+            this.upAnim(quene.node);
         };
         /**
          * 应用点击动画
@@ -2004,7 +2025,8 @@ var mx = (function () {
                     node: node,
                     stopPropagation: stopPropagation,
                     callback: callback,
-                    once: once
+                    once: once,
+                    clicking: false
                 };
                 node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
                 node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);

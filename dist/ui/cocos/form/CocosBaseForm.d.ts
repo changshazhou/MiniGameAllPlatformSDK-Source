@@ -1,9 +1,11 @@
 import BaseForm from "../../engine/BaseForm";
+import clickQueneItem from "../../../model/clickQueneItem";
 export default class CocosBaseForm extends BaseForm {
     private downAnim;
     private upAnim;
     private mDowning;
     private mClickQuene;
+    getClickQueneItem(e: cc.Event.EventTouch): clickQueneItem;
     private onTouchStart;
     private onTouchEnd;
     private onTouchCancel;

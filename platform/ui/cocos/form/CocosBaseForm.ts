@@ -2,6 +2,7 @@ import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import CocosFormFactory from "../helper/CocosFormFactory";
+import clickQueneItem from "../../../model/clickQueneItem";
 
 
 
@@ -35,28 +36,44 @@ export default class CocosBaseForm extends BaseForm {
     }
     private mDowning: boolean = false;
     private mClickQuene = {};
+
+    public getClickQueneItem(e: cc.Event.EventTouch): clickQueneItem {
+        let queneId = e.getCurrentTarget().uuid;
+        let retVal = this.mClickQuene[queneId]
+        if (retVal)
+            return retVal;
+        else
+            return null
+    }
     private onTouchStart(e: cc.Event.EventTouch) {
+        let quene = this.getClickQueneItem(e);
+        if (!quene) return;
+        if (quene.once && quene.clicking) return;
         console.log('onMouseDown')
-        
-        this.downAnim(e.getCurrentTarget())
+        this.downAnim(quene.node)
         if (this.mDowning)
             return;
         this.mDowning = true;
 
     }
     private onTouchEnd(e: cc.Event.EventTouch) {
+        let quene = this.getClickQueneItem(e);
+        if (!quene) return;
+        if (quene.once && quene.clicking) return;
         console.log('onMouseUp')
-        let queneId = e.getCurrentTarget().uuid
-        this.upAnim(e.getCurrentTarget(), () => {
-            if (this.mClickQuene[queneId] && this.mClickQuene[queneId].callback)
-                this.mClickQuene[queneId].callback();
+        this.upAnim(quene.node, () => {
+            if (quene && quene.callback)
+                quene.callback();
         })
-        if (this.mClickQuene[queneId] && this.mClickQuene[queneId].stopPropagation)
+        if (quene && quene.stopPropagation)
             e.stopPropagation();
     }
 
     private onTouchCancel(e: cc.Event.EventTouch) {
-        this.upAnim(e.getCurrentTarget())
+        let quene = this.getClickQueneItem(e);
+        if (!quene) return;
+        if (quene.once && quene.clicking) return;
+        this.upAnim(quene.node)
     }
 
     /**
@@ -72,7 +89,8 @@ export default class CocosBaseForm extends BaseForm {
                 node,
                 stopPropagation,
                 callback,
-                once
+                once,
+                clicking: false
             };
             node.on(CocosNodeEvent.TOUCH_START, this.onTouchStart, this);
             node.on(CocosNodeEvent.TOUCH_END, this.onTouchEnd, this);
