@@ -1887,21 +1887,24 @@ var mx = (function () {
         };
         PlatformModule.prototype.createRewardAD = function (show) {
             var _this = this;
-            if (moosnow.platform.videoLoading) {
+            if (this.videoLoading) {
                 return;
             }
             if (!window[this.platformName]) {
-                moosnow.platform.videoCb(VIDEO_STATUS.END);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
                 return;
             }
             if (!window[this.platformName].createRewardedVideoAd) {
-                moosnow.platform.videoCb(VIDEO_STATUS.END);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
                 return;
             }
             var videoId = this.videoId;
             if (Common.isEmpty(videoId)) {
                 console.warn(MSG.VIDEO_KEY_IS_NULL);
-                moosnow.platform.videoCb(VIDEO_STATUS.END);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
                 return;
             }
             if (!this.video) {
@@ -4070,7 +4073,10 @@ var mx = (function () {
             _this._registerTTCallback();
             _this.initBanner();
             _this.initRecord();
-            // this.initInter();
+            // 
+            _this.scheduleOnce(function () {
+                _this.initVideo();
+            }, 1);
             _this.bannerWidth = 208;
             return _this;
         }

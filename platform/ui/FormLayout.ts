@@ -6,6 +6,7 @@ export default class FormLayout {
     public static readonly TotalForm: string = "totalForm";
     public static readonly EndForm: string = "endForm";
     public static readonly RespawnForm: string = "respawnForm";
+    public static readonly FailForm: string = "failForm";
     public static readonly PauseForm: string = "pauseForm";
     public static readonly ShareForm: string = "shareForm";
     public static readonly TryForm: string = "tryForm";

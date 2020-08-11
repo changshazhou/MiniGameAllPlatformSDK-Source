@@ -1170,21 +1170,24 @@ export default class PlatformModule extends BaseModule {
         this.createRewardAD(false);
     }
     public createRewardAD(show) {
-        if (moosnow.platform.videoLoading) {
+        if (this.videoLoading) {
             return;
         }
         if (!window[this.platformName]) {
-            moosnow.platform.videoCb(VIDEO_STATUS.END);
+            if (moosnow.platform.videoCb)
+                moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
         if (!window[this.platformName].createRewardedVideoAd) {
-            moosnow.platform.videoCb(VIDEO_STATUS.END);
+            if (moosnow.platform.videoCb)
+                moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
         let videoId = this.videoId;
         if (Common.isEmpty(videoId)) {
             console.warn(MSG.VIDEO_KEY_IS_NULL)
-            moosnow.platform.videoCb(VIDEO_STATUS.END);
+            if (moosnow.platform.videoCb)
+                moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
         if (!this.video) {

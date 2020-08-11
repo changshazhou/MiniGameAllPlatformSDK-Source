@@ -3919,6 +3919,7 @@ var mx = (function () {
         FormLayout.TotalForm = "totalForm";
         FormLayout.EndForm = "endForm";
         FormLayout.RespawnForm = "respawnForm";
+        FormLayout.FailForm = "failForm";
         FormLayout.PauseForm = "pauseForm";
         FormLayout.ShareForm = "shareForm";
         FormLayout.TryForm = "tryForm";
@@ -4087,6 +4088,66 @@ var mx = (function () {
         return CocosRespawnForm;
     }(CocosBaseForm));
 
+    var CocosFailForm = /** @class */ (function (_super) {
+        __extends(CocosFailForm, _super);
+        function CocosFailForm() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.btnBack = null;
+            _this.btnVideo = null;
+            return _this;
+        }
+        Object.defineProperty(CocosFailForm.prototype, "FormData", {
+            /**
+             * 父类缓存willShow，onShow传递到实体的逻辑数据
+             */
+            get: function () {
+                return this.mFormData;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CocosFailForm.prototype.addListener = function () {
+            var _this = this;
+            this.applyClickAnim(this.btnBack, function () {
+                _this.onBack();
+            });
+            this.applyClickAnim(this.btnVideo, function () {
+                _this.onVideo();
+            });
+        };
+        CocosFailForm.prototype.removeListener = function () {
+            this.removeClickAnim(this.btnBack);
+        };
+        CocosFailForm.prototype.onVideo = function () {
+            var _this = this;
+            moosnow.platform.showVideo(function (res) {
+                if (res == VIDEO_STATUS.END) {
+                    _this.hideForm();
+                    if (_this.FormData.videoCallback)
+                        _this.FormData.videoCallback();
+                }
+                else if (res == VIDEO_STATUS.ERR) {
+                    moosnow.form.showToast(VIDEO_MSG.ERR);
+                }
+                else if (res == VIDEO_STATUS.NOTEND) {
+                    moosnow.form.showToast(VIDEO_MSG.NOTEND);
+                }
+            });
+        };
+        CocosFailForm.prototype.onShow = function (data) {
+            this.addListener();
+        };
+        CocosFailForm.prototype.willHide = function () {
+            this.removeListener();
+        };
+        CocosFailForm.prototype.onBack = function () {
+            this.hideForm();
+            if (this.FormData.callback)
+                this.FormData.callback();
+        };
+        return CocosFailForm;
+    }(CocosBaseForm));
+
     /**
      * 广告结果
      */
@@ -4176,6 +4237,14 @@ var mx = (function () {
             */
         FormUtil.prototype.showRespawn = function (options) {
             this.formFactory.showForm(FormLayout.RespawnForm, CocosRespawnForm, options);
+        };
+        /**
+         * 显示失败页面
+         * @param coinNum
+         * @param callback
+         */
+        FormUtil.prototype.showFail = function (options) {
+            this.formFactory.showForm(FormLayout.FailForm, CocosFailForm, options);
         };
         /**
           * 显示结算统计页

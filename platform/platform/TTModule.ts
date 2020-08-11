@@ -27,7 +27,10 @@ export default class TTModule extends PlatformModule {
         this._registerTTCallback();
         this.initBanner();
         this.initRecord();
-        // this.initInter();
+        // 
+        this.scheduleOnce(() => {
+            this.initVideo();
+        }, 1)
         this.bannerWidth = 208;
     }
 

@@ -12,6 +12,7 @@ import loadAdOptions from "../model/loadAdOptions";
 import FormFactory from "./engine/FormFactory";
 import showNativeOptions from "../model/showNativeOptions";
 import showRespawnOptions from "../model/showRespawnOptions";
+import showFailOptions from "../model/showFailOptions";
 /**
  * 广告结果
  */
@@ -71,6 +72,12 @@ export default class FormUtil {
         * @param callback
         */
     showRespawn(options: showRespawnOptions): void;
+    /**
+     * 显示失败页面
+     * @param coinNum
+     * @param callback
+     */
+    showFail(options: showFailOptions): void;
     /**
       * 显示结算统计页
       * @param coinNum

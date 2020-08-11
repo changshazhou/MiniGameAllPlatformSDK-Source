@@ -39,6 +39,8 @@ import showNativeOptions from "../model/showNativeOptions";
 import vectory from "../../dist/model/Vectory";
 import CocosRespawnForm from "./cocos/form/CocosRespawnForm";
 import showRespawnOptions from "../model/showRespawnOptions";
+import showFailOptions from "../model/showFailOptions";
+import CocosFailForm from "./cocos/form/CocosFailForm";
 
 /**
  * 广告结果
@@ -150,7 +152,14 @@ export default class FormUtil {
     public showRespawn(options: showRespawnOptions) {
         this.formFactory.showForm(FormLayout.RespawnForm, CocosRespawnForm, options)
     }
-
+    /**
+     * 显示失败页面
+     * @param coinNum 
+     * @param callback 
+     */
+    public showFail(options: showFailOptions) {
+        this.formFactory.showForm(FormLayout.FailForm, CocosFailForm, options)
+    }
     /**
       * 显示结算统计页
       * @param coinNum 
