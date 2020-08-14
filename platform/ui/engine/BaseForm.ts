@@ -65,6 +65,8 @@ export default class BaseForm extends BaseModule {
                 this.node.x = data.x
             if (data.y)
                 this.node.y = data.y
+            if (data.zIndex)
+                this.node.zIndex = data.zIndex
         }
         this.formComponents.forEach(item => {
             item.willShow(data);

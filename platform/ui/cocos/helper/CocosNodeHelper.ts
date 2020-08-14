@@ -351,8 +351,9 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     private static onMaskMouseDown(e: cc.Event.EventTouch) {
-        e.stopPropagation();
         console.log('阻止事件传递, node name ', e.getCurrentTarget().name)
+        e.stopPropagation();
+
     }
 
 

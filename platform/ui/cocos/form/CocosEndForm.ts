@@ -5,6 +5,7 @@ import showEndOptions from "../../../model/showEndOptions";
 export default class CocosEndForm extends CocosBaseForm {
 
     public btnBack: cc.Node = null;
+    public btnContinue: cc.Node = null;
 
 
     /**
@@ -17,6 +18,9 @@ export default class CocosEndForm extends CocosBaseForm {
 
     private addListener() {
         this.applyClickAnim(this.btnBack, () => {
+            this.onBack();
+        })
+        this.applyClickAnim(this.btnContinue, () => {
             this.onBack();
         })
     }

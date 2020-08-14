@@ -2,6 +2,7 @@ import CocosBaseForm from "./CocosBaseForm";
 import showEndOptions from "../../../model/showEndOptions";
 export default class CocosEndForm extends CocosBaseForm {
     btnBack: cc.Node;
+    btnContinue: cc.Node;
     /**
      * 父类缓存willShow，onShow传递到实体的逻辑数据
      */

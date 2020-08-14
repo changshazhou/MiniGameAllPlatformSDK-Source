@@ -18,6 +18,7 @@ import Delay from "./framework/Delay";
 import AudioModule from "./framework/AudioModule";
 import ResourceModule from "./framework/ResourceModule";
 import PlatformModule from "./platform/PlatformModule";
+import CocosNodeHelper from "../platform/ui/cocos/helper/CocosNodeHelper";
 
 declare global {
     class moosnow {
@@ -86,6 +87,7 @@ declare global {
         static data: GameDataCenter
         static event: EventModule
         static form: FormUtil
+        static nodeHelper: CocosNodeHelper
         static delay: Delay
         static audio: AudioModule
         static resource: ResourceModule

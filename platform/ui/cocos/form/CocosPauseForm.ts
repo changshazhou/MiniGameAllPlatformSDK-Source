@@ -33,13 +33,16 @@ export default class CocosPauseForm extends CocosBaseForm {
     }
 
     willShow(data) {
+        super.willShow(data);
         this.addListener();
         moosnow.platform.hideBanner();
     }
     willHide(data) {
+        super.willHide(data);
         this.removeListener();
     }
-    onShow() {
+    onShow(data) {
+        super.onShow(data);
         moosnow.platform.pauseRecord();
 
     }
@@ -50,12 +53,13 @@ export default class CocosPauseForm extends CocosBaseForm {
 
     }
     public onToHome() {
+        this.hideForm();
         moosnow.platform.stopRecord();
-
         if (this.FormData.homeCallback)
             this.FormData.homeCallback();
     }
     public onReplay() {
+        this.hideForm();
         moosnow.platform.stopRecord(() => {
             moosnow.platform.startRecord();
         });

@@ -19,6 +19,20 @@ import showFailOptions from "../model/showFailOptions";
 export default class FormUtil {
     formFactory: FormFactory;
     constructor();
+    private mBaseForm;
+    /**
+     * 增加点击效果和事件回调
+     * @param node
+     * @param callback
+     * @param stopPropagation
+     * @param once
+     */
+    applyClickAnim(node: cc.Node, callback?: Function, stopPropagation?: boolean, once?: boolean): void;
+    /**
+     * 删除点击效果和事件回调
+     * @param node
+     */
+    removeClickAnim(node: cc.Node): void;
     /**
      * Toast消息
      * @param msg  消息内容

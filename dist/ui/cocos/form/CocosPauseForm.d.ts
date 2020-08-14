@@ -10,7 +10,7 @@ export default class CocosPauseForm extends CocosBaseForm {
     private removeListener;
     willShow(data: any): void;
     willHide(data: any): void;
-    onShow(): void;
+    onShow(data: any): void;
     onContinue(): void;
     onToHome(): void;
     onReplay(): void;

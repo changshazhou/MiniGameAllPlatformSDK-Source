@@ -1206,6 +1206,8 @@ var mx = (function () {
                     this.node.x = data.x;
                 if (data.y)
                     this.node.y = data.y;
+                if (data.zIndex)
+                    this.node.zIndex = data.zIndex;
             }
             this.formComponents.forEach(function (item) {
                 item.willShow(data);
@@ -1631,8 +1633,8 @@ var mx = (function () {
                 node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
         };
         CocosNodeHelper.onMaskMouseDown = function (e) {
-            e.stopPropagation();
             console.log('阻止事件传递, node name ', e.getCurrentTarget().name);
+            e.stopPropagation();
         };
         CocosNodeHelper.findNodeByName = function (node, attrName) {
             var targetNode = null;
@@ -1983,6 +1985,7 @@ var mx = (function () {
             if (quene.once && quene.clicking)
                 return;
             console.log('onMouseDown');
+            moosnow.audio.playClickEffect();
             this.downAnim(quene.node);
             if (this.mDowning)
                 return;
@@ -2056,6 +2059,7 @@ var mx = (function () {
         function CocosEndForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.btnBack = null;
+            _this.btnContinue = null;
             return _this;
         }
         Object.defineProperty(CocosEndForm.prototype, "FormData", {
@@ -2071,6 +2075,9 @@ var mx = (function () {
         CocosEndForm.prototype.addListener = function () {
             var _this = this;
             this.applyClickAnim(this.btnBack, function () {
+                _this.onBack();
+            });
+            this.applyClickAnim(this.btnContinue, function () {
                 _this.onBack();
             });
         };
@@ -2141,13 +2148,16 @@ var mx = (function () {
             this.removeClickAnim(this.btnReplay);
         };
         CocosPauseForm.prototype.willShow = function (data) {
+            _super.prototype.willShow.call(this, data);
             this.addListener();
             moosnow.platform.hideBanner();
         };
         CocosPauseForm.prototype.willHide = function (data) {
+            _super.prototype.willHide.call(this, data);
             this.removeListener();
         };
-        CocosPauseForm.prototype.onShow = function () {
+        CocosPauseForm.prototype.onShow = function (data) {
+            _super.prototype.onShow.call(this, data);
             moosnow.platform.pauseRecord();
         };
         CocosPauseForm.prototype.onContinue = function () {
@@ -2156,11 +2166,13 @@ var mx = (function () {
                 this.FormData.callback();
         };
         CocosPauseForm.prototype.onToHome = function () {
+            this.hideForm();
             moosnow.platform.stopRecord();
             if (this.FormData.homeCallback)
                 this.FormData.homeCallback();
         };
         CocosPauseForm.prototype.onReplay = function () {
+            this.hideForm();
             moosnow.platform.stopRecord(function () {
                 moosnow.platform.startRecord();
             });
@@ -4153,8 +4165,28 @@ var mx = (function () {
      */
     var FormUtil = /** @class */ (function () {
         function FormUtil() {
+            this.mBaseForm = new CocosBaseForm();
             this.formFactory = new CocosFormFactory();
         }
+        /**
+         * 增加点击效果和事件回调
+         * @param node
+         * @param callback
+         * @param stopPropagation
+         * @param once
+         */
+        FormUtil.prototype.applyClickAnim = function (node, callback, stopPropagation, once) {
+            if (stopPropagation === void 0) { stopPropagation = false; }
+            if (once === void 0) { once = true; }
+            this.mBaseForm.applyClickAnim(node, callback, stopPropagation, once);
+        };
+        /**
+         * 删除点击效果和事件回调
+         * @param node
+         */
+        FormUtil.prototype.removeClickAnim = function (node) {
+            this.mBaseForm.removeClickAnim(node);
+        };
         /**
          * Toast消息
          * @param msg  消息内容
@@ -4617,7 +4649,7 @@ var mx = (function () {
                 return;
             }
             window["moosnow"].form = this.formUtil;
-            window["moosnow"].nodeHelper = new CocosNodeHelper();
+            window["moosnow"].nodeHelper = CocosNodeHelper;
             // window["moosnow"].delay = this.delay
         }
         Object.defineProperty(moosnowUI.prototype, "formUtil", {

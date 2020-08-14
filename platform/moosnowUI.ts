@@ -26,7 +26,7 @@ export default class moosnowUI {
             return;
         }
         window["moosnow"].form = this.formUtil
-        window["moosnow"].nodeHelper = new CocosNodeHelper();
+        window["moosnow"].nodeHelper = CocosNodeHelper;
         // window["moosnow"].delay = this.delay
     }
     /**

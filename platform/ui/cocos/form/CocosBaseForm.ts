@@ -1,7 +1,6 @@
 import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
-import CocosFormFactory from "../helper/CocosFormFactory";
 import clickQueneItem from "../../../model/clickQueneItem";
 
 
@@ -50,6 +49,7 @@ export default class CocosBaseForm extends BaseForm {
         if (!quene) return;
         if (quene.once && quene.clicking) return;
         console.log('onMouseDown')
+        moosnow.audio.playClickEffect();
         this.downAnim(quene.node)
         if (this.mDowning)
             return;

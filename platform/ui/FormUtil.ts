@@ -54,6 +54,26 @@ export default class FormUtil {
         this.formFactory = new CocosFormFactory();
     }
 
+
+    private mBaseForm = new CocosBaseForm();
+    /**
+     * 增加点击效果和事件回调
+     * @param node 
+     * @param callback 
+     * @param stopPropagation 
+     * @param once 
+     */
+    public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false, once: boolean = true) {
+        this.mBaseForm.applyClickAnim(node, callback, stopPropagation, once)
+    }
+    /**
+     * 删除点击效果和事件回调
+     * @param node 
+     */
+    public removeClickAnim(node: cc.Node) {
+        this.mBaseForm.removeClickAnim(node)
+    }
+
     /**
      * Toast消息
      * @param msg  消息内容
