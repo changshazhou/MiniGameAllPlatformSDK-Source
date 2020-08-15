@@ -250,6 +250,15 @@ export default class FormFactory {
         return [];
     }
 
+    /**
+     * 更新layout缓存，非专业人员不要使用！！
+     * @param res 
+     */
+    public setLayout(res) {
+        this.mCachedLayout = res;
+
+    }
+
     private mLayoutQuene = [];
     private mCachedLayout: any;
     public getLayout(callback: (attr) => void) {
@@ -268,6 +277,14 @@ export default class FormFactory {
         }
         else
             callback(this.mCachedLayout);
+    }
+
+    /**
+     * 更新模板缓存 ，非专业人员不要使用！！
+     * @param res 
+     */
+    public setTemplates(res) {
+        this.mCachedTemplates = res
     }
 
     private mTemplatesQuene = [];
