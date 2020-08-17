@@ -11,8 +11,14 @@ import WidgetAttribute from "../../attribute/WidgetAttribute";
 
 export default class CocosNodeHelper extends NodeHelper {
 
+    public static mRootNode: cc.Node
     public static get canvasNode() {
-        return cc.Canvas.instance.node;
+        if (!this.mRootNode)
+            this.mRootNode = cc.Canvas.instance.node;
+        return this.mRootNode
+    }
+    public static set canvasNode(value) {
+        this.mRootNode = value;
     }
 
     public static createNode(name?: string, nodeCfg?: NodeAttribute) {
