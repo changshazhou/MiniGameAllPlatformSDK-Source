@@ -12,4 +12,6 @@ export default class CocosNodeEvent extends NodeEvent {
         return cc.Node.EventType.TOUCH_CANCEL;
     }
 
+    
+
 }

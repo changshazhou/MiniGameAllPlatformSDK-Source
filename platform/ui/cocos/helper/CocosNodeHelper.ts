@@ -8,6 +8,7 @@ import LayoutAttribute from "../../attribute/LayoutAttribute";
 import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
 import ScrollAttribute from "../../attribute/ScrollAttribute";
 import WidgetAttribute from "../../attribute/WidgetAttribute";
+import Common from "../../../utils/Common";
 
 export default class CocosNodeHelper extends NodeHelper {
 
@@ -347,6 +348,8 @@ export default class CocosNodeHelper extends NodeHelper {
     }
 
     public static addStopPropagation(node: cc.Node) {
+        if (Common.isOnlyUI && Common.isPC)
+            return;
         if (node)
             node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this)
     }

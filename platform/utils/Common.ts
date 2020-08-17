@@ -190,6 +190,14 @@ export default class Common {
 
     }
 
+    static get isOnlyUI() {
+        return window["onlyUI"] == true;
+    }
+
+    static get isPC() {
+        return cc.sys.browserType === cc.sys.BROWSER_TYPE_CHROME
+    }
+
     static get config(): moosnowAppConfig {
         let winCfg = window["moosnowConfig"];
         let config;

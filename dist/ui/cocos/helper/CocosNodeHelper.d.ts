@@ -7,7 +7,9 @@ import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
 import ScrollAttribute from "../../attribute/ScrollAttribute";
 import WidgetAttribute from "../../attribute/WidgetAttribute";
 export default class CocosNodeHelper extends NodeHelper {
+    static mRootNode: cc.Node;
     static get canvasNode(): cc.Node;
+    static set canvasNode(value: cc.Node);
     static createNode(name?: string, nodeCfg?: NodeAttribute): cc.Node;
     static createImage(parent: cc.Node, imgCfg: NodeAttribute): cc.Node;
     /**

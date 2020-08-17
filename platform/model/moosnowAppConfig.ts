@@ -2,10 +2,6 @@
  * 广告结果
  */
 export default class moosnowAppConfig {
-    public layout: {
-        url: string,
-        templates: string
-    }
     public bannerId: string;
     public videoId: string;
     public interId: string;

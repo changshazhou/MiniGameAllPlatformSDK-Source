@@ -68,9 +68,19 @@ export default class FormFactory {
      */
     getKVByName(name: string, formNode: cc.Node | Laya.Node): LayoutFormKeyValue;
     getKVsByName(name: string): LayoutFormKeyValue[];
+    /**
+     * 更新layout缓存，非专业人员不要使用！！
+     * @param res
+     */
+    setLayout(res: any): void;
     private mLayoutQuene;
     private mCachedLayout;
     getLayout(callback: (attr: any) => void): void;
+    /**
+     * 更新模板缓存 ，非专业人员不要使用！！
+     * @param res
+     */
+    setTemplates(res: any): void;
     private mTemplatesQuene;
     private mCachedTemplates;
     getTemplates(callback: (attr: any) => void): void;

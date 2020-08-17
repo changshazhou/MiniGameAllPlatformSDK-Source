@@ -31,6 +31,8 @@ export default class Common {
      * debug没有时 默认返回微信平台
      */
     static get platform(): PlatformType;
+    static get isOnlyUI(): boolean;
+    static get isPC(): boolean;
     static get config(): moosnowAppConfig;
     static colorRGB2Hex(color: any): string;
     static deepCopy(obj: any): object | [];

@@ -529,6 +529,20 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Common, "isOnlyUI", {
+            get: function () {
+                return window["onlyUI"] == true;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Common, "isPC", {
+            get: function () {
+                return cc.sys.browserType === cc.sys.BROWSER_TYPE_CHROME;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Common, "config", {
             get: function () {
                 var winCfg = window["moosnowConfig"];
@@ -941,6 +955,13 @@ var mx = (function () {
             }
             return [];
         };
+        /**
+         * 更新layout缓存，非专业人员不要使用！！
+         * @param res
+         */
+        FormFactory.prototype.setLayout = function (res) {
+            this.mCachedLayout = res;
+        };
         FormFactory.prototype.getLayout = function (callback) {
             var _this = this;
             if (!this.mCachedLayout) {
@@ -957,6 +978,13 @@ var mx = (function () {
             }
             else
                 callback(this.mCachedLayout);
+        };
+        /**
+         * 更新模板缓存 ，非专业人员不要使用！！
+         * @param res
+         */
+        FormFactory.prototype.setTemplates = function (res) {
+            this.mCachedTemplates = res;
         };
         FormFactory.prototype.getTemplates = function (callback) {
             var _this = this;
@@ -1353,7 +1381,12 @@ var mx = (function () {
         }
         Object.defineProperty(CocosNodeHelper, "canvasNode", {
             get: function () {
-                return cc.Canvas.instance.node;
+                if (!this.mRootNode)
+                    this.mRootNode = cc.Canvas.instance.node;
+                return this.mRootNode;
+            },
+            set: function (value) {
+                this.mRootNode = value;
             },
             enumerable: true,
             configurable: true
@@ -1625,6 +1658,8 @@ var mx = (function () {
             this.addStopPropagation(mask);
         };
         CocosNodeHelper.addStopPropagation = function (node) {
+            if (Common.isOnlyUI && Common.isPC)
+                return;
             if (node)
                 node.on(CocosNodeEvent.TOUCH_START, this.onMaskMouseDown, this);
         };
@@ -2023,6 +2058,8 @@ var mx = (function () {
         CocosBaseForm.prototype.applyClickAnim = function (node, callback, stopPropagation, once) {
             if (stopPropagation === void 0) { stopPropagation = false; }
             if (once === void 0) { once = true; }
+            if (Common.isOnlyUI && Common.isPC)
+                return;
             if (node && node.uuid) {
                 this.mClickQuene[node.uuid] = {
                     node: node,

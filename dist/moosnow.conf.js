@@ -1,3 +1,4 @@
+window.onlyUI = true;
 window.moosnowConfig = {
     debug: "wx",
     /**

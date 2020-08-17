@@ -2,6 +2,7 @@ import BaseForm from "../../engine/BaseForm"
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import clickQueneItem from "../../../model/clickQueneItem";
+import Common from "../../../utils/Common";
 
 
 
@@ -84,6 +85,8 @@ export default class CocosBaseForm extends BaseForm {
      * @param once 
      */
     public applyClickAnim(node: cc.Node, callback?: Function, stopPropagation: boolean = false, once: boolean = true) {
+        if (Common.isOnlyUI && Common.isPC)
+            return;
         if (node && node.uuid) {
             this.mClickQuene[node.uuid] = {
                 node,
