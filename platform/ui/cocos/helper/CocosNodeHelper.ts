@@ -199,17 +199,10 @@ export default class CocosNodeHelper extends NodeHelper {
         layoutNode.height = this.convertHeight(viewCfg.layout.height);
         scroll.content = layoutNode;
 
-
-
-
-
         return {
             viewContainer: container,
             layoutNode
         };
-
-
-
     }
 
     public static createWidget(view: cc.Node, widgetCfg: WidgetAttribute) {
