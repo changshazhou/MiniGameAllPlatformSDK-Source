@@ -7,6 +7,8 @@ export default class CocosFormFactory extends FormFactory {
     private _createUINode;
     hideFormByLogic(logic: any, formData?: any): void;
     hideForm(name: string, formNode: any, formData?: any): void;
+    private logicShow;
+    private logicHide;
     showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: () => void, remoteLayout?: boolean, layoutOptions?: any): void;
     createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout?: boolean, layoutOptions?: any): void;
     hideNodeByTemplate(name: string, formNode: any, formData?: any): void;

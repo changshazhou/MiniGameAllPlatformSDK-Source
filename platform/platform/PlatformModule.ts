@@ -1055,10 +1055,19 @@ export default class PlatformModule extends BaseModule {
         if (this.banner) {
             console.log('show banner style ', this.banner.style)
             this.banner.hide();
+            /**
+             * 先设置位置
+             */
+            this._resetBanenrStyle({
+                width: this.banner.style.width,
+                height: this.banner.style.realHeight
+            })
             let showPromise = this.banner.show();
-
             showPromise && showPromise
                 .then(() => {
+                    /**
+                     * 再微调，banner 大小可能跟上一个有变化
+                     */
                     this._resetBanenrStyle({
                         width: this.banner.style.width,
                         height: this.banner.style.realHeight

@@ -476,6 +476,20 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Common, "isOnlyUI", {
+            get: function () {
+                return window["onlyUI"] == true;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Common, "isPC", {
+            get: function () {
+                return cc.sys.browserType === cc.sys.BROWSER_TYPE_CHROME;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Common, "config", {
             get: function () {
                 var winCfg = window["moosnowConfig"];
@@ -1779,9 +1793,19 @@ var mx = (function () {
             if (this.banner) {
                 console.log('show banner style ', this.banner.style);
                 this.banner.hide();
+                /**
+                 * 先设置位置
+                 */
+                this._resetBanenrStyle({
+                    width: this.banner.style.width,
+                    height: this.banner.style.realHeight
+                });
                 var showPromise = this.banner.show();
                 showPromise && showPromise
                     .then(function () {
+                    /**
+                     * 再微调
+                     */
                     _this._resetBanenrStyle({
                         width: _this.banner.style.width,
                         height: _this.banner.style.realHeight

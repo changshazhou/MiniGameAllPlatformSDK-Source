@@ -116,20 +116,20 @@ export default class CocosFormFactory extends FormFactory {
 
 
     private logicShow(formLogic, formNode, formData) {
-        if (Common.isOnlyUI && Common.isPC) {
-            formLogic.willShow(formData);
-            formNode.active = true;
-            formLogic.onShow(formData);
-        }
+        if (Common.isOnlyUI && Common.isPC)
+            return;
+        formLogic.willShow(formData);
+        formNode.active = true;
+        formLogic.onShow(formData);
     }
 
     private logicHide(formLogic, formNode, formData) {
-        if (Common.isOnlyUI && Common.isPC) {
-            formLogic.willHide(formData);
-            formNode.active = true;
-            formLogic.onHide(formData);
-            (formNode as cc.Node).removeFromParent();
-        }
+        if (Common.isOnlyUI && Common.isPC)
+            return;
+        formLogic.willHide(formData);
+        formNode.active = true;
+        formLogic.onHide(formData);
+        (formNode as cc.Node).removeFromParent();
     }
 
     public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: () => void, remoteLayout: boolean = true, layoutOptions: any = null) {
