@@ -16,7 +16,7 @@ export default class CheckboxComponent extends CocosBaseComponent {
      * @param isChecked 
      * @param callback 
      */
-    constructor(isChecked, callback: (isChecked) => void, checkedName?: string, uncheckedName?: string) {
+    constructor(isChecked = true, callback?: (isChecked) => void, checkedName?: string, uncheckedName?: string) {
         super();
         this.toggleCallback = callback;
         this.mCheckedVideo = isChecked;
@@ -32,22 +32,21 @@ export default class CheckboxComponent extends CocosBaseComponent {
 
 
     private addListener() {
-        if (!this[this.uncheckedName])
-            console.log('unchecked node is null')
 
-        if (!this[this.checkedName])
-            console.log('checked node is null')
-
-        this.applyClickAnim(this[this.uncheckedName], () => {
-            this.checkToggle(true);
-        })
-        this.applyClickAnim(this[this.checkedName], () => {
-            this.checkToggle(true);
-        })
+        if (this[this.uncheckedName])
+            this.applyClickAnim(this[this.uncheckedName], () => {
+                this.checkToggle();
+            })
+        if (this[this.checkedName])
+            this.applyClickAnim(this[this.checkedName], () => {
+                this.checkToggle();
+            })
     }
     private removeListener() {
-        this.removeClickAnim(this[this.checkedName])
-        this.removeClickAnim(this[this.uncheckedName])
+        if (this[this.checkedName])
+            this.removeClickAnim(this[this.checkedName])
+        if (this[this.uncheckedName])
+            this.removeClickAnim(this[this.uncheckedName])
     }
 
     public onReceive() {
@@ -74,26 +73,23 @@ export default class CheckboxComponent extends CocosBaseComponent {
     private mCanNum: number = 0;
     private mCheckBoxMistouch: boolean = false;
     private mClickNum: number = 0;
-    private mVideoNum: number = 4;
-    public checkToggle(mistouch: boolean = false) {
-        if (mistouch && this.mCheckBoxMistouch) {
+    private mCheckBoxVideoNum: number = 3;
+    public checkToggle() {
+        if (this.mCheckBoxMistouch) {
             this.mClickNum++;
-            if (this.mClickNum == this.mVideoNum) {
+            if (this.mClickNum == this.mCheckBoxVideoNum) {
                 moosnow.platform.showVideo(() => { });
             }
             if (this.mClickNum >= this.mCanNum) {
                 this.mCheckedVideo = !this.mCheckedVideo
-                this[this.checkedName].active = this.mCheckedVideo
-                this[this.uncheckedName].active = !this.mCheckedVideo;
-                this.checkCallback();
-
+                this.updateCheckbox();
             }
+            this.checkCallback();
             return;
         }
 
         this.mCheckedVideo = !this.mCheckedVideo
-        this[this.checkedName].active = this.mCheckedVideo
-        this[this.uncheckedName].active = !this.mCheckedVideo;
+        this.updateCheckbox();
         this.checkCallback();
     }
 
@@ -101,13 +97,22 @@ export default class CheckboxComponent extends CocosBaseComponent {
         super.onShow(data);
         moosnow.http.getAllConfig(res => {
             this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
+            this.mCheckBoxVideoNum = res && !isNaN(res.checkBoxVideoNum) ? res.checkBoxVideoNum : 3
             this.mCheckBoxMistouch = res.checkBoxMistouch == 1
         })
         this.addListener();
-        this[this.checkedName].active = this.mCheckedVideo
-        this[this.uncheckedName].active = !this.mCheckedVideo;
+        this.updateCheckbox();
         this.checkCallback();
     }
+
+
+    private updateCheckbox() {
+        if (this[this.checkedName])
+            this[this.checkedName].active = this.mCheckedVideo
+        if (this[this.uncheckedName])
+            this[this.uncheckedName].active = !this.mCheckedVideo;
+    }
+
 
     private checkCallback() {
         if (this.toggleCallback)

@@ -236,45 +236,40 @@ export default class CocosNodeHelper extends NodeHelper {
         // if (imgCfg.name == "bg")
         //     debugger
         if (imgCfg.url) {
-            let isRemote = imgCfg.url.indexOf("http") != -1
-            // if (cc.resources)
-            //     if (!isRemote)
-            //         cc.resources.load(imgCfg.url, cc.Texture2D, (err, tex: cc.Texture2D) => {
-            //             if (err) {
-            //                 console.log(' cc.resources.load ', err)
-            //                 return;
-            //             }
-            //             this.updateSprite(sprite, tex);
-            //             this.setSpriteGrid(imgCfg, sprite);
-            //             if (callback)
-            //                 callback();
-            //         });
-            //     else {
-            //         cc.loader.load(imgCfg.url, (err, tex: cc.Texture2D) => {
-            //             if (err) {
-            //                 console.log(' cc.assetManager.loadRemote ', err)
-            //                 return;
-            //             }
-
-            //             this.updateSprite(sprite, tex);
-            //             this.setSpriteGrid(imgCfg, sprite);
-            //             if (callback)
-            //                 callback();
-            //         });
-            //     }
-            // else {
-            cc.loader.load(imgCfg.url, (err, tex) => {
-                if (err) {
-                    console.log(' cc.loader.load ', err)
+            let isRemote = imgCfg.url.indexOf("http") != -1;
+            if (isRemote)
+                cc.loader.load(imgCfg.url, (err, tex) => {
+                    if (err) {
+                        console.log(' cc.loader.load ', err)
+                        return;
+                    }
+                    this.updateSprite(sprite, tex);
+                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
+                    // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
+                    this.setSpriteGrid(imgCfg, sprite);
+                    if (callback)
+                        callback();
+                });
+            else {
+                let res = cc.loader.getRes(imgCfg.url, cc.SpriteFrame);
+                if (res) {
+                    sprite.spriteFrame = res;
+                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
+                    if (callback) {
+                        callback();
+                    }
                     return;
                 }
-                this.updateSprite(sprite, tex);
-                this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
-                this.setSpriteGrid(imgCfg, sprite);
-                if (callback)
-                    callback();
-            });
+                cc.loader.loadRes(imgCfg.url, cc.SpriteFrame, function (err, asset) {
+                    sprite.spriteFrame = res;
+                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }
+
+
             // }
         }
     }

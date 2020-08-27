@@ -9,16 +9,17 @@ export default class CheckboxComponent extends CocosBaseComponent {
      * @param isChecked
      * @param callback
      */
-    constructor(isChecked: any, callback: (isChecked: any) => void, checkedName?: string, uncheckedName?: string);
+    constructor(isChecked?: boolean, callback?: (isChecked: any) => void, checkedName?: string, uncheckedName?: string);
     private addListener;
     private removeListener;
     onReceive(): void;
     private mCanNum;
     private mCheckBoxMistouch;
     private mClickNum;
-    private mVideoNum;
-    checkToggle(mistouch?: boolean): void;
+    private mCheckBoxVideoNum;
+    checkToggle(): void;
     onShow(data: any): void;
+    private updateCheckbox;
     private checkCallback;
     willHide(): void;
 }

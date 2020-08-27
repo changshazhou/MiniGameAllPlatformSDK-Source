@@ -5,25 +5,17 @@
 </head>
 <script src="./moosnow.conf.js"></script>
 <script src="./moosnow.platform.sdk.js"></script>
+<script src="./moosnow.platform.ui.js"></script>
 
 <script>
 
-    moosnow.http.getAllConfig(res => {
-        console.log('getAllConfig', res)
+    moosnow.form.initCheckboxState(true, (isChecked) => {
+        console.log('  moosnow.form.initCheckboxState', isChecked)
     })
+    setInterval(() => {
+        moosnow.form.checkboxToggle();
+    }, 1000)
 
-    moosnow.ad.getAd(res => {
-        console.log('ad', res)
-    })
-
-
-    moosnow.http.getMistouchPosNum(res => {
-        console.log('getMistouchPosNum', res)
-    })
-
-    moosnow.platform.checkVersion("1.0.0", (res) => {
-        console.log('checkVersion', res)
-    });
 </script>
 
 </html>

@@ -41,6 +41,7 @@ import CocosRespawnForm from "./cocos/form/CocosRespawnForm";
 import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
 import CocosFailForm from "./cocos/form/CocosFailForm";
+import CheckboxComponent from "./cocos/common/CheckboxComponent";
 
 /**
  * 广告结果
@@ -53,6 +54,28 @@ export default class FormUtil {
     constructor() {
         this.formFactory = new CocosFormFactory();
     }
+
+    public mCheckbox: CheckboxComponent;
+    /**
+     * 初始化多选框状态
+     * @param defaultChecked 默认选择状态
+     * @param callback checkboxToggle 触发的回调 isChecked 表示选择状态
+     */
+    public initCheckboxState(defaultChecked = true, callback?: (isChecked) => void) {
+        this.mCheckbox = new CheckboxComponent(defaultChecked, callback);
+        this.mCheckbox.onShow(null);
+
+    }
+
+    /**
+     * 执行点击
+     */
+    public checkboxToggle() {
+        this.mCheckbox.checkToggle();
+    }
+
+
+
 
 
     private mBaseForm = new CocosBaseForm();

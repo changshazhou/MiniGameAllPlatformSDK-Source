@@ -1562,43 +1562,37 @@ var mx = (function () {
             //     debugger
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
-                // if (cc.resources)
-                //     if (!isRemote)
-                //         cc.resources.load(imgCfg.url, cc.Texture2D, (err, tex: cc.Texture2D) => {
-                //             if (err) {
-                //                 console.log(' cc.resources.load ', err)
-                //                 return;
-                //             }
-                //             this.updateSprite(sprite, tex);
-                //             this.setSpriteGrid(imgCfg, sprite);
-                //             if (callback)
-                //                 callback();
-                //         });
-                //     else {
-                //         cc.loader.load(imgCfg.url, (err, tex: cc.Texture2D) => {
-                //             if (err) {
-                //                 console.log(' cc.assetManager.loadRemote ', err)
-                //                 return;
-                //             }
-                //             this.updateSprite(sprite, tex);
-                //             this.setSpriteGrid(imgCfg, sprite);
-                //             if (callback)
-                //                 callback();
-                //         });
-                //     }
-                // else {
-                cc.loader.load(imgCfg.url, function (err, tex) {
-                    if (err) {
-                        console.log(' cc.loader.load ', err);
+                if (isRemote)
+                    cc.loader.load(imgCfg.url, function (err, tex) {
+                        if (err) {
+                            console.log(' cc.loader.load ', err);
+                            return;
+                        }
+                        _this.updateSprite(sprite, tex);
+                        _this.checkSize(sprite, _this.convertWidth(imgCfg.width), _this.convertHeight(imgCfg.height));
+                        // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
+                        _this.setSpriteGrid(imgCfg, sprite);
+                        if (callback)
+                            callback();
+                    });
+                else {
+                    var res_1 = cc.loader.getRes(imgCfg.url, cc.SpriteFrame);
+                    if (res_1) {
+                        sprite.spriteFrame = res_1;
+                        this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
+                        if (callback) {
+                            callback();
+                        }
                         return;
                     }
-                    _this.updateSprite(sprite, tex);
-                    _this.checkSize(sprite, _this.convertWidth(imgCfg.width), _this.convertHeight(imgCfg.height));
-                    // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
-                    _this.setSpriteGrid(imgCfg, sprite);
-                    if (callback)
-                        callback();
-                });
+                    cc.loader.loadRes(imgCfg.url, cc.SpriteFrame, function (err, asset) {
+                        sprite.spriteFrame = res_1;
+                        this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
+                        if (callback) {
+                            callback();
+                        }
+                    });
+                }
                 // }
             }
         };
@@ -1847,46 +1841,49 @@ var mx = (function () {
             // this._createChild(formNode, formCfg.child);
             var logic = new formLogic();
             logic.initForm(formNode);
-            logic.willShow(formData);
-            formNode.active = true;
-            logic.onShow(formNode);
+            this.logicShow(logic, formNode, formData);
             this.addForm2Quene(formCfg.name, formNode, logic);
             return formNode;
         };
         CocosFormFactory.prototype.hideFormByLogic = function (logic, formData) {
+            var _this = this;
             this.removeFormByLogic(logic, function (formKV) {
                 if (formKV instanceof Array) {
                     formKV.forEach(function (item) {
-                        item.formLogic.willHide(formData);
-                        item.formNode.active = false;
-                        item.formLogic.onHide(formData);
-                        item.formNode.removeFromParent();
+                        _this.logicHide(item.formLogic, item.formNode, formData);
                     });
                 }
                 else {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                    formKV.formNode.removeFromParent();
+                    _this.logicHide(formKV.formLogic, formKV.formNode, formData);
                 }
             });
         };
         CocosFormFactory.prototype.hideForm = function (name, formNode, formData) {
+            var _this = this;
             if (formNode) {
                 this.removeFormFromQuene(name, formNode, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                    formKV.formNode.removeFromParent();
+                    _this.logicHide(formKV.formLogic, formKV.formNode, formData);
                 });
             }
             else
                 this.removeAllFormFromQuene(name, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                    formKV.formNode.removeFromParent();
+                    _this.logicHide(formKV.formLogic, formKV.formNode, formData);
                 });
+        };
+        CocosFormFactory.prototype.logicShow = function (formLogic, formNode, formData) {
+            if (Common.isOnlyUI && Common.isPC)
+                return;
+            formLogic.willShow(formData);
+            formNode.active = true;
+            formLogic.onShow(formData);
+        };
+        CocosFormFactory.prototype.logicHide = function (formLogic, formNode, formData) {
+            if (Common.isOnlyUI && Common.isPC)
+                return;
+            formLogic.willHide(formData);
+            formNode.active = true;
+            formLogic.onHide(formData);
+            formNode.removeFromParent();
         };
         CocosFormFactory.prototype.showForm = function (name, formLogic, formData, parent, callback, remoteLayout, layoutOptions) {
             var _this = this;
@@ -1897,9 +1894,7 @@ var mx = (function () {
             var formKV = this.getFormFromCached(name);
             if (formKV) {
                 parent.addChild(formKV.formNode);
-                formKV.formLogic.willShow(formData);
-                formKV.formNode.active = true;
-                formKV.formLogic.onShow(formData);
+                this.logicShow(formKV.formLogic, formKV.formNode, formData);
                 this.addForm2Quene(name, formKV.formNode, formKV.formLogic);
             }
             else {
@@ -1931,9 +1926,7 @@ var mx = (function () {
             var formKV = this.getFormFromCached(name);
             if (formKV) {
                 parent.addChild(formKV.formNode);
-                formKV.formLogic.willShow(tempData);
-                formKV.formNode.active = true;
-                formKV.formLogic.onShow(tempData);
+                this.logicShow(formKV.formLogic, formKV.formNode, tempData);
                 this.addForm2Quene(name, formKV.formNode, formKV.formLogic);
             }
             else {
@@ -1954,20 +1947,15 @@ var mx = (function () {
             }
         };
         CocosFormFactory.prototype.hideNodeByTemplate = function (name, formNode, formData) {
+            var _this = this;
             if (formNode) {
                 this.removeFormFromQuene(name, formNode, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                    formKV.formNode.removeFromParent();
+                    _this.logicHide(formKV.formLogic, formKV.formNode, formData);
                 });
             }
             else
                 this.removeAllFormFromQuene(name, function (formKV) {
-                    formKV.formLogic.willHide(formData);
-                    formKV.formNode.active = false;
-                    formKV.formLogic.onHide(formData);
-                    formKV.formNode.removeFromParent();
+                    _this.logicHide(formKV.formLogic, formKV.formNode, formData);
                 });
         };
         CocosFormFactory.prototype.getTemplate = function (tempName, callback) {
@@ -2284,6 +2272,7 @@ var mx = (function () {
          * @param callback
          */
         function CheckboxComponent(isChecked, callback, checkedName, uncheckedName) {
+            if (isChecked === void 0) { isChecked = true; }
             var _this = _super.call(this) || this;
             _this.checkedName = "checked";
             _this.uncheckedName = "unchecked";
@@ -2291,7 +2280,7 @@ var mx = (function () {
             _this.mCanNum = 0;
             _this.mCheckBoxMistouch = false;
             _this.mClickNum = 0;
-            _this.mVideoNum = 4;
+            _this.mCheckBoxVideoNum = 3;
             _this.toggleCallback = callback;
             _this.mCheckedVideo = isChecked;
             if (checkedName)
@@ -2306,20 +2295,20 @@ var mx = (function () {
         }
         CheckboxComponent.prototype.addListener = function () {
             var _this = this;
-            if (!this[this.uncheckedName])
-                console.log('unchecked node is null');
-            if (!this[this.checkedName])
-                console.log('checked node is null');
-            this.applyClickAnim(this[this.uncheckedName], function () {
-                _this.checkToggle(true);
-            });
-            this.applyClickAnim(this[this.checkedName], function () {
-                _this.checkToggle(true);
-            });
+            if (this[this.uncheckedName])
+                this.applyClickAnim(this[this.uncheckedName], function () {
+                    _this.checkToggle();
+                });
+            if (this[this.checkedName])
+                this.applyClickAnim(this[this.checkedName], function () {
+                    _this.checkToggle();
+                });
         };
         CheckboxComponent.prototype.removeListener = function () {
-            this.removeClickAnim(this[this.checkedName]);
-            this.removeClickAnim(this[this.uncheckedName]);
+            if (this[this.checkedName])
+                this.removeClickAnim(this[this.checkedName]);
+            if (this[this.uncheckedName])
+                this.removeClickAnim(this[this.uncheckedName]);
         };
         CheckboxComponent.prototype.onReceive = function () {
             var _this = this;
@@ -2342,24 +2331,21 @@ var mx = (function () {
                     this.FormData.callback();
             }
         };
-        CheckboxComponent.prototype.checkToggle = function (mistouch) {
-            if (mistouch === void 0) { mistouch = false; }
-            if (mistouch && this.mCheckBoxMistouch) {
+        CheckboxComponent.prototype.checkToggle = function () {
+            if (this.mCheckBoxMistouch) {
                 this.mClickNum++;
-                if (this.mClickNum == this.mVideoNum) {
+                if (this.mClickNum == this.mCheckBoxVideoNum) {
                     moosnow.platform.showVideo(function () { });
                 }
                 if (this.mClickNum >= this.mCanNum) {
                     this.mCheckedVideo = !this.mCheckedVideo;
-                    this[this.checkedName].active = this.mCheckedVideo;
-                    this[this.uncheckedName].active = !this.mCheckedVideo;
-                    this.checkCallback();
+                    this.updateCheckbox();
                 }
+                this.checkCallback();
                 return;
             }
             this.mCheckedVideo = !this.mCheckedVideo;
-            this[this.checkedName].active = this.mCheckedVideo;
-            this[this.uncheckedName].active = !this.mCheckedVideo;
+            this.updateCheckbox();
             this.checkCallback();
         };
         CheckboxComponent.prototype.onShow = function (data) {
@@ -2367,12 +2353,18 @@ var mx = (function () {
             _super.prototype.onShow.call(this, data);
             moosnow.http.getAllConfig(function (res) {
                 _this.mCanNum = MathUtils.probabilitys(res.checkBoxProbabilitys) + 1;
+                _this.mCheckBoxVideoNum = res && !isNaN(res.checkBoxVideoNum) ? res.checkBoxVideoNum : 3;
                 _this.mCheckBoxMistouch = res.checkBoxMistouch == 1;
             });
             this.addListener();
-            this[this.checkedName].active = this.mCheckedVideo;
-            this[this.uncheckedName].active = !this.mCheckedVideo;
+            this.updateCheckbox();
             this.checkCallback();
+        };
+        CheckboxComponent.prototype.updateCheckbox = function () {
+            if (this[this.checkedName])
+                this[this.checkedName].active = this.mCheckedVideo;
+            if (this[this.uncheckedName])
+                this[this.uncheckedName].active = !this.mCheckedVideo;
         };
         CheckboxComponent.prototype.checkCallback = function () {
             if (this.toggleCallback)
@@ -4205,6 +4197,22 @@ var mx = (function () {
             this.mBaseForm = new CocosBaseForm();
             this.formFactory = new CocosFormFactory();
         }
+        /**
+         * 初始化多选框状态
+         * @param defaultChecked 默认选择状态
+         * @param callback checkboxToggle 触发的回调 isChecked 表示选择状态
+         */
+        FormUtil.prototype.initCheckboxState = function (defaultChecked, callback) {
+            if (defaultChecked === void 0) { defaultChecked = true; }
+            this.mCheckbox = new CheckboxComponent(defaultChecked, callback);
+            this.mCheckbox.onShow(null);
+        };
+        /**
+         * 执行点击
+         */
+        FormUtil.prototype.checkboxToggle = function () {
+            this.mCheckbox.checkToggle();
+        };
         /**
          * 增加点击效果和事件回调
          * @param node

@@ -6,9 +6,13 @@ export default class VIVOModule extends PlatformModule {
     appSid: string;
     bannerWidth: number;
     bannerHeight: number;
+    private mNativeLoadTime;
+    private nativeAdResults;
     private interLoadedShow;
     constructor();
     private initAdService;
+    private addToNativeAdResults;
+    private getNativeAdResult;
     prevNavigate: number;
     /**
      * 跳转到指定App

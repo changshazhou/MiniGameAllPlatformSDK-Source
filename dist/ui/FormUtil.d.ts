@@ -13,12 +13,24 @@ import FormFactory from "./engine/FormFactory";
 import showNativeOptions from "../model/showNativeOptions";
 import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
+import CheckboxComponent from "./cocos/common/CheckboxComponent";
 /**
  * 广告结果
  */
 export default class FormUtil {
     formFactory: FormFactory;
     constructor();
+    mCheckbox: CheckboxComponent;
+    /**
+     * 初始化多选框状态
+     * @param defaultChecked 默认选择状态
+     * @param callback checkboxToggle 触发的回调 isChecked 表示选择状态
+     */
+    initCheckboxState(defaultChecked?: boolean, callback?: (isChecked: any) => void): void;
+    /**
+     * 执行点击
+     */
+    checkboxToggle(): void;
     private mBaseForm;
     /**
      * 增加点击效果和事件回调

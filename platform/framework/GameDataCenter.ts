@@ -4,12 +4,12 @@ import EventType from "../utils/EventType";
 
 export default class GameDataCenter extends BaseModule {
 
-    private TOKEN: string = "token";
-    private COIN: string = "COIN";
+    private TOKEN: string = "MOOSNOW_SDK_TOKEN";
+    private COIN: string = "MOOSNOW_SDK_COIN";
 
     private mUserToken: string = "";
-    private VIBRATE_SWITCH: string = "VIBRATE_SWITCH";
-    private USER_PRIZE_KEY = "USER_PRIZE_KEY";
+    private VIBRATE_SWITCH: string = "MOOSNOW_VIBRATE_SWITCH";
+    private USER_PRIZE_KEY = "MOOSNOW_USER_PRIZE_KEY";
 
     private mCoin: number = 0;
     /***********
@@ -95,7 +95,7 @@ export default class GameDataCenter extends BaseModule {
     }
 
 
-    
+
     public clearPrizeBox() {
         this.mPrizeBox = {}
     }

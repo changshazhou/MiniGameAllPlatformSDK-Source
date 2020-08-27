@@ -1804,7 +1804,7 @@ var mx = (function () {
                 showPromise && showPromise
                     .then(function () {
                     /**
-                     * 再微调
+                     * 再微调，banner 大小可能跟上一个有变化
                      */
                     _this._resetBanenrStyle({
                         width: _this.banner.style.width,
@@ -3803,11 +3803,11 @@ var mx = (function () {
         __extends(GameDataCenter, _super);
         function GameDataCenter() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.TOKEN = "token";
-            _this.COIN = "COIN";
+            _this.TOKEN = "MOOSNOW_SDK_TOKEN";
+            _this.COIN = "MOOSNOW_SDK_COIN";
             _this.mUserToken = "";
-            _this.VIBRATE_SWITCH = "VIBRATE_SWITCH";
-            _this.USER_PRIZE_KEY = "USER_PRIZE_KEY";
+            _this.VIBRATE_SWITCH = "MOOSNOW_VIBRATE_SWITCH";
+            _this.USER_PRIZE_KEY = "MOOSNOW_USER_PRIZE_KEY";
             _this.mCoin = 0;
             _this.mCurrentMisTouchCount = 0;
             _this.mChannel_id = "0";
@@ -5532,6 +5532,7 @@ var mx = (function () {
             _this.appSid = "";
             _this.bannerWidth = 720;
             _this.bannerHeight = 114;
+            _this.nativeAdResults = [];
             _this.interLoadedShow = false;
             _this.prevNavigate = Date.now();
             _this.mMinInterval = 10;
@@ -5543,8 +5544,29 @@ var mx = (function () {
         VIVOModule.prototype.initAdService = function () {
             // this.initBanner();
             // this.initInter();
-            this._prepareNative();
+            this._prepareNative(true);
             moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow);
+        };
+        VIVOModule.prototype.addToNativeAdResults = function (res) {
+            var _this = this;
+            if (res === void 0) { res = []; }
+            res.forEach(function (resRow) {
+                var existsRows = _this.nativeAdResults.filter(function (item) {
+                    return item.adId == resRow.adId;
+                });
+                if (existsRows.length == 0) {
+                    _this.nativeAdResults.push(__assign(__assign({}, Common.deepCopy(resRow)), { isClick: false }));
+                }
+            });
+        };
+        VIVOModule.prototype.getNativeAdResult = function () {
+            var noClickResults = this.nativeAdResults.filter(function (item) {
+                return !item.isClick;
+            });
+            if (noClickResults.length > 0)
+                return noClickResults[0];
+            else
+                return null;
         };
         /**
          * 跳转到指定App
@@ -5993,23 +6015,29 @@ var mx = (function () {
             this.native.onLoad(this._onNativeLoad.bind(this));
             this.native.onError(this._onNativeError.bind(this));
             this.nativeLoading = true;
-            if (isLoad)
+            if (isLoad) {
+                this.mNativeLoadTime = Date.now();
                 this.native.load();
+            }
         };
         VIVOModule.prototype._onNativeLoad = function (res) {
             var _this = this;
             this.nativeLoading = false;
             console.log(MSG.NATIVE_LOAD_COMPLETED, res);
             if (res && res.adList && res.adList.length > 0) {
-                this.nativeAdResult = res.adList[res.adList.length - 1];
+                this.addToNativeAdResults(res.adList);
+                this.nativeAdResult = this.getNativeAdResult();
                 if (!Common.isEmpty(this.nativeAdResult.adId)) {
                     console.log(MSG.NATIVE_REPORT);
                     this.native.reportAdShow({
                         adId: this.nativeAdResult.adId
                     });
+                    if (Common.isFunction(this.nativeCb)) {
+                        this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                    }
                 }
-                if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                else {
+                    this.nativeCb(null);
                 }
             }
             else {
@@ -6085,21 +6113,27 @@ var mx = (function () {
             var _this = this;
             this.nativeCb = callback;
             if (this.native) {
-                var ret = this.native.load();
-                ret && ret.then(function () {
-                    console.log('原生广告加载完成');
-                }).catch(function (err) {
-                    console.log('原生广告加载失败');
-                    moosnow.http.getAllConfig(function (res) {
-                        if (res.nativeErrorShowInter == 1) {
-                            console.log('原生加载出错，用插屏代替');
-                            _this.showInter();
-                        }
-                        else {
-                            _this.nativeCb(null);
-                        }
+                if (this.mNativeLoadTime - Date.now() <= 11 * 1000) {
+                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                }
+                else {
+                    this.mNativeLoadTime = Date.now();
+                    var ret = this.native.load();
+                    ret && ret.then(function () {
+                        console.log('原生广告加载完成');
+                    }).catch(function (err) {
+                        console.log('原生广告加载失败');
+                        moosnow.http.getAllConfig(function (res) {
+                            if (res.nativeErrorShowInter == 1) {
+                                console.log('原生加载出错，用插屏代替');
+                                _this.showInter();
+                            }
+                            else {
+                                _this.nativeCb(null);
+                            }
+                        });
                     });
-                });
+                }
             }
             else {
                 this._prepareNative(true);
