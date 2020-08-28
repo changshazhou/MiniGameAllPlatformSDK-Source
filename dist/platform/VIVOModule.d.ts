@@ -6,13 +6,9 @@ export default class VIVOModule extends PlatformModule {
     appSid: string;
     bannerWidth: number;
     bannerHeight: number;
-    private mNativeLoadTime;
-    private nativeAdResults;
     private interLoadedShow;
     constructor();
     private initAdService;
-    private addToNativeAdResults;
-    private getNativeAdResult;
     prevNavigate: number;
     /**
      * 跳转到指定App
@@ -36,7 +32,6 @@ export default class VIVOModule extends PlatformModule {
      */
     _onBannerError(err: any): void;
     getSystemInfoSync(): any;
-    _prepareBanner(): void;
     private mShowTime;
     private mMinInterval;
     _createBannerAd(): any;
@@ -44,7 +39,6 @@ export default class VIVOModule extends PlatformModule {
     _bottomCenterBanner(size: any): void;
     _onBannerClose(): void;
     _onBannerHide(): void;
-    destroyBanner(): void;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false

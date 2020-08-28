@@ -11,7 +11,6 @@ export default class VIVOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
-
     public bannerWidth: number = 720;
     public bannerHeight: number = 114;
 
@@ -21,6 +20,7 @@ export default class VIVOModule extends PlatformModule {
         this._regisiterWXCallback();
         this.initAdService();
     }
+
     private initAdService() {
         // this.initBanner();
         // this.initInter();
@@ -190,7 +190,6 @@ export default class VIVOModule extends PlatformModule {
 
     public _onBannerError(err) {
         console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
-        this.destroyBanner();
     }
 
     public getSystemInfoSync() {
@@ -204,26 +203,6 @@ export default class VIVOModule extends PlatformModule {
 
 
         return this.systemInfo;
-    }
-
-    public _prepareBanner() {
-        if (!window[this.platformName].createBannerAd) return;
-        if (this.banner) {
-            this.banner.offSize();
-            this.banner.offError();
-            this.banner.offLoad();
-            this.banner.offClose()
-            this.banner.destroy()
-            this.banner = null;
-        }
-        this.banner = this._createBannerAd();
-        if (this.banner) {
-            this.banner.onSize(this._bottomCenterBanner.bind(this));
-            this.banner.onError(this._onBannerError.bind(this));
-            this.banner.onLoad(this._onBannerLoad.bind(this));
-            this.banner.onClose(this._onBannerClose.bind(this))
-        }
-
     }
 
     private mShowTime: number;
@@ -275,7 +254,6 @@ export default class VIVOModule extends PlatformModule {
             width: this.bannerWidth,
             height: this.bannerHeight
         }
-        console.log('_createBannerAd style', style, 'screenHeight', screenHeight, 'bannerHeigth', this.bannerHeigth)
         let banner = window[this.platformName].createBannerAd({
             posId: this.bannerId,
             style
@@ -306,16 +284,6 @@ export default class VIVOModule extends PlatformModule {
         console.log('banner 已隐藏 ')
     }
 
-    public destroyBanner() {
-        if (this.banner) {
-            this.banner.offResize(this._bottomCenterBanner);
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.offClose(this._onBannerClose);
-            this.banner.destroy();
-            this.banner = null;
-        }
-    }
 
     /**
       * 显示平台的banner广告
@@ -350,13 +318,15 @@ export default class VIVOModule extends PlatformModule {
     }
 
     public _showBanner() {
-        if (!this.banner) {
-            this.initBanner();
+        if (this.banner) {
+            this.banner.hide();
+            this.banner.destroy()
+            this.banner = null;
         }
-        if (!this.banner)
+        this.banner = this._createBannerAd();
+        if (!(this.banner && this.banner.show))
             return;
         let adshow = this.banner.show();
-        console.log('显示banner style ', this.banner)
         adshow && adshow.then(() => {
             console.log("banner广告展示成功");
         }).catch((err) => {
@@ -388,17 +358,15 @@ export default class VIVOModule extends PlatformModule {
 
     public hideBanner() {
         console.log(MSG.HIDE_BANNER)
-        if (!this.isBannerShow)
-            return;
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerShowCount++;
         if (this.banner) {
+            console.log("隐藏和销毁banner")
             this.banner.hide();
-            this.destroyBanner();
+            this.banner.destroy();
+            this.banner = null;
         }
-        this.isBannerShow = false;
     }
 
     public createRewardAD(show) {
@@ -516,6 +484,7 @@ export default class VIVOModule extends PlatformModule {
     public _prepareNative(isLoad: boolean = false) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createNativeAd) return;
+        this._destroyNative();
         this.native = window[this.platformName].createNativeAd({
             posId: this.nativeId[this.nativeIdIndex]
         })
@@ -581,16 +550,19 @@ export default class VIVOModule extends PlatformModule {
                 this.showInter();
             }
             else {
-                this.nativeCb(null)
+                if (this.nativeCb)
+                    this.nativeCb(null)
             }
         })
     }
 
     public _destroyNative() {
         this.nativeLoading = false;
-        this.native.offLoad() // 移除原生广告加载成功回调
-        this.native.offError() // 移除失败回调
-        this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
+        if (this.native) {
+            this.native.offLoad() // 移除原生广告加载成功回调
+            this.native.offError() // 移除失败回调
+            this.native.destroy() // 隐藏 banner，成功回调 onHide, 出错的时候回调 onError
+        }
         console.log(MSG.NATIVE_DESTROY)
     }
 
@@ -625,7 +597,8 @@ export default class VIVOModule extends PlatformModule {
 
                 moosnow.http.getAllConfig(res => {
                     if (res.nativeErrorShowInter == 1) {
-                        console.log('原生加载出错，用插屏代替')
+                        console.log('原生加载出错，用插屏代替');
+                        this.nativeCb(null);
                         this.showInter();
                     }
                     else {
