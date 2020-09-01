@@ -169,9 +169,6 @@ export default class CocosNodeHelper extends NodeHelper {
             this.createWidget(container, WidgetAttribute.parse(viewCfg.widget))
         }
 
-
-
-
         let scrollNode = this.createNode(viewCfg.name + '_scroll', viewCfg);
         let scroll = scrollNode.addComponent(cc.ScrollView);
         scroll.horizontal = !!viewCfg.scroll.horizontal;

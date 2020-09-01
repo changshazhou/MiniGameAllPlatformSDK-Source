@@ -62,7 +62,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
     public onClickAd() {
         let openAd = this.mAdItem
-        if (this.FormData.refresh) {
+        if (this.FormData && this.FormData.refresh) {
             let nextAd = this.findNextAd();
             if (nextAd.refresh)
                 moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
@@ -72,7 +72,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
             this.refreshImg(nextAd);
         }
         moosnow.platform.navigate2Mini(openAd, () => { }, () => {
-            if (this.mAdItem.onCancel)
+            if (this.mAdItem && this.mAdItem.onCancel)
                 this.mAdItem.onCancel(openAd);
         })
     }

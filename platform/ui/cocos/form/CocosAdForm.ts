@@ -457,7 +457,6 @@ export default class CocosAdForm extends CocosBaseForm {
     public onFwUpdate() {
 
         this.floatAnim();
-
         this.scrollMove();
 
     }

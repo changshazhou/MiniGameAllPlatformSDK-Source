@@ -1,6 +1,6 @@
 window.onlyUI = true;
 window.moosnowConfig = {
-    debug: "wx",
+    debug: "byte",
     /**
      * 微信平台
      */
@@ -55,7 +55,7 @@ window.moosnowConfig = {
         videoId: "168781",
         interId: "168777",
         nativeId: ["168779", "168780"],
-        moosnowAppId: "t1c2b6a9683015c7d",
+        moosnowAppId: "tt07e4715998dfbc8b",
         version: "1.1.0",
     }
 }

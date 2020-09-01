@@ -5,8 +5,16 @@ import EventType from "../../utils/EventType";
 
 export default class BaseForm extends BaseModule {
 
-
-    public node: any
+    private mOwner: any = null;
+    public get node() {
+        if (this.mOwner)
+            return this.mOwner
+        else
+            return {}
+    }
+    public set node(value) {
+        this.mOwner = value;
+    }
     public mFormData: any;
 
     start() {

@@ -2190,6 +2190,9 @@ var mx = (function () {
             _this._regisiterWXCallback();
             _this.initBanner();
             _this.initInter();
+            setTimeout(function () {
+                _this.initVideo();
+            }, 1);
             return _this;
         }
         /**

@@ -11,6 +11,10 @@ export default class WXModule extends PlatformModule {
         this._regisiterWXCallback();
         this.initBanner();
         this.initInter();
+
+        setTimeout(() => {
+            this.initVideo();
+        }, 1)
     }
 
     /**

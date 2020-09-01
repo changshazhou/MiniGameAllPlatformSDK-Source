@@ -1,6 +1,8 @@
 import BaseModule from "../../framework/BaseModule";
 export default class BaseForm extends BaseModule {
-    node: any;
+    private mOwner;
+    get node(): any;
+    set node(value: any);
     mFormData: any;
     start(): void;
     /**
