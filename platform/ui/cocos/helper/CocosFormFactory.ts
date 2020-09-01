@@ -116,16 +116,20 @@ export default class CocosFormFactory extends FormFactory {
 
 
     private logicShow(formLogic, formNode, formData) {
-        if (Common.isOnlyUI && Common.isPC)
+        if (Common.isOnlyUI && Common.isPC) {
+            console.warn('UI编辑模式，取消业务逻辑')
             return;
+        }
         formLogic.willShow(formData);
         formNode.active = true;
         formLogic.onShow(formData);
     }
 
     private logicHide(formLogic, formNode, formData) {
-        if (Common.isOnlyUI && Common.isPC)
+        if (Common.isOnlyUI && Common.isPC) {
+            console.warn('UI编辑模式，取消业务逻辑')
             return;
+        }
         formLogic.willHide(formData);
         formNode.active = true;
         formLogic.onHide(formData);
