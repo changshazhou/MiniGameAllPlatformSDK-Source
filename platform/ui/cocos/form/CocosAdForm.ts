@@ -302,7 +302,6 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public initFloatAd(callback?: Function) {
 
-        this.floatContainer.removeAllChildren();
 
         if (this.mAdData.indexLeft.length == 0)
             return;
@@ -343,19 +342,19 @@ export default class CocosAdForm extends CocosBaseForm {
 
 
     private removeFloatAd() {
-        // this.floatContainer.children.forEach(floatNode => {
-        //     floatNode.stopAllActions();
-        // })
+        this.floatContainer.children.forEach(floatNode => {
+            floatNode.stopAllActions();
+        })
 
-        // let templetes = this.FormData.floatTempletes;
-        // if (this.mTempTempletes) {
-        //     templetes = templetes.concat(this.mTempTempletes)
-        // }
-        // templetes.forEach(tempName => {
-        //     moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
-        // })
-        
-        // this.unschedule(this.updateFloat)
+        let templetes = this.FormData.floatTempletes;
+        if (this.mTempTempletes) {
+            templetes = templetes.concat(this.mTempTempletes)
+        }
+        templetes.forEach(tempName => {
+            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+        })
+
+        this.unschedule(this.updateFloat)
     }
 
 

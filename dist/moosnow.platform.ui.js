@@ -1899,6 +1899,8 @@ var mx = (function () {
             formLogic.willHide(formData);
             formNode.active = true;
             formLogic.onHide(formData);
+            formNode.x = 0;
+            formNode.y = 0;
             formNode.removeFromParent();
         };
         CocosFormFactory.prototype.showForm = function (name, formLogic, formData, parent, callback, remoteLayout, layoutOptions) {
@@ -3459,7 +3461,6 @@ var mx = (function () {
          */
         CocosAdForm.prototype.initFloatAd = function (callback) {
             var _this = this;
-            this.floatContainer.removeAllChildren();
             if (this.mAdData.indexLeft.length == 0)
                 return;
             var source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
@@ -3490,17 +3491,17 @@ var mx = (function () {
             this.floatRuning = false;
         };
         CocosAdForm.prototype.removeFloatAd = function () {
-            // this.floatContainer.children.forEach(floatNode => {
-            //     floatNode.stopAllActions();
-            // })
-            // let templetes = this.FormData.floatTempletes;
-            // if (this.mTempTempletes) {
-            //     templetes = templetes.concat(this.mTempTempletes)
-            // }
-            // templetes.forEach(tempName => {
-            //     moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
-            // })
-            // this.unschedule(this.updateFloat)
+            this.floatContainer.children.forEach(function (floatNode) {
+                floatNode.stopAllActions();
+            });
+            var templetes = this.FormData.floatTempletes;
+            if (this.mTempTempletes) {
+                templetes = templetes.concat(this.mTempTempletes);
+            }
+            templetes.forEach(function (tempName) {
+                moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+            });
+            this.unschedule(this.updateFloat);
         };
         CocosAdForm.prototype.floatAnim = function () {
             if (this.floatRuning)
