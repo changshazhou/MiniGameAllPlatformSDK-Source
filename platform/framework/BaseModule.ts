@@ -11,20 +11,17 @@ export default class BaseModule {
 
 
     public schedule(callback: Function, time: number, ...arg) {
-
         let self = this;
-        let id = setInterval(() => {
+        let handle = setInterval(() => {
             if (callback)
                 callback.apply(self, ...arg);
-        }, time * 1000)
-        console.log('BaseModule schedule ', id)
-        this.mIntervalArr[id] = callback;
+        }, time * 1000, self)
+        console.log('BaseModule schedule handle ', handle)
+        this.mIntervalArr[callback.toString()] = handle;
     }
     public unschedule(callback) {
-        for (let key in this.mIntervalArr) {
-            if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                clearInterval(parseInt(key))
-            }
+        if (!isNaN(this.mIntervalArr[callback.toString()])) {
+            clearInterval(parseInt(this.mIntervalArr[callback.toString()]))
         }
     }
 

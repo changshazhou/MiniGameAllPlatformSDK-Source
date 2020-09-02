@@ -95,8 +95,8 @@ export default class CocosAdForm extends CocosBaseForm {
         this.mShowAd = AD_POSITION.NONE;
         this.displayAd(false)
 
-        this.mTempPoints = data.points;
-        this.mTempTempletes = data.templetes;
+        this.mTempPoints = data && data.points ? data.points : null;
+        this.mTempTempletes = data && data.templetes ? data.templetes : null;
 
         if (data.showAd != AD_POSITION.RECOVER) {
             this.mPrevShowAd = this.mShowAd;
@@ -302,6 +302,8 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public initFloatAd(callback?: Function) {
 
+        this.floatContainer.removeAllChildren();
+
         if (this.mAdData.indexLeft.length == 0)
             return;
         let source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
@@ -332,26 +334,28 @@ export default class CocosAdForm extends CocosBaseForm {
 
         })
         this.updateFloat(source);
-        this.schedule(() => {
-            this.updateFloat(source);
-        }, this.mFloatRefresh);
+
+        this.schedule(this.updateFloat, this.mFloatRefresh, [source]);
+
         this.floatRuning = false;
 
     }
-    private removeFloatAd() {
-        this.floatContainer.children.forEach(floatNode => {
-            floatNode.stopAllActions();
-        })
 
-        let templetes = this.FormData.floatTempletes;
-        if (this.mTempTempletes) {
-            templetes = templetes.concat(this.mTempTempletes)
-        }
-        templetes.forEach(tempName => {
-            moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
-        })
-        this.mTempPoints = null;
-        this.mTempTempletes = null;
+
+    private removeFloatAd() {
+        // this.floatContainer.children.forEach(floatNode => {
+        //     floatNode.stopAllActions();
+        // })
+
+        // let templetes = this.FormData.floatTempletes;
+        // if (this.mTempTempletes) {
+        //     templetes = templetes.concat(this.mTempTempletes)
+        // }
+        // templetes.forEach(tempName => {
+        //     moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+        // })
+        
+        // this.unschedule(this.updateFloat)
     }
 
 
@@ -387,7 +391,8 @@ export default class CocosAdForm extends CocosBaseForm {
                             kv.formLogic.FormData.index++;
                         else
                             kv.formLogic.FormData.index = 0;
-                        (kv.formLogic as any).refreshImg({ ...this.mAdData.indexLeft[kv.formLogic.FormData.index], onCancel: kv.formLogic.FormData.onCancel });
+                        let logic = (kv.formLogic as any) as CocosAdViewItem
+                        logic.refreshImg({ ...this.mAdData.indexLeft[kv.formLogic.FormData.index], onCancel: kv.formLogic.FormData.onCancel });
                     }
                 })
             })
@@ -536,10 +541,13 @@ export default class CocosAdForm extends CocosBaseForm {
         this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
 
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
+
         this.floatContainer.active && this.initFloatAd();
+
         if (!this.floatContainer.active) {
             this.removeFloatAd();
         }
+
 
         this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
         this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)

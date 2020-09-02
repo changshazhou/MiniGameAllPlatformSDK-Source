@@ -34,8 +34,13 @@ export default class CocosAdViewItem extends CocosBaseForm {
 
     public willShow(cell: moosnowAdRow) {
         super.willShow(cell);
+        console.log('ad view item data 1 ', cell.title, this.node.x, this.node.y)
         this.mAdItem = cell;
         this.addListener();
+
+        this.scheduleOnce(() => {
+            console.log('ad view item data 2 ', cell.title, this.node.x, this.node.y)
+        }, 2)
     }
 
 

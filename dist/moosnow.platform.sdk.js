@@ -627,18 +627,16 @@ var mx = (function () {
                 arg[_i - 2] = arguments[_i];
             }
             var self = this;
-            var id = setInterval(function () {
+            var handle = setInterval(function () {
                 if (callback)
                     callback.apply.apply(callback, __spreadArrays([self], arg));
-            }, time * 1000);
-            console.log('BaseModule schedule ', id);
-            this.mIntervalArr[id] = callback;
+            }, time * 1000, self);
+            console.log('BaseModule schedule handle ', handle);
+            this.mIntervalArr[callback.toString()] = handle;
         };
         BaseModule.prototype.unschedule = function (callback) {
-            for (var key in this.mIntervalArr) {
-                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                    clearInterval(parseInt(key));
-                }
+            if (!isNaN(this.mIntervalArr[callback.toString()])) {
+                clearInterval(parseInt(this.mIntervalArr[callback.toString()]));
             }
         };
         BaseModule.prototype.scheduleOnce = function (callback, time) {

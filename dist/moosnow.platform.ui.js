@@ -1040,18 +1040,16 @@ var mx = (function () {
                 arg[_i - 2] = arguments[_i];
             }
             var self = this;
-            var id = setInterval(function () {
+            var handle = setInterval(function () {
                 if (callback)
                     callback.apply.apply(callback, __spreadArrays([self], arg));
-            }, time * 1000);
-            console.log('BaseModule schedule ', id);
-            this.mIntervalArr[id] = callback;
+            }, time * 1000, self);
+            console.log('BaseModule schedule handle ', handle);
+            this.mIntervalArr[callback.toString()] = handle;
         };
         BaseModule.prototype.unschedule = function (callback) {
-            for (var key in this.mIntervalArr) {
-                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                    clearInterval(parseInt(key));
-                }
+            if (!isNaN(this.mIntervalArr[callback.toString()])) {
+                clearInterval(parseInt(this.mIntervalArr[callback.toString()]));
             }
         };
         BaseModule.prototype.scheduleOnce = function (callback, time) {
@@ -1179,10 +1177,24 @@ var mx = (function () {
         __extends(BaseForm, _super);
         function BaseForm() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mOwner = null;
             _this.formComponents = [];
             _this.mNodeMap = [];
             return _this;
         }
+        Object.defineProperty(BaseForm.prototype, "node", {
+            get: function () {
+                if (this.mOwner)
+                    return this.mOwner;
+                else
+                    return {};
+            },
+            set: function (value) {
+                this.mOwner = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         BaseForm.prototype.start = function () {
         };
         Object.defineProperty(BaseForm.prototype, "FormData", {
@@ -1871,15 +1883,19 @@ var mx = (function () {
                 });
         };
         CocosFormFactory.prototype.logicShow = function (formLogic, formNode, formData) {
-            if (Common.isOnlyUI && Common.isPC)
+            if (Common.isOnlyUI && Common.isPC) {
+                console.warn('UI编辑模式，取消业务逻辑');
                 return;
+            }
             formLogic.willShow(formData);
             formNode.active = true;
             formLogic.onShow(formData);
         };
         CocosFormFactory.prototype.logicHide = function (formLogic, formNode, formData) {
-            if (Common.isOnlyUI && Common.isPC)
+            if (Common.isOnlyUI && Common.isPC) {
+                console.warn('UI编辑模式，取消业务逻辑');
                 return;
+            }
             formLogic.willHide(formData);
             formNode.active = true;
             formLogic.onHide(formData);
@@ -3086,9 +3102,14 @@ var mx = (function () {
         CocosAdViewItem.prototype.initPosition = function (data) {
         };
         CocosAdViewItem.prototype.willShow = function (cell) {
+            var _this = this;
             _super.prototype.willShow.call(this, cell);
+            console.log('ad view item data 1 ', cell.title, this.node.x, this.node.y);
             this.mAdItem = cell;
             this.addListener();
+            this.scheduleOnce(function () {
+                console.log('ad view item data 2 ', cell.title, _this.node.x, _this.node.y);
+            }, 2);
         };
         CocosAdViewItem.prototype.refreshImg = function (cell) {
             this.mAdItem = cell;
@@ -3109,7 +3130,7 @@ var mx = (function () {
         CocosAdViewItem.prototype.onClickAd = function () {
             var _this = this;
             var openAd = this.mAdItem;
-            if (this.FormData.refresh) {
+            if (this.FormData && this.FormData.refresh) {
                 var nextAd = this.findNextAd();
                 if (nextAd.refresh)
                     moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
@@ -3119,7 +3140,7 @@ var mx = (function () {
                 this.refreshImg(nextAd);
             }
             moosnow.platform.navigate2Mini(openAd, function () { }, function () {
-                if (_this.mAdItem.onCancel)
+                if (_this.mAdItem && _this.mAdItem.onCancel)
                     _this.mAdItem.onCancel(openAd);
             });
         };
@@ -3253,8 +3274,8 @@ var mx = (function () {
         CocosAdForm.prototype.onAdChange = function (data) {
             this.mShowAd = AD_POSITION.NONE;
             this.displayAd(false);
-            this.mTempPoints = data.points;
-            this.mTempTempletes = data.templetes;
+            this.mTempPoints = data && data.points ? data.points : null;
+            this.mTempTempletes = data && data.templetes ? data.templetes : null;
             if (data.showAd != AD_POSITION.RECOVER) {
                 this.mPrevShowAd = this.mShowAd;
                 this.mPrevBackCall = this.mBackCall;
@@ -3438,6 +3459,7 @@ var mx = (function () {
          */
         CocosAdForm.prototype.initFloatAd = function (callback) {
             var _this = this;
+            this.floatContainer.removeAllChildren();
             if (this.mAdData.indexLeft.length == 0)
                 return;
             var source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
@@ -3464,24 +3486,21 @@ var mx = (function () {
                 moosnow.form.formFactory.createNodeByTemplate(templateName, CocosAdViewItem, adRow, _this.floatContainer);
             });
             this.updateFloat(source);
-            this.schedule(function () {
-                _this.updateFloat(source);
-            }, this.mFloatRefresh);
+            this.schedule(this.updateFloat, this.mFloatRefresh, [source]);
             this.floatRuning = false;
         };
         CocosAdForm.prototype.removeFloatAd = function () {
-            this.floatContainer.children.forEach(function (floatNode) {
-                floatNode.stopAllActions();
-            });
-            var templetes = this.FormData.floatTempletes;
-            if (this.mTempTempletes) {
-                templetes = templetes.concat(this.mTempTempletes);
-            }
-            templetes.forEach(function (tempName) {
-                moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
-            });
-            this.mTempPoints = null;
-            this.mTempTempletes = null;
+            // this.floatContainer.children.forEach(floatNode => {
+            //     floatNode.stopAllActions();
+            // })
+            // let templetes = this.FormData.floatTempletes;
+            // if (this.mTempTempletes) {
+            //     templetes = templetes.concat(this.mTempTempletes)
+            // }
+            // templetes.forEach(tempName => {
+            //     moosnow.form.formFactory.hideNodeByTemplate(tempName, null);
+            // })
+            // this.unschedule(this.updateFloat)
         };
         CocosAdForm.prototype.floatAnim = function () {
             if (this.floatRuning)
@@ -3505,7 +3524,8 @@ var mx = (function () {
                                 kv.formLogic.FormData.index++;
                             else
                                 kv.formLogic.FormData.index = 0;
-                            kv.formLogic.refreshImg(__assign(__assign({}, _this.mAdData.indexLeft[kv.formLogic.FormData.index]), { onCancel: kv.formLogic.FormData.onCancel }));
+                            var logic = kv.formLogic;
+                            logic.refreshImg(__assign(__assign({}, _this.mAdData.indexLeft[kv.formLogic.FormData.index]), { onCancel: kv.formLogic.FormData.onCancel }));
                         }
                     });
                 });
