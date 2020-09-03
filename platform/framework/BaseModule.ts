@@ -6,75 +6,95 @@ export default class BaseModule {
 
     private static mIntervalArr: Object = {};
     private static mTimeoutArr: Object = {};
+    private static mScheduleIndex: number = 0;
     private mIntervalArr: Object = {};
     private mTimeoutArr: Object = {};
+    private mScheduleIndex: number = 0;
 
+    private mMaping = {}
 
     public schedule(callback: Function, time: number, ...arg) {
         let self = this;
+        // this.mMaping[this.mScheduleIndex] = callback;
         let handle = setInterval(() => {
             if (callback)
                 callback.apply(self, ...arg);
-        }, time * 1000, self)
-        console.log('BaseModule schedule handle ', handle)
-        this.mIntervalArr[callback.toString()] = handle;
+        }, time * 1000, self);
+        this.mIntervalArr[this.mScheduleIndex] = {
+            handle,
+            callback
+        };
+        this.mScheduleIndex++;
     }
     public unschedule(callback) {
-        if (!isNaN(this.mIntervalArr[callback.toString()])) {
-            clearInterval(parseInt(this.mIntervalArr[callback.toString()]))
+        for (let idx in this.mIntervalArr) {
+            if (this.mIntervalArr[idx].callback == callback) {
+                clearInterval(parseInt(this.mIntervalArr[idx].handle))
+            }
         }
     }
 
     public scheduleOnce(callback: Function, time: number) {
         let self = this;
-        let id = setTimeout(() => {
-            clearTimeout(id);
+        let handle = setTimeout(() => {
+            clearTimeout(handle);
             if (callback)
                 callback.apply(self)
 
         }, time * 1000)
-        this.mTimeoutArr[id] = callback;
+        this.mTimeoutArr[this.mScheduleIndex] = {
+            handle,
+            callback
+        };
+        this.mScheduleIndex++;
     }
     public unscheduleOnce(callback) {
-        for (let key in this.mTimeoutArr) {
-            if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
-                clearTimeout(parseInt(key))
+        for (let idx in this.mTimeoutArr) {
+            if (this.mTimeoutArr[idx].callback == callback) {
+                clearInterval(parseInt(this.mTimeoutArr[idx].handle))
             }
         }
     }
 
     public static schedule(callback: Function, time: number, ...arg) {
-
         let self = this;
-        let id = setInterval(() => {
+        // this.mMaping[this.mScheduleIndex] = callback;
+        let handle = setInterval(() => {
             if (callback)
                 callback.apply(self, ...arg);
-        }, time * 1000)
-        console.log('BaseModule schedule ', id)
-        this.mIntervalArr[id] = callback;
+        }, time * 1000, self);
+        this.mIntervalArr[this.mScheduleIndex] = {
+            handle,
+            callback
+        };
+        this.mScheduleIndex++;
     }
     public static unschedule(callback) {
-        for (let key in this.mIntervalArr) {
-            if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                clearInterval(parseInt(key))
+        for (let idx in this.mIntervalArr) {
+            if (this.mIntervalArr[idx].callback == callback) {
+                clearInterval(parseInt(this.mIntervalArr[idx].handle))
             }
         }
     }
 
     public static scheduleOnce(callback: Function, time: number) {
         let self = this;
-        let id = setTimeout(() => {
-            clearTimeout(id);
+        let handle = setTimeout(() => {
+            clearTimeout(handle);
             if (callback)
                 callback.apply(self)
 
         }, time * 1000)
-        this.mTimeoutArr[id] = callback;
+        this.mTimeoutArr[this.mScheduleIndex] = {
+            handle,
+            callback
+        };
+        this.mScheduleIndex++;
     }
     public static unscheduleOnce(callback) {
-        for (let key in this.mTimeoutArr) {
-            if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
-                clearTimeout(parseInt(key))
+        for (let idx in this.mTimeoutArr) {
+            if (this.mTimeoutArr[idx].callback == callback) {
+                clearInterval(parseInt(this.mTimeoutArr[idx].handle))
             }
         }
     }

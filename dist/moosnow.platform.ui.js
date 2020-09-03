@@ -1033,6 +1033,8 @@ var mx = (function () {
             this.moduleName = "";
             this.mIntervalArr = {};
             this.mTimeoutArr = {};
+            this.mScheduleIndex = 0;
+            this.mMaping = {};
         }
         BaseModule.prototype.schedule = function (callback, time) {
             var arg = [];
@@ -1040,31 +1042,41 @@ var mx = (function () {
                 arg[_i - 2] = arguments[_i];
             }
             var self = this;
+            // this.mMaping[this.mScheduleIndex] = callback;
             var handle = setInterval(function () {
                 if (callback)
                     callback.apply.apply(callback, __spreadArrays([self], arg));
             }, time * 1000, self);
-            console.log('BaseModule schedule handle ', handle);
-            this.mIntervalArr[callback.toString()] = handle;
+            this.mIntervalArr[this.mScheduleIndex] = {
+                handle: handle,
+                callback: callback
+            };
+            this.mScheduleIndex++;
         };
         BaseModule.prototype.unschedule = function (callback) {
-            if (!isNaN(this.mIntervalArr[callback.toString()])) {
-                clearInterval(parseInt(this.mIntervalArr[callback.toString()]));
+            for (var idx in this.mIntervalArr) {
+                if (this.mIntervalArr[idx].callback == callback) {
+                    clearInterval(parseInt(this.mIntervalArr[idx].handle));
+                }
             }
         };
         BaseModule.prototype.scheduleOnce = function (callback, time) {
             var self = this;
-            var id = setTimeout(function () {
-                clearTimeout(id);
+            var handle = setTimeout(function () {
+                clearTimeout(handle);
                 if (callback)
                     callback.apply(self);
             }, time * 1000);
-            this.mTimeoutArr[id] = callback;
+            this.mTimeoutArr[this.mScheduleIndex] = {
+                handle: handle,
+                callback: callback
+            };
+            this.mScheduleIndex++;
         };
         BaseModule.prototype.unscheduleOnce = function (callback) {
-            for (var key in this.mTimeoutArr) {
-                if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
-                    clearTimeout(parseInt(key));
+            for (var idx in this.mTimeoutArr) {
+                if (this.mTimeoutArr[idx].callback == callback) {
+                    clearInterval(parseInt(this.mTimeoutArr[idx].handle));
                 }
             }
         };
@@ -1074,33 +1086,41 @@ var mx = (function () {
                 arg[_i - 2] = arguments[_i];
             }
             var self = this;
-            var id = setInterval(function () {
+            // this.mMaping[this.mScheduleIndex] = callback;
+            var handle = setInterval(function () {
                 if (callback)
                     callback.apply.apply(callback, __spreadArrays([self], arg));
-            }, time * 1000);
-            console.log('BaseModule schedule ', id);
-            this.mIntervalArr[id] = callback;
+            }, time * 1000, self);
+            this.mIntervalArr[this.mScheduleIndex] = {
+                handle: handle,
+                callback: callback
+            };
+            this.mScheduleIndex++;
         };
         BaseModule.unschedule = function (callback) {
-            for (var key in this.mIntervalArr) {
-                if (this.mIntervalArr[key] === callback || Common.isEmpty(this.mIntervalArr[key])) {
-                    clearInterval(parseInt(key));
+            for (var idx in this.mIntervalArr) {
+                if (this.mIntervalArr[idx].callback == callback) {
+                    clearInterval(parseInt(this.mIntervalArr[idx].handle));
                 }
             }
         };
         BaseModule.scheduleOnce = function (callback, time) {
             var self = this;
-            var id = setTimeout(function () {
-                clearTimeout(id);
+            var handle = setTimeout(function () {
+                clearTimeout(handle);
                 if (callback)
                     callback.apply(self);
             }, time * 1000);
-            this.mTimeoutArr[id] = callback;
+            this.mTimeoutArr[this.mScheduleIndex] = {
+                handle: handle,
+                callback: callback
+            };
+            this.mScheduleIndex++;
         };
         BaseModule.unscheduleOnce = function (callback) {
-            for (var key in this.mTimeoutArr) {
-                if (this.mTimeoutArr[key] === callback || Common.isEmpty(this.mTimeoutArr[key])) {
-                    clearTimeout(parseInt(key));
+            for (var idx in this.mTimeoutArr) {
+                if (this.mTimeoutArr[idx].callback == callback) {
+                    clearInterval(parseInt(this.mTimeoutArr[idx].handle));
                 }
             }
         };
@@ -1140,6 +1160,7 @@ var mx = (function () {
         };
         BaseModule.mIntervalArr = {};
         BaseModule.mTimeoutArr = {};
+        BaseModule.mScheduleIndex = 0;
         return BaseModule;
     }());
 

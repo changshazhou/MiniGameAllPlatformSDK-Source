@@ -2,8 +2,11 @@ export default class BaseModule {
     protected moduleName: string;
     private static mIntervalArr;
     private static mTimeoutArr;
+    private static mScheduleIndex;
     private mIntervalArr;
     private mTimeoutArr;
+    private mScheduleIndex;
+    private mMaping;
     schedule(callback: Function, time: number, ...arg: any[]): void;
     unschedule(callback: any): void;
     scheduleOnce(callback: Function, time: number): void;
