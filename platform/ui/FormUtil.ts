@@ -112,8 +112,9 @@ export default class FormUtil {
 
     public loadAd(options: loadAdOptions) {
 
-        this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, () => {
+        this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, (node: cc.Node) => {
             console.log('create ad form')
+            // cc.game.addPersistRootNode(node);
         })
     }
 

@@ -1,7 +1,6 @@
 
 import Common from "../../utils/Common";
 import UIFormSetting from "../../config/UIFormSetting";
-import PrizeForm from "../engine/PrizeForm";
 import CoinForm from "../engine/CoinForm";
 
 export default class CocosCoinForm extends CoinForm {
@@ -26,7 +25,7 @@ export default class CocosCoinForm extends CoinForm {
                     )
                 ),
                 cc.callFunc(() => {
-                    moosnow.entity.hideEntity(logic, null, true);
+                    // moosnow.entity.hideEntkty(logic, null, true);
                 })
             )
 

@@ -697,10 +697,10 @@ export default class CocosAdForm extends CocosBaseForm {
                 adRow.showIds = showIds;
                 moosnow.form.formFactory.createNodeByTemplate(tempName, CocosAdViewItem, adRow, this.rotateContainer_layout);
             })
-            let t = cc.Canvas.instance.node.width / 2 / 800
+            let t = CocosNodeHelper.canvasNode.width / 2 / 800
             this.rotateContainer_layout.children.forEach((item, idx) => {
 
-                item.x = pos[idx].x - cc.Canvas.instance.node.width / 2;
+                item.x = pos[idx].x - CocosNodeHelper.canvasNode.width / 2;
                 item.stopAllActions();
                 item.runAction(
                     cc.spawn(
@@ -711,5 +711,10 @@ export default class CocosAdForm extends CocosBaseForm {
             })
         })
 
+    }
+
+
+    public disableAd() {
+        this.unschedule(this.onFwUpdate)
     }
 }

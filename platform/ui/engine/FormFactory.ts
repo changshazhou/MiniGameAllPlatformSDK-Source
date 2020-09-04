@@ -66,6 +66,12 @@ export default class FormFactory {
         this.mCachedLayoutQuene = value;
     }
 
+
+    public destory() {
+        this.cachedLayoutQuene = [];
+        this.layoutQuene = [];
+    }
+
     private addFrom2Cached(name: string, formKV: LayoutFormKeyValue) {
         let cacheIdx: number = -1;
         for (let i = 0; i < this.cachedLayoutQuene.length; i++) {

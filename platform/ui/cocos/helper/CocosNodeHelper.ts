@@ -16,7 +16,8 @@ export default class CocosNodeHelper extends NodeHelper {
     public static get canvasNode() {
         if (!this.mRootNode)
             this.mRootNode = cc.Canvas.instance.node;
-        return this.mRootNode
+        return cc.Canvas.instance.node
+        // return cc.director.getScene();
     }
     public static set canvasNode(value) {
         this.mRootNode = value;

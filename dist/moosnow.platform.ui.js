@@ -778,6 +778,10 @@ var mx = (function () {
             enumerable: true,
             configurable: true
         });
+        FormFactory.prototype.destory = function () {
+            this.cachedLayoutQuene = [];
+            this.layoutQuene = [];
+        };
         FormFactory.prototype.addFrom2Cached = function (name, formKV) {
             var cacheIdx = -1;
             for (var i = 0; i < this.cachedLayoutQuene.length; i++) {
@@ -1417,6 +1421,7 @@ var mx = (function () {
                 if (!this.mRootNode)
                     this.mRootNode = cc.Canvas.instance.node;
                 return this.mRootNode;
+                // return cc.director.getScene();
             },
             set: function (value) {
                 this.mRootNode = value;
@@ -1942,17 +1947,17 @@ var mx = (function () {
                         if (res[name]) {
                             var formCfg = res[name]; //NodeAttribute.parse(res[name]);
                             formCfg.name = name;
-                            _this._createUINode(formCfg, formLogic, formData, parent);
+                            var node = _this._createUINode(formCfg, formLogic, formData, parent);
                             console.log('_createUINode ', Date.now());
                             if (callback)
-                                callback();
+                                callback(node);
                         }
                     });
                 }
                 else {
-                    this._createUINode(layoutOptions, formLogic, formData);
+                    var node = this._createUINode(layoutOptions, formLogic, formData);
                     if (callback)
-                        callback();
+                        callback(node);
                 }
             }
         };
@@ -3825,6 +3830,9 @@ var mx = (function () {
                 });
             });
         };
+        CocosAdForm.prototype.disableAd = function () {
+            this.unschedule(this.onFwUpdate);
+        };
         return CocosAdForm;
     }(CocosBaseForm));
 
@@ -4285,8 +4293,9 @@ var mx = (function () {
             this.formFactory.showForm(FormLayout.NativeForm, CocosNativeForm, options);
         };
         FormUtil.prototype.loadAd = function (options) {
-            this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function () {
+            this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, __assign(__assign({}, new loadAdOptions()), options), null, function (node) {
                 console.log('create ad form');
+                // cc.game.addPersistRootNode(node);
             });
         };
         /**

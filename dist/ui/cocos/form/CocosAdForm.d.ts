@@ -118,4 +118,5 @@ export default class CocosAdForm extends CocosBaseForm {
     private initExport;
     private disableRotate;
     private initRotate;
+    disableAd(): void;
 }

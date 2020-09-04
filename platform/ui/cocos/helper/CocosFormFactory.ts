@@ -138,7 +138,7 @@ export default class CocosFormFactory extends FormFactory {
         (formNode as cc.Node).removeFromParent();
     }
 
-    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: () => void, remoteLayout: boolean = true, layoutOptions: any = null) {
+    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: (node: cc.Node) => void, remoteLayout: boolean = true, layoutOptions: any = null) {
         if (!parent)
             parent = CocosNodeHelper.canvasNode;
 
@@ -154,17 +154,17 @@ export default class CocosFormFactory extends FormFactory {
                     if (res[name]) {
                         let formCfg = res[name];//NodeAttribute.parse(res[name]);
                         formCfg.name = name;
-                        this._createUINode(formCfg, formLogic, formData, parent);
+                        let node = this._createUINode(formCfg, formLogic, formData, parent);
                         console.log('_createUINode ', Date.now())
                         if (callback)
-                            callback()
+                            callback(node)
                     }
                 })
             }
             else {
-                this._createUINode(layoutOptions, formLogic, formData);
+                let node = this._createUINode(layoutOptions, formLogic, formData);
                 if (callback)
-                    callback()
+                    callback(node)
             }
         }
     }

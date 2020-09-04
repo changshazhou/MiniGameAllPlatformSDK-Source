@@ -8,7 +8,17 @@
 <script src="./moosnow.platform.ui.js"></script>
 
 <script>
+    moosnow.http.getAllConfig(res => {
+        console.log('res', res)
+    })
+    moosnow.http.getMistouchPosNum(res => {
+        console.log('getMistouchPosNum res', res)
+    })
+    moosnow.http.getMisTouchNum(res => {
+        console.log('getMisTouchNum res ', res)
+    })
 
+    
     //
     moosnow.form.initCheckboxState(true, (isChecked) => {
         console.log('moosnow.form.initCheckboxState', isChecked)

@@ -84,7 +84,8 @@ export default class WXModule extends PlatformModule {
             user_id: user_id,
             channel_id: channel_id,
             channel_appid: channel_appid,
-            scene, fromApp
+            scene,
+            fromApp
         }, "POST", (respone) => {
             if (respone.code == 0 && respone.data && respone.data.user_id) {
                 moosnow.data.setToken(respone.data.user_id);

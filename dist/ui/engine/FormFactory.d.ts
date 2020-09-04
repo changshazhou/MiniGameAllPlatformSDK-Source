@@ -28,6 +28,7 @@ export default class FormFactory {
     private mCachedLayoutQuene;
     get cachedLayoutQuene(): LayoutFormQuene[];
     set cachedLayoutQuene(value: LayoutFormQuene[]);
+    destory(): void;
     private addFrom2Cached;
     /**
      * 从缓存中取form
