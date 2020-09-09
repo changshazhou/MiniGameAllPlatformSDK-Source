@@ -28,9 +28,9 @@ export default class TTModule extends PlatformModule {
         this.initBanner();
         this.initRecord();
         // 
-        this.scheduleOnce(() => {
-            this.initVideo();
-        }, 1)
+        // this.scheduleOnce(() => {
+        //     this.initVideo();
+        // }, 1)
         this.bannerWidth = 208;
     }
 

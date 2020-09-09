@@ -4,15 +4,23 @@ import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 
 export default class WXAdModule extends AdModule {
 
+    private mErrorNum: number = 0;
     public getRemoteAd(cb) {
-        let url = `${ROOT_CONFIG.HTTP_ROOT}/exportConfig/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
+        let url = `${ROOT_CONFIG.HTTP_ROOT}/exportConfig/${Common.config.moosnowAppId}1.json?t=${Date.now()}`;
         moosnow.http.request(url, {}, 'GET',
             (res) => {
                 cb(res)
                 console.log('WXAdModule getRemoteAd', res)
             },
             (error) => {
-                this.repairAd(cb);
+                this.mErrorNum++;
+                if (this.mErrorNum < 4) {
+                    this.getRemoteAd(cb);
+                }
+                else {
+                    this.mErrorNum = 0;
+                    this.repairAd(cb);
+                }
                 console.log('getRemoteAd fail');
             },
             () => {

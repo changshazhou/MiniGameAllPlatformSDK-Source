@@ -110,7 +110,6 @@ export default class AdModule extends BaseModule {
     public getRemoteAd(cb) {
         cb([])
 
-
     }
 
     private cacheImage = null;
@@ -124,7 +123,7 @@ export default class AdModule extends BaseModule {
             wx.getStorage({
                 key: this.cacheKey,
                 success: function (storageVal) {
-                    this.this.cacheImage = storageVal.data;
+                    this.cacheImage = storageVal.data;
                     console.log('cacheKey data  ', storageVal.data)
                 },
                 fail: () => {

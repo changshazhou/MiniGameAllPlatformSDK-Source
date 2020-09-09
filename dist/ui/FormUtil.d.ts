@@ -8,9 +8,11 @@ import showPauseOptions from "../model/showPauseOptions";
 import showTryOptions from "../model/showTryOptions";
 import showSetOptions from "../model/showSetOptions";
 import showBoxOptions from "../model/showBoxOptions";
+import showAdOptions from "../model/showAdOptions";
 import loadAdOptions from "../model/loadAdOptions";
 import FormFactory from "./engine/FormFactory";
 import showNativeOptions from "../model/showNativeOptions";
+import vectory from "../../dist/model/Vectory";
 import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
 import CheckboxComponent from "./cocos/common/CheckboxComponent";
@@ -60,7 +62,12 @@ export default class FormUtil {
      * @param templetes  层级
      * @param zIndex  层级
      */
-    showAd(adType: number, callback: Function, points?: Array<cc.Vec2>, templetes?: Array<string>, zIndex?: number): void;
+    showAd(adType: number, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex?: number, pointName?: string): void;
+    /**
+     * 显示广告
+     * @param options
+     */
+    showAd2(options: showAdOptions): void;
     hideAd(callback: Function): void;
     /**
      * 金币动画

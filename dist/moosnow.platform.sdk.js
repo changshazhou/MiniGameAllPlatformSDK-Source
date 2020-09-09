@@ -2579,7 +2579,7 @@ var mx = (function () {
                 wx.getStorage({
                     key: this.cacheKey,
                     success: function (storageVal) {
-                        this.this.cacheImage = storageVal.data;
+                        this.cacheImage = storageVal.data;
                         console.log('cacheKey data  ', storageVal.data);
                     },
                     fail: function () {
@@ -4053,16 +4053,25 @@ var mx = (function () {
     var WXAdModule = /** @class */ (function (_super) {
         __extends(WXAdModule, _super);
         function WXAdModule() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mErrorNum = 0;
+            return _this;
         }
         WXAdModule.prototype.getRemoteAd = function (cb) {
             var _this = this;
-            var url = ROOT_CONFIG.HTTP_ROOT + "/exportConfig/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
+            var url = ROOT_CONFIG.HTTP_ROOT + "/exportConfig/" + Common.config.moosnowAppId + "1.json?t=" + Date.now();
             moosnow.http.request(url, {}, 'GET', function (res) {
                 cb(res);
                 console.log('WXAdModule getRemoteAd', res);
             }, function (error) {
-                _this.repairAd(cb);
+                _this.mErrorNum++;
+                if (_this.mErrorNum < 3) {
+                    _this.getRemoteAd(cb);
+                }
+                else {
+                    _this.mErrorNum = 0;
+                    _this.repairAd(cb);
+                }
                 console.log('getRemoteAd fail');
             }, function () {
                 console.log('getRemoteAd complete');
@@ -4121,9 +4130,9 @@ var mx = (function () {
             _this.initBanner();
             _this.initRecord();
             // 
-            _this.scheduleOnce(function () {
-                _this.initVideo();
-            }, 1);
+            // this.scheduleOnce(() => {
+            //     this.initVideo();
+            // }, 1)
             _this.bannerWidth = 208;
             return _this;
         }

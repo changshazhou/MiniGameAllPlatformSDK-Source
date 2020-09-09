@@ -18,7 +18,10 @@
         console.log('getMisTouchNum res ', res)
     })
 
-    
+    moosnow.ad.getAd(res => {
+        console.log('getAd res ', res)
+    })
+
     //
     moosnow.form.initCheckboxState(true, (isChecked) => {
         console.log('moosnow.form.initCheckboxState', isChecked)

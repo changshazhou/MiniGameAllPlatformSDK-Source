@@ -126,14 +126,32 @@ export default class FormUtil {
      * @param templetes  层级
      * @param zIndex  层级
      */
-    public showAd(adType: number = AD_POSITION.NONE, callback: Function, points?: Array<cc.Vec2>, templetes?: Array<string>, zIndex: number = cc.macro.MAX_ZINDEX) {
-        //
-        if (Common.platform == PlatformType.BYTEDANCE && moosnow.platform.isIphone()) {
-            console.log('头条iphone 不显示广告')
-            return;
-        }
-        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, { showAd: adType, callback, zIndex, points, templetes })
+    public showAd(adType: number = AD_POSITION.NONE, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex: number = cc.macro.MAX_ZINDEX, pointName: string = "") {
 
+        let options = new showAdOptions();
+        options.adType = adType;
+        options.zIndex = zIndex;
+        options.floatPositon = points;
+        options.floatTempletes = templetes;
+        options.pointName = pointName;
+        options.callback = callback;
+        this.showAd2(options)
+
+    }
+
+    /**
+     * 显示广告
+     * @param options 
+     */
+    public showAd2(options: showAdOptions) {
+        moosnow.event.sendEventImmediately(EventType.AD_VIEW_CHANGE, {
+            showAd: options.adType,
+            zIndex: options.zIndex,
+            points: options.floatPositon,
+            templetes: options.floatTempletes,
+            pointName: options.pointName,
+            callback: options.callback,
+        })
     }
 
 
