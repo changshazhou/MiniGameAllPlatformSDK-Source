@@ -9,6 +9,7 @@ import ViewAttribute from "../../attribute/ViewAttribute";
 import LayoutType from "../../../enum/LayoutType";
 import WidgetAttribute from "../../attribute/WidgetAttribute";
 import Common from "../../../utils/Common";
+import showFormOptions from "../../../model/showFormOptions";
 
 
 
@@ -102,19 +103,6 @@ export default class CocosFormFactory extends FormFactory {
     }
 
 
-    public hideForm(name: string, formNode: any, formData?: any) {
-        if (formNode) {
-            this.removeFormFromQuene(name, formNode, (formKV) => {
-                this.logicHide(formKV.formLogic, formKV.formNode, formData);
-            })
-        }
-        else
-            this.removeAllFormFromQuene(name, (formKV) => {
-                this.logicHide(formKV.formLogic, formKV.formNode, formData);
-            })
-    }
-
-
     private logicShow(formLogic, formNode, formData) {
         if (Common.isOnlyUI && Common.isPC) {
             console.warn('UI编辑模式，取消业务逻辑')
@@ -138,38 +126,52 @@ export default class CocosFormFactory extends FormFactory {
         (formNode as cc.Node).removeFromParent();
     }
 
-    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: (node: cc.Node) => void, remoteLayout: boolean = true, layoutOptions: any = null) {
-        if (!parent)
-            parent = CocosNodeHelper.canvasNode;
 
-        let formKV = this.getFormFromCached(name);
+    public hideForm(name: string, formNode: any, formData?: any) {
+        if (formNode) {
+            this.removeFormFromQuene(name, formNode, (formKV) => {
+                this.logicHide(formKV.formLogic, formKV.formNode, formData);
+            })
+        }
+        else
+            this.removeAllFormFromQuene(name, (formKV) => {
+                this.logicHide(formKV.formLogic, formKV.formNode, formData);
+            })
+    }
+
+    public showForm(options: showFormOptions) {
+        if (!!options.showOnce) {
+            if (this.hasFormInQuene(options.name)) {
+                return;
+            }
+        }
+        if (!options.parent)
+            options.parent = CocosNodeHelper.canvasNode;
+        let formKV = this.getFormFromCached(options.name);
         if (formKV) {
-            parent.addChild(formKV.formNode as cc.Node);
-            this.logicShow(formKV.formLogic, formKV.formNode, formData);
-            this.addForm2Quene(name, formKV.formNode, formKV.formLogic)
+            options.parent.addChild(formKV.formNode as cc.Node);
+            this.logicShow(formKV.formLogic, formKV.formNode, options.formData);
+            this.addForm2Quene(options.name, formKV.formNode, formKV.formLogic)
         }
         else {
-            if (remoteLayout) {
+            if (options.remoteLayout) {
                 this.getLayout((res) => {
-                    if (res[name]) {
-                        let formCfg = res[name];//NodeAttribute.parse(res[name]);
-                        formCfg.name = name;
-                        let node = this._createUINode(formCfg, formLogic, formData, parent);
-                        console.log('_createUINode ', Date.now())
-                        if (callback)
-                            callback(node)
+                    if (res[options.name]) {
+                        let formCfg = res[options.name];
+                        formCfg.name = options.name;
+                        let node = this._createUINode(formCfg, options.formLogic, options.formData, options.parent);
+                        if (options.callback)
+                            options.callback(node)
                     }
                 })
             }
             else {
-                let node = this._createUINode(layoutOptions, formLogic, formData);
-                if (callback)
-                    callback(node)
+                let node = this._createUINode(options.layoutOptions, options.formLogic, options.formData);
+                if (options.callback)
+                    options.callback(node)
             }
         }
     }
-
-
 
     public createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout: boolean = true, layoutOptions: any = null) {
         if (!parent)

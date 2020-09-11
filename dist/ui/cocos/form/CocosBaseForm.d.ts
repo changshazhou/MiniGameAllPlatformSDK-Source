@@ -6,6 +6,7 @@ export default class CocosBaseForm extends BaseForm {
     private mDowning;
     private mClickQuene;
     getClickQueneItem(e: cc.Event.EventTouch): clickQueneItem;
+    setClickQueneItem(e: any, clicking: any): void;
     private onTouchStart;
     private onTouchEnd;
     private onTouchCancel;

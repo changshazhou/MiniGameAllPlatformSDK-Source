@@ -69,12 +69,15 @@ export default class CocosAdViewItem extends CocosBaseForm {
         let openAd = this.mAdItem
         if (this.FormData && this.FormData.refresh) {
             let nextAd = this.findNextAd();
-            if (nextAd.refresh)
-                moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
-                    current: openAd,
-                    next: nextAd
-                })
-            this.refreshImg(nextAd);
+            if (nextAd) {
+                if (nextAd.refresh)
+                    moosnow.event.sendEventImmediately(EventType.AD_VIEW_REFRESH, {
+                        current: openAd,
+                        next: nextAd
+                    })
+                this.refreshImg(nextAd);
+            }
+
         }
         moosnow.platform.navigate2Mini(openAd, () => { }, () => {
             if (this.mAdItem && this.mAdItem.onCancel)

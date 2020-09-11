@@ -2,6 +2,7 @@ import BaseForm from "./BaseForm";
 import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
 import Common from "../../utils/Common";
 import NodeAttribute from "../attribute/NodeAttribute";
+import showFormOptions from "../../model/showFormOptions";
 
 /**
  * UI节点和逻辑
@@ -90,8 +91,9 @@ export default class FormFactory {
             item.quene.push(formKV)
             this.cachedLayoutQuene.push(item);
         }
-
     }
+
+
 
     /**
      * 从缓存中取form
@@ -145,9 +147,20 @@ export default class FormFactory {
             quene.quene.push(kv)
             this.layoutQuene.push(quene);
         }
-
-        // console.log('addForm2Quene 2 ', this._FormQuene)
     }
+    public hasFormInQuene(name: string): boolean {
+        let idx = -1;
+        for (let i = 0; i < this.layoutQuene.length; i++) {
+            let item = this.layoutQuene[i];
+            if (item.formName == name) {
+                idx = i
+                break;
+            }
+        }
+        return idx != -1
+    }
+
+
     /**
      * 根据逻辑类回收
      * @param item 
@@ -321,7 +334,7 @@ export default class FormFactory {
         })
     }
 
-    public showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: Function, remoteLayout: boolean = true, layoutOptions: any = null) {
+    public showForm(options: showFormOptions) {
 
     }
 

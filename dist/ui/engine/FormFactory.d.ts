@@ -1,4 +1,5 @@
 import BaseForm from "./BaseForm";
+import showFormOptions from "../../model/showFormOptions";
 /**
  * UI节点和逻辑
  */
@@ -42,6 +43,7 @@ export default class FormFactory {
      * @param formLogic
      */
     addForm2Quene(name: string, formNode: cc.Node | Laya.Node, formLogic?: BaseForm): void;
+    hasFormInQuene(name: string): boolean;
     /**
      * 根据逻辑类回收
      * @param item
@@ -86,7 +88,7 @@ export default class FormFactory {
     private mCachedTemplates;
     getTemplates(callback: (attr: any) => void): void;
     getTemplate(tempName: string, callback?: Function): void;
-    showForm(name: string, formLogic?: typeof BaseForm, formData?: any, parent?: cc.Node, callback?: Function, remoteLayout?: boolean, layoutOptions?: any): void;
+    showForm(options: showFormOptions): void;
     hideFormByLogic(logic: any, callback?: (formKV: any) => void): void;
     hideForm(name: string, formNode: any, formData?: any): void;
     createNodeByTemplate(name: string, tempLogic?: any, tempData?: any, parent?: cc.Node, remoteLayout?: boolean, layoutOptions?: any): void;

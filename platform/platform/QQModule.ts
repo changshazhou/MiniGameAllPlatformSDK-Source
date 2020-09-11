@@ -167,7 +167,6 @@ export default class QQModule extends PlatformModule {
             if (promise) {
                 promise
                     .then(() => {
-
                         console.log('destroy successfully ', promise)
                         this.box = null;
                         if (Common.isFunction(callback))

@@ -45,11 +45,17 @@ export default class CocosBaseForm extends BaseForm {
         else
             return null
     }
+
+    public setClickQueneItem(e, clicking) {
+        let queneId = e.getCurrentTarget().uuid;
+        if (this.mClickQuene[queneId])
+            this.mClickQuene[queneId].clicking = clicking
+    }
+
     private onTouchStart(e: cc.Event.EventTouch) {
         let quene = this.getClickQueneItem(e);
         if (!quene) return;
         if (quene.once && quene.clicking) return;
-        console.log('onMouseDown')
         moosnow.audio.playClickEffect();
         this.downAnim(quene.node)
         if (this.mDowning)
@@ -61,10 +67,12 @@ export default class CocosBaseForm extends BaseForm {
         let quene = this.getClickQueneItem(e);
         if (!quene) return;
         if (quene.once && quene.clicking) return;
-        console.log('onMouseUp')
+        this.setClickQueneItem(e, true)
+        console.log('onTouchEnd')
         this.upAnim(quene.node, () => {
             if (quene && quene.callback)
                 quene.callback();
+            this.setClickQueneItem(e, false);
         })
         if (quene && quene.stopPropagation)
             e.stopPropagation();
@@ -73,8 +81,11 @@ export default class CocosBaseForm extends BaseForm {
     private onTouchCancel(e: cc.Event.EventTouch) {
         let quene = this.getClickQueneItem(e);
         if (!quene) return;
-        if (quene.once && quene.clicking) return;
-        this.upAnim(quene.node)
+        // if (quene.once && quene.clicking) return;
+        console.log('onTouchCancel')
+        this.upAnim(quene.node, () => {
+            this.setClickQueneItem(e, false);
+        })
     }
 
     /**

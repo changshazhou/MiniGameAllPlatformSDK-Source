@@ -4065,7 +4065,7 @@ var mx = (function () {
                 console.log('WXAdModule getRemoteAd', res);
             }, function (error) {
                 _this.mErrorNum++;
-                if (_this.mErrorNum < 3) {
+                if (_this.mErrorNum < 4) {
                     _this.getRemoteAd(cb);
                 }
                 else {
@@ -4130,9 +4130,9 @@ var mx = (function () {
             _this.initBanner();
             _this.initRecord();
             // 
-            // this.scheduleOnce(() => {
-            //     this.initVideo();
-            // }, 1)
+            _this.scheduleOnce(function () {
+                _this.initVideo();
+            }, 1);
             _this.bannerWidth = 208;
             return _this;
         }

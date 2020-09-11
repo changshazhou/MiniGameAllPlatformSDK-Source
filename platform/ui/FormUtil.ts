@@ -42,6 +42,7 @@ import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
 import CocosFailForm from "./cocos/form/CocosFailForm";
 import CheckboxComponent from "./cocos/common/CheckboxComponent";
+import showFormOptions from "../model/showFormOptions";
 
 /**
  * 广告结果
@@ -102,20 +103,20 @@ export default class FormUtil {
      * @param msg  消息内容
      */
     public showToast(msg: string) {
-        this.formFactory.showForm(FormLayout.ToastForm, CocosToastForm, msg)
+        this.formFactory.showForm(new showFormOptions(FormLayout.ToastForm, CocosToastForm, msg))
     }
 
 
     public showNativeAd(options: showNativeOptions) {
-        this.formFactory.showForm(FormLayout.NativeForm, CocosNativeForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.NativeForm, CocosNativeForm, options))
     }
-
+    
     public loadAd(options: loadAdOptions) {
-
-        this.formFactory.showForm(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options }, null, (node: cc.Node) => {
+        let formOptions = new showFormOptions(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options });
+        formOptions.callback = (node: cc.Node) => {
             console.log('create ad form')
-            // cc.game.addPersistRootNode(node);
-        })
+        }
+        this.formFactory.showForm(formOptions)
     }
 
     /**
@@ -172,7 +173,7 @@ export default class FormUtil {
      * @param options 
      */
     public showMistouch(options: showMistouchOptions) {
-        this.formFactory.showForm(FormLayout.MistouchForm, CocosMistouchForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.MistouchForm, CocosMistouchForm, options))
     }
     /**
      * 显示奖励
@@ -182,7 +183,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showPrize(options: showPrizeOptions) {
-        this.formFactory.showForm(FormLayout.PrizeForm, CocosPrizeForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.PrizeForm, CocosPrizeForm, options))
     }
 
 
@@ -193,7 +194,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showTotal(options: showTotalOptions) {
-        this.formFactory.showForm(FormLayout.TotalForm, CocosTotalForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.TotalForm, CocosTotalForm, options))
     }
 
 
@@ -203,7 +204,7 @@ export default class FormUtil {
     * @param callback 
     */
     public showEnd(options: showEndOptions) {
-        this.formFactory.showForm(FormLayout.EndForm, CocosEndForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.EndForm, CocosEndForm, options))
     }
 
     /**
@@ -212,7 +213,7 @@ export default class FormUtil {
         * @param callback 
         */
     public showRespawn(options: showRespawnOptions) {
-        this.formFactory.showForm(FormLayout.RespawnForm, CocosRespawnForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.RespawnForm, CocosRespawnForm, options))
     }
     /**
      * 显示失败页面
@@ -220,7 +221,7 @@ export default class FormUtil {
      * @param callback 
      */
     public showFail(options: showFailOptions) {
-        this.formFactory.showForm(FormLayout.FailForm, CocosFailForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.FailForm, CocosFailForm, options))
     }
     /**
       * 显示结算统计页
@@ -228,35 +229,35 @@ export default class FormUtil {
       * @param callback 
       */
     public showPause(options: showPauseOptions) {
-        this.formFactory.showForm(FormLayout.PauseForm, CocosPauseForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.PauseForm, CocosPauseForm, options))
     }
 
     /**
      *  showShare
      */
     public showShare(options: showShareOptions) {
-        this.formFactory.showForm(FormLayout.ShareForm, CocosShareForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.ShareForm, CocosShareForm, options))
     }
 
     /**
     *  showShare
     */
     public showTry(options: showTryOptions) {
-        this.formFactory.showForm(FormLayout.TryForm, CocosTryForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.TryForm, CocosTryForm, options))
     }
 
     /**
      *  showShare
      */
     public showSet(options: showSetOptions) {
-        this.formFactory.showForm(FormLayout.SetForm, CocosSetForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.SetForm, CocosSetForm, options))
     }
 
     /**
         *  showShare
         */
     public showBox(options: showBoxOptions) {
-        this.formFactory.showForm(FormLayout.BoxForm, CocosBoxForm, options)
+        this.formFactory.showForm(new showFormOptions(FormLayout.BoxForm, CocosBoxForm, options))
     }
 
     /**
@@ -264,7 +265,7 @@ export default class FormUtil {
      * @param formName FormLayout 中的枚举值或者 字符串
      */
     public createForm(formName: string) {
-        this.formFactory.showForm(formName, CocosBaseForm, {})
+        this.formFactory.showForm(new showFormOptions(formName, CocosBaseForm, {}))
     }
     /**
      * 隐藏窗体  
