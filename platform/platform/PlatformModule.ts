@@ -352,6 +352,7 @@ export default class PlatformModule extends BaseModule {
             //     success();
             return;
         }
+        let launchOption = this.getLaunchOption();
         let { appid, path, extraData } = row;
         extraData = extraData || {};
         moosnow.http.navigate(appid, (res) => {
@@ -363,7 +364,8 @@ export default class PlatformModule extends BaseModule {
                     moosnow.http.point("跳转", {
                         position: row.position,
                         appid,
-                        img: row.atlas || row.img
+                        img: row.atlas || row.img,
+                        scene: launchOption.scene
                     })
                     moosnow.http.navigateEnd(res.code)
                     moosnow.http.exportUser();
@@ -806,7 +808,12 @@ export default class PlatformModule extends BaseModule {
     }
     //-----------------录屏 具体逻辑在子类实现------------------
     public initRecord() { }
-    public clipRecord() { }
+    /**
+     * 裁剪视频
+     * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+     * @param callback 剪切完成时回调
+     */
+    public clipRecord(timeRange: Array<number> = [2, 2], callback: (res: any) => void) { };
     /**
      * 开始录屏
      * @param duration 录屏时长

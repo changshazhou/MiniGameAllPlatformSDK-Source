@@ -1120,6 +1120,7 @@ var mx = (function () {
                 //     success();
                 return;
             }
+            var launchOption = this.getLaunchOption();
             var appid = row.appid, path = row.path, extraData = row.extraData;
             extraData = extraData || {};
             moosnow.http.navigate(appid, function (res) {
@@ -1131,7 +1132,8 @@ var mx = (function () {
                         moosnow.http.point("跳转", {
                             position: row.position,
                             appid: appid,
-                            img: row.atlas || row.img
+                            img: row.atlas || row.img,
+                            scene: launchOption.scene
                         });
                         moosnow.http.navigateEnd(res.code);
                         moosnow.http.exportUser();
@@ -1573,7 +1575,15 @@ var mx = (function () {
         };
         //-----------------录屏 具体逻辑在子类实现------------------
         PlatformModule.prototype.initRecord = function () { };
-        PlatformModule.prototype.clipRecord = function () { };
+        /**
+         * 裁剪视频
+         * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+         * @param callback 剪切完成时回调
+         */
+        PlatformModule.prototype.clipRecord = function (timeRange, callback) {
+            if (timeRange === void 0) { timeRange = [2, 2]; }
+        };
+        ;
         /**
          * 开始录屏
          * @param duration 录屏时长
@@ -4059,7 +4069,7 @@ var mx = (function () {
         }
         WXAdModule.prototype.getRemoteAd = function (cb) {
             var _this = this;
-            var url = ROOT_CONFIG.HTTP_ROOT + "/exportConfig/" + Common.config.moosnowAppId + "1.json?t=" + Date.now();
+            var url = ROOT_CONFIG.HTTP_ROOT + "/exportConfig/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
             moosnow.http.request(url, {}, 'GET', function (res) {
                 cb(res);
                 console.log('WXAdModule getRemoteAd', res);
@@ -4205,15 +4215,23 @@ var mx = (function () {
             // if (!this.isDouyin()) return;
             this.recordObj = window[this.platformName].getGameRecorderManager();
         };
-        TTModule.prototype.clipRecord = function () {
+        /**
+         * 裁剪视频
+         * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+         * @param callback 剪切完成时回调
+         */
+        TTModule.prototype.clipRecord = function (timeRange, callback) {
+            if (timeRange === void 0) { timeRange = [2, 2]; }
             if (!this.recordObj)
                 return;
             this.recordNumber++;
             console.log('clipRecord', this.recordNumber);
             this.recordObj.recordClip({
-                timeRange: [2, 2],
+                timeRange: timeRange,
                 success: function (r) {
                     console.log('clipRecord 成功 ', r);
+                    if (Common.isFunction(callback))
+                        callback(r);
                 }
             });
         };
@@ -4243,7 +4261,7 @@ var mx = (function () {
             var recordRes = this.recordRes;
             this.recordObj.onStop(function (res) {
                 console.log('on stop ', res);
-                if (_this.recordNumber >= 4) {
+                if (_this.recordNumber >= 1) {
                     _this.recordObj.clipVideo({
                         path: res.videoPath,
                         success: function (r) {

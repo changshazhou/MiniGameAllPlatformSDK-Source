@@ -6,7 +6,7 @@ export default class WXAdModule extends AdModule {
 
     private mErrorNum: number = 0;
     public getRemoteAd(cb) {
-        let url = `${ROOT_CONFIG.HTTP_ROOT}/exportConfig/${Common.config.moosnowAppId}1.json?t=${Date.now()}`;
+        let url = `${ROOT_CONFIG.HTTP_ROOT}/exportConfig/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
         moosnow.http.request(url, {}, 'GET',
             (res) => {
                 cb(res)

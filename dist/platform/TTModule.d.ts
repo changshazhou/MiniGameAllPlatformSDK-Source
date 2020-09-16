@@ -12,7 +12,12 @@ export default class TTModule extends PlatformModule {
     showInter(): void;
     _bottomCenterBanner(size: any): void;
     initRecord(): void;
-    clipRecord(): void;
+    /**
+     * 裁剪视频
+     * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+     * @param callback 剪切完成时回调
+     */
+    clipRecord(timeRange: Array<number>, callback: (res: any) => void): void;
     /**
      * 开始录屏
      * @param duration 录屏时长

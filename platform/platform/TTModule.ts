@@ -101,15 +101,21 @@ export default class TTModule extends PlatformModule {
         // if (!this.isDouyin()) return;
         this.recordObj = window[this.platformName].getGameRecorderManager();
     }
-
-    public clipRecord() {
+    /**
+     * 裁剪视频
+     * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+     * @param callback 剪切完成时回调
+     */
+    public clipRecord(timeRange: Array<number> = [2, 2], callback: (res: any) => void) {
         if (!this.recordObj) return;
         this.recordNumber++;
         console.log('clipRecord', this.recordNumber)
         this.recordObj.recordClip({
-            timeRange: [2, 2],
+            timeRange: timeRange,
             success: (r) => {
                 console.log('clipRecord 成功 ', r)
+                if (Common.isFunction(callback))
+                    callback(r)
             }
         })
     }
@@ -140,7 +146,7 @@ export default class TTModule extends PlatformModule {
         let recordRes = this.recordRes
         this.recordObj.onStop(res => {
             console.log('on stop ', res)
-            if (this.recordNumber >= 4) {
+            if (this.recordNumber >= 1) {
                 this.recordObj.clipVideo({
                     path: res.videoPath,
                     success: (r) => {
