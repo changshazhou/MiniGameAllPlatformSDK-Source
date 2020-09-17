@@ -434,13 +434,13 @@ var mx = (function () {
                         if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
                             this.mPlatform = PlatformType.VIVO;
                         }
-                        else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                        else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                             this.mPlatform = PlatformType.OPPO_ZS;
                         else {
                             this.mPlatform = PlatformType.OPPO;
                         }
                     }
-                    else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                    else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                         this.mPlatform = PlatformType.OPPO_ZS;
                     else {
                         this.mPlatform = PlatformType.OPPO;
