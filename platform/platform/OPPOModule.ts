@@ -676,4 +676,39 @@ export default class OPPOModule extends PlatformModule {
                 this.mClickedNativeCallback();
         }
     }
+
+
+    public hasShortcutInstalled(success: (has) => void) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].hasShortcutInstalled) return;
+        window[this.platformName].hasShortcutInstalled({
+            success: (status) => {
+                if (success)
+                    success(!!status)
+                if (status) {
+                    console.log('已创建')
+                } else {
+                    console.log('未创建')
+                }
+            }
+        })
+    }
+    public installShortcut(success: () => void, message: string = "方便下次快速启动") {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].installShortcut) return;
+        window[this.platformName].installShortcut({
+            message,
+            success: (status) => {
+                if (success)
+                    success()
+                console.log('创建成功')
+            }
+        })
+    }
+
+    public exitApplication() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].exitApplication) return;
+        window[this.platformName].exitApplication();
+    }
 }

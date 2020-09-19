@@ -3829,6 +3829,46 @@ var mx = (function () {
                     this.mClickedNativeCallback();
             }
         };
+        OPPOModule.prototype.hasShortcutInstalled = function (success) {
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].hasShortcutInstalled)
+                return;
+            window[this.platformName].hasShortcutInstalled({
+                success: function (status) {
+                    if (success)
+                        success(!!status);
+                    if (status) {
+                        console.log('已创建');
+                    }
+                    else {
+                        console.log('未创建');
+                    }
+                }
+            });
+        };
+        OPPOModule.prototype.installShortcut = function (success, message) {
+            if (message === void 0) { message = "方便下次快速启动"; }
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].installShortcut)
+                return;
+            window[this.platformName].installShortcut({
+                message: message,
+                success: function (status) {
+                    if (success)
+                        success();
+                    console.log('创建成功');
+                }
+            });
+        };
+        OPPOModule.prototype.exitApplication = function () {
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].exitApplication)
+                return;
+            window[this.platformName].exitApplication();
+        };
         return OPPOModule;
     }(PlatformModule));
 
