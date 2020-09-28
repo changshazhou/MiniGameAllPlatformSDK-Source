@@ -10,6 +10,12 @@ import ScrollAttribute from "../../attribute/ScrollAttribute";
 import WidgetAttribute from "../../attribute/WidgetAttribute";
 import Common from "../../../utils/Common";
 
+export class ChangeQuene {
+    public node: cc.Sprite;
+    public imgCfg: NodeAttribute;
+    public callback: () => void
+}
+
 export default class CocosNodeHelper extends NodeHelper {
 
     public static mRootNode: cc.Node
@@ -224,15 +230,70 @@ export default class CocosNodeHelper extends NodeHelper {
         return view;
     }
 
+    private static srcQuene: Array<ChangeQuene> = [];
 
-    public static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: Function) {
+    private static addToSrcQuene(image: cc.Sprite, imgCfg: NodeAttribute, callback?: () => void) {
+        let existsCall: boolean = false;
+        for (let i = 0; i < this.srcQuene.length; i++) {
+            if (this.srcQuene[i].node == image) {
+                existsCall = true;
+                this.srcQuene[i] = {
+                    node: image,
+                    imgCfg,
+                    callback
+                }
+                break;
+            }
+        }
+        if (!existsCall) {
+            this.srcQuene.push({
+                node: image,
+                imgCfg,
+                callback
+            })
+        }
+    }
+
+    private static getSrcQuene(image: cc.Sprite): ChangeQuene {
+        let retValue = null;
+        for (let i = 0; i < this.srcQuene.length; i++) {
+            if (this.srcQuene[i].node == image) {
+                retValue = this.srcQuene[i]
+                break;
+            }
+        }
+        return retValue;
+    }
+
+
+    private static applySrcQuene(image: cc.Sprite, tex: cc.Texture2D, imgCfg: NodeAttribute) {
+        let queneItem = this.getSrcQuene(image);
+        if (queneItem && queneItem.imgCfg == imgCfg) {
+            this.updateSprite(image, tex);
+            this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
+            this.schedule(this.checkSize, 0.16, [image, imgCfg.width, imgCfg.height])
+            this.setSpriteGrid(queneItem.imgCfg, image);
+            this.clearSrcQuene(image)
+
+        }
+    }
+
+    private static clearSrcQuene(image: cc.Sprite) {
+        for (let i = 0; i < this.srcQuene.length; i++) {
+            if (this.srcQuene[i].node == image) {
+                this.srcQuene.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    public static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: () => void) {
         let sprite;
         if (image instanceof cc.Node)
             sprite = image.getComponent(cc.Sprite);
         else
             sprite = image;
-        // if (imgCfg.name == "bg")
-        //     debugger
+        this.addToSrcQuene(sprite, imgCfg, callback);
         if (imgCfg.url) {
             let isRemote = imgCfg.url.indexOf("http") != -1;
             if (isRemote)
@@ -241,34 +302,18 @@ export default class CocosNodeHelper extends NodeHelper {
                         console.log(' cc.loader.load ', err)
                         return;
                     }
-                    this.updateSprite(sprite, tex);
-                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                    // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
-                    this.setSpriteGrid(imgCfg, sprite);
-                    if (callback)
-                        callback();
+                    this.applySrcQuene(sprite, tex, imgCfg);
                 });
             else {
-                let res = cc.loader.getRes(imgCfg.url, cc.SpriteFrame);
+                let res = cc.loader.getRes(imgCfg.url);
                 if (res) {
-                    sprite.spriteFrame = res;
-                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                    if (callback) {
-                        callback();
-                    }
+                    this.applySrcQuene(sprite, res, imgCfg);
                     return;
                 }
-                cc.loader.loadRes(imgCfg.url, cc.SpriteFrame, function (err, asset) {
-                    sprite.spriteFrame = res;
-                    this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                    if (callback) {
-                        callback();
-                    }
+                cc.loader.loadRes(imgCfg.url, cc.Texture2D, (err, tex) => {
+                    this.applySrcQuene(sprite, tex, imgCfg);
                 });
             }
-
-
-            // }
         }
     }
     private static updateSprite(sprite: cc.Sprite, tex: cc.Texture2D) {

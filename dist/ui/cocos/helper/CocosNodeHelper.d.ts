@@ -6,6 +6,11 @@ import LayoutAttribute from "../../attribute/LayoutAttribute";
 import ProgressBarAttribute from "../../attribute/ProgressBarAttribute";
 import ScrollAttribute from "../../attribute/ScrollAttribute";
 import WidgetAttribute from "../../attribute/WidgetAttribute";
+export declare class ChangeQuene {
+    node: cc.Sprite;
+    imgCfg: NodeAttribute;
+    callback: () => void;
+}
 export default class CocosNodeHelper extends NodeHelper {
     static mRootNode: cc.Node;
     static get canvasNode(): cc.Node;
@@ -26,7 +31,12 @@ export default class CocosNodeHelper extends NodeHelper {
         layoutNode: cc.Node;
     };
     static createWidget(view: cc.Node, widgetCfg: WidgetAttribute): cc.Node;
-    static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: Function): void;
+    private static srcQuene;
+    private static addToSrcQuene;
+    private static getSrcQuene;
+    private static applySrcQuene;
+    private static clearSrcQuene;
+    static changeSrc(image: cc.Node | cc.Sprite, imgCfg: NodeAttribute, callback?: () => void): void;
     private static updateSprite;
     private static checkSize;
     static setSpriteGrid(imgCfg: NodeAttribute, sprite: cc.Sprite): void;

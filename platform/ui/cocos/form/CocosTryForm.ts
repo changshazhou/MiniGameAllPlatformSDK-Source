@@ -48,7 +48,7 @@ export default class CocosTryForm extends CocosBaseForm {
 
     public onShow(data) {
         super.onShow(data);
-        CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl } as NodeAttribute);
+        CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl, width: this.logo.width, height: this.logo.height } as NodeAttribute);
         this.addListener();
     }
 

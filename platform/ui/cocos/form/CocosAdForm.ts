@@ -386,10 +386,7 @@ export default class CocosAdForm extends CocosBaseForm {
             templetes.forEach(templeteName => {
                 moosnow.form.formFactory.getKVsByName(templeteName).forEach(kv => {
                     if (kv.formNode == floatNode) {
-                        if (kv.formLogic.FormData.index < this.mAdData.indexLeft.length - 1)
-                            kv.formLogic.FormData.index++;
-                        else
-                            kv.formLogic.FormData.index = 0;
+                        kv.formLogic.FormData.index = (kv.formLogic.FormData.index + this.floatContainer.childrenCount) % (this.mAdData.indexLeft.length - 1)
                         let logic = (kv.formLogic as any) as CocosAdViewItem
                         logic.refreshImg({ ...this.mAdData.indexLeft[kv.formLogic.FormData.index], onCancel: kv.formLogic.FormData.onCancel });
                     }

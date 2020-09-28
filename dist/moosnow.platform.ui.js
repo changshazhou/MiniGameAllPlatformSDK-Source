@@ -487,13 +487,13 @@ var mx = (function () {
                         if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
                             this.mPlatform = PlatformType.VIVO;
                         }
-                        else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                        else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                             this.mPlatform = PlatformType.OPPO_ZS;
                         else {
                             this.mPlatform = PlatformType.OPPO;
                         }
                     }
-                    else if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                    else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                         this.mPlatform = PlatformType.OPPO_ZS;
                     else {
                         this.mPlatform = PlatformType.OPPO;
@@ -1419,6 +1419,11 @@ var mx = (function () {
         return WidgetAttribute;
     }(NodeAttribute));
 
+    var ChangeQuene = /** @class */ (function () {
+        function ChangeQuene() {
+        }
+        return ChangeQuene;
+    }());
     var CocosNodeHelper = /** @class */ (function (_super) {
         __extends(CocosNodeHelper, _super);
         function CocosNodeHelper() {
@@ -1597,6 +1602,55 @@ var mx = (function () {
             // }
             return view;
         };
+        CocosNodeHelper.addToSrcQuene = function (image, imgCfg, callback) {
+            var existsCall = false;
+            for (var i = 0; i < this.srcQuene.length; i++) {
+                if (this.srcQuene[i].node == image) {
+                    existsCall = true;
+                    this.srcQuene[i] = {
+                        node: image,
+                        imgCfg: imgCfg,
+                        callback: callback
+                    };
+                    break;
+                }
+            }
+            if (!existsCall) {
+                this.srcQuene.push({
+                    node: image,
+                    imgCfg: imgCfg,
+                    callback: callback
+                });
+            }
+        };
+        CocosNodeHelper.getSrcQuene = function (image) {
+            var retValue = null;
+            for (var i = 0; i < this.srcQuene.length; i++) {
+                if (this.srcQuene[i].node == image) {
+                    retValue = this.srcQuene[i];
+                    break;
+                }
+            }
+            return retValue;
+        };
+        CocosNodeHelper.applySrcQuene = function (image, tex, imgCfg) {
+            var queneItem = this.getSrcQuene(image);
+            if (queneItem && queneItem.imgCfg == imgCfg) {
+                this.updateSprite(image, tex);
+                this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
+                this.schedule(this.checkSize, 0.16, [image, imgCfg.width, imgCfg.height]);
+                this.setSpriteGrid(queneItem.imgCfg, image);
+                this.clearSrcQuene(image);
+            }
+        };
+        CocosNodeHelper.clearSrcQuene = function (image) {
+            for (var i = 0; i < this.srcQuene.length; i++) {
+                if (this.srcQuene[i].node == image) {
+                    this.srcQuene.splice(i, 1);
+                    i--;
+                }
+            }
+        };
         CocosNodeHelper.changeSrc = function (image, imgCfg, callback) {
             var _this = this;
             var sprite;
@@ -1604,8 +1658,7 @@ var mx = (function () {
                 sprite = image.getComponent(cc.Sprite);
             else
                 sprite = image;
-            // if (imgCfg.name == "bg")
-            //     debugger
+            this.addToSrcQuene(sprite, imgCfg, callback);
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
                 if (isRemote)
@@ -1614,32 +1667,18 @@ var mx = (function () {
                             console.log(' cc.loader.load ', err);
                             return;
                         }
-                        _this.updateSprite(sprite, tex);
-                        _this.checkSize(sprite, _this.convertWidth(imgCfg.width), _this.convertHeight(imgCfg.height));
-                        // this.schedule(this.checkSize, 0.16, [sprite, imgCfg.width, imgCfg.height])
-                        _this.setSpriteGrid(imgCfg, sprite);
-                        if (callback)
-                            callback();
+                        _this.applySrcQuene(sprite, tex, imgCfg);
                     });
                 else {
-                    var res_1 = cc.loader.getRes(imgCfg.url, cc.SpriteFrame);
-                    if (res_1) {
-                        sprite.spriteFrame = res_1;
-                        this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                        if (callback) {
-                            callback();
-                        }
+                    var res = cc.loader.getRes(imgCfg.url);
+                    if (res) {
+                        this.applySrcQuene(sprite, res, imgCfg);
                         return;
                     }
-                    cc.loader.loadRes(imgCfg.url, cc.SpriteFrame, function (err, asset) {
-                        sprite.spriteFrame = res_1;
-                        this.checkSize(sprite, this.convertWidth(imgCfg.width), this.convertHeight(imgCfg.height));
-                        if (callback) {
-                            callback();
-                        }
+                    cc.loader.loadRes(imgCfg.url, cc.Texture2D, function (err, tex) {
+                        _this.applySrcQuene(sprite, tex, imgCfg);
                     });
                 }
-                // }
             }
         };
         CocosNodeHelper.updateSprite = function (sprite, tex) {
@@ -1749,6 +1788,7 @@ var mx = (function () {
             }
             return 0;
         };
+        CocosNodeHelper.srcQuene = [];
         return CocosNodeHelper;
     }(NodeHelper));
 
@@ -2591,7 +2631,7 @@ var mx = (function () {
         };
         CocosTryForm.prototype.onShow = function (data) {
             _super.prototype.onShow.call(this, data);
-            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl });
+            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.skinUrl, width: this.logo.width, height: this.logo.height });
             this.addListener();
         };
         CocosTryForm.prototype.onHide = function (data) {
@@ -3060,6 +3100,7 @@ var mx = (function () {
             this.addEvent();
             this.schedule(this.subProgress, 0.1);
             moosnow.form.showAd(AD_POSITION.NONE, null);
+            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.url, width: this.logo.width, height: this.logo.height });
             this.mBannerShow = false;
             moosnow.http.getAllConfig(function (res) {
                 _this.mBannerClickType = res.bannerClickType;
@@ -3083,6 +3124,7 @@ var mx = (function () {
                 this.unschedule(this.resetProgress);
                 moosnow.platform.hideBanner();
                 this.mBannerShow = false;
+                this.hideForm();
                 if (this.FormData && this.FormData.callback)
                     this.FormData.callback();
             }
@@ -3167,7 +3209,7 @@ var mx = (function () {
             var _this = this;
             var _a = this.logo, width = _a.width, height = _a.height;
             // console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
-            CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img }, function () {
+            CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img, width: width, height: height }, function () {
                 // console.log('logo complete 2 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
                 _this.logo.width = width;
                 _this.logo.height = height;
@@ -3569,10 +3611,7 @@ var mx = (function () {
                 templetes.forEach(function (templeteName) {
                     moosnow.form.formFactory.getKVsByName(templeteName).forEach(function (kv) {
                         if (kv.formNode == floatNode) {
-                            if (kv.formLogic.FormData.index < _this.mAdData.indexLeft.length - 1)
-                                kv.formLogic.FormData.index++;
-                            else
-                                kv.formLogic.FormData.index = 0;
+                            kv.formLogic.FormData.index = (kv.formLogic.FormData.index + _this.floatContainer.childrenCount) % (_this.mAdData.indexLeft.length - 1);
                             var logic = kv.formLogic;
                             logic.refreshImg(__assign(__assign({}, _this.mAdData.indexLeft[kv.formLogic.FormData.index]), { onCancel: kv.formLogic.FormData.onCancel }));
                         }
@@ -3995,7 +4034,7 @@ var mx = (function () {
             this.mTotalSecond = 10;
             this.mCurrentSecond = 0;
             if (this.FormData && this.FormData.logo)
-                CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo });
+                CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo, width: this.logo.width, height: this.logo.height });
             this.resumeCountdown();
             moosnow.platform.showBanner(false);
         };
@@ -4112,7 +4151,7 @@ var mx = (function () {
                         _this.baseBox.height = _this.baseBox.width * (210 / 320);
                     }
                     CocosNodeHelper.changeText(_this.txtMemo, row.desc);
-                    CocosNodeHelper.changeSrc(_this.logo, { url: row.imgUrlList[0] });
+                    CocosNodeHelper.changeSrc(_this.logo, { url: row.imgUrlList[0], width: _this.logo.width, height: _this.logo.height });
                 }
                 else {
                     if (_this.FormData && _this.FormData.nullCallback)

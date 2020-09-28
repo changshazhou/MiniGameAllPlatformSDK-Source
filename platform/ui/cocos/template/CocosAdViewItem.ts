@@ -53,7 +53,7 @@ export default class CocosAdViewItem extends CocosBaseForm {
     private updateUI() {
         let { width, height } = this.logo;
         // console.log('logo complete 1', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
-        CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img } as NodeAttribute, () => {
+        CocosNodeHelper.changeSrc(this.logo, { url: this.mAdItem.img, width, height } as NodeAttribute, () => {
             // console.log('logo complete 2 ', this.mAdItem.title, "logo ", this.logo.width, this.logo.height, "node ", this.node.width, this.node.height)
             this.logo.width = width;
             this.logo.height = height;

@@ -58,7 +58,7 @@ export default class CocosPrizeForm extends CocosBaseForm {
         this.mCurrentSecond = 0;
 
         if (this.FormData && this.FormData.logo)
-            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo } as NodeAttribute)
+            CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.logo, width: this.logo.width, height: this.logo.height } as NodeAttribute)
 
         this.resumeCountdown();
         moosnow.platform.showBanner(false);

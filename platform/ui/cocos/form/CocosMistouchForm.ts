@@ -5,6 +5,8 @@ import CocosBaseForm from "./CocosBaseForm";
 import Common from "../../../utils/Common";
 import showMistouchOptions from "../../../model/showMistouchOptions";
 import { AD_POSITION } from "../../../enum/AD_POSITION";
+import CocosNodeHelper from "../helper/CocosNodeHelper";
+import NodeAttribute from "../../attribute/NodeAttribute";
 
 export default class CocosMistouchForm extends CocosBaseForm {
 
@@ -21,6 +23,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
     public mShowTime: number = 0;
 
     public addEvent() {
+
         this.btnReceive.on(CocosNodeEvent.TOUCH_START, this.onLogoUp, this)
         this.btnReceive.on(CocosNodeEvent.TOUCH_END, this.onBannerClick, this)
     }
@@ -61,7 +64,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
         this.schedule(this.subProgress, 0.1)
         moosnow.form.showAd(AD_POSITION.NONE, null)
 
-
+        CocosNodeHelper.changeSrc(this.logo, { url: this.FormData.url, width: this.logo.width, height: this.logo.height } as NodeAttribute)
         this.mBannerShow = false;
 
         moosnow.http.getAllConfig(res => {
@@ -89,6 +92,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
             this.unschedule(this.resetProgress)
             moosnow.platform.hideBanner();
             this.mBannerShow = false;
+            this.hideForm();
             if (this.FormData && this.FormData.callback)
                 this.FormData.callback();
         }

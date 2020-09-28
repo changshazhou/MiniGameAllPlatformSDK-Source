@@ -39,7 +39,7 @@ export default class CocosNativeForm extends CocosBaseForm {
                     this.baseBox.height = this.baseBox.width * (210 / 320);
                 }
                 CocosNodeHelper.changeText(this.txtMemo, row.desc)
-                CocosNodeHelper.changeSrc(this.logo, { url: row.imgUrlList[0] } as NodeAttribute);
+                CocosNodeHelper.changeSrc(this.logo, { url: row.imgUrlList[0], width: this.logo.width, height: this.logo.height } as NodeAttribute);
 
             }
             else {
