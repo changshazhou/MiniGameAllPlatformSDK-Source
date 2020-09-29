@@ -70,7 +70,7 @@ export default class CocosMistouchForm extends CocosBaseForm {
         moosnow.http.getAllConfig(res => {
             this.mBannerClickType = res.bannerClickType
         })
-        this.schedule(this.onFwUpdate, 0.1)
+        this.schedule(this.onFwUpdate, 0.16)
 
     }
     willHide() {

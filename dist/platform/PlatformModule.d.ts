@@ -224,6 +224,7 @@ export default class PlatformModule extends BaseModule {
     _onBannerError(err: any): void;
     _bottomCenterBanner(size: any): void;
     _resetBanenrStyle(size: any): void;
+    private applyCustomStyle;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false

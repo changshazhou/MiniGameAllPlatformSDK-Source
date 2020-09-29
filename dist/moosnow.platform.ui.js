@@ -1636,9 +1636,10 @@ var mx = (function () {
         CocosNodeHelper.applySrcQuene = function (image, tex, imgCfg) {
             var queneItem = this.getSrcQuene(image);
             if (queneItem && queneItem.imgCfg == imgCfg) {
+                console.log('applySrcQuene', image.node.name, tex.url);
                 this.updateSprite(image, tex);
                 this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
-                this.schedule(this.checkSize, 0.16, [image, imgCfg.width, imgCfg.height]);
+                // this.schedule(this.checkSize, 0.16, [image, queneItem.imgCfg.width, queneItem.imgCfg.height])
                 this.setSpriteGrid(queneItem.imgCfg, image);
                 this.clearSrcQuene(image);
             }
@@ -1718,20 +1719,8 @@ var mx = (function () {
             var skin = moosnow.form.formFactory.maskUrl;
             var mask = this.createNode("img_mask");
             var sprite = mask.addComponent(cc.Sprite);
-            var widget = mask.addComponent(cc.Widget);
-            widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
-            widget.left = widget.top = widget.right = widget.bottom = 0;
             this.changeSrc(mask, { url: skin }, function () {
-                sprite.type = cc.Sprite.Type.SLICED;
-                sprite.spriteFrame.insetBottom = 1;
-                sprite.spriteFrame.insetTop = 1;
-                sprite.spriteFrame.insetLeft = 1;
-                sprite.spriteFrame.insetRight = 1;
-                mask.width = parent.width;
-                mask.height = parent.height;
             });
-            mask.width = parent.width;
-            mask.height = parent.height;
             parent.addChild(mask);
             mask.zIndex = -1;
             this.addStopPropagation(mask);
@@ -3105,7 +3094,7 @@ var mx = (function () {
             moosnow.http.getAllConfig(function (res) {
                 _this.mBannerClickType = res.bannerClickType;
             });
-            this.schedule(this.onFwUpdate, 0.1);
+            this.schedule(this.onFwUpdate, 0.16);
         };
         CocosMistouchForm.prototype.willHide = function () {
             this.unschedule(this.subProgress);

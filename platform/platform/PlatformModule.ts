@@ -986,10 +986,15 @@ export default class PlatformModule extends BaseModule {
         let windowWidth = wxsys.windowWidth;
         // let windowHeight = wxsys.windowHeight;
         // this.banner.style.height = size.height;
-        this.banner.style.left = (windowWidth - size.width) / 2;
         // this.banner.style.top = windowHeight - size.height;
         this.bannerWidth = this.banner.style.realWidth;
         this.bannerHeigth = this.banner.style.realHeight;
+
+        if (this.bannerStyle)
+            this.applyCustomStyle();
+        else
+            this.banner.style.left = (windowWidth - size.width) / 2;
+
         console.log('_bottomCenterBanner', this.banner.style)
     }
 
@@ -1011,11 +1016,17 @@ export default class PlatformModule extends BaseModule {
             top = 0;
 
         if (this.bannerStyle) {
-            this.banner.style = this.bannerStyle;
+            this.applyCustomStyle();
         }
         else {
             this.banner.style.top = top;
             console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
+        }
+    }
+
+    private applyCustomStyle() {
+        for (let key in this.bannerStyle) {
+            this.banner.style[key] = this.bannerStyle[key]
         }
     }
 

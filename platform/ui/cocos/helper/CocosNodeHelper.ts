@@ -269,12 +269,12 @@ export default class CocosNodeHelper extends NodeHelper {
     private static applySrcQuene(image: cc.Sprite, tex: cc.Texture2D, imgCfg: NodeAttribute) {
         let queneItem = this.getSrcQuene(image);
         if (queneItem && queneItem.imgCfg == imgCfg) {
+            console.log('applySrcQuene', image.node.name, tex.url)
             this.updateSprite(image, tex);
             this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
-            this.schedule(this.checkSize, 0.16, [image, imgCfg.width, imgCfg.height])
+            // this.schedule(this.checkSize, 0.16, [image, queneItem.imgCfg.width, queneItem.imgCfg.height])
             this.setSpriteGrid(queneItem.imgCfg, image);
             this.clearSrcQuene(image)
-
         }
     }
 
@@ -357,21 +357,9 @@ export default class CocosNodeHelper extends NodeHelper {
         let skin = moosnow.form.formFactory.maskUrl;
         let mask = this.createNode("img_mask");
         let sprite = mask.addComponent(cc.Sprite);
-        let widget = mask.addComponent(cc.Widget);
-        widget.isAlignLeft = widget.isAlignTop = widget.isAlignRight = widget.isAlignBottom = true;
-        widget.left = widget.top = widget.right = widget.bottom = 0;
 
         this.changeSrc(mask, { url: skin } as NodeAttribute, () => {
-            sprite.type = cc.Sprite.Type.SLICED;
-            sprite.spriteFrame.insetBottom = 1;
-            sprite.spriteFrame.insetTop = 1;
-            sprite.spriteFrame.insetLeft = 1;
-            sprite.spriteFrame.insetRight = 1;
-            mask.width = parent.width
-            mask.height = parent.height
         })
-        mask.width = parent.width
-        mask.height = parent.height
 
         parent.addChild(mask);
         mask.zIndex = -1;
