@@ -51,6 +51,7 @@ export default class CocosAdForm extends CocosBaseForm {
     private mFloatCache;
     private mAdData;
     private loadAd;
+    private onAdCancel;
     private loadNum;
     private loadManNum;
     private checkLoad;

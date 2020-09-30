@@ -92,12 +92,16 @@ export default class CocosAdForm extends CocosBaseForm {
     private mTempTempletes: Array<string>;
     private onAdChange(data) {
 
-        this.mShowAd = AD_POSITION.NONE;
         this.displayAd(false)
 
         this.mTempPoints = data && data.points ? data.points : null;
         this.mTempTempletes = data && data.templetes ? data.templetes : null;
 
+        // this.mShowAd = AD_POSITION.NONE;
+        if (!this.mShowAd) {
+            this.mShowAd = data.showAd;
+            this.mBackCall = data.callback;
+        }
         if (data.showAd != AD_POSITION.RECOVER) {
             this.mPrevShowAd = this.mShowAd;
             this.mPrevBackCall = this.mBackCall;
@@ -128,6 +132,7 @@ export default class CocosAdForm extends CocosBaseForm {
 
 
 
+
     private mFloatIndex = 0;
     private mFloatRefresh = 3;
     private mFloatCache = {};
@@ -150,6 +155,13 @@ export default class CocosAdForm extends CocosBaseForm {
             })
         }
     }
+
+    private onAdCancel() {
+        moosnow.form.showAd(AD_POSITION.EXPORT | AD_POSITION.MASK | AD_POSITION.BACK, () => {
+            moosnow.form.showAd(AD_POSITION.RECOVER, () => { })
+        })
+    }
+
     private loadNum = 0;
     private loadManNum = 3;
     private checkLoad(callback?: Function) {
@@ -302,7 +314,6 @@ export default class CocosAdForm extends CocosBaseForm {
      */
     public initFloatAd(callback?: Function) {
 
-
         if (this.mAdData.indexLeft.length == 0)
             return;
         let source = this.setPosition(this.mAdData.indexLeft, "浮动ICON", callback, true);
@@ -311,16 +322,14 @@ export default class CocosAdForm extends CocosBaseForm {
 
         let points = this.mTempPoints || this.FormData.floatPositon;
         let templetes = this.mTempTempletes || this.FormData.floatTempletes;
-
+        let showIndex = Common.randomNumBoth(0, source.length - 1);
         points.forEach((point, idx) => {
-            let showIndex = idx;
-            if (showIndex > source.length - 1)
-                showIndex = 0;
-            let adRow = source[showIndex] as any;
+            let nowIdx = (showIndex + idx) % (source.length - 1)
+            let adRow = source[nowIdx] as any;
             showIds.push({
                 appid: adRow.appid,
                 position: adRow.position,
-                index: idx
+                index: nowIdx
             })
             let templateName = templetes.length - 1 > idx ? templetes[idx] as any : templetes[0];
             console.log('initFloatAd', point.x, point.y)
@@ -538,7 +547,7 @@ export default class CocosAdForm extends CocosBaseForm {
 
         this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
 
-        this.floatContainer.active && this.initFloatAd();
+        this.floatContainer.active && this.initFloatAd(this.onAdCancel);
 
         if (!this.floatContainer.active) {
             this.removeFloatAd();
@@ -548,7 +557,7 @@ export default class CocosAdForm extends CocosBaseForm {
         this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
         this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT)
         this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
-        this.rotateContainer.active && this.initRotate();
+        this.rotateContainer.active && this.initRotate(this.initRotate);
         !this.rotateContainer.active && this.disableRotate();
         this.formMask.active = visible && this.hasAd(AD_POSITION.MASK);
         if (visible && this.hasAd(AD_POSITION.EXPORT)) {
@@ -587,11 +596,14 @@ export default class CocosAdForm extends CocosBaseForm {
     }
 
     private initBanner() {
+
+        // this.bannerContainer_layout.width = this.bannerContainer.width - 140;
+
         let layout = this.bannerContainer_layout.getComponent(cc.Layout);
         let scrollView = this.bannerContainer_scroll.getComponent(cc.ScrollView);
         layout.type = cc.Layout.Type.HORIZONTAL;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-        this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
+        this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem", this.onAdCancel);
         //控制显示广告  后续补充
     }
 
@@ -600,11 +612,11 @@ export default class CocosAdForm extends CocosBaseForm {
         let scrollView = this.topContainer_scroll.getComponent(cc.ScrollView);
         layout.type = cc.Layout.Type.HORIZONTAL;
         layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-        this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
+        this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem", this.onAdCancel);
         //控制显示广告  后续补充
     }
     private initLeftRight() {
-        let source = this.mAdData.indexLeft;
+        let source: Array<any> = Common.deepCopy(this.mAdData.indexLeft) as [];
         let endNum = source.length / 2
         let right = source.slice(0, endNum)
         let left = source.slice(endNum, source.length)
@@ -623,15 +635,18 @@ export default class CocosAdForm extends CocosBaseForm {
         let rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
         rightView.horizontal = false;
         rightView.vertical = true;
-        this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", () => { }, left);
-        this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", () => { }, right);
+
+        let newLeft = this.setPosition(left, "left", this.onAdCancel);
+        let newRight = this.setPosition(right, "right", this.onAdCancel);
+        this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", this.onAdCancel, newLeft);
+        this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", this.onAdCancel, newRight);
     }
 
     private initEnd() {
         let layout = this.endContainer_layout.getComponent(cc.Layout);
         layout.type = cc.Layout.Type.GRID;
         layout.resizeMode = cc.Layout.ResizeMode.NONE;
-        this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem");
+        this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem", this.onAdCancel);
     }
     // private disableEnd() {
     //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);

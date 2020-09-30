@@ -1636,7 +1636,7 @@ var mx = (function () {
         CocosNodeHelper.applySrcQuene = function (image, tex, imgCfg) {
             var queneItem = this.getSrcQuene(image);
             if (queneItem && queneItem.imgCfg == imgCfg) {
-                console.log('applySrcQuene', image.node.name, tex.url);
+                // console.log('applySrcQuene', image.node.name, tex.url)
                 this.updateSprite(image, tex);
                 this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
                 // this.schedule(this.checkSize, 0.16, [image, queneItem.imgCfg.width, queneItem.imgCfg.height])
@@ -3181,14 +3181,13 @@ var mx = (function () {
         CocosAdViewItem.prototype.initPosition = function (data) {
         };
         CocosAdViewItem.prototype.willShow = function (cell) {
-            var _this = this;
             _super.prototype.willShow.call(this, cell);
-            console.log('ad view item data 1 ', cell.title, this.node.x, this.node.y);
+            // console.log('ad view item data 1 ', cell.title, this.node.x, this.node.y)
             this.mAdItem = cell;
             this.addListener();
-            this.scheduleOnce(function () {
-                console.log('ad view item data 2 ', cell.title, _this.node.x, _this.node.y);
-            }, 2);
+            // this.scheduleOnce(() => {
+            //     console.log('ad view item data 2 ', cell.title, this.node.x, this.node.y)
+            // }, 2)
         };
         CocosAdViewItem.prototype.refreshImg = function (cell) {
             this.mAdItem = cell;
@@ -3353,10 +3352,14 @@ var mx = (function () {
             moosnow.event.removeListener(EventType.AD_VIEW_CHANGE, this);
         };
         CocosAdForm.prototype.onAdChange = function (data) {
-            this.mShowAd = AD_POSITION.NONE;
             this.displayAd(false);
             this.mTempPoints = data && data.points ? data.points : null;
             this.mTempTempletes = data && data.templetes ? data.templetes : null;
+            // this.mShowAd = AD_POSITION.NONE;
+            if (!this.mShowAd) {
+                this.mShowAd = data.showAd;
+                this.mBackCall = data.callback;
+            }
             if (data.showAd != AD_POSITION.RECOVER) {
                 this.mPrevShowAd = this.mShowAd;
                 this.mPrevBackCall = this.mBackCall;
@@ -3402,6 +3405,11 @@ var mx = (function () {
                     _this.checkLoad(callback);
                 });
             }
+        };
+        CocosAdForm.prototype.onAdCancel = function () {
+            moosnow.form.showAd(AD_POSITION.EXPORT | AD_POSITION.MASK | AD_POSITION.BACK, function () {
+                moosnow.form.showAd(AD_POSITION.RECOVER, function () { });
+            });
         };
         CocosAdForm.prototype.checkLoad = function (callback) {
             this.loadNum++;
@@ -3546,15 +3554,14 @@ var mx = (function () {
             var showIds = [];
             var points = this.mTempPoints || this.FormData.floatPositon;
             var templetes = this.mTempTempletes || this.FormData.floatTempletes;
+            var showIndex = Common.randomNumBoth(0, source.length - 1);
             points.forEach(function (point, idx) {
-                var showIndex = idx;
-                if (showIndex > source.length - 1)
-                    showIndex = 0;
-                var adRow = source[showIndex];
+                var nowIdx = (showIndex + idx) % (source.length - 1);
+                var adRow = source[nowIdx];
                 showIds.push({
                     appid: adRow.appid,
                     position: adRow.position,
-                    index: idx
+                    index: nowIdx
                 });
                 var templateName = templetes.length - 1 > idx ? templetes[idx] : templetes[0];
                 console.log('initFloatAd', point.x, point.y);
@@ -3735,14 +3742,14 @@ var mx = (function () {
             this.bannerContainer.active = visible && this.hasAd(AD_POSITION.BANNER);
             this.topContainer.active = visible && this.hasAd(AD_POSITION.TOP);
             this.floatContainer.active = visible && this.hasAd(AD_POSITION.FLOAT);
-            this.floatContainer.active && this.initFloatAd();
+            this.floatContainer.active && this.initFloatAd(this.onAdCancel);
             if (!this.floatContainer.active) {
                 this.removeFloatAd();
             }
             this.leftContainer.active = this.rightContainer.active = visible && this.hasAd(AD_POSITION.LEFTRIGHT);
             this.exportContainer.active = visible && this.hasAd(AD_POSITION.EXPORT);
             this.rotateContainer.active = visible && this.hasAd(AD_POSITION.ROTATE);
-            this.rotateContainer.active && this.initRotate();
+            this.rotateContainer.active && this.initRotate(this.initRotate);
             !this.rotateContainer.active && this.disableRotate();
             this.formMask.active = visible && this.hasAd(AD_POSITION.MASK);
             if (visible && this.hasAd(AD_POSITION.EXPORT)) {
@@ -3777,11 +3784,12 @@ var mx = (function () {
             });
         };
         CocosAdForm.prototype.initBanner = function () {
+            // this.bannerContainer_layout.width = this.bannerContainer.width - 140;
             var layout = this.bannerContainer_layout.getComponent(cc.Layout);
             var scrollView = this.bannerContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.HORIZONTAL;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem");
+            this.initView(scrollView, this.bannerContainer_layout, "banner", "bannerAdItem", this.onAdCancel);
             //控制显示广告  后续补充
         };
         CocosAdForm.prototype.initTop = function () {
@@ -3789,11 +3797,11 @@ var mx = (function () {
             var scrollView = this.topContainer_scroll.getComponent(cc.ScrollView);
             layout.type = cc.Layout.Type.HORIZONTAL;
             layout.resizeMode = cc.Layout.ResizeMode.CONTAINER;
-            this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem");
+            this.initView(scrollView, this.topContainer_layout, "top", "bannerAdItem", this.onAdCancel);
             //控制显示广告  后续补充
         };
         CocosAdForm.prototype.initLeftRight = function () {
-            var source = this.mAdData.indexLeft;
+            var source = Common.deepCopy(this.mAdData.indexLeft);
             var endNum = source.length / 2;
             var right = source.slice(0, endNum);
             var left = source.slice(endNum, source.length);
@@ -3809,14 +3817,16 @@ var mx = (function () {
             var rightView = this.rightContainer_scroll.getComponent(cc.ScrollView);
             rightView.horizontal = false;
             rightView.vertical = true;
-            this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", function () { }, left);
-            this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", function () { }, right);
+            var newLeft = this.setPosition(left, "left", this.onAdCancel);
+            var newRight = this.setPosition(right, "right", this.onAdCancel);
+            this.initView(leftView, this.leftContainer_layout, "left", "leftAdItem", this.onAdCancel, newLeft);
+            this.initView(rightView, this.rightContainer_layout, "right", "leftAdItem", this.onAdCancel, newRight);
         };
         CocosAdForm.prototype.initEnd = function () {
             var layout = this.endContainer_layout.getComponent(cc.Layout);
             layout.type = cc.Layout.Type.GRID;
             layout.resizeMode = cc.Layout.ResizeMode.NONE;
-            this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem");
+            this.initFiexdView(this.endContainer_layout, "8个固定大导出", "fiexdAdItem", this.onAdCancel);
         };
         // private disableEnd() {
         //     moosnow.form.formFactory.hideNodeByTemplate("exportAdItem", null);
