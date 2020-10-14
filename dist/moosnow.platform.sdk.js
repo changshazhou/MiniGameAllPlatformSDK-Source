@@ -5956,6 +5956,20 @@ var mx = (function () {
                 console.warn(MSG.VIDEO_KEY_IS_NULL);
                 return;
             }
+            if (!this.mVideoTime) {
+                this.mVideoTime = Date.now();
+            }
+            else {
+                if (Date.now() - this.mVideoTime < 10 * 1000) {
+                    if (moosnow.platform.videoCb) {
+                        moosnow.platform.videoCb(VIDEO_STATUS.ERR);
+                    }
+                    return;
+                }
+                else {
+                    this.mVideoTime = Date.now();
+                }
+            }
             if (!this.video) {
                 moosnow.platform.videoLoading = true;
                 this.video = window[this.platformName].createRewardedVideoAd({
@@ -5980,6 +5994,9 @@ var mx = (function () {
                     console.log('激励视频广告展示完成');
                 }).catch(function (err) {
                     console.log('激励视频广告展示失败', JSON.stringify(err));
+                    if (moosnow.platform.videoCb) {
+                        moosnow.platform.videoCb(VIDEO_STATUS.ERR);
+                    }
                 });
             }
         };

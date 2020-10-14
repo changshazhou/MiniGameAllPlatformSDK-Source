@@ -49,6 +49,7 @@ export default class VIVOModule extends PlatformModule {
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
     _showBanner(): void;
     hideBanner(): void;
+    private mVideoTime;
     createRewardAD(show: any): void;
     _onVideoLoad(): void;
     _onVideoClose(isEnd: any): void;

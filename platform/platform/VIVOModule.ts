@@ -368,8 +368,9 @@ export default class VIVOModule extends PlatformModule {
             this.banner = null;
         }
     }
-
+    private mVideoTime: number;
     public createRewardAD(show) {
+
         if (moosnow.platform.videoLoading) {
             return;
         }
@@ -384,6 +385,22 @@ export default class VIVOModule extends PlatformModule {
             console.warn(MSG.VIDEO_KEY_IS_NULL)
             return;
         }
+
+        if (!this.mVideoTime) {
+            this.mVideoTime = Date.now();
+        }
+        else {
+            if (Date.now() - this.mVideoTime < 10 * 1000) {
+                if (moosnow.platform.videoCb) {
+                    moosnow.platform.videoCb(VIDEO_STATUS.ERR);
+                }
+                return;
+            }
+            else {
+                this.mVideoTime = Date.now();
+            }
+        }
+
         if (!this.video) {
             moosnow.platform.videoLoading = true;
             this.video = window[this.platformName].createRewardedVideoAd({
@@ -408,6 +425,9 @@ export default class VIVOModule extends PlatformModule {
                     console.log('激励视频广告展示完成');
                 }).catch((err) => {
                     console.log('激励视频广告展示失败', JSON.stringify(err));
+                    if (moosnow.platform.videoCb) {
+                        moosnow.platform.videoCb(VIDEO_STATUS.ERR);
+                    }
                 })
         }
     }

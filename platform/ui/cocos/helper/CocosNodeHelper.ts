@@ -271,6 +271,7 @@ export default class CocosNodeHelper extends NodeHelper {
         if (queneItem && queneItem.imgCfg == imgCfg) {
             // console.log('applySrcQuene', image.node.name, tex.url)
             this.updateSprite(image, tex);
+            
             this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
             // this.schedule(this.checkSize, 0.16, [image, queneItem.imgCfg.width, queneItem.imgCfg.height])
             this.setSpriteGrid(queneItem.imgCfg, image);
