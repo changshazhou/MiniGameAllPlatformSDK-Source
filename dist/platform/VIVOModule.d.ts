@@ -102,7 +102,7 @@ export default class VIVOModule extends PlatformModule {
     private mClickedNativeCallback;
     private mIsClickedNative;
     private onAppShow;
-    hasShortcutInstalled(success: (has: any) => void): void;
+    hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: () => void, message?: string): void;
     exitApplication(): void;
 }

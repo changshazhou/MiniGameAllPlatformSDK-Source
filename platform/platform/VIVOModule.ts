@@ -672,7 +672,7 @@ export default class VIVOModule extends PlatformModule {
     }
 
 
-    public hasShortcutInstalled(success: (has) => void) {
+    public hasShortcutInstalled(success: (has) => void, fail: (err) => void) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].hasShortcutInstalled) return;
         window[this.platformName].hasShortcutInstalled({
@@ -684,6 +684,10 @@ export default class VIVOModule extends PlatformModule {
                 } else {
                     console.log('未创建')
                 }
+            },
+            fail: (res) => {
+                if (fail)
+                    fail(res)
             }
         })
     }

@@ -351,7 +351,7 @@ export default class PlatformModule extends BaseModule {
      * @param fail
      */
     openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
-    hasShortcutInstalled(success: (has: any) => void): void;
+    hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: () => void, message?: string): void;
     onDisable(): void;
 }

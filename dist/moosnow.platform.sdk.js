@@ -1985,6 +1985,7 @@ var mx = (function () {
             this.video.load()
                 .then(function () {
                 if (show) {
+                    moosnow.platform.videoPlaying = true;
                     _this.video.show().then(function () { }).catch(function (err) {
                         _this._onVideoError(err.errMsg, err.errCode);
                         console.log(err.errMsg);
@@ -2008,6 +2009,7 @@ var mx = (function () {
             console.log(MSG.VIDEO_CLOSE_COMPLETED, isEnd.isEnded);
             moosnow.platform.videoLoading = false;
             moosnow.platform.videoPlaying = false;
+            moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, null);
             if (!!isEnd.isEnded) {
                 moosnow.http.clickVideo();
             }
@@ -2203,7 +2205,7 @@ var mx = (function () {
             if (success)
                 success(true);
         };
-        PlatformModule.prototype.hasShortcutInstalled = function (success) {
+        PlatformModule.prototype.hasShortcutInstalled = function (success, fail) {
             success(false);
         };
         PlatformModule.prototype.installShortcut = function (success, message) {
@@ -2227,10 +2229,10 @@ var mx = (function () {
             _this._regisiterWXCallback();
             _this.initBanner();
             _this.initInter();
-            setTimeout(function () {
-                _this.initVideo();
-            }, 1);
             return _this;
+            // setTimeout(() => {
+            //     this.initVideo();
+            // }, 1)
         }
         /**
          * 游戏登录
@@ -3837,7 +3839,7 @@ var mx = (function () {
                     this.mClickedNativeCallback();
             }
         };
-        OPPOModule.prototype.hasShortcutInstalled = function (success) {
+        OPPOModule.prototype.hasShortcutInstalled = function (success, fail) {
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].hasShortcutInstalled)
@@ -3852,6 +3854,10 @@ var mx = (function () {
                     else {
                         console.log('未创建');
                     }
+                },
+                fail: function (res) {
+                    if (fail)
+                        fail(res);
                 }
             });
         };
@@ -6228,7 +6234,7 @@ var mx = (function () {
                     this.mClickedNativeCallback();
             }
         };
-        VIVOModule.prototype.hasShortcutInstalled = function (success) {
+        VIVOModule.prototype.hasShortcutInstalled = function (success, fail) {
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].hasShortcutInstalled)
@@ -6243,6 +6249,10 @@ var mx = (function () {
                     else {
                         console.log('未创建');
                     }
+                },
+                fail: function (res) {
+                    if (fail)
+                        fail(res);
                 }
             });
         };

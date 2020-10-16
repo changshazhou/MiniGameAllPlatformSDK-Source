@@ -1235,6 +1235,7 @@ export default class PlatformModule extends BaseModule {
         this.video.load()
             .then(() => {
                 if (show) {
+                    moosnow.platform.videoPlaying = true;
                     this.video.show().then(() => { }).catch(err => {
                         this._onVideoError(err.errMsg, err.errCode);
                         console.log(err.errMsg);
@@ -1260,6 +1261,7 @@ export default class PlatformModule extends BaseModule {
         console.log(MSG.VIDEO_CLOSE_COMPLETED, isEnd.isEnded)
         moosnow.platform.videoLoading = false;
         moosnow.platform.videoPlaying = false;
+        moosnow.event.sendEventImmediately(EventType.ON_PLATFORM_SHOW, null);
         if (!!isEnd.isEnded) {
             moosnow.http.clickVideo();
         }
@@ -1470,7 +1472,7 @@ export default class PlatformModule extends BaseModule {
             success(true)
     }
 
-    public hasShortcutInstalled(success: (has) => void) {
+    public hasShortcutInstalled(success: (has) => void, fail: (err) => void) {
         success(false)
     }
 
