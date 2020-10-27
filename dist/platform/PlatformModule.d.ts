@@ -8,7 +8,7 @@ export default class PlatformModule extends BaseModule {
     baseUrl: string;
     moosnowConfig: moosnowAppConfig;
     share_clickTime: number;
-    currentShareCallback: Function;
+    currentShareCallback: (success: boolean) => void;
     currentShortCall: Function;
     shareFail: boolean;
     vibrateOn: boolean;
@@ -97,6 +97,9 @@ export default class PlatformModule extends BaseModule {
         action: number;
         data?: any;
     }): void;
+    navigate2Video(videoid: any): void;
+    getClipboardData(success: (res: any) => void, fail: (res: any) => void): void;
+    setClipboardData(msg: string, success: (res: any) => void, fail: (res: any) => void): void;
     prevNavigate: number;
     /**
      * 跳转到指定App
@@ -352,6 +355,6 @@ export default class PlatformModule extends BaseModule {
      */
     openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
-    installShortcut(success: () => void, message?: string): void;
+    installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     onDisable(): void;
 }

@@ -205,6 +205,7 @@ export default class TTModule extends PlatformModule {
             this.recordObj.resume()
     }
 
+
     /**
       * 分享
       * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }  
@@ -229,7 +230,7 @@ export default class TTModule extends PlatformModule {
         window[this.platformName].shareAppMessage(shareInfo);
     }
 
-
+    private shareVideoId: number;
     public _buildShareInfo(query: any) {
         let title = "", imageUrl = ""
         if (this.shareInfoArr.length > 0) {
@@ -242,6 +243,7 @@ export default class TTModule extends PlatformModule {
             channel = query.channel;
         }
         // console.log('this. recordRes ', this.recordRes)
+        //"https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/1.mp4";//
         let videoPath = (this.recordRes && this.recordRes.videoPath) ? this.recordRes.videoPath : "";
         console.log('video path ', videoPath)
         return {
@@ -251,10 +253,12 @@ export default class TTModule extends PlatformModule {
             query: moosnow.http._object2Query(query),
             extra: {
                 videoPath: videoPath,
-                videoTopics: [title]
+                videoTopics: [title],
+                withVideoId: true,
             },
-            success: () => {
-                console.log('share video success ')
+            success: (res) => {
+                console.log('share video success :', res)
+                this.shareVideoId = res.videoId
                 if (this.currentShareCallback)
                     this.currentShareCallback(true);
             },
@@ -270,6 +274,30 @@ export default class TTModule extends PlatformModule {
 
             }
         }
+    }
+
+
+
+    public navigate2Video(videoId) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].navigateToVideoView) return;
+        console.log("navigate2Video id ", videoId || this.shareVideoId, videoId, this.shareVideoId);
+        if (!(videoId || this.shareVideoId)) return;
+        window[this.platformName].navigateToVideoView({
+            videoId: videoId || this.shareVideoId,
+            success: (res) => {
+                /* res结构： {errMsg: string } */
+                console.log("navigate2Video success ", res);
+            },
+            fail: (err) => {
+                console.log("navigate2Video err ", err);
+                if (err.errCode === 1006) {
+                    // tt.showToast({
+                    //     title: "something wrong with your network",
+                    // });
+                }
+            },
+        })
     }
 
     private mBannerLoaded: boolean = false
@@ -305,7 +333,7 @@ export default class TTModule extends PlatformModule {
         let top = 0;
         if (this.isLandscape(windowHeight, windowWidth)) {
             if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                top = windowHeight - this.bannerHeigth - 30
+                top = windowHeight - this.bannerHeigth
             }
             else if (this.bannerPosition == BANNER_POSITION.CENTER)
                 top = (windowHeight - this.bannerHeigth) / 2;
@@ -314,7 +342,7 @@ export default class TTModule extends PlatformModule {
         }
         else {
             if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                top = windowHeight - this.bannerHeigth - 30
+                top = windowHeight - this.bannerHeigth
             }
             else if (this.bannerPosition == BANNER_POSITION.CENTER)
                 top = (windowHeight - this.bannerHeigth) / 2;

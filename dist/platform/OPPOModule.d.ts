@@ -99,6 +99,6 @@ export default class OPPOModule extends PlatformModule {
     private mIsClickedNative;
     private onAppShow;
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
-    installShortcut(success: () => void, message?: string): void;
+    installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     exitApplication(): void;
 }

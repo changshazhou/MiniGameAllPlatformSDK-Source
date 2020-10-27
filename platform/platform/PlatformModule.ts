@@ -33,7 +33,7 @@ export default class PlatformModule extends BaseModule {
     public baseUrl = "https://api.liteplay.com.cn/";
     public moosnowConfig: moosnowAppConfig;
     public share_clickTime: number;
-    public currentShareCallback: Function = null;
+    public currentShareCallback: (success: boolean) => void;
     public currentShortCall: Function = null;
     public shareFail: boolean = null;
     public vibrateOn: boolean = false;
@@ -327,6 +327,46 @@ export default class PlatformModule extends BaseModule {
         // console.log("postMessage:", data);
         if (!window[this.platformName].getOpenDataContext) return;
         window[this.platformName].getOpenDataContext().postMessage(data);
+    }
+
+    public navigate2Video(videoid) {
+
+    }
+
+    public getClipboardData(success: (res) => void, fail: (res) => void) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].getClipboardData) return;
+        window[this.platformName].getClipboardData({
+            success(res) {
+                if (success)
+                    success(res.data)
+                console.log(`${res.data}`);
+            },
+            fail(res) {
+                if (fail)
+                    fail(res)
+                console.log(`getClipboardData调用失败`);
+            },
+        });
+    }
+
+    public setClipboardData(msg: string, success: (res) => void, fail: (res) => void) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].setClipboardData) return;
+        window[this.platformName].setClipboardData({
+            data: msg,
+            success: (res) => {
+                if (success)
+                    success(res)
+                console.log(`setClipboardData调用成功`);
+            },
+            fail: (res) => {
+                if (fail)
+                    fail(res)
+                console.log(`setClipboardData调用失败`);
+            },
+        });
+
     }
     public prevNavigate = Date.now();
     /**
@@ -1476,7 +1516,7 @@ export default class PlatformModule extends BaseModule {
         success(false)
     }
 
-    public installShortcut(success: () => void, message: string = "方便下次快速启动") {
+    public installShortcut(success: (res) => void, message: string = "方便下次快速启动", fail: (err) => void) {
 
     }
     onDisable() {

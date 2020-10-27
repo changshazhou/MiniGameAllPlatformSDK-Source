@@ -691,15 +691,19 @@ export default class VIVOModule extends PlatformModule {
             }
         })
     }
-    public installShortcut(success: () => void, message: string = "方便下次快速启动") {
+    public installShortcut(success: (res) => void, message: string = "方便下次快速启动", fail: (err) => void) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].installShortcut) return;
         window[this.platformName].installShortcut({
             message,
             success: (status) => {
                 if (success)
-                    success()
+                    success(status)
                 console.log('创建成功')
+            },
+            fail: (res) => {
+                if (fail)
+                    fail(res)
             }
         })
     }

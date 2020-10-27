@@ -39,6 +39,7 @@ export default class TTModule extends PlatformModule {
       * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
       */
     share(query?: Object, callback?: (shared: boolean) => void, shortCall?: (err: any) => void): void;
+    private shareVideoId;
     _buildShareInfo(query: any): {
         channel: string;
         title: string;
@@ -47,10 +48,12 @@ export default class TTModule extends PlatformModule {
         extra: {
             videoPath: any;
             videoTopics: string[];
+            withVideoId: boolean;
         };
-        success: () => void;
+        success: (res: any) => void;
         fail: (e: any) => void;
     };
+    navigate2Video(videoId: any): void;
     private mBannerLoaded;
     _onBannerLoad(): void;
     _prepareBanner(): void;

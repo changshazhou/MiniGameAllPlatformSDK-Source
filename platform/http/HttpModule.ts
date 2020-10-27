@@ -324,7 +324,8 @@ export class HttpModule extends BaseModule {
                             bannerShowCountLimit: 1,
                             isLimitArea: 1,
                             nativeErrorShowInter: 0,
-                            bannerErrorShowInter: 0
+                            bannerErrorShowInter: 0,
+                            delayShow: 0
                         })
                     }
                     else {
@@ -382,6 +383,7 @@ export class HttpModule extends BaseModule {
                         checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0,
                         nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0,
                         bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0,
+                        delayShow: mistouchOn ? res.delayShow : 0,
                     };
                     if (moosnow.platform) {
                         if (res) {
