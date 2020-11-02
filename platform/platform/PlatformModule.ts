@@ -401,12 +401,15 @@ export default class PlatformModule extends BaseModule {
                 path: path,
                 extraData: extraData,
                 success: () => {
-                    moosnow.http.point("跳转", {
+                    let param = {
                         position: row.position,
                         appid,
                         img: row.atlas || row.img,
-                        scene: launchOption.scene
-                    })
+                        scene: launchOption.scene,
+                        wxgamecid: launchOption.query.wxgamecid
+                    }
+                    console.log('跳转参数', param)
+                    moosnow.http.point("跳转", param)
                     moosnow.http.navigateEnd(res.code)
                     moosnow.http.exportUser();
                     if (success)
