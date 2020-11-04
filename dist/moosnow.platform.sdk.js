@@ -755,7 +755,9 @@ var mx = (function () {
         TOP: "__banner_top",
         CENTER: "__banner_center",
         BOTTOM: "__banner_bottom",
-        CUSTOM: "__banner_custom"
+        CUSTOM: "__banner_custom",
+        LEFT_BOTTOM: "__banner_left_bottom",
+        RIGHT_BOTTOM: "__banner_right_bottom"
     };
 
     var VIDEO_STATUS = {
@@ -1167,12 +1169,15 @@ var mx = (function () {
                     path: path,
                     extraData: extraData,
                     success: function () {
-                        moosnow.http.point("跳转", {
+                        var param = {
                             position: row.position,
                             appid: appid,
                             img: row.atlas || row.img,
-                            scene: launchOption.scene
-                        });
+                            scene: launchOption.scene,
+                            wxgamecid: launchOption.query.wxgamecid
+                        };
+                        console.log('跳转参数', param);
+                        moosnow.http.point("跳转", param);
                         moosnow.http.navigateEnd(res.code);
                         moosnow.http.exportUser();
                         if (success)
@@ -1806,13 +1811,25 @@ var mx = (function () {
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
             var top = 0;
-            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+            if (this.bannerPosition == BANNER_POSITION.BOTTOM
+                || this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM
+                || this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
                 top = windowHeight - this.bannerHeigth;
             }
             else if (this.bannerPosition == BANNER_POSITION.CENTER)
                 top = (windowHeight - this.bannerHeigth) / 2;
             else if (this.bannerPosition == BANNER_POSITION.TOP)
                 top = 0;
+            if (this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM) {
+                this.banner.style.left = 0;
+            }
+            else if (this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
+                this.banner.style.top = windowWidth - this.bannerWidth;
+            }
+            else {
+                var left = (windowWidth - this.bannerWidth) / 2;
+                this.banner.style.left = left;
+            }
             if (this.bannerStyle) {
                 this.applyCustomStyle();
             }

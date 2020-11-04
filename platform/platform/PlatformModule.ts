@@ -1050,13 +1050,29 @@ export default class PlatformModule extends BaseModule {
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
         let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+        if (this.bannerPosition == BANNER_POSITION.BOTTOM
+            || this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM
+            || this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
             top = windowHeight - this.bannerHeigth;
         }
         else if (this.bannerPosition == BANNER_POSITION.CENTER)
             top = (windowHeight - this.bannerHeigth) / 2;
         else if (this.bannerPosition == BANNER_POSITION.TOP)
             top = 0;
+
+        if (this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM) {
+            this.banner.style.left = 0;
+        }
+        else if (this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
+            this.banner.style.top = windowWidth - this.bannerWidth;
+        }
+        else {
+            let left = (windowWidth - this.bannerWidth) / 2;
+            this.banner.style.left = left;
+        }
+
+
+
 
         if (this.bannerStyle) {
             this.applyCustomStyle();

@@ -68,7 +68,7 @@ export default class DelayMove extends BaseModule {
     }
 
     public copyNode() {
-
+        
     }
 
     public onPosCallback(tempButtom) {
