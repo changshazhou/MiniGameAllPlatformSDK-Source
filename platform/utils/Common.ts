@@ -161,6 +161,8 @@ export default class Common {
             }
 
         }
+        else if (window['uc'])
+            this.mPlatform = PlatformType.UC
         else if (window['wx'])
             this.mPlatform = PlatformType.WX
         else {
@@ -180,6 +182,8 @@ export default class Common {
                     this.mPlatform = PlatformType.QQ
                 else if (winCfg.debug == "vivo")
                     this.mPlatform = PlatformType.VIVO
+                else if (winCfg.debug == "uc")
+                    this.mPlatform = PlatformType.UC
                 else
                     this.mPlatform = PlatformType.PC
             }

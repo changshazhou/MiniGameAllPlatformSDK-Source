@@ -1153,7 +1153,7 @@ export default class PlatformModule extends BaseModule {
         }
     }
 
-    private mTimeoutId: number
+    public mTimeoutId: number
     /**
      * 会自动隐藏的banner
      * 一般用游戏中

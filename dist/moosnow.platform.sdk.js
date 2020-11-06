@@ -287,6 +287,10 @@ var mx = (function () {
          * VIVO
          */
         PlatformType[PlatformType["VIVO"] = 7] = "VIVO";
+        /**
+        * VIVO
+        */
+        PlatformType[PlatformType["UC"] = 8] = "UC";
     })(PlatformType || (PlatformType = {}));
 
     var ENGINE_TYPE = {
@@ -446,6 +450,8 @@ var mx = (function () {
                         this.mPlatform = PlatformType.OPPO;
                     }
                 }
+                else if (window['uc'])
+                    this.mPlatform = PlatformType.UC;
                 else if (window['wx'])
                     this.mPlatform = PlatformType.WX;
                 else {
@@ -465,6 +471,8 @@ var mx = (function () {
                             this.mPlatform = PlatformType.QQ;
                         else if (winCfg.debug == "vivo")
                             this.mPlatform = PlatformType.VIVO;
+                        else if (winCfg.debug == "uc")
+                            this.mPlatform = PlatformType.UC;
                         else
                             this.mPlatform = PlatformType.PC;
                     }
@@ -6708,6 +6716,181 @@ var mx = (function () {
         return AudioModule;
     }(BaseModule));
 
+    var UCModule = /** @class */ (function (_super) {
+        __extends(UCModule, _super);
+        function UCModule() {
+            var _a;
+            var _this = _super.call(this) || this;
+            _this.platformName = "uc";
+            _this.mGravity = (_a = {},
+                _a[BANNER_POSITION.TOP] = 1,
+                _a[BANNER_POSITION.CENTER] = 4,
+                _a[BANNER_POSITION.BOTTOM] = 7,
+                _a[BANNER_POSITION.LEFT_BOTTOM] = 6,
+                _a[BANNER_POSITION.RIGHT_BOTTOM] = 8,
+                _a);
+            if (!window[_this.platformName])
+                return _this;
+            if (!window[_this.platformName].setEnableDebug)
+                return _this;
+            // 打开调试
+            window[_this.platformName].setEnableDebug({
+                enableDebug: Common.config["enableDebug"] == true,
+                complete: function (data) {
+                    console.log('uc.setEnableDebug openDebug. ');
+                },
+            });
+            if (!window[_this.platformName].requestScreenOrientation)
+                return _this;
+            window[_this.platformName].requestScreenOrientation({
+                orientaiton: Common.config["orientaiton"] == "portrait" ? 1 : 2,
+                success: function (res) {
+                    console.log(res);
+                },
+                fail: function (res) {
+                    console.error(res);
+                },
+            });
+            return _this;
+        }
+        UCModule.prototype._prepareBanner = function () {
+            if (!window[this.platformName].createBannerAd)
+                return;
+            var wxsys = this.getSystemInfoSync();
+            var windowWidth = wxsys.windowWidth;
+            //横屏模式
+            if (wxsys.windowHeight < wxsys.windowWidth) {
+                if (windowWidth < this.bannerWidth) {
+                    this.bannerWidth = windowWidth;
+                }
+            }
+            else {
+                //竖屏
+                this.bannerWidth = windowWidth;
+            }
+            if (this.banner) {
+                this.banner.offError(this._onBannerError);
+                this.banner.offLoad(this._onBannerLoad);
+                this.banner.destroy();
+                this.banner = null;
+            }
+            this.banner = this._createBannerAd();
+            if (this.banner) {
+                this.banner.onError(this._onBannerError.bind(this));
+                this.banner.onLoad(this._onBannerLoad.bind(this));
+            }
+        };
+        UCModule.prototype._createBannerAd = function () {
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createBannerAd)
+                return;
+            var wxsys = this.getSystemInfoSync();
+            var windowWidth = wxsys.windowWidth;
+            var windowHeight = wxsys.windowHeight;
+            var left = (windowWidth - this.bannerWidth) / 2;
+            this.bannerShowTime = Date.now();
+            var banner = window[this.platformName].createBannerAd({
+                style: {
+                    gravity: this.mGravity[BANNER_POSITION.BOTTOM],
+                    width: this.bannerWidth
+                }
+            });
+            return banner;
+        };
+        /**
+         * 显示平台的banner广告
+         * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+         * @param callback 点击回调
+         * @param position banner的位置，默认底部
+         * @param style 自定义样式
+         */
+        UCModule.prototype.showBanner = function (remoteOn, callback, position, style) {
+            var _this = this;
+            if (remoteOn === void 0) { remoteOn = true; }
+            if (position === void 0) { position = BANNER_POSITION.BOTTOM; }
+            console.log(MSG.BANNER_SHOW);
+            this.bannerCb = callback;
+            this.isBannerShow = true;
+            if (!window[this.platformName]) {
+                return;
+            }
+            this.bannerPosition = position;
+            this.bannerStyle = style;
+            if (this.mTimeoutId) {
+                clearTimeout(this.mTimeoutId);
+                this.mTimeoutId = null;
+            }
+            if (remoteOn)
+                moosnow.http.getAllConfig(function (res) {
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner，不执行显示');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        if (_this.banner) {
+                            _this.banner.show();
+                        }
+                    }
+                });
+            else {
+                if (this.banner) {
+                    this.banner.show();
+                }
+            }
+        };
+        UCModule.prototype.createRewardAD = function (show) {
+            var _this = this;
+            if (this.videoLoading) {
+                return;
+            }
+            if (!window[this.platformName]) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            if (!window[this.platformName].createRewardedVideoAd) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            var videoId = this.videoId;
+            if (Common.isEmpty(videoId)) {
+                console.warn(MSG.VIDEO_KEY_IS_NULL);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            if (!this.video) {
+                this.video = window[this.platformName].createRewardVideoAd();
+                if (!this.video) {
+                    console.warn('创建视频广告失败');
+                    return;
+                }
+                this.video.onError(this._onVideoError);
+                this.video.onClose(this._onVideoClose);
+                this.video.onLoad(this._onVideoLoad);
+            }
+            moosnow.platform.videoLoading = true;
+            moosnow.platform.videoPlaying = false;
+            this.video.load()
+                .then(function () {
+                if (show) {
+                    moosnow.platform.videoPlaying = true;
+                    _this.video.show().then(function () { }).catch(function (err) {
+                        _this._onVideoError(err.errMsg, err.errCode);
+                        console.log(err.errMsg);
+                    });
+                }
+            }).catch(function (err) {
+                _this._onVideoError(err.errMsg, err.errCode);
+                console.log(err.errMsg);
+            });
+        };
+        return UCModule;
+    }(PlatformModule));
+
     var moosnow$1 = /** @class */ (function () {
         function moosnow() {
             this.VIDEO_STATUS = VIDEO_STATUS;
@@ -6766,6 +6949,8 @@ var mx = (function () {
                 this.mPlatform = new QQModule();
             else if (Common.platform == PlatformType.BAIDU)
                 this.mPlatform = new BDModule();
+            else if (Common.platform == PlatformType.UC)
+                this.mPlatform = new UCModule();
             else {
                 this.mPlatform = new PlatformModule();
             }

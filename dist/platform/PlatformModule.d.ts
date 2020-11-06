@@ -237,7 +237,7 @@ export default class PlatformModule extends BaseModule {
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
     _showBanner(): void;
-    private mTimeoutId;
+    mTimeoutId: number;
     /**
      * 会自动隐藏的banner
      * 一般用游戏中

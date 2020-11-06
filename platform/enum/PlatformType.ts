@@ -30,5 +30,9 @@ export enum PlatformType {
     /**
      * VIVO
      */
-    VIVO
+    VIVO,
+    /**
+    * VIVO
+    */
+    UC
 }

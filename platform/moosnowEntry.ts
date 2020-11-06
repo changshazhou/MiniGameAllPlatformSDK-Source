@@ -27,6 +27,7 @@ import VIVOModule from "./platform/VIVOModule";
 import { AD_POSITION } from "./enum/AD_POSITION";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
+import UCModule from "./platform/UCModule";
 
 export default class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -84,6 +85,8 @@ export default class moosnow {
             this.mPlatform = new QQModule();
         else if (Common.platform == PlatformType.BAIDU)
             this.mPlatform = new BDModule();
+        else if (Common.platform == PlatformType.UC)
+            this.mPlatform = new UCModule();
         else {
             this.mPlatform = new PlatformModule();
         }

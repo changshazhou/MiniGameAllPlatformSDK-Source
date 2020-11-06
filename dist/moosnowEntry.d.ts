@@ -27,6 +27,8 @@ export default class moosnow {
         CENTER: string;
         BOTTOM: string;
         CUSTOM: string;
+        LEFT_BOTTOM: string;
+        RIGHT_BOTTOM: string;
     };
     SHARE_CHANNEL: {
         ARTICLE: string;

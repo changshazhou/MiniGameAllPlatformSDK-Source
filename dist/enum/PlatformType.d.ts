@@ -30,5 +30,9 @@ export declare enum PlatformType {
     /**
      * VIVO
      */
-    VIVO = 7
+    VIVO = 7,
+    /**
+    * VIVO
+    */
+    UC = 8
 }
