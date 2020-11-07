@@ -170,7 +170,7 @@ export default class Common {
                 if (winCfg.debug == "wx")
                     this.mPlatform = PlatformType.WX
                 else if (winCfg.debug == "oppo")
-                    if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                    if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                         this.mPlatform = PlatformType.OPPO_ZS
                     else
                         this.mPlatform = PlatformType.OPPO

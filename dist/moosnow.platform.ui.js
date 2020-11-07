@@ -340,6 +340,10 @@ var mx = (function () {
          * VIVO
          */
         PlatformType[PlatformType["VIVO"] = 7] = "VIVO";
+        /**
+        * VIVO
+        */
+        PlatformType[PlatformType["UC"] = 8] = "UC";
     })(PlatformType || (PlatformType = {}));
 
     var ENGINE_TYPE = {
@@ -499,6 +503,8 @@ var mx = (function () {
                         this.mPlatform = PlatformType.OPPO;
                     }
                 }
+                else if (window['uc'])
+                    this.mPlatform = PlatformType.UC;
                 else if (window['wx'])
                     this.mPlatform = PlatformType.WX;
                 else {
@@ -506,7 +512,7 @@ var mx = (function () {
                         if (winCfg.debug == "wx")
                             this.mPlatform = PlatformType.WX;
                         else if (winCfg.debug == "oppo")
-                            if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                            if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                                 this.mPlatform = PlatformType.OPPO_ZS;
                             else
                                 this.mPlatform = PlatformType.OPPO;
@@ -518,6 +524,8 @@ var mx = (function () {
                             this.mPlatform = PlatformType.QQ;
                         else if (winCfg.debug == "vivo")
                             this.mPlatform = PlatformType.VIVO;
+                        else if (winCfg.debug == "uc")
+                            this.mPlatform = PlatformType.UC;
                         else
                             this.mPlatform = PlatformType.PC;
                     }

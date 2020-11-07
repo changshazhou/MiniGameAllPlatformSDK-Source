@@ -1,5 +1,6 @@
 import PlatformModule from './PlatformModule';
 import bannerStyle from '../model/bannerStyle';
+import { BLOCK_POSITION } from '../enum/BLOCK_POSITION';
 export default class QQModule extends PlatformModule {
     platformName: string;
     constructor();
@@ -24,4 +25,9 @@ export default class QQModule extends PlatformModule {
     hideAppBox(callback?: Function): void;
     private mOnBoxCallback;
     private onBoxClose;
+    showBlock(position?: BLOCK_POSITION, orientation?: number, size?: number): void;
+    _onBlockLoad(res: any): void;
+    _onBlockError(res: any): void;
+    private _hasPosition;
+    _onBlockResize(size: any): void;
 }

@@ -459,7 +459,7 @@ var mx = (function () {
                         if (winCfg.debug == "wx")
                             this.mPlatform = PlatformType.WX;
                         else if (winCfg.debug == "oppo")
-                            if (winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
+                            if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
                                 this.mPlatform = PlatformType.OPPO_ZS;
                             else
                                 this.mPlatform = PlatformType.OPPO;
@@ -820,6 +820,16 @@ var mx = (function () {
         PLATFORM_UNSUPPORT: "版本过低 平台不支持"
     };
 
+    var BLOCK_POSITION;
+    (function (BLOCK_POSITION) {
+        BLOCK_POSITION[BLOCK_POSITION["NONE"] = 0] = "NONE";
+        BLOCK_POSITION[BLOCK_POSITION["LEFT"] = 1] = "LEFT";
+        BLOCK_POSITION[BLOCK_POSITION["RIGHT"] = 2] = "RIGHT";
+        BLOCK_POSITION[BLOCK_POSITION["TOP"] = 4] = "TOP";
+        BLOCK_POSITION[BLOCK_POSITION["CENTER"] = 8] = "CENTER";
+        BLOCK_POSITION[BLOCK_POSITION["BOTTOM"] = 16] = "BOTTOM";
+    })(BLOCK_POSITION || (BLOCK_POSITION = {}));
+
     // var videoLoading: boolean = false;
     // var videoCb = null;
     var PlatformModule = /** @class */ (function (_super) {
@@ -831,6 +841,7 @@ var mx = (function () {
             _this.shareFail = null;
             _this.vibrateOn = false;
             _this.systemInfo = null;
+            _this.block = null;
             _this.banner = null;
             _this.video = null;
             _this.inter = null;
@@ -858,6 +869,9 @@ var mx = (function () {
             _this.bannerPosition = BANNER_POSITION.BOTTOM;
             _this.bannerStyle = null;
             _this.isBannerShow = false;
+            _this.blockWidth = 300;
+            _this.blockHeigth = 96;
+            _this.blockPosition = BLOCK_POSITION.NONE;
             _this.videoCb = null;
             _this.videoLoading = false;
             _this.videoPlaying = false;
@@ -884,6 +898,26 @@ var mx = (function () {
         Object.defineProperty(PlatformModule.prototype, "bannerId", {
             get: function () {
                 var id = Common.config["bannerId"];
+                if (id instanceof Array) {
+                    if (this.mBannerIndex > id.length - 1)
+                        this.mBannerIndex = 0;
+                    // this.mBannerIndex = Common.randomNumBoth(0, id.length - 1);
+                    var retValue = id[this.mBannerIndex];
+                    this.mBannerIndex++;
+                    console.log('使用banner id ', retValue);
+                    return retValue;
+                }
+                else {
+                    return id;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(PlatformModule.prototype, "blockId", {
+            get: function () {
+                var id = Common.config["blockId"];
                 if (id instanceof Array) {
                     if (this.mBannerIndex > id.length - 1)
                         this.mBannerIndex = 0;
@@ -2275,6 +2309,11 @@ var mx = (function () {
             if (message === void 0) { message = "方便下次快速启动"; }
         };
         PlatformModule.prototype.onDisable = function () {
+        };
+        PlatformModule.prototype.showBlock = function (position, orientation, size) {
+            if (position === void 0) { position = BLOCK_POSITION.NONE; }
+            if (orientation === void 0) { orientation = 1; }
+            if (size === void 0) { size = 5; }
         };
         return PlatformModule;
     }(BaseModule));
@@ -5064,6 +5103,68 @@ var mx = (function () {
         QQModule.prototype.onBoxClose = function () {
             if (Common.isFunction(this.mOnBoxCallback))
                 this.mOnBoxCallback(0);
+        };
+        QQModule.prototype.showBlock = function (position, orientation, size) {
+            if (position === void 0) { position = BLOCK_POSITION.NONE; }
+            if (orientation === void 0) { orientation = 1; }
+            if (size === void 0) { size = 5; }
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createBlockAd)
+                return;
+            if (this.block) {
+                this.block.destroy();
+            }
+            this.block = window[this.platformName].createBlockAd({
+                adUnitId: this.blockId,
+                orientation: orientation == 1 ? "landscape" : "vertical",
+                size: size,
+                style: {
+                    left: 16,
+                    top: 16
+                }
+            });
+            this.block.onLoad(this._onBlockLoad.bind(this));
+            this.block.onError(this._onBlockError.bind(this));
+            this.block.onResize(this._onBlockResize.bind(this));
+        };
+        QQModule.prototype._onBlockLoad = function (res) {
+            console.log("QQModule -> _onBlockLoad -> res", res);
+            this.block.show()
+                .then(function (showResult) {
+                console.log("QQModule -> _onBlockLoad -> showResult", showResult);
+            });
+        };
+        QQModule.prototype._onBlockError = function (res) {
+            console.log("QQModule -> _onBlockError -> res", res);
+        };
+        QQModule.prototype._hasPosition = function (position) {
+            return (this.blockPosition & position) == position;
+        };
+        QQModule.prototype._onBlockResize = function (size) {
+            var wxsys = this.getSystemInfoSync();
+            var windowWidth = wxsys.windowWidth;
+            var windowHeight = wxsys.windowHeight;
+            var top = 0;
+            var left = 0;
+            if (this._hasPosition(BLOCK_POSITION.TOP)) {
+                top = 16;
+            }
+            else if (this._hasPosition(BLOCK_POSITION.CENTER)) {
+                top = (windowHeight - this.blockHeigth) / 2;
+            }
+            else if (this._hasPosition(BLOCK_POSITION.BOTTOM)) {
+                top = windowHeight - this.blockHeigth - 16;
+            }
+            if (this._hasPosition(BLOCK_POSITION.LEFT)) {
+                left = 16;
+            }
+            else if (this._hasPosition(BLOCK_POSITION.RIGHT)) {
+                top = windowWidth - this.blockWidth - 16;
+            }
+            this.block.style.top = top;
+            this.block.style.left = left;
+            console.log(MSG.BANNER_RESIZE, this.block.style, 'set top ', top);
         };
         return QQModule;
     }(PlatformModule));

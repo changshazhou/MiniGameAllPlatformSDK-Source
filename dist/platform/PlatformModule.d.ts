@@ -3,6 +3,7 @@ import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 import nativeAdRow from "../model/nativeAdRow";
 import bannerStyle from "../model/bannerStyle";
+import { BLOCK_POSITION } from "../enum/BLOCK_POSITION";
 export default class PlatformModule extends BaseModule {
     constructor();
     baseUrl: string;
@@ -13,6 +14,7 @@ export default class PlatformModule extends BaseModule {
     shareFail: boolean;
     vibrateOn: boolean;
     systemInfo: any;
+    block: any;
     banner: any;
     video: any;
     inter: any;
@@ -22,6 +24,7 @@ export default class PlatformModule extends BaseModule {
     mBannerId: string;
     mBannerIndex: number;
     get bannerId(): any;
+    get blockId(): any;
     mVideoId: string;
     mVideoIndex: number;
     get videoId(): any;
@@ -43,6 +46,9 @@ export default class PlatformModule extends BaseModule {
     bannerPosition: string;
     bannerStyle: bannerStyle;
     isBannerShow: boolean;
+    blockWidth: number;
+    blockHeigth: number;
+    blockPosition: BLOCK_POSITION;
     videoCb: Function;
     videoLoading: boolean;
     videoPlaying: boolean;
@@ -357,4 +363,5 @@ export default class PlatformModule extends BaseModule {
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     onDisable(): void;
+    showBlock(position?: BLOCK_POSITION, orientation?: number, size?: number): void;
 }

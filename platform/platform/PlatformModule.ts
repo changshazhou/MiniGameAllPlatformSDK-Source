@@ -10,6 +10,7 @@ import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
 import { MSG } from "../config/MSG";
+import { BLOCK_POSITION } from "../enum/BLOCK_POSITION";
 
 
 
@@ -39,6 +40,7 @@ export default class PlatformModule extends BaseModule {
     public vibrateOn: boolean = false;
     public systemInfo: any = null;
 
+    public block: any = null;
     public banner: any = null;
     public video: any = null;
     public inter: any = null;
@@ -64,6 +66,23 @@ export default class PlatformModule extends BaseModule {
             return id;
         }
     };
+
+    public get blockId() {
+        let id = Common.config["blockId"] as any;
+        if (id instanceof Array) {
+            if (this.mBannerIndex > id.length - 1)
+                this.mBannerIndex = 0;
+            // this.mBannerIndex = Common.randomNumBoth(0, id.length - 1);
+            let retValue = id[this.mBannerIndex];
+            this.mBannerIndex++;
+            console.log('使用banner id ', retValue)
+            return retValue;
+        }
+        else {
+            return id;
+        }
+    };
+
     public mVideoId: string;
     public mVideoIndex: number = 0;
     public get videoId() {
@@ -103,6 +122,10 @@ export default class PlatformModule extends BaseModule {
     public bannerPosition: string = BANNER_POSITION.BOTTOM;
     public bannerStyle: bannerStyle = null;
     public isBannerShow: boolean = false;
+
+    public blockWidth: number = 300;
+    public blockHeigth: number = 96;
+    public blockPosition: BLOCK_POSITION = BLOCK_POSITION.NONE;
 
     public videoCb: Function = null;
     public videoLoading: boolean = false;
@@ -1539,5 +1562,9 @@ export default class PlatformModule extends BaseModule {
 
     }
     onDisable() {
+    }
+
+    public showBlock(position: BLOCK_POSITION = BLOCK_POSITION.NONE, orientation: number = 1, size: number = 5) {
+
     }
 }

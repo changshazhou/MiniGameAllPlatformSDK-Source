@@ -3,6 +3,7 @@ import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
 import bannerStyle from '../model/bannerStyle';
 import { MSG } from '../config/MSG';
+import { BLOCK_POSITION } from '../enum/BLOCK_POSITION';
 
 
 export default class QQModule extends PlatformModule {
@@ -188,5 +189,67 @@ export default class QQModule extends PlatformModule {
     private onBoxClose() {
         if (Common.isFunction(this.mOnBoxCallback))
             this.mOnBoxCallback(0);
+    }
+
+
+    public showBlock(position: BLOCK_POSITION = BLOCK_POSITION.NONE, orientation: number = 1, size: number = 5) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createBlockAd) return;
+        if (this.block) {
+            this.block.destroy();
+        }
+        this.block = window[this.platformName].createBlockAd({
+            adUnitId: this.blockId,
+            orientation: orientation == 1 ? "landscape" : "vertical",
+            size,
+            style: {
+                left: 16,
+                top: 16
+            }
+        })
+        this.block.onLoad(this._onBlockLoad.bind(this))
+        this.block.onError(this._onBlockError.bind(this))
+        this.block.onResize(this._onBlockResize.bind(this))
+    }
+    public _onBlockLoad(res) {
+        console.log("QQModule -> _onBlockLoad -> res", res)
+        this.block.show()
+            .then((showResult) => {
+                console.log("QQModule -> _onBlockLoad -> showResult", showResult)
+            })
+
+    }
+    public _onBlockError(res) {
+        console.log("QQModule -> _onBlockError -> res", res)
+    }
+
+    private _hasPosition(position) {
+        return (this.blockPosition & position) == position;
+    }
+    public _onBlockResize(size) {
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let top = 0;
+        let left = 0;
+        if (this._hasPosition(BLOCK_POSITION.TOP)) {
+            top = 16;
+        }
+        else if (this._hasPosition(BLOCK_POSITION.CENTER)) {
+            top = (windowHeight - this.blockHeigth) / 2;
+        }
+        else if (this._hasPosition(BLOCK_POSITION.BOTTOM)) {
+            top = windowHeight - this.blockHeigth - 16;
+        }
+
+        if (this._hasPosition(BLOCK_POSITION.LEFT)) {
+            left = 16;
+        }
+        else if (this._hasPosition(BLOCK_POSITION.RIGHT)) {
+            top = windowWidth - this.blockWidth - 16;
+        }
+        this.block.style.top = top;
+        this.block.style.left = left;
+        console.log(MSG.BANNER_RESIZE, this.block.style, 'set top ', top)
     }
 }
