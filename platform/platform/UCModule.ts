@@ -1,6 +1,6 @@
 import { MSG } from "../config/MSG";
 import { AD_POSITION } from "../enum/AD_POSITION";
-import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import bannerStyle from "../model/bannerStyle";
 import Common from "../utils/Common";
@@ -34,11 +34,11 @@ export default class UCModule extends PlatformModule {
     }
 
     private mGravity = {
-        [BANNER_POSITION.TOP]: 1,
-        [BANNER_POSITION.CENTER]: 4,
-        [BANNER_POSITION.BOTTOM]: 7,
-        [BANNER_POSITION.LEFT_BOTTOM]: 6,
-        [BANNER_POSITION.RIGHT_BOTTOM]: 8
+        [`${BANNER_HORIZONTAL.CENTER}_${BANNER_VERTICAL.TOP}`]: 1,
+        [`${BANNER_HORIZONTAL.CENTER}_${BANNER_VERTICAL.CENTER}`]: 4,
+        [`${BANNER_HORIZONTAL.CENTER}_${BANNER_VERTICAL.BOTTOM}`]: 7,
+        [`${BANNER_HORIZONTAL.LEFT}_${BANNER_VERTICAL.BOTTOM}`]: 6,
+        [`${BANNER_HORIZONTAL.RIGHT}_${BANNER_VERTICAL.BOTTOM}`]: 8,
     }
 
     public _prepareBanner() {
@@ -79,7 +79,7 @@ export default class UCModule extends PlatformModule {
         this.bannerShowTime = Date.now();
         let banner = window[this.platformName].createBannerAd({
             style: {
-                gravity: this.mGravity[BANNER_POSITION.BOTTOM],
+                gravity: this.mGravity[`${this.bannerHorizontal}_${this.bannerVertical}`],
                 width: this.bannerWidth
             }
         });
@@ -93,7 +93,7 @@ export default class UCModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
 
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
@@ -101,7 +101,8 @@ export default class UCModule extends PlatformModule {
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerPosition = position;
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
         this.bannerStyle = style;
 
         if (this.mTimeoutId) {

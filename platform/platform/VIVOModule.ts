@@ -2,7 +2,7 @@ import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import Common from "../utils/Common";
 import bannerStyle from "../model/bannerStyle";
-import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
 import { MSG } from "../config/MSG";
@@ -205,6 +205,59 @@ export default class VIVOModule extends PlatformModule {
         return this.systemInfo;
     }
 
+    public _getBannerPosition(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
+
+        console.log("QQModule -> _getBannerPosition -> vertical", vertical)
+        console.log("QQModule -> _getBannerPosition -> horizontal", horizontal)
+
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let statusBarHeight = wxsys.statusBarHeight;
+        let notchHeight = wxsys.notchHeight || 0
+
+        if (!isNaN(this.bannerWidth))
+            this.banner.style.width = this.bannerWidth;
+        if (!isNaN(this.bannerHeight))
+            this.banner.style.height = this.bannerHeight;
+
+        let top = 0;
+        let left = 0;
+        if (vertical == BANNER_VERTICAL.TOP) {
+            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+                top = 0
+            else
+                top = statusBarHeight + notchHeight
+        }
+        else if (vertical == BANNER_VERTICAL.CENTER) {
+            top = (windowHeight - this.bannerHeigth) / 2;
+        }
+        else if (vertical == BANNER_VERTICAL.BOTTOM) {
+            top = windowHeight - this.bannerHeigth - 16;
+        }
+
+        if (horizontal == BANNER_HORIZONTAL.LEFT) {
+            left = 0;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
+            left = windowWidth - this.bannerWidth;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.CENTER) {
+            left = (windowWidth - this.bannerWidth) / 2;
+        }
+
+        console.log("QQModule -> _getBannerPosition -> left", left, 'top', top)
+        // return {
+        //     left: 16,
+        //     top: 16,
+        // }
+        return {
+            left,
+            top,
+        }
+    }
+
+
     private mShowTime: number;
     private mMinInterval: number = 10
     public _createBannerAd() {
@@ -233,30 +286,15 @@ export default class VIVOModule extends PlatformModule {
             return;
         }
 
-        let styleTop = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = (screenHeight - this.bannerHeight);
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (screenHeight - this.bannerHeight) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP) {
-            if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
-                styleTop = 0
-            else
-                styleTop = statusBarHeight + notchHeight
-        }
-        else
-            styleTop = this.bannerStyle.top;
-
-        let style = {
-            top: styleTop,
-            left: left,
-            width: this.bannerWidth,
-            height: this.bannerHeight
-        }
+        let style = this._getBannerPosition();
         let banner = window[this.platformName].createBannerAd({
             posId: this.bannerId,
-            style
+            style: {
+                left: style.left,
+                top: style.top,
+                width: this.bannerWidth,
+                height: this.bannerHeight
+            }
         });
         return banner;
     }
@@ -292,13 +330,14 @@ export default class VIVOModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
 
 
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) return;
-        this.bannerPosition = position;
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
         this.bannerStyle = style;
 
         if (remoteOn)

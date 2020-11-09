@@ -2,8 +2,6 @@ import PlatformModule from "./PlatformModule";
 export default class BDModule extends PlatformModule {
     constructor();
     platformName: string;
-    bannerId: string;
-    videoId: string;
     appSid: string;
     recordRes: any;
     recordCb: any;

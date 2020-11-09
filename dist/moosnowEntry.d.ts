@@ -9,6 +9,8 @@ import EventModule from "./framework/EventModule";
 import EventType from "./utils/EventType";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
 export default class moosnow {
     VIDEO_STATUS: {
         END: string;
@@ -22,14 +24,10 @@ export default class moosnow {
     SHARE_MSG: {
         FAIL: string;
     };
-    BANNER_POSITION: {
-        TOP: string;
-        CENTER: string;
-        BOTTOM: string;
-        CUSTOM: string;
-        LEFT_BOTTOM: string;
-        RIGHT_BOTTOM: string;
-    };
+    BANNER_HORIZONTAL: typeof BANNER_HORIZONTAL;
+    BANNER_VERTICAL: typeof BANNER_VERTICAL;
+    BLOCK_HORIZONTAL: typeof BLOCK_HORIZONTAL;
+    BLOCK_VERTICAL: typeof BLOCK_VERTICAL;
     SHARE_CHANNEL: {
         ARTICLE: string;
         VIDEO: string;

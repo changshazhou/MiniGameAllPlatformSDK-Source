@@ -1,6 +1,7 @@
 import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import bannerStyle from "../model/bannerStyle";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 export default class OPPOModule extends PlatformModule {
     platformName: string;
     appSid: string;
@@ -34,6 +35,10 @@ export default class OPPOModule extends PlatformModule {
     _prepareBanner(): void;
     _createBannerAd(): any;
     _bottomCenterBanner(size: any): void;
+    _getBannerPosition(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): {
+        left: number;
+        top: number;
+    };
     _resetBanenrStyle(size: any): void;
     _onBannerHide(): void;
     destroyBanner(): void;
@@ -44,7 +49,7 @@ export default class OPPOModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
     _showBanner(): void;
     hideBanner(): void;
     createRewardAD(show: any): void;

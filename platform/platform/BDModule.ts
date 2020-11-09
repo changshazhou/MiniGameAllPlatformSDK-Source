@@ -7,8 +7,6 @@ export default class BDModule extends PlatformModule {
         super();
     }
     public platformName: string = "swan";
-    public bannerId: string = "";
-    public videoId: string = "";
     public appSid: string = "";
 
     public recordRes: any = null;

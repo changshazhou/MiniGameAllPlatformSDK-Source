@@ -1,6 +1,7 @@
 import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import bannerStyle from "../model/bannerStyle";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 export default class VIVOModule extends PlatformModule {
     platformName: string;
     appSid: string;
@@ -32,6 +33,10 @@ export default class VIVOModule extends PlatformModule {
      */
     _onBannerError(err: any): void;
     getSystemInfoSync(): any;
+    _getBannerPosition(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): {
+        left: number;
+        top: number;
+    };
     private mShowTime;
     private mMinInterval;
     _createBannerAd(): any;
@@ -46,7 +51,7 @@ export default class VIVOModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
     _showBanner(): void;
     hideBanner(): void;
     private mVideoTime;

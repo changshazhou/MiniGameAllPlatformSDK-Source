@@ -3,7 +3,7 @@ import Common from "../utils/Common";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import MathUtils from "../utils/MathUtils";
 import { SHARE_CHANNEL } from "../enum/SHARE_CHANNEL";
-import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import appLaunchOption from "../model/appLaunchOption";
 import bannerStyle from "../model/bannerStyle";
 import moosnowAdRow from "../model/moosnowAdRow";
@@ -313,51 +313,6 @@ export default class TTModule extends PlatformModule {
         this.mBannerLoaded = false;
         super._prepareBanner();
     }
-    public _resetBanenrStyle(size) {
-        if (Common.isEmpty(size)) {
-            console.log('设置的banner尺寸为空,不做调整')
-            return;
-        }
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        // if (Common.getEngine() == ENGINE_TYPE.COCOS) {
-        //     windowWidth = cc.Canvas.instance.node.width;
-        //     windowHeight = cc.Canvas.instance.node.height;
-        // }
-        // if (Common.getEngine() == ENGINE_TYPE.LAYA) {
-        //     windowWidth = Laya.stage.width;
-        //     windowHeight = Laya.stage.height;
-        // }
-
-        let top = 0;
-        if (this.isLandscape(windowHeight, windowWidth)) {
-            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                top = windowHeight - this.bannerHeigth
-            }
-            else if (this.bannerPosition == BANNER_POSITION.CENTER)
-                top = (windowHeight - this.bannerHeigth) / 2;
-            else if (this.bannerPosition == BANNER_POSITION.TOP)
-                top = 0;
-        }
-        else {
-            if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-                top = windowHeight - this.bannerHeigth
-            }
-            else if (this.bannerPosition == BANNER_POSITION.CENTER)
-                top = (windowHeight - this.bannerHeigth) / 2;
-            else if (this.bannerPosition == BANNER_POSITION.TOP)
-                top = 0;
-        }
-
-        if (this.bannerStyle) {
-            this.banner.style = this.bannerStyle;
-        }
-        else {
-            this.banner.style.top = top;
-            console.log(MSG.BANNER_RESIZE, this.banner.style, this.banner)
-        }
-    }
     /**
      * 显示平台的banner广告
      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -365,7 +320,7 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log(MSG.BANNER_SHOW)
@@ -379,7 +334,9 @@ export default class TTModule extends PlatformModule {
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerPosition = position;
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
+        this.bannerStyle = style;
         this.bannerStyle = style;
 
 

@@ -2,10 +2,10 @@ import PlatformModule from "./PlatformModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import Common from "../utils/Common";
 import bannerStyle from "../model/bannerStyle";
-import { BANNER_POSITION } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
 import { MSG } from "../config/MSG";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 
 export default class OPPOModule extends PlatformModule {
 
@@ -290,24 +290,27 @@ export default class OPPOModule extends PlatformModule {
 
         this.banner.style.left = (windowWidth - size.width) / 2;
         let styleTop = windowHeight - this.bannerHeigth;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP) {
-            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                styleTop = 0
-            else
-                styleTop = statusBarHeight + notchHeight
-        }
-        else
-            styleTop = this.bannerStyle.top;
+        // if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
+        //     styleTop = windowHeight - this.bannerHeigth;
+        // }
+        // else if (this.bannerPosition == BANNER_POSITION.CENTER)
+        //     styleTop = (windowHeight - this.bannerHeigth) / 2;
+        // else if (this.bannerPosition == BANNER_POSITION.TOP) {
+        //     if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+        //         styleTop = 0
+        //     else
+        //         styleTop = statusBarHeight + notchHeight
+        // }
+        // else
+        //     styleTop = this.bannerStyle.top;
         this.banner.style.top = styleTop;
         console.log('_bottomCenterBanner  ', this.banner.style)
     }
 
-    public _resetBanenrStyle(size) {
+    public _getBannerPosition(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
+
+        console.log("QQModule -> _getBannerPosition -> vertical", vertical)
+        console.log("QQModule -> _getBannerPosition -> horizontal", horizontal)
 
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
@@ -320,23 +323,50 @@ export default class OPPOModule extends PlatformModule {
         if (!isNaN(this.bannerHeight))
             this.banner.style.height = this.bannerHeight;
 
-        let styleTop = windowHeight - this.bannerHeigth;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            styleTop = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            styleTop = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP) {
+        let top = 0;
+        let left = 0;
+        if (vertical == BANNER_VERTICAL.TOP) {
             if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                styleTop = 0
+                top = 0
             else
-                styleTop = statusBarHeight + notchHeight
+                top = statusBarHeight + notchHeight
         }
-        else
-            styleTop = this.bannerStyle.top;
+        else if (vertical == BANNER_VERTICAL.CENTER) {
+            top = (windowHeight - this.bannerHeigth) / 2;
+        }
+        else if (vertical == BANNER_VERTICAL.BOTTOM) {
+            top = windowHeight - this.bannerHeigth - 16;
+        }
 
-        this.banner.style.top = styleTop;
-        console.log('_resetBanenrStyle ', this.banner.style, 'set styleTop ', styleTop)
+        if (horizontal == BANNER_HORIZONTAL.LEFT) {
+            left = 0;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
+            left = windowWidth - this.bannerWidth;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.CENTER) {
+            left = (windowWidth - this.bannerWidth) / 2;
+        }
+
+        console.log("QQModule -> _getBannerPosition -> left", left, 'top', top)
+        // return {
+        //     left: 16,
+        //     top: 16,
+        // }
+        return {
+            left,
+            top,
+        }
+    }
+
+
+    public _resetBanenrStyle(size) {
+
+
+        let style = this._getBannerPosition();
+        this.banner.style.top = style.top;
+        this.banner.style.left = style.left;
+        console.log('_resetBanenrStyle ', this.banner.style, 'set style ', style)
     }
 
     public _onBannerHide() {
@@ -362,13 +392,16 @@ export default class OPPOModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
+        this.bannerStyle = style;
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {

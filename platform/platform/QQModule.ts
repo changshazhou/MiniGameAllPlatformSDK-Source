@@ -1,9 +1,9 @@
 import PlatformModule from './PlatformModule';
-import { BANNER_POSITION } from '../enum/BANNER_POSITION';
 import Common from '../utils/Common';
 import bannerStyle from '../model/bannerStyle';
 import { MSG } from '../config/MSG';
-import { BLOCK_POSITION } from '../enum/BLOCK_POSITION';
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from '../enum/BLOCK_POSITION';
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from '../enum/BANNER_POSITION';
 
 
 export default class QQModule extends PlatformModule {
@@ -22,20 +22,18 @@ export default class QQModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
-        let centerPos = (windowWidth - this.bannerWidth) / 2;
-        let top = windowHeight - height / 2;
         if (Common.isEmpty(this.bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
-        console.log('create banner by banner id ', this.bannerId)
+        let bannerStyle = this._getBannerPosition();
         let style = {
-            top: top,
-            left: centerPos,
+            top: bannerStyle.top,
+            left: bannerStyle.left,
             width: this.bannerWidth,
             height: height
         }
-        console.log('create banner style ', style)
+        console.log("QQModule -> _createBannerAd -> style", style)
         let banner = window[this.platformName].createBannerAd({
             adUnitId: this.bannerId,
             style: style
@@ -50,14 +48,15 @@ export default class QQModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerPosition = position;
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
         this.bannerStyle = style;
 
         if (remoteOn)
@@ -78,6 +77,9 @@ export default class QQModule extends PlatformModule {
 
     public _showBanner() {
         if (this.banner) {
+            this._resetBanenrStyle({
+
+            });
             let t = this.banner.show();
             if (t)
                 t.then(() => {
@@ -93,24 +95,6 @@ export default class QQModule extends PlatformModule {
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
         console.log('Resize后正式宽高:', size.width, size.height);
         // this._resetBanenrStyle(size);
-    }
-
-    public _resetBanenrStyle(size) {
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM) {
-            top = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP)
-            top = 0;
-        else
-            top = this.bannerStyle.top;
-        if (this.banner && this.banner.style)
-            this.banner.style.top = top;
     }
 
 
@@ -192,25 +176,31 @@ export default class QQModule extends PlatformModule {
     }
 
 
-    public showBlock(position: BLOCK_POSITION = BLOCK_POSITION.NONE, orientation: number = 1, size: number = 5) {
+    public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE, orientation: number = 1, size: number = 5) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBlockAd) return;
         if (this.block) {
             this.block.destroy();
         }
+        let style = this._getBlockPosition(horizontal, vertical)
+        console.log("QQModule -> showBlock -> style", style)
         this.block = window[this.platformName].createBlockAd({
             adUnitId: this.blockId,
             orientation: orientation == 1 ? "landscape" : "vertical",
             size,
             style: {
-                left: 16,
-                top: 16
+                left: style.left,
+                top: style.top,
             }
         })
+        console.log("QQModule -> showBlock ->  this.block", this.block)
         this.block.onLoad(this._onBlockLoad.bind(this))
         this.block.onError(this._onBlockError.bind(this))
         this.block.onResize(this._onBlockResize.bind(this))
     }
+
+
+
     public _onBlockLoad(res) {
         console.log("QQModule -> _onBlockLoad -> res", res)
         this.block.show()
@@ -223,33 +213,51 @@ export default class QQModule extends PlatformModule {
         console.log("QQModule -> _onBlockError -> res", res)
     }
 
-    private _hasPosition(position) {
-        return (this.blockPosition & position) == position;
-    }
-    public _onBlockResize(size) {
+    private _getBlockPosition(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE) {
+
+        console.log("QQModule -> _getBlockPosition -> vertical", vertical)
+        console.log("QQModule -> _getBlockPosition -> horizontal", horizontal)
+
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
         let top = 0;
         let left = 0;
-        if (this._hasPosition(BLOCK_POSITION.TOP)) {
+        if (vertical == BLOCK_VERTICAL.TOP) {
             top = 16;
         }
-        else if (this._hasPosition(BLOCK_POSITION.CENTER)) {
+        else if (vertical == BLOCK_VERTICAL.CENTER) {
             top = (windowHeight - this.blockHeigth) / 2;
         }
-        else if (this._hasPosition(BLOCK_POSITION.BOTTOM)) {
+        else if (vertical == BLOCK_VERTICAL.BOTTOM) {
             top = windowHeight - this.blockHeigth - 16;
         }
 
-        if (this._hasPosition(BLOCK_POSITION.LEFT)) {
+        if (horizontal == BLOCK_HORIZONTAL.LEFT) {
             left = 16;
         }
-        else if (this._hasPosition(BLOCK_POSITION.RIGHT)) {
-            top = windowWidth - this.blockWidth - 16;
+        else if (horizontal == BLOCK_HORIZONTAL.RIGHT) {
+            left = windowWidth - this.blockWidth - 16;
         }
-        this.block.style.top = top;
-        this.block.style.left = left;
+        else if (horizontal == BLOCK_HORIZONTAL.CENTER) {
+            left = (windowWidth - this.blockWidth) / 2;
+        }
+
+        console.log("QQModule -> _getBlockPosition -> left", left, 'top', top)
+        // return {
+        //     left: 16,
+        //     top: 16,
+        // }
+        return {
+            left,
+            top,
+        }
+    }
+    public _onBlockResize(size) {
+        let style = this._getBlockPosition()
+        console.log("QQModule -> _onBlockResize -> style", style)
+        this.block.style.top = style.top;
+        this.block.style.left = style.left;
         console.log(MSG.BANNER_RESIZE, this.block.style, 'set top ', top)
     }
 }

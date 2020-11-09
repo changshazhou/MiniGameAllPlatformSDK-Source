@@ -1,4 +1,5 @@
 import PlatformModule from "./PlatformModule";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import bannerStyle from "../model/bannerStyle";
 import moosnowAdRow from "../model/moosnowAdRow";
 export default class TTModule extends PlatformModule {
@@ -57,7 +58,6 @@ export default class TTModule extends PlatformModule {
     private mBannerLoaded;
     _onBannerLoad(): void;
     _prepareBanner(): void;
-    _resetBanenrStyle(size: any): void;
     /**
      * 显示平台的banner广告
      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -65,7 +65,7 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
     _showBanner(): void;
     /**
     * 盒子广告

@@ -3,14 +3,13 @@ import Common from "../utils/Common";
 import BaseModule from "../framework/BaseModule";
 import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
-import { PlatformType } from "../enum/PlatformType";
 import nativeAdRow from "../model/nativeAdRow";
 import bannerStyle from "../model/bannerStyle";
-import { BANNER_POSITION } from "../enum/BANNER_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
 import EventType from "../utils/EventType";
 import { MSG } from "../config/MSG";
-import { BLOCK_POSITION } from "../enum/BLOCK_POSITION";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "../enum/BLOCK_POSITION";
 
 
 
@@ -111,6 +110,8 @@ export default class PlatformModule extends BaseModule {
 
     public bannerWidth: number = 300;
     public bannerHeigth: number = 96;
+    public bannerHorizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE;
+    public bannerVertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE
     public bannerShowCount: number = 0;
     public bannerShowCountLimit: number = 3;
 
@@ -119,13 +120,11 @@ export default class PlatformModule extends BaseModule {
     public bannerLimitType: number = 0;
 
     public bannerCb: Function = null;
-    public bannerPosition: string = BANNER_POSITION.BOTTOM;
     public bannerStyle: bannerStyle = null;
     public isBannerShow: boolean = false;
 
     public blockWidth: number = 300;
     public blockHeigth: number = 96;
-    public blockPosition: BLOCK_POSITION = BLOCK_POSITION.NONE;
 
     public videoCb: Function = null;
     public videoLoading: boolean = false;
@@ -1042,6 +1041,7 @@ export default class PlatformModule extends BaseModule {
 
     }
     public _bottomCenterBanner(size) {
+        console.log("_bottomCenterBanner -> size", size)
 
         // if (Common.isEmpty(size)) {
         //     console.log('设置的banner尺寸为空,不做调整')
@@ -1055,6 +1055,7 @@ export default class PlatformModule extends BaseModule {
         // this.banner.style.top = windowHeight - size.height;
         this.bannerWidth = this.banner.style.realWidth;
         this.bannerHeigth = this.banner.style.realHeight;
+        console.log("_bottomCenterBanner -> this.banner.style", this.banner.style)
 
         if (this.bannerStyle)
             this.applyCustomStyle();
@@ -1065,43 +1066,14 @@ export default class PlatformModule extends BaseModule {
     }
 
     public _resetBanenrStyle(size) {
-        if (Common.isEmpty(size)) {
-            console.log('设置的banner尺寸为空,不做调整')
-            return;
-        }
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let top = 0;
-        if (this.bannerPosition == BANNER_POSITION.BOTTOM
-            || this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM
-            || this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
-            top = windowHeight - this.bannerHeigth;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.CENTER)
-            top = (windowHeight - this.bannerHeigth) / 2;
-        else if (this.bannerPosition == BANNER_POSITION.TOP)
-            top = 0;
-
-        if (this.bannerPosition == BANNER_POSITION.LEFT_BOTTOM) {
-            this.banner.style.left = 0;
-        }
-        else if (this.bannerPosition == BANNER_POSITION.RIGHT_BOTTOM) {
-            this.banner.style.top = windowWidth - this.bannerWidth;
-        }
-        else {
-            let left = (windowWidth - this.bannerWidth) / 2;
-            this.banner.style.left = left;
-        }
-
-
-
 
         if (this.bannerStyle) {
             this.applyCustomStyle();
         }
         else {
-            this.banner.style.top = top;
+            let style = this._getBannerPosition();
+            this.banner.style.top = style.top;
+            this.banner.style.left = style.left;
             console.log(MSG.BANNER_RESIZE, this.banner.style, 'set top ', top)
         }
     }
@@ -1112,6 +1084,51 @@ export default class PlatformModule extends BaseModule {
         }
     }
 
+    public _getBannerPosition() {
+
+        let horizontal: BANNER_HORIZONTAL = this.bannerHorizontal
+        let vertical: BANNER_VERTICAL = this.bannerVertical
+
+        console.log("_getBannerPosition -> horizontal", horizontal)
+        console.log("_getBannerPosition -> vertical", vertical)
+
+
+
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        let windowHeight = wxsys.windowHeight;
+        let top = 0;
+        let left = 0;
+        if (vertical == BANNER_VERTICAL.TOP) {
+            top = 0;
+        }
+        else if (vertical == BANNER_VERTICAL.CENTER) {
+            top = (windowHeight - this.bannerHeigth) / 2;
+        }
+        else if (vertical == BANNER_VERTICAL.BOTTOM) {
+            top = windowHeight - this.bannerHeigth;
+        }
+
+        if (horizontal == BANNER_HORIZONTAL.LEFT) {
+            left = 0;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
+            left = windowWidth - this.bannerWidth;
+        }
+        else if (horizontal == BANNER_HORIZONTAL.CENTER) {
+            left = (windowWidth - this.bannerWidth) / 2;
+        }
+
+        console.log("QQModule -> _getBannerPosition -> left", left, 'top', top)
+        // return {
+        //     left: 16,
+        //     top: 16,
+        // }
+        return {
+            left,
+            top,
+        }
+    }
 
     /**
       * 显示平台的banner广告
@@ -1120,7 +1137,7 @@ export default class PlatformModule extends BaseModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, position: string = BANNER_POSITION.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
 
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
@@ -1128,7 +1145,8 @@ export default class PlatformModule extends BaseModule {
         if (!window[this.platformName]) {
             return;
         }
-        this.bannerPosition = position;
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
         this.bannerStyle = style;
 
         if (this.mTimeoutId) {
@@ -1182,25 +1200,25 @@ export default class PlatformModule extends BaseModule {
      * 一般用游戏中
      * @param position banner的位置，默认底部
      */
-    public showAutoBanner(position: string = BANNER_POSITION.BOTTOM) {
+    public showAutoBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
         console.log('执行自动显示和隐藏Banner功能')
-        moosnow.http.getAllConfig(res => {
-            if (res && res.gameBanner == 1) {
-                moosnow.platform.showBanner(true, () => { }, position);
-                let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
+        // moosnow.http.getAllConfig(res => {
+        //     if (res && res.gameBanner == 1) {
+        //         moosnow.platform.showBanner(true, () => { }, horizontal, vertical);
+        //         let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
 
-                this.mTimeoutId = setTimeout(() => {
-                    console.log('自动隐藏时间已到，开始隐藏Banner')
-                    if (this.isBannerShow) {
-                        this.hideBanner();
-                    }
-                    else {
-                        this.hideBanner();
-                    }
+        //         this.mTimeoutId = setTimeout(() => {
+        //             console.log('自动隐藏时间已到，开始隐藏Banner')
+        //             if (this.isBannerShow) {
+        //                 this.hideBanner();
+        //             }
+        //             else {
+        //                 this.hideBanner();
+        //             }
 
-                }, time * 1000)
-            }
-        })
+        //         }, time * 1000)
+        //     }
+        // })
     }
 
 
@@ -1213,12 +1231,12 @@ export default class PlatformModule extends BaseModule {
      * 连续不断的显示和隐藏 banner
      * @param position 
      */
-    public showIntervalBanner(position: string = BANNER_POSITION.BOTTOM) {
+    public showIntervalBanner(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE) {
         console.log('执行 showIntervalBanner')
         moosnow.http.getAllConfig(res => {
             let gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
-            this.showAutoBanner(position);
-            this.schedule(this.showAutoBanner, gameBannerInterval, [position])
+            // this.showAutoBanner(horizontal, vertical);
+            this.schedule(this.showAutoBanner, gameBannerInterval, [horizontal, vertical])
         })
     }
     /**
@@ -1564,7 +1582,7 @@ export default class PlatformModule extends BaseModule {
     onDisable() {
     }
 
-    public showBlock(position: BLOCK_POSITION = BLOCK_POSITION.NONE, orientation: number = 1, size: number = 5) {
+    public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE, orientation: number = 1, size: number = 5) {
 
     }
 }

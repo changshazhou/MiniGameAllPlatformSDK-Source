@@ -16,7 +16,6 @@ import ZSOPPOModule from "./platform/ZSOPPOModule";
 import BDModule from "./platform/BDModule";
 import { ZSHttpModule } from "./http/ZSHttpModule";
 
-import { BANNER_POSITION } from "./enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "./enum/VIDEO_STATUS";
 import { SHARE_MSG } from "./enum/SHARE_MSG";
 import { VIDEO_MSG } from "./enum/VIDEO_MSG";
@@ -28,12 +27,17 @@ import { AD_POSITION } from "./enum/AD_POSITION";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
 import UCModule from "./platform/UCModule";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
 
 export default class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
     public VIDEO_MSG = VIDEO_MSG;
     public SHARE_MSG = SHARE_MSG;
-    public BANNER_POSITION = BANNER_POSITION;
+    public BANNER_HORIZONTAL = BANNER_HORIZONTAL;
+    public BANNER_VERTICAL = BANNER_VERTICAL;
+    public BLOCK_HORIZONTAL = BLOCK_HORIZONTAL;
+    public BLOCK_VERTICAL = BLOCK_VERTICAL;
     public SHARE_CHANNEL = SHARE_CHANNEL;
     public APP_PLATFORM = PlatformType;
     public PLATFORM_EVENT = EventType;
@@ -167,3 +171,4 @@ export default class moosnow {
 
 }
 new moosnow();
+

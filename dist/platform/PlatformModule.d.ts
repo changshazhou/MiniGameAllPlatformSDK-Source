@@ -3,7 +3,8 @@ import moosnowAdRow from "../model/moosnowAdRow";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 import nativeAdRow from "../model/nativeAdRow";
 import bannerStyle from "../model/bannerStyle";
-import { BLOCK_POSITION } from "../enum/BLOCK_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "../enum/BLOCK_POSITION";
 export default class PlatformModule extends BaseModule {
     constructor();
     baseUrl: string;
@@ -37,18 +38,18 @@ export default class PlatformModule extends BaseModule {
     nativeIdIndex: number;
     bannerWidth: number;
     bannerHeigth: number;
+    bannerHorizontal: BANNER_HORIZONTAL;
+    bannerVertical: BANNER_VERTICAL;
     bannerShowCount: number;
     bannerShowCountLimit: number;
     bannerShowTime: number;
     bannerShowTimeLimit: number;
     bannerLimitType: number;
     bannerCb: Function;
-    bannerPosition: string;
     bannerStyle: bannerStyle;
     isBannerShow: boolean;
     blockWidth: number;
     blockHeigth: number;
-    blockPosition: BLOCK_POSITION;
     videoCb: Function;
     videoLoading: boolean;
     videoPlaying: boolean;
@@ -234,6 +235,10 @@ export default class PlatformModule extends BaseModule {
     _bottomCenterBanner(size: any): void;
     _resetBanenrStyle(size: any): void;
     private applyCustomStyle;
+    _getBannerPosition(): {
+        left: number;
+        top: number;
+    };
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -241,7 +246,7 @@ export default class PlatformModule extends BaseModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, position?: string, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
     _showBanner(): void;
     mTimeoutId: number;
     /**
@@ -249,13 +254,13 @@ export default class PlatformModule extends BaseModule {
      * 一般用游戏中
      * @param position banner的位置，默认底部
      */
-    showAutoBanner(position?: string): void;
+    showAutoBanner(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): void;
     exitApplication(): void;
     /**
      * 连续不断的显示和隐藏 banner
      * @param position
      */
-    showIntervalBanner(position?: string): void;
+    showIntervalBanner(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL): void;
     /**
      * 取消banner
      */
@@ -363,5 +368,5 @@ export default class PlatformModule extends BaseModule {
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     onDisable(): void;
-    showBlock(position?: BLOCK_POSITION, orientation?: number, size?: number): void;
+    showBlock(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL, orientation?: number, size?: number): void;
 }
