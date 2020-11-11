@@ -26,6 +26,7 @@ export default class QQModule extends PlatformModule {
     private mOnBoxCallback;
     private onBoxClose;
     showBlock(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL, orientation?: number, size?: number): void;
+    hideBlock(): void;
     _onBlockLoad(res: any): void;
     _onBlockError(res: any): void;
     private _getBlockPosition;

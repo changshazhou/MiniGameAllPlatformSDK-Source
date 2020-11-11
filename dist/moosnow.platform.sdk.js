@@ -897,6 +897,8 @@ var mx = (function () {
             _this.isBannerShow = false;
             _this.blockWidth = 300;
             _this.blockHeigth = 96;
+            _this.blockHorizontal = BLOCK_HORIZONTAL.NONE;
+            _this.blockVertical = BLOCK_VERTICAL.NONE;
             _this.videoCb = null;
             _this.videoLoading = false;
             _this.videoPlaying = false;
@@ -1810,6 +1812,7 @@ var mx = (function () {
                 this.banner = null;
             }
             this.banner = this._createBannerAd();
+            console.log("_prepareBanner -> this.banner", this.banner);
             if (this.banner) {
                 this.banner.onResize(this._bottomCenterBanner.bind(this));
                 this.banner.onError(this._onBannerError.bind(this));
@@ -1821,21 +1824,18 @@ var mx = (function () {
                 return;
             if (!window[this.platformName].createBannerAd)
                 return;
-            var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            var windowHeight = wxsys.windowHeight;
-            var left = (windowWidth - this.bannerWidth) / 2;
             var bannerId = this.bannerId;
             if (Common.isEmpty(bannerId)) {
                 console.warn(MSG.BANNER_KEY_IS_NULL);
                 return;
             }
             this.bannerShowTime = Date.now();
+            var style = this._getBannerPosition();
             var banner = window[this.platformName].createBannerAd({
                 adUnitId: bannerId,
                 style: {
-                    top: windowHeight - this.bannerHeigth,
-                    left: left,
+                    top: style.top,
+                    left: style.left,
                     width: this.bannerWidth
                 }
             });
@@ -1862,14 +1862,15 @@ var mx = (function () {
             // let windowHeight = wxsys.windowHeight;
             // this.banner.style.height = size.height;
             // this.banner.style.top = windowHeight - size.height;
-            this.bannerWidth = this.banner.style.realWidth;
-            this.bannerHeigth = this.banner.style.realHeight;
+            if (!isNaN(this.banner.style.realWidth))
+                this.bannerWidth = this.banner.style.realWidth;
+            if (!isNaN(this.banner.style.realHeight))
+                this.bannerHeigth = this.banner.style.realHeight;
             console.log("_bottomCenterBanner -> this.banner.style", this.banner.style);
             if (this.bannerStyle)
                 this.applyCustomStyle();
             else
                 this.banner.style.left = (windowWidth - size.width) / 2;
-            console.log('_bottomCenterBanner', this.banner.style);
         };
         PlatformModule.prototype._resetBanenrStyle = function (size) {
             if (this.bannerStyle) {
@@ -2358,6 +2359,8 @@ var mx = (function () {
             if (vertical === void 0) { vertical = BLOCK_VERTICAL.NONE; }
             if (orientation === void 0) { orientation = 1; }
             if (size === void 0) { size = 5; }
+        };
+        PlatformModule.prototype.hideBlock = function () {
         };
         return PlatformModule;
     }(BaseModule));
@@ -5123,8 +5126,8 @@ var mx = (function () {
                 this.mOnBoxCallback(0);
         };
         QQModule.prototype.showBlock = function (horizontal, vertical, orientation, size) {
-            if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BLOCK_VERTICAL.NONE; }
+            if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BLOCK_VERTICAL.TOP; }
             if (orientation === void 0) { orientation = 1; }
             if (size === void 0) { size = 5; }
             if (!window[this.platformName])
@@ -5134,7 +5137,9 @@ var mx = (function () {
             if (this.block) {
                 this.block.destroy();
             }
-            var style = this._getBlockPosition(horizontal, vertical);
+            this.blockHorizontal = horizontal;
+            this.blockVertical = vertical;
+            var style = this._getBlockPosition();
             console.log("QQModule -> showBlock -> style", style);
             this.block = window[this.platformName].createBlockAd({
                 adUnitId: this.blockId,
@@ -5150,6 +5155,10 @@ var mx = (function () {
             this.block.onError(this._onBlockError.bind(this));
             this.block.onResize(this._onBlockResize.bind(this));
         };
+        QQModule.prototype.hideBlock = function () {
+            if (this.block)
+                this.block.hide();
+        };
         QQModule.prototype._onBlockLoad = function (res) {
             console.log("QQModule -> _onBlockLoad -> res", res);
             this.block.show()
@@ -5160,9 +5169,9 @@ var mx = (function () {
         QQModule.prototype._onBlockError = function (res) {
             console.log("QQModule -> _onBlockError -> res", res);
         };
-        QQModule.prototype._getBlockPosition = function (horizontal, vertical) {
-            if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BLOCK_VERTICAL.NONE; }
+        QQModule.prototype._getBlockPosition = function () {
+            var horizontal = this.blockHorizontal;
+            var vertical = this.blockVertical;
             console.log("QQModule -> _getBlockPosition -> vertical", vertical);
             console.log("QQModule -> _getBlockPosition -> horizontal", horizontal);
             var wxsys = this.getSystemInfoSync();

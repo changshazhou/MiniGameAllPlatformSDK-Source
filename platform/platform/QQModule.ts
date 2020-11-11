@@ -176,13 +176,15 @@ export default class QQModule extends PlatformModule {
     }
 
 
-    public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE, orientation: number = 1, size: number = 5) {
+    public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.CENTER, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.TOP, orientation: number = 1, size: number = 5) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBlockAd) return;
         if (this.block) {
             this.block.destroy();
         }
-        let style = this._getBlockPosition(horizontal, vertical)
+        this.blockHorizontal = horizontal;
+        this.blockVertical = vertical;
+        let style = this._getBlockPosition()
         console.log("QQModule -> showBlock -> style", style)
         this.block = window[this.platformName].createBlockAd({
             adUnitId: this.blockId,
@@ -199,6 +201,11 @@ export default class QQModule extends PlatformModule {
         this.block.onResize(this._onBlockResize.bind(this))
     }
 
+    public hideBlock() {
+        if (this.block)
+            this.block.hide();
+    }
+
 
 
     public _onBlockLoad(res) {
@@ -213,7 +220,10 @@ export default class QQModule extends PlatformModule {
         console.log("QQModule -> _onBlockError -> res", res)
     }
 
-    private _getBlockPosition(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE) {
+    private _getBlockPosition() {
+
+        let horizontal: BLOCK_HORIZONTAL = this.blockHorizontal;
+        let vertical: BLOCK_VERTICAL = this.blockVertical;
 
         console.log("QQModule -> _getBlockPosition -> vertical", vertical)
         console.log("QQModule -> _getBlockPosition -> horizontal", horizontal)

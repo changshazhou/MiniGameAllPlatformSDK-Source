@@ -125,6 +125,8 @@ export default class PlatformModule extends BaseModule {
 
     public blockWidth: number = 300;
     public blockHeigth: number = 96;
+    public blockHorizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE;
+    public blockVertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE
 
     public videoCb: Function = null;
     public videoLoading: boolean = false;
@@ -1000,6 +1002,7 @@ export default class PlatformModule extends BaseModule {
             this.banner = null;
         }
         this.banner = this._createBannerAd();
+        console.log("_prepareBanner -> this.banner", this.banner)
         if (this.banner) {
             this.banner.onResize(this._bottomCenterBanner.bind(this));
             this.banner.onError(this._onBannerError.bind(this));
@@ -1009,21 +1012,18 @@ export default class PlatformModule extends BaseModule {
     public _createBannerAd() {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
-        let left = (windowWidth - this.bannerWidth) / 2;
         let bannerId = this.bannerId;
         if (Common.isEmpty(bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         this.bannerShowTime = Date.now();
+        let style = this._getBannerPosition();
         let banner = window[this.platformName].createBannerAd({
             adUnitId: bannerId,
             style: {
-                top: windowHeight - this.bannerHeigth,
-                left: left,
+                top: style.top,
+                left: style.left,
                 width: this.bannerWidth
             }
         });
@@ -1053,8 +1053,11 @@ export default class PlatformModule extends BaseModule {
         // let windowHeight = wxsys.windowHeight;
         // this.banner.style.height = size.height;
         // this.banner.style.top = windowHeight - size.height;
-        this.bannerWidth = this.banner.style.realWidth;
-        this.bannerHeigth = this.banner.style.realHeight;
+        if (!isNaN(this.banner.style.realWidth))
+            this.bannerWidth = this.banner.style.realWidth;
+        if (!isNaN(this.banner.style.realHeight))
+            this.bannerHeigth = this.banner.style.realHeight;
+
         console.log("_bottomCenterBanner -> this.banner.style", this.banner.style)
 
         if (this.bannerStyle)
@@ -1062,7 +1065,6 @@ export default class PlatformModule extends BaseModule {
         else
             this.banner.style.left = (windowWidth - size.width) / 2;
 
-        console.log('_bottomCenterBanner', this.banner.style)
     }
 
     public _resetBanenrStyle(size) {
@@ -1583,6 +1585,10 @@ export default class PlatformModule extends BaseModule {
     }
 
     public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE, orientation: number = 1, size: number = 5) {
+
+    }
+
+    public hideBlock() {
 
     }
 }

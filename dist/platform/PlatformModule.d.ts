@@ -50,6 +50,8 @@ export default class PlatformModule extends BaseModule {
     isBannerShow: boolean;
     blockWidth: number;
     blockHeigth: number;
+    blockHorizontal: BLOCK_HORIZONTAL;
+    blockVertical: BLOCK_VERTICAL;
     videoCb: Function;
     videoLoading: boolean;
     videoPlaying: boolean;
@@ -369,4 +371,5 @@ export default class PlatformModule extends BaseModule {
     installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     onDisable(): void;
     showBlock(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL, orientation?: number, size?: number): void;
+    hideBlock(): void;
 }
