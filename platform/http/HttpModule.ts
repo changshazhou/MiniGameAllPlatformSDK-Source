@@ -325,7 +325,8 @@ export class HttpModule extends BaseModule {
                             isLimitArea: 1,
                             nativeErrorShowInter: 0,
                             bannerErrorShowInter: 0,
-                            delayShow: 0
+                            delayShow: 0,
+                            showAppBox: 0
                         })
                     }
                     else {
@@ -384,6 +385,7 @@ export class HttpModule extends BaseModule {
                         nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0,
                         bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0,
                         delayShow: mistouchOn ? res.delayShow : 0,
+                        showAppBox: mistouchOn ? res.showAppBox : 0,
                     };
                     if (moosnow.platform) {
                         if (res) {
@@ -409,7 +411,10 @@ export class HttpModule extends BaseModule {
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             bannerShowCountLimit: 1,
-                            exportAutoNavigate: 0
+                            exportBtnNavigate: 0,
+                            exportAutoNavigate: 0,
+                            delayShow: 0,
+                            showAppBox: 0,
                         });
                     })
                     this._cfgQuene = [];

@@ -3134,7 +3134,7 @@ var mx = (function () {
                                 exportAutoNavigate = 0;
                             if (res.exportAutoNavigate == 2)
                                 exportAutoNavigate = 1;
-                            callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0 }));
+                            callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0 }));
                         }
                         else {
                             if (res.exportAutoNavigate == 1)
@@ -3166,7 +3166,7 @@ var mx = (function () {
                     var mistouchOn = res && res.mistouchOn == 1 ? true : false;
                     if (!mistouchOn)
                         console.log('总开关已关闭----------------');
-                    _this.cfgData = __assign(__assign({ checkBoxProbabilitys: [100, 0, 0, 0, 0] }, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0, exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0, exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0, checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0, nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0, bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0, delayShow: mistouchOn ? res.delayShow : 0 });
+                    _this.cfgData = __assign(__assign({ checkBoxProbabilitys: [100, 0, 0, 0, 0] }, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0, exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0, exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0, checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0, nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0, bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0, delayShow: mistouchOn ? res.delayShow : 0, showAppBox: mistouchOn ? res.showAppBox : 0 });
                     if (moosnow.platform) {
                         if (res) {
                             if (!isNaN(res.bannerShowCountLimit))
@@ -3189,7 +3189,10 @@ var mx = (function () {
                             mistouchNum: 0,
                             mistouchPosNum: 0,
                             bannerShowCountLimit: 1,
-                            exportAutoNavigate: 0
+                            exportBtnNavigate: 0,
+                            exportAutoNavigate: 0,
+                            delayShow: 0,
+                            showAppBox: 0,
                         });
                     });
                     _this._cfgQuene = [];
