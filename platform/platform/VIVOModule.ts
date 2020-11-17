@@ -205,30 +205,32 @@ export default class VIVOModule extends PlatformModule {
         return this.systemInfo;
     }
 
-    public _getBannerPosition(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
+    public _getBannerPosition() {
+
+        let horizontal: BANNER_HORIZONTAL = this.bannerHorizontal
+        let vertical: BANNER_VERTICAL = this.bannerVertical
 
         console.log("VIVOModule -> _getBannerPosition -> vertical", vertical)
         console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal)
 
-
         let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
+        let windowWidth = wxsys.screenWidth;
+        let windowHeight = wxsys.screenHeight;
         let statusBarHeight = wxsys.statusBarHeight;
         let notchHeight = wxsys.notchHeight || 0
 
-        if (!isNaN(this.bannerWidth))
+        if (!isNaN(this.bannerWidth) && this.banner)
             this.banner.style.width = this.bannerWidth;
-        if (!isNaN(this.bannerHeight))
+        if (!isNaN(this.bannerHeight) && this.banner)
             this.banner.style.height = this.bannerHeight;
 
         let top = 0;
         let left = 0;
         if (vertical == BANNER_VERTICAL.TOP) {
-            if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                top = 0
-            else
-                top = statusBarHeight + notchHeight
+            // if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+            //     top = 0
+            // else
+            top = statusBarHeight + notchHeight
         }
         else if (vertical == BANNER_VERTICAL.CENTER) {
             top = (windowHeight - this.bannerHeigth) / 2;
@@ -239,13 +241,18 @@ export default class VIVOModule extends PlatformModule {
 
         if (horizontal == BANNER_HORIZONTAL.LEFT) {
             left = 0;
+            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.LEFT")
         }
         else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
             left = windowWidth - this.bannerWidth;
+            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.RIGHT")
         }
         else if (horizontal == BANNER_HORIZONTAL.CENTER) {
             left = (windowWidth - this.bannerWidth) / 2;
+            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.CENTER")
         }
+        else
+            console.log("VIVOModule -> _getBannerPosition -> left ERROR ")
 
         console.log("VIVOModule -> _getBannerPosition -> top,left", top, left)
         // return {
@@ -267,21 +274,12 @@ export default class VIVOModule extends PlatformModule {
         let nowTime = Date.now();
         if (!this.mShowTime)
             this.mShowTime = nowTime;
-        if (!!!this.mShowTime || ((!!this.mShowTime) && nowTime - this.mShowTime <= this.mMinInterval * 1000)) {
+        else if (this.mShowTime && (nowTime - this.mShowTime <= this.mMinInterval * 1000)) {
             console.log(`banner创建太频繁了 ${this.mMinInterval}秒内只能显示一次`);
             return;
         }
         this.mShowTime = Date.now();
 
-
-        let wxsys = this.getSystemInfoSync();
-        let screenWidth = wxsys.screenWidth;
-        let screenHeight = wxsys.screenHeight;
-        let statusBarHeight = wxsys.statusBarHeight;
-        let pixelRatio = wxsys.pixelRatio;
-        let notchHeight = this.getNotchHeight();
-
-        let left = (screenWidth - this.bannerWidth) / 2;
         if (Common.isEmpty(this.bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
@@ -337,6 +335,7 @@ export default class VIVOModule extends PlatformModule {
         this.bannerCb = callback;
         this.isBannerShow = true;
         if (!window[this.platformName]) return;
+
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
@@ -395,10 +394,18 @@ export default class VIVOModule extends PlatformModule {
             }
         });
     }
-
+    private mHideTime: number;
+    private mMinHideInterval: number = 5
     public hideBanner() {
         console.log(MSG.HIDE_BANNER)
         if (!window[this.platformName]) {
+            return;
+        }
+        let nowTime = Date.now();
+        if (!this.mShowTime)
+            this.mShowTime = nowTime;
+        if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
+            console.log(`banner隐藏太频繁了 ${this.mMinHideInterval}秒内只隐藏一次`);
             return;
         }
         if (this.banner) {

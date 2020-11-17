@@ -3744,9 +3744,9 @@ var mx = (function () {
             var windowHeight = wxsys.windowHeight;
             var statusBarHeight = wxsys.statusBarHeight;
             var notchHeight = wxsys.notchHeight || 0;
-            if (!isNaN(this.bannerWidth))
+            if (!isNaN(this.bannerWidth) && this.banner)
                 this.banner.style.width = this.bannerWidth;
-            if (!isNaN(this.bannerHeight))
+            if (!isNaN(this.bannerHeight) && this.banner)
                 this.banner.style.height = this.bannerHeight;
             var top = 0;
             var left = 0;
@@ -5971,6 +5971,7 @@ var mx = (function () {
             _this.interLoadedShow = false;
             _this.prevNavigate = Date.now();
             _this.mMinInterval = 10;
+            _this.mMinHideInterval = 5;
             _this.mIsClickedNative = false;
             _this._regisiterWXCallback();
             _this.initAdService();
@@ -6131,27 +6132,27 @@ var mx = (function () {
             }
             return this.systemInfo;
         };
-        VIVOModule.prototype._getBannerPosition = function (horizontal, vertical) {
-            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
+        VIVOModule.prototype._getBannerPosition = function () {
+            var horizontal = this.bannerHorizontal;
+            var vertical = this.bannerVertical;
             console.log("VIVOModule -> _getBannerPosition -> vertical", vertical);
             console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal);
             var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            var windowHeight = wxsys.windowHeight;
+            var windowWidth = wxsys.screenWidth;
+            var windowHeight = wxsys.screenHeight;
             var statusBarHeight = wxsys.statusBarHeight;
             var notchHeight = wxsys.notchHeight || 0;
-            if (!isNaN(this.bannerWidth))
+            if (!isNaN(this.bannerWidth) && this.banner)
                 this.banner.style.width = this.bannerWidth;
-            if (!isNaN(this.bannerHeight))
+            if (!isNaN(this.bannerHeight) && this.banner)
                 this.banner.style.height = this.bannerHeight;
             var top = 0;
             var left = 0;
             if (vertical == BANNER_VERTICAL.TOP) {
-                if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-                    top = 0;
-                else
-                    top = statusBarHeight + notchHeight;
+                // if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
+                //     top = 0
+                // else
+                top = statusBarHeight + notchHeight;
             }
             else if (vertical == BANNER_VERTICAL.CENTER) {
                 top = (windowHeight - this.bannerHeigth) / 2;
@@ -6161,13 +6162,18 @@ var mx = (function () {
             }
             if (horizontal == BANNER_HORIZONTAL.LEFT) {
                 left = 0;
+                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.LEFT");
             }
             else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
                 left = windowWidth - this.bannerWidth;
+                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.RIGHT");
             }
             else if (horizontal == BANNER_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.bannerWidth) / 2;
+                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.CENTER");
             }
+            else
+                console.log("VIVOModule -> _getBannerPosition -> left ERROR ");
             console.log("VIVOModule -> _getBannerPosition -> top,left", top, left);
             // return {
             //     left: 16,
@@ -6186,18 +6192,11 @@ var mx = (function () {
             var nowTime = Date.now();
             if (!this.mShowTime)
                 this.mShowTime = nowTime;
-            if (!!!this.mShowTime || ((!!this.mShowTime) && nowTime - this.mShowTime <= this.mMinInterval * 1000)) {
+            else if (this.mShowTime && (nowTime - this.mShowTime <= this.mMinInterval * 1000)) {
                 console.log("banner\u521B\u5EFA\u592A\u9891\u7E41\u4E86 " + this.mMinInterval + "\u79D2\u5185\u53EA\u80FD\u663E\u793A\u4E00\u6B21");
                 return;
             }
             this.mShowTime = Date.now();
-            var wxsys = this.getSystemInfoSync();
-            var screenWidth = wxsys.screenWidth;
-            var screenHeight = wxsys.screenHeight;
-            var statusBarHeight = wxsys.statusBarHeight;
-            var pixelRatio = wxsys.pixelRatio;
-            var notchHeight = this.getNotchHeight();
-            var left = (screenWidth - this.bannerWidth) / 2;
             if (Common.isEmpty(this.bannerId)) {
                 console.warn(MSG.BANNER_KEY_IS_NULL);
                 return;
@@ -6305,6 +6304,13 @@ var mx = (function () {
         VIVOModule.prototype.hideBanner = function () {
             console.log(MSG.HIDE_BANNER);
             if (!window[this.platformName]) {
+                return;
+            }
+            var nowTime = Date.now();
+            if (!this.mShowTime)
+                this.mShowTime = nowTime;
+            if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
+                console.log("banner\u9690\u85CF\u592A\u9891\u7E41\u4E86 " + this.mMinHideInterval + "\u79D2\u5185\u53EA\u9690\u85CF\u4E00\u6B21");
                 return;
             }
             if (this.banner) {

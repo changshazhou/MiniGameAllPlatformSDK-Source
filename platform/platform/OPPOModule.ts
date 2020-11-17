@@ -318,9 +318,9 @@ export default class OPPOModule extends PlatformModule {
         let statusBarHeight = wxsys.statusBarHeight;
         let notchHeight = wxsys.notchHeight || 0
 
-        if (!isNaN(this.bannerWidth))
+        if (!isNaN(this.bannerWidth) && this.banner)
             this.banner.style.width = this.bannerWidth;
-        if (!isNaN(this.bannerHeight))
+        if (!isNaN(this.bannerHeight) && this.banner)
             this.banner.style.height = this.bannerHeight;
 
         let top = 0;

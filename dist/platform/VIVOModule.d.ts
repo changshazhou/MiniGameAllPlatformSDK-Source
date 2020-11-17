@@ -33,7 +33,7 @@ export default class VIVOModule extends PlatformModule {
      */
     _onBannerError(err: any): void;
     getSystemInfoSync(): any;
-    _getBannerPosition(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): {
+    _getBannerPosition(): {
         left: number;
         top: number;
     };
@@ -53,6 +53,8 @@ export default class VIVOModule extends PlatformModule {
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
     _showBanner(): void;
+    private mHideTime;
+    private mMinHideInterval;
     hideBanner(): void;
     private mVideoTime;
     createRewardAD(show: any): void;
