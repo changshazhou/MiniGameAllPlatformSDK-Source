@@ -3148,26 +3148,31 @@ var mx = (function () {
         HttpModule.prototype.getAllConfig = function (callback) {
             var _this = this;
             this.loadCfg(function (res) {
-                _this.loadArea(function (res2) {
-                    _this.disableAd(res, res2, function (disable) {
-                        var exportAutoNavigate = 0;
-                        if (disable) {
-                            //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
-                            if (res.exportAutoNavigate == 1)
-                                exportAutoNavigate = 0;
-                            if (res.exportAutoNavigate == 2)
-                                exportAutoNavigate = 1;
-                            callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0 }));
-                        }
-                        else {
-                            if (res.exportAutoNavigate == 1)
-                                exportAutoNavigate = 1;
-                            if (res.exportAutoNavigate == 2)
-                                exportAutoNavigate = 1;
-                            callback(__assign(__assign({}, res), { exportAutoNavigate: exportAutoNavigate, isLimitArea: 0 }));
-                        }
+                if (res.inWhite) {
+                    callback(__assign(__assign({}, res), { exportAutoNavigate: 1, isLimitArea: 0 }));
+                }
+                else {
+                    _this.loadArea(function (res2) {
+                        _this.disableAd(res, res2, function (disable) {
+                            var exportAutoNavigate = 0;
+                            if (disable) {
+                                //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
+                                if (res.exportAutoNavigate == 1)
+                                    exportAutoNavigate = 0;
+                                if (res.exportAutoNavigate == 2)
+                                    exportAutoNavigate = 1;
+                                callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0 }));
+                            }
+                            else {
+                                if (res.exportAutoNavigate == 1)
+                                    exportAutoNavigate = 1;
+                                if (res.exportAutoNavigate == 2)
+                                    exportAutoNavigate = 1;
+                                callback(__assign(__assign({}, res), { exportAutoNavigate: exportAutoNavigate, isLimitArea: 0 }));
+                            }
+                        });
                     });
-                });
+                }
             });
         };
         HttpModule.prototype.defaultCfg = function (res, applyRemote) {
@@ -3223,6 +3228,7 @@ var mx = (function () {
                             isStartMistouch: 1,
                             isStartVideo: 1,
                             loadingAdOn: 1,
+                            inWhite: inWhite
                         });
                         console.warn("白名单后 -> cfg", cfg);
                     }
