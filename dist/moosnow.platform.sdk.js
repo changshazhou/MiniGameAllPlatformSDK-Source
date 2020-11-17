@@ -2446,6 +2446,7 @@ var mx = (function () {
                 scene: scene,
                 fromApp: fromApp
             }, "POST", function (respone) {
+                console.log("WXModule -> getUserToken -> respone", respone);
                 if (respone.code == 0 && respone.data && respone.data.user_id) {
                     moosnow.data.setToken(respone.data.user_id);
                 }
@@ -3191,28 +3192,40 @@ var mx = (function () {
             };
             if (res) {
                 cfg = __assign(__assign({}, cfg), __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: applyRemote ? res.mistouchNum : 0, mistouchPosNum: applyRemote ? res.mistouchPosNum : 0, mistouchInterval: applyRemote ? res.mistouchInterval : 0, exportAutoNavigate: applyRemote ? res.exportAutoNavigate : 0, exportBtnNavigate: applyRemote ? res.exportBtnNavigate : 0, checkBoxMistouch: applyRemote ? res.checkBoxMistouch : 0, nativeErrorShowInter: applyRemote ? res.nativeErrorShowInter : 0, bannerErrorShowInter: applyRemote ? res.bannerErrorShowInter : 0, delayShow: applyRemote ? res.delayShow : 0, showAppBox: applyRemote ? res.showAppBox : 0, isStartMistouch: applyRemote ? res.isStartMistouch : 0, isStartVideo: applyRemote ? res.isStartVideo : 0, loadingAdOn: applyRemote ? res.loadingAdOn : 0 }));
-                console.log("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken());
-                console.log("defaultCfg -> res.whitelist", res.whitelist);
-                if (res.whitelist && res.whitelist.indexOf(moosnow.data.getToken()) != -1) {
-                    cfg = __assign(__assign({}, cfg), {
-                        checkBoxMistouch: 1,
-                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                        mistouchNum: 1,
-                        mistouchPosNum: 1,
-                        bannerShowCountLimit: 1,
-                        exportBtnNavigate: 1,
-                        exportAutoNavigate: 1,
-                        delayShow: 1,
-                        showAppBox: 1,
-                        zs_native_click_switch: 1,
-                        zs_jump_switch: 1,
-                        mistouchInterval: 1,
-                        nativeErrorShowInter: 1,
-                        bannerErrorShowInter: 1,
-                        isStartMistouch: 1,
-                        isStartVideo: 1,
-                        loadingAdOn: 1,
-                    });
+                console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken());
+                console.warn("defaultCfg -> res.whitelist", res.whitelist);
+                if (res.whitelist) {
+                    var token = moosnow.data.getToken();
+                    var inWhite = false;
+                    for (var i = 0; i < res.whitelist.length; i++) {
+                        if (token == res.whitelist[i]) {
+                            inWhite = true;
+                            break;
+                        }
+                    }
+                    if (inWhite) {
+                        console.warn("白名单前 -> cfg", cfg);
+                        cfg = __assign(__assign({}, cfg), {
+                            checkBoxMistouch: 1,
+                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                            mistouchNum: 1,
+                            mistouchPosNum: 1,
+                            bannerShowCountLimit: 1,
+                            exportBtnNavigate: 1,
+                            exportAutoNavigate: 1,
+                            delayShow: 1,
+                            showAppBox: 1,
+                            zs_native_click_switch: 1,
+                            zs_jump_switch: 1,
+                            mistouchInterval: 1,
+                            nativeErrorShowInter: 1,
+                            bannerErrorShowInter: 1,
+                            isStartMistouch: 1,
+                            isStartVideo: 1,
+                            loadingAdOn: 1,
+                        });
+                        console.warn("白名单后 -> cfg", cfg);
+                    }
                 }
             }
             if (moosnow.platform) {
@@ -3245,13 +3258,13 @@ var mx = (function () {
                     var versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
                         _this.cfgData = _this.defaultCfg(res, versionRet);
-                        console.log('版本关闭----------------');
+                        console.log('版本关闭----------------', _this.cfgData);
                     }
                     else {
                         //总开关控制
                         var mistouchOn = res && res.mistouchOn == 1 ? true : false;
                         if (!mistouchOn) {
-                            console.log('总开关已关闭----------------');
+                            console.log('总开关已关闭----------------', _this.cfgData);
                         }
                         _this.cfgData = _this.defaultCfg(res, mistouchOn);
                     }

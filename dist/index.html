@@ -8,11 +8,13 @@
 <script src="./moosnow.platform.ui.js"></script>
 
 <script>
-
-	moosnow.platform.checkVersion("",res => {
-        console.log('res', res)
+    moosnow.platform.login("", res => {
+        console.log("login res", res)
     })
-	
+    moosnow.platform.checkVersion("", res => {
+        console.log('checkVersion res', res)
+    })
+
     moosnow.http.getAllConfig(res => {
         console.log('res', res)
     })

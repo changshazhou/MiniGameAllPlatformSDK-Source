@@ -417,30 +417,42 @@ export class HttpModule extends BaseModule {
                     loadingAdOn: applyRemote ? res.loadingAdOn : 0,
                 }
             }
-            console.log("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken())
-            console.log("defaultCfg -> res.whitelist", res.whitelist)
-            if (res.whitelist && res.whitelist.indexOf(moosnow.data.getToken()) != -1) {
-                cfg = {
-                    ...cfg,
-                    ...{
-                        checkBoxMistouch: 1,
-                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                        mistouchNum: 1,
-                        mistouchPosNum: 1,
-                        bannerShowCountLimit: 1,
-                        exportBtnNavigate: 1,
-                        exportAutoNavigate: 1,
-                        delayShow: 1,
-                        showAppBox: 1,
-                        zs_native_click_switch: 1,
-                        zs_jump_switch: 1,
-                        mistouchInterval: 1,
-                        nativeErrorShowInter: 1,
-                        bannerErrorShowInter: 1,
-                        isStartMistouch: 1,
-                        isStartVideo: 1,
-                        loadingAdOn: 1,
+            console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken())
+            console.warn("defaultCfg -> res.whitelist", res.whitelist)
+            if (res.whitelist) {
+                let token = moosnow.data.getToken();
+                let inWhite = false;
+                for (let i = 0; i < res.whitelist.length; i++) {
+                    if (token == res.whitelist[i]) {
+                        inWhite = true;
+                        break;
                     }
+                }
+                if (inWhite) {
+                    console.warn("白名单前 -> cfg", cfg)
+                    cfg = {
+                        ...cfg,
+                        ...{
+                            checkBoxMistouch: 1,
+                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                            mistouchNum: 1,
+                            mistouchPosNum: 1,
+                            bannerShowCountLimit: 1,
+                            exportBtnNavigate: 1,
+                            exportAutoNavigate: 1,
+                            delayShow: 1,
+                            showAppBox: 1,
+                            zs_native_click_switch: 1,
+                            zs_jump_switch: 1,
+                            mistouchInterval: 1,
+                            nativeErrorShowInter: 1,
+                            bannerErrorShowInter: 1,
+                            isStartMistouch: 1,
+                            isStartVideo: 1,
+                            loadingAdOn: 1,
+                        }
+                    }
+                    console.warn("白名单后 -> cfg", cfg)
                 }
             }
         }
@@ -479,13 +491,13 @@ export class HttpModule extends BaseModule {
                     let versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
                         this.cfgData = this.defaultCfg(res, versionRet)
-                        console.log('版本关闭----------------');
+                        console.log('版本关闭----------------', this.cfgData);
                     }
                     else {
                         //总开关控制
                         let mistouchOn = res && res.mistouchOn == 1 ? true : false;
                         if (!mistouchOn) {
-                            console.log('总开关已关闭----------------');
+                            console.log('总开关已关闭----------------', this.cfgData);
                         }
                         this.cfgData = this.defaultCfg(res, mistouchOn)
                     }

@@ -87,6 +87,7 @@ export default class WXModule extends PlatformModule {
             scene,
             fromApp
         }, "POST", (respone) => {
+            console.log("WXModule -> getUserToken -> respone", respone)
             if (respone.code == 0 && respone.data && respone.data.user_id) {
                 moosnow.data.setToken(respone.data.user_id);
             }
