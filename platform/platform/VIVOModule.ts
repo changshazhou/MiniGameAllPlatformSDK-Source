@@ -207,8 +207,9 @@ export default class VIVOModule extends PlatformModule {
 
     public _getBannerPosition(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
 
-        console.log("QQModule -> _getBannerPosition -> vertical", vertical)
-        console.log("QQModule -> _getBannerPosition -> horizontal", horizontal)
+        console.log("VIVOModule -> _getBannerPosition -> vertical", vertical)
+        console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal)
+
 
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
@@ -233,7 +234,7 @@ export default class VIVOModule extends PlatformModule {
             top = (windowHeight - this.bannerHeigth) / 2;
         }
         else if (vertical == BANNER_VERTICAL.BOTTOM) {
-            top = windowHeight - this.bannerHeigth - 16;
+            top = windowHeight - this.bannerHeigth;
         }
 
         if (horizontal == BANNER_HORIZONTAL.LEFT) {
@@ -246,7 +247,7 @@ export default class VIVOModule extends PlatformModule {
             left = (windowWidth - this.bannerWidth) / 2;
         }
 
-        console.log("QQModule -> _getBannerPosition -> left", left, 'top', top)
+        console.log("VIVOModule -> _getBannerPosition -> top,left", top, left)
         // return {
         //     left: 16,
         //     top: 16,

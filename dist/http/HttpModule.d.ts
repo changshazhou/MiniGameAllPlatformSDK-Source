@@ -83,6 +83,7 @@ export declare class HttpModule extends BaseModule {
     cfgData: any;
     areaData: any;
     _cfgQuene: any[];
+    private defaultCfg;
     loadCfg(callback: any): void;
     private _localQuene;
     loadArea(callback: any): void;

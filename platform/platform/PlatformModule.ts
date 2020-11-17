@@ -313,7 +313,7 @@ export default class PlatformModule extends BaseModule {
 
     public checkLog(remoteVersion) {
         let configVersion = moosnow.platform.moosnowConfig.version
-        let versionRet = remoteVersion == configVersion;
+        let versionRet = remoteVersion != configVersion;
         console.log(`版本检查 后台版本${remoteVersion} 配置文件版本${configVersion}`)
         console.log("获取广告开关：", versionRet);
         return versionRet;

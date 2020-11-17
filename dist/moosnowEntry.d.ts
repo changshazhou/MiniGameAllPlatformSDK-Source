@@ -11,6 +11,7 @@ import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
 import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
+import moosnowAppConfig from "./model/moosnowAppConfig";
 export default class moosnow {
     VIDEO_STATUS: {
         END: string;
@@ -60,6 +61,7 @@ export default class moosnow {
          * 获取当前的游戏平台
          */
     getAppPlatform(): PlatformType;
+    appConfig(): moosnowAppConfig;
     constructor();
     private initHttp;
     private initPlatform;

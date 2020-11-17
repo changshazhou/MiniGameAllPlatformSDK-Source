@@ -29,6 +29,7 @@ import AudioModule from "./framework/AudioModule";
 import UCModule from "./platform/UCModule";
 import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
+import moosnowAppConfig from "./model/moosnowAppConfig";
 
 export default class moosnow {
     public VIDEO_STATUS = VIDEO_STATUS;
@@ -48,6 +49,9 @@ export default class moosnow {
          */
     public getAppPlatform(): PlatformType {
         return Common.platform;
+    }
+    public appConfig(): moosnowAppConfig {
+        return Common.config;
     }
     constructor() {
         (window["moosnow"]) = this;

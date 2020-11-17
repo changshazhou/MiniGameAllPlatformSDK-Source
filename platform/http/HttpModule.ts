@@ -241,6 +241,9 @@ export class HttpModule extends BaseModule {
             if (window['wx'] && window['wx'].aldSendEvent)
                 (window['wx'] as any).aldSendEvent(name, data);
         }
+        else if (Common.platform == PlatformType.BYTEDANCE) {
+            window["tt"].reportAnalytics(name, data);
+        }
     }
 
     /**
@@ -248,15 +251,22 @@ export class HttpModule extends BaseModule {
     * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
     */
     public startGame(level: string) {
-        if (Common.platform == PlatformType.WX)
+        let e = {
+            stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+            stageName: "" + level,//关卡名称，该字段必传
+            userId: moosnow.data.getToken() //用户ID
+        }
+        if (Common.platform == PlatformType.WX) {
             if (window['wx'] && window['wx'].aldStage)
-                window['wx'].aldStage.onStart({
-                    stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                    stageName: "" + level,//关卡名称，该字段必传
-                    userId: moosnow.data.getToken() //用户ID
-                });
+                window['wx'].aldStage.onStart(e);
             else
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
+        }
+        else if (Common.platform == PlatformType.BYTEDANCE) {
+            window["tt"].reportAnalytics(name, e);
+        }
+        else
+            console.log("startGame -> e", e)
     }
     /**
      * 统计结束游戏
@@ -264,22 +274,29 @@ export class HttpModule extends BaseModule {
      * @param {boolean} isWin 是否成功
      */
     public endGame(level: string, isWin: boolean) {
-        if (Common.platform != PlatformType.WX) return;
-
         var event = isWin ? "complete" : "fail";
         var desc = isWin ? "关卡完成" : "关卡失败";
-        if (window['wx'] && window['wx'].aldStage)
-            window['wx'].aldStage.onEnd({
-                stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
-                stageName: "" + level,//关卡名称，该字段必传
-                userId: moosnow.data.getToken(), //用户ID
-                event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
-                params: {
-                    desc: desc   //描述
-                }
-            });
+        let e = {
+            stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+            stageName: "" + level,//关卡名称，该字段必传
+            userId: moosnow.data.getToken(), //用户ID
+            event: event,   //关卡完成  关卡进行中，用户触发的操作    该字段必传
+            params: {
+                desc: desc   //描述
+            }
+        }
+        if (Common.platform == PlatformType.WX) {
+            if (window['wx'] && window['wx'].aldStage)
+                window['wx'].aldStage.onEnd(e);
+            else
+                console.warn(MSG.ALD_FILE_NO_IMPORT)
+        }
+        else if (Common.platform == PlatformType.BYTEDANCE) {
+            window["tt"].reportAnalytics(desc, e);
+        }
         else
-            console.warn(MSG.ALD_FILE_NO_IMPORT)
+            console.log("startGame -> e", e)
+
     }
     /**
      * 视频统计
@@ -288,14 +305,22 @@ export class HttpModule extends BaseModule {
      * @param {string} level 关卡数
      */
     public videoPoint(type, info: string, level: string) {
-        if (Common.platform != PlatformType.WX) return;
         var name = type == 0 ? "点击视频" : "观看完成视频";
-        if (window['wx'] && window['wx'].aldSendEvent)
-            window['wx'].aldSendEvent(name, { info, level: level + "" });
+        let e = { info, level: level + "" }
+        if (Common.platform == PlatformType.WX) {
+            if (window['wx'] && window['wx'].aldSendEvent)
+                window['wx'].aldSendEvent(name, e);
+            else
+                console.warn(MSG.ALD_FILE_NO_IMPORT)
+        }
+        else if (Common.platform == PlatformType.BYTEDANCE) {
+            window["tt"].reportAnalytics(name, e);
+        }
         else
-            console.warn(MSG.ALD_FILE_NO_IMPORT)
+            console.log("startGame -> e", e)
 
     }
+
 
     /**
      * 
@@ -349,6 +374,90 @@ export class HttpModule extends BaseModule {
     public cfgData = null;
     public areaData = null;
     public _cfgQuene = [];
+
+    private defaultCfg(res, applyRemote: boolean) {
+        let cfg = {
+            checkBoxMistouch: 0,
+            checkBoxProbabilitys: [100, 0, 0, 0, 0],
+            mistouchNum: 0,
+            mistouchPosNum: 0,
+            bannerShowCountLimit: 1,
+            exportBtnNavigate: 0,
+            exportAutoNavigate: 0,
+            delayShow: 0,
+            showAppBox: 0,
+            zs_native_click_switch: 0,
+            zs_jump_switch: 0,
+            mistouchInterval: 0,
+            nativeErrorShowInter: 0,
+            bannerErrorShowInter: 0,
+            isStartMistouch: 0,
+            isStartVideo: 0,
+            loadingAdOn: 0,
+        };
+        if (res) {
+            cfg = {
+                ...cfg,
+                ...{
+                    ...Common.deepCopy(res),
+                    zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
+                    zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
+                    mistouchNum: applyRemote ? res.mistouchNum : 0,
+                    mistouchPosNum: applyRemote ? res.mistouchPosNum : 0,
+                    mistouchInterval: applyRemote ? res.mistouchInterval : 0,
+                    exportAutoNavigate: applyRemote ? res.exportAutoNavigate : 0,
+                    exportBtnNavigate: applyRemote ? res.exportBtnNavigate : 0,
+                    checkBoxMistouch: applyRemote ? res.checkBoxMistouch : 0,
+                    nativeErrorShowInter: applyRemote ? res.nativeErrorShowInter : 0,
+                    bannerErrorShowInter: applyRemote ? res.bannerErrorShowInter : 0,
+                    delayShow: applyRemote ? res.delayShow : 0,
+                    showAppBox: applyRemote ? res.showAppBox : 0,
+                    isStartMistouch: applyRemote ? res.isStartMistouch : 0,
+                    isStartVideo: applyRemote ? res.isStartVideo : 0,
+                    loadingAdOn: applyRemote ? res.loadingAdOn : 0,
+                }
+            }
+            console.log("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken())
+            console.log("defaultCfg -> res.whitelist", res.whitelist)
+            if (res.whitelist && res.whitelist.indexOf(moosnow.data.getToken()) != -1) {
+                cfg = {
+                    ...cfg,
+                    ...{
+                        checkBoxMistouch: 1,
+                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                        mistouchNum: 1,
+                        mistouchPosNum: 1,
+                        bannerShowCountLimit: 1,
+                        exportBtnNavigate: 1,
+                        exportAutoNavigate: 1,
+                        delayShow: 1,
+                        showAppBox: 1,
+                        zs_native_click_switch: 1,
+                        zs_jump_switch: 1,
+                        mistouchInterval: 1,
+                        nativeErrorShowInter: 1,
+                        bannerErrorShowInter: 1,
+                        isStartMistouch: 1,
+                        isStartVideo: 1,
+                        loadingAdOn: 1,
+                    }
+                }
+            }
+        }
+
+        if (moosnow.platform) {
+            if (res) {
+                if (!isNaN(res.bannerShowCountLimit))
+                    moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                if (!isNaN(res.bannerLimitType))
+                    moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
+                if (!isNaN(res.bannerShowTimeLimit))
+                    moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+            }
+        }
+        return cfg;
+    }
+
     public loadCfg(callback) {
         if (!Common.isEmpty(this.cfgData)) {
             callback(this.cfgData);
@@ -367,36 +476,18 @@ export class HttpModule extends BaseModule {
 
             this.request(url, {}, 'GET',
                 (res) => {
-                    //总开关控制
-                    let mistouchOn = res && res.mistouchOn == 1 ? true : false;
-                    if (!mistouchOn)
-                        console.log('总开关已关闭----------------')
-                    this.cfgData = {
-                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                        ...Common.deepCopy(res),
-                        zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
-                        zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
-                        mistouchNum: mistouchOn ? res.mistouchNum : 0,
-                        mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0,
-                        mistouchInterval: mistouchOn ? res.mistouchInterval : 0,
-                        exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0,
-                        exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0,
-                        checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0,
-                        nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0,
-                        bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0,
-                        delayShow: mistouchOn ? res.delayShow : 0,
-                        showAppBox: mistouchOn ? res.showAppBox : 0,
-                    };
-                    if (moosnow.platform) {
-                        if (res) {
-                            if (!isNaN(res.bannerShowCountLimit))
-                                moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
-                            if (!isNaN(res.bannerLimitType))
-                                moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
-                            if (!isNaN(res.bannerShowTimeLimit))
-                                moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+                    let versionRet = moosnow.platform.checkLog(res.version);
+                    if (!versionRet) {
+                        this.cfgData = this.defaultCfg(res, versionRet)
+                        console.log('版本关闭----------------');
+                    }
+                    else {
+                        //总开关控制
+                        let mistouchOn = res && res.mistouchOn == 1 ? true : false;
+                        if (!mistouchOn) {
+                            console.log('总开关已关闭----------------');
                         }
-
+                        this.cfgData = this.defaultCfg(res, mistouchOn)
                     }
                     this._cfgQuene.forEach(item => {
                         item(this.cfgData);
@@ -404,18 +495,9 @@ export class HttpModule extends BaseModule {
                     this._cfgQuene = [];
                 },
                 () => {
+                    let cfg = this.defaultCfg(null, false)
                     this._cfgQuene.forEach(item => {
-                        item({
-                            checkBoxMistouch: 0,
-                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                            mistouchNum: 0,
-                            mistouchPosNum: 0,
-                            bannerShowCountLimit: 1,
-                            exportBtnNavigate: 0,
-                            exportAutoNavigate: 0,
-                            delayShow: 0,
-                            showAppBox: 0,
-                        });
+                        item(cfg);
                     })
                     this._cfgQuene = [];
                     console.log('load config json fail');

@@ -1132,7 +1132,7 @@ var mx = (function () {
         };
         PlatformModule.prototype.checkLog = function (remoteVersion) {
             var configVersion = moosnow.platform.moosnowConfig.version;
-            var versionRet = remoteVersion == configVersion;
+            var versionRet = remoteVersion != configVersion;
             console.log("\u7248\u672C\u68C0\u67E5 \u540E\u53F0\u7248\u672C" + remoteVersion + " \u914D\u7F6E\u6587\u4EF6\u7248\u672C" + configVersion);
             console.log("获取广告开关：", versionRet);
             return versionRet;
@@ -3064,21 +3064,31 @@ var mx = (function () {
                 if (window['wx'] && window['wx'].aldSendEvent)
                     window['wx'].aldSendEvent(name, data);
             }
+            else if (Common.platform == PlatformType.BYTEDANCE) {
+                window["tt"].reportAnalytics(name, data);
+            }
         };
         /**
         * 统计开始游戏
         * @param {string} level 关卡数 必须是1 || 2 || 1.1 || 12.2 格式
         */
         HttpModule.prototype.startGame = function (level) {
-            if (Common.platform == PlatformType.WX)
+            var e = {
+                stageId: "" + level,
+                stageName: "" + level,
+                userId: moosnow.data.getToken() //用户ID
+            };
+            if (Common.platform == PlatformType.WX) {
                 if (window['wx'] && window['wx'].aldStage)
-                    window['wx'].aldStage.onStart({
-                        stageId: "" + level,
-                        stageName: "" + level,
-                        userId: moosnow.data.getToken() //用户ID
-                    });
+                    window['wx'].aldStage.onStart(e);
                 else
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
+            }
+            else if (Common.platform == PlatformType.BYTEDANCE) {
+                window["tt"].reportAnalytics(name, e);
+            }
+            else
+                console.log("startGame -> e", e);
         };
         /**
          * 统计结束游戏
@@ -3086,22 +3096,28 @@ var mx = (function () {
          * @param {boolean} isWin 是否成功
          */
         HttpModule.prototype.endGame = function (level, isWin) {
-            if (Common.platform != PlatformType.WX)
-                return;
             var event = isWin ? "complete" : "fail";
             var desc = isWin ? "关卡完成" : "关卡失败";
-            if (window['wx'] && window['wx'].aldStage)
-                window['wx'].aldStage.onEnd({
-                    stageId: "" + level,
-                    stageName: "" + level,
-                    userId: moosnow.data.getToken(),
-                    event: event,
-                    params: {
-                        desc: desc //描述
-                    }
-                });
+            var e = {
+                stageId: "" + level,
+                stageName: "" + level,
+                userId: moosnow.data.getToken(),
+                event: event,
+                params: {
+                    desc: desc //描述
+                }
+            };
+            if (Common.platform == PlatformType.WX) {
+                if (window['wx'] && window['wx'].aldStage)
+                    window['wx'].aldStage.onEnd(e);
+                else
+                    console.warn(MSG.ALD_FILE_NO_IMPORT);
+            }
+            else if (Common.platform == PlatformType.BYTEDANCE) {
+                window["tt"].reportAnalytics(desc, e);
+            }
             else
-                console.warn(MSG.ALD_FILE_NO_IMPORT);
+                console.log("startGame -> e", e);
         };
         /**
          * 视频统计
@@ -3110,13 +3126,19 @@ var mx = (function () {
          * @param {string} level 关卡数
          */
         HttpModule.prototype.videoPoint = function (type, info, level) {
-            if (Common.platform != PlatformType.WX)
-                return;
             var name = type == 0 ? "点击视频" : "观看完成视频";
-            if (window['wx'] && window['wx'].aldSendEvent)
-                window['wx'].aldSendEvent(name, { info: info, level: level + "" });
+            var e = { info: info, level: level + "" };
+            if (Common.platform == PlatformType.WX) {
+                if (window['wx'] && window['wx'].aldSendEvent)
+                    window['wx'].aldSendEvent(name, e);
+                else
+                    console.warn(MSG.ALD_FILE_NO_IMPORT);
+            }
+            else if (Common.platform == PlatformType.BYTEDANCE) {
+                window["tt"].reportAnalytics(name, e);
+            }
             else
-                console.warn(MSG.ALD_FILE_NO_IMPORT);
+                console.log("startGame -> e", e);
         };
         /**
          *
@@ -3147,6 +3169,64 @@ var mx = (function () {
                 });
             });
         };
+        HttpModule.prototype.defaultCfg = function (res, applyRemote) {
+            var cfg = {
+                checkBoxMistouch: 0,
+                checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                mistouchNum: 0,
+                mistouchPosNum: 0,
+                bannerShowCountLimit: 1,
+                exportBtnNavigate: 0,
+                exportAutoNavigate: 0,
+                delayShow: 0,
+                showAppBox: 0,
+                zs_native_click_switch: 0,
+                zs_jump_switch: 0,
+                mistouchInterval: 0,
+                nativeErrorShowInter: 0,
+                bannerErrorShowInter: 0,
+                isStartMistouch: 0,
+                isStartVideo: 0,
+                loadingAdOn: 0,
+            };
+            if (res) {
+                cfg = __assign(__assign({}, cfg), __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: applyRemote ? res.mistouchNum : 0, mistouchPosNum: applyRemote ? res.mistouchPosNum : 0, mistouchInterval: applyRemote ? res.mistouchInterval : 0, exportAutoNavigate: applyRemote ? res.exportAutoNavigate : 0, exportBtnNavigate: applyRemote ? res.exportBtnNavigate : 0, checkBoxMistouch: applyRemote ? res.checkBoxMistouch : 0, nativeErrorShowInter: applyRemote ? res.nativeErrorShowInter : 0, bannerErrorShowInter: applyRemote ? res.bannerErrorShowInter : 0, delayShow: applyRemote ? res.delayShow : 0, showAppBox: applyRemote ? res.showAppBox : 0, isStartMistouch: applyRemote ? res.isStartMistouch : 0, isStartVideo: applyRemote ? res.isStartVideo : 0, loadingAdOn: applyRemote ? res.loadingAdOn : 0 }));
+                console.log("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken());
+                console.log("defaultCfg -> res.whitelist", res.whitelist);
+                if (res.whitelist && res.whitelist.indexOf(moosnow.data.getToken()) != -1) {
+                    cfg = __assign(__assign({}, cfg), {
+                        checkBoxMistouch: 1,
+                        checkBoxProbabilitys: [100, 0, 0, 0, 0],
+                        mistouchNum: 1,
+                        mistouchPosNum: 1,
+                        bannerShowCountLimit: 1,
+                        exportBtnNavigate: 1,
+                        exportAutoNavigate: 1,
+                        delayShow: 1,
+                        showAppBox: 1,
+                        zs_native_click_switch: 1,
+                        zs_jump_switch: 1,
+                        mistouchInterval: 1,
+                        nativeErrorShowInter: 1,
+                        bannerErrorShowInter: 1,
+                        isStartMistouch: 1,
+                        isStartVideo: 1,
+                        loadingAdOn: 1,
+                    });
+                }
+            }
+            if (moosnow.platform) {
+                if (res) {
+                    if (!isNaN(res.bannerShowCountLimit))
+                        moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
+                    if (!isNaN(res.bannerLimitType))
+                        moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
+                    if (!isNaN(res.bannerShowTimeLimit))
+                        moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+                }
+            }
+            return cfg;
+        };
         HttpModule.prototype.loadCfg = function (callback) {
             var _this = this;
             if (!Common.isEmpty(this.cfgData)) {
@@ -3162,38 +3242,27 @@ var mx = (function () {
                 else
                     url = ROOT_CONFIG.HTTP_ROOT + "/config/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    //总开关控制
-                    var mistouchOn = res && res.mistouchOn == 1 ? true : false;
-                    if (!mistouchOn)
-                        console.log('总开关已关闭----------------');
-                    _this.cfgData = __assign(__assign({ checkBoxProbabilitys: [100, 0, 0, 0, 0] }, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: mistouchOn ? res.mistouchNum : 0, mistouchPosNum: mistouchOn ? res.mistouchPosNum : 0, mistouchInterval: mistouchOn ? res.mistouchInterval : 0, exportAutoNavigate: mistouchOn ? res.exportAutoNavigate : 0, exportBtnNavigate: mistouchOn ? res.exportBtnNavigate : 0, checkBoxMistouch: mistouchOn ? res.checkBoxMistouch : 0, nativeErrorShowInter: mistouchOn ? res.nativeErrorShowInter : 0, bannerErrorShowInter: mistouchOn ? res.bannerErrorShowInter : 0, delayShow: mistouchOn ? res.delayShow : 0, showAppBox: mistouchOn ? res.showAppBox : 0 });
-                    if (moosnow.platform) {
-                        if (res) {
-                            if (!isNaN(res.bannerShowCountLimit))
-                                moosnow.platform.bannerShowCountLimit = parseInt(res.bannerShowCountLimit);
-                            if (!isNaN(res.bannerLimitType))
-                                moosnow.platform.bannerLimitType = parseInt(res.bannerLimitType);
-                            if (!isNaN(res.bannerShowTimeLimit))
-                                moosnow.platform.bannerShowTimeLimit = parseInt(res.bannerShowTimeLimit);
+                    var versionRet = moosnow.platform.checkLog(res.version);
+                    if (!versionRet) {
+                        _this.cfgData = _this.defaultCfg(res, versionRet);
+                        console.log('版本关闭----------------');
+                    }
+                    else {
+                        //总开关控制
+                        var mistouchOn = res && res.mistouchOn == 1 ? true : false;
+                        if (!mistouchOn) {
+                            console.log('总开关已关闭----------------');
                         }
+                        _this.cfgData = _this.defaultCfg(res, mistouchOn);
                     }
                     _this._cfgQuene.forEach(function (item) {
                         item(_this.cfgData);
                     });
                     _this._cfgQuene = [];
                 }, function () {
+                    var cfg = _this.defaultCfg(null, false);
                     _this._cfgQuene.forEach(function (item) {
-                        item({
-                            checkBoxMistouch: 0,
-                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                            mistouchNum: 0,
-                            mistouchPosNum: 0,
-                            bannerShowCountLimit: 1,
-                            exportBtnNavigate: 0,
-                            exportAutoNavigate: 0,
-                            delayShow: 0,
-                            showAppBox: 0,
-                        });
+                        item(cfg);
                     });
                     _this._cfgQuene = [];
                     console.log('load config json fail');
@@ -6046,8 +6115,8 @@ var mx = (function () {
         VIVOModule.prototype._getBannerPosition = function (horizontal, vertical) {
             if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
             if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
-            console.log("QQModule -> _getBannerPosition -> vertical", vertical);
-            console.log("QQModule -> _getBannerPosition -> horizontal", horizontal);
+            console.log("VIVOModule -> _getBannerPosition -> vertical", vertical);
+            console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal);
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
@@ -6069,7 +6138,7 @@ var mx = (function () {
                 top = (windowHeight - this.bannerHeigth) / 2;
             }
             else if (vertical == BANNER_VERTICAL.BOTTOM) {
-                top = windowHeight - this.bannerHeigth - 16;
+                top = windowHeight - this.bannerHeigth;
             }
             if (horizontal == BANNER_HORIZONTAL.LEFT) {
                 left = 0;
@@ -6080,7 +6149,7 @@ var mx = (function () {
             else if (horizontal == BANNER_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.bannerWidth) / 2;
             }
-            console.log("QQModule -> _getBannerPosition -> left", left, 'top', top);
+            console.log("VIVOModule -> _getBannerPosition -> top,left", top, left);
             // return {
             //     left: 16,
             //     top: 16,
@@ -7112,6 +7181,9 @@ var mx = (function () {
              */
         moosnow.prototype.getAppPlatform = function () {
             return Common.platform;
+        };
+        moosnow.prototype.appConfig = function () {
+            return Common.config;
         };
         moosnow.prototype.initHttp = function () {
             if (Common.platform == PlatformType.WX)
