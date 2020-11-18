@@ -347,21 +347,9 @@ export class HttpModule extends BaseModule {
                             if (res.exportAutoNavigate == 2)
                                 exportAutoNavigate = 1
                             callback({
-                                ...res,
-                                mistouchNum: 0,
-                                mistouchPosNum: 0,
-                                mistouchInterval: 0,
-                                exportBtnNavigate: 0,
-                                checkBoxMistouch: 0,
-                                exportAutoNavigate,
-                                bannerShowCountLimit: 1,
                                 isLimitArea: 1,
-                                nativeErrorShowInter: 0,
-                                bannerErrorShowInter: 0,
-                                delayShow: 0,
-                                showAppBox: 0,
-                                isStartMistouch: 0,
-                                isStartVideo: 0,
+                                ...res,
+                                ...this.getCfg(false)
                             })
                         }
                         else {
@@ -387,12 +375,7 @@ export class HttpModule extends BaseModule {
     public areaData = null;
     public _cfgQuene = [];
 
-    /**
-     * 
-     * @param res 
-     * @param applyRemote 使用后台数据
-     */
-    private defaultCfg(res, applyRemote: boolean) {
+    private getCfg(open: boolean) {
         let cfg = {
             checkBoxMistouch: 0,
             checkBoxProbabilitys: [100, 0, 0, 0, 0],
@@ -405,33 +388,36 @@ export class HttpModule extends BaseModule {
             showAppBox: 0,
             zs_native_click_switch: 0,
             zs_jump_switch: 0,
+            mx_native_click_switch: 0,
+            mx_jump_switch: 0,
             mistouchInterval: 0,
             nativeErrorShowInter: 0,
             bannerErrorShowInter: 0,
             isStartMistouch: 0,
             isStartVideo: 0,
             loadingAdOn: 0,
-        };
+        }
+        if (open) {
+            for (let key in cfg) {
+                if (!isNaN(cfg[key]))
+                    cfg[key] = 1
+            }
+        }
+        return cfg;
+    }
+
+    /**
+     * 
+     * @param res 
+     * @param applyRemote 使用后台数据
+     */
+    private defaultCfg(res, applyRemote: boolean) {
+        let cfg: any = this.getCfg(false);
         if (res) {
-            cfg = {
-                ...cfg,
-                ...{
-                    ...Common.deepCopy(res),
-                    zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0,
-                    zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0,
-                    mistouchNum: applyRemote ? res.mistouchNum : 0,
-                    mistouchPosNum: applyRemote ? res.mistouchPosNum : 0,
-                    mistouchInterval: applyRemote ? res.mistouchInterval : 0,
-                    exportAutoNavigate: applyRemote ? res.exportAutoNavigate : 0,
-                    exportBtnNavigate: applyRemote ? res.exportBtnNavigate : 0,
-                    checkBoxMistouch: applyRemote ? res.checkBoxMistouch : 0,
-                    nativeErrorShowInter: applyRemote ? res.nativeErrorShowInter : 0,
-                    bannerErrorShowInter: applyRemote ? res.bannerErrorShowInter : 0,
-                    delayShow: applyRemote ? res.delayShow : 0,
-                    showAppBox: applyRemote ? res.showAppBox : 0,
-                    isStartMistouch: applyRemote ? res.isStartMistouch : 0,
-                    isStartVideo: applyRemote ? res.isStartVideo : 0,
-                    loadingAdOn: applyRemote ? res.loadingAdOn : 0,
+            if (applyRemote) {
+                for (let key in cfg) {
+                    if (!isNaN(cfg[key]))
+                        cfg[key] = res[key]
                 }
             }
             console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken())
@@ -448,27 +434,9 @@ export class HttpModule extends BaseModule {
                 if (inWhite) {
                     console.warn("白名单前 -> cfg", cfg)
                     cfg = {
+                        inWhite,
                         ...cfg,
-                        ...{
-                            checkBoxMistouch: 1,
-                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                            mistouchNum: 1,
-                            mistouchPosNum: 1,
-                            bannerShowCountLimit: 1,
-                            exportBtnNavigate: 1,
-                            exportAutoNavigate: 1,
-                            delayShow: 1,
-                            showAppBox: 1,
-                            zs_native_click_switch: 1,
-                            zs_jump_switch: 1,
-                            mistouchInterval: 1,
-                            nativeErrorShowInter: 1,
-                            bannerErrorShowInter: 1,
-                            isStartMistouch: 1,
-                            isStartVideo: 1,
-                            loadingAdOn: 1,
-                            inWhite
-                        }
+                        ...this.getCfg(true)
                     }
                     console.warn("白名单后 -> cfg", cfg)
                 }

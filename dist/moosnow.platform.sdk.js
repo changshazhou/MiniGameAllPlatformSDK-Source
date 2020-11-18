@@ -3161,7 +3161,7 @@ var mx = (function () {
                                     exportAutoNavigate = 0;
                                 if (res.exportAutoNavigate == 2)
                                     exportAutoNavigate = 1;
-                                callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0, isStartMistouch: 0, isStartVideo: 0 }));
+                                callback(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)));
                             }
                             else {
                                 if (res.exportAutoNavigate == 1)
@@ -3175,12 +3175,7 @@ var mx = (function () {
                 }
             });
         };
-        /**
-         *
-         * @param res
-         * @param applyRemote 使用后台数据
-         */
-        HttpModule.prototype.defaultCfg = function (res, applyRemote) {
+        HttpModule.prototype.getCfg = function (open) {
             var cfg = {
                 checkBoxMistouch: 0,
                 checkBoxProbabilitys: [100, 0, 0, 0, 0],
@@ -3200,8 +3195,28 @@ var mx = (function () {
                 isStartVideo: 0,
                 loadingAdOn: 0,
             };
+            if (open) {
+                for (var key in cfg) {
+                    if (!isNaN(cfg[key]))
+                        cfg[key] = 1;
+                }
+            }
+            return cfg;
+        };
+        /**
+         *
+         * @param res
+         * @param applyRemote 使用后台数据
+         */
+        HttpModule.prototype.defaultCfg = function (res, applyRemote) {
+            var cfg = this.getCfg(false);
             if (res) {
-                cfg = __assign(__assign({}, cfg), __assign(__assign({}, Common.deepCopy(res)), { zs_native_click_switch: res && res.mx_native_click_switch ? res.mx_native_click_switch : 0, zs_jump_switch: res && res.mx_jump_switch ? res.mx_jump_switch : 0, mistouchNum: applyRemote ? res.mistouchNum : 0, mistouchPosNum: applyRemote ? res.mistouchPosNum : 0, mistouchInterval: applyRemote ? res.mistouchInterval : 0, exportAutoNavigate: applyRemote ? res.exportAutoNavigate : 0, exportBtnNavigate: applyRemote ? res.exportBtnNavigate : 0, checkBoxMistouch: applyRemote ? res.checkBoxMistouch : 0, nativeErrorShowInter: applyRemote ? res.nativeErrorShowInter : 0, bannerErrorShowInter: applyRemote ? res.bannerErrorShowInter : 0, delayShow: applyRemote ? res.delayShow : 0, showAppBox: applyRemote ? res.showAppBox : 0, isStartMistouch: applyRemote ? res.isStartMistouch : 0, isStartVideo: applyRemote ? res.isStartVideo : 0, loadingAdOn: applyRemote ? res.loadingAdOn : 0 }));
+                if (applyRemote) {
+                    for (var key in cfg) {
+                        if (!isNaN(cfg[key]))
+                            cfg[key] = res[key];
+                    }
+                }
                 console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken());
                 console.warn("defaultCfg -> res.whitelist", res.whitelist);
                 if (res.whitelist) {
@@ -3215,26 +3230,7 @@ var mx = (function () {
                     }
                     if (inWhite) {
                         console.warn("白名单前 -> cfg", cfg);
-                        cfg = __assign(__assign({}, cfg), {
-                            checkBoxMistouch: 1,
-                            checkBoxProbabilitys: [100, 0, 0, 0, 0],
-                            mistouchNum: 1,
-                            mistouchPosNum: 1,
-                            bannerShowCountLimit: 1,
-                            exportBtnNavigate: 1,
-                            exportAutoNavigate: 1,
-                            delayShow: 1,
-                            showAppBox: 1,
-                            zs_native_click_switch: 1,
-                            zs_jump_switch: 1,
-                            mistouchInterval: 1,
-                            nativeErrorShowInter: 1,
-                            bannerErrorShowInter: 1,
-                            isStartMistouch: 1,
-                            isStartVideo: 1,
-                            loadingAdOn: 1,
-                            inWhite: inWhite
-                        });
+                        cfg = __assign(__assign({ inWhite: inWhite }, cfg), this.getCfg(true));
                         console.warn("白名单后 -> cfg", cfg);
                     }
                 }

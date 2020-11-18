@@ -83,6 +83,7 @@ export declare class HttpModule extends BaseModule {
     cfgData: any;
     areaData: any;
     _cfgQuene: any[];
+    private getCfg;
     /**
      *
      * @param res
