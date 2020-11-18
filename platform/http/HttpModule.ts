@@ -359,7 +359,9 @@ export class HttpModule extends BaseModule {
                                 nativeErrorShowInter: 0,
                                 bannerErrorShowInter: 0,
                                 delayShow: 0,
-                                showAppBox: 0
+                                showAppBox: 0,
+                                isStartMistouch: 0,
+                                isStartVideo: 0,
                             })
                         }
                         else {
@@ -385,6 +387,11 @@ export class HttpModule extends BaseModule {
     public areaData = null;
     public _cfgQuene = [];
 
+    /**
+     * 
+     * @param res 
+     * @param applyRemote 使用后台数据
+     */
     private defaultCfg(res, applyRemote: boolean) {
         let cfg = {
             checkBoxMistouch: 0,
@@ -501,7 +508,7 @@ export class HttpModule extends BaseModule {
                 (res) => {
                     let versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
-                        this.cfgData = this.defaultCfg(res, versionRet)
+                        this.cfgData = this.defaultCfg(res, false)
                         console.log('版本关闭----------------', this.cfgData);
                     }
                     else {
@@ -510,7 +517,7 @@ export class HttpModule extends BaseModule {
                         if (!mistouchOn) {
                             console.log('总开关已关闭----------------', this.cfgData);
                         }
-                        this.cfgData = this.defaultCfg(res, mistouchOn)
+                        this.cfgData = this.defaultCfg(res, !mistouchOn)
                     }
                     this._cfgQuene.forEach(item => {
                         item(this.cfgData);

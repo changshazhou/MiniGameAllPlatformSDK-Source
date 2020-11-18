@@ -83,6 +83,11 @@ export declare class HttpModule extends BaseModule {
     cfgData: any;
     areaData: any;
     _cfgQuene: any[];
+    /**
+     *
+     * @param res
+     * @param applyRemote 使用后台数据
+     */
     private defaultCfg;
     loadCfg(callback: any): void;
     private _localQuene;

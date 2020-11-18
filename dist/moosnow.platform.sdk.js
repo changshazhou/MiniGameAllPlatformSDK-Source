@@ -3161,7 +3161,7 @@ var mx = (function () {
                                     exportAutoNavigate = 0;
                                 if (res.exportAutoNavigate == 2)
                                     exportAutoNavigate = 1;
-                                callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0 }));
+                                callback(__assign(__assign({}, res), { mistouchNum: 0, mistouchPosNum: 0, mistouchInterval: 0, exportBtnNavigate: 0, checkBoxMistouch: 0, exportAutoNavigate: exportAutoNavigate, bannerShowCountLimit: 1, isLimitArea: 1, nativeErrorShowInter: 0, bannerErrorShowInter: 0, delayShow: 0, showAppBox: 0, isStartMistouch: 0, isStartVideo: 0 }));
                             }
                             else {
                                 if (res.exportAutoNavigate == 1)
@@ -3175,6 +3175,11 @@ var mx = (function () {
                 }
             });
         };
+        /**
+         *
+         * @param res
+         * @param applyRemote 使用后台数据
+         */
         HttpModule.prototype.defaultCfg = function (res, applyRemote) {
             var cfg = {
                 checkBoxMistouch: 0,
@@ -3263,7 +3268,7 @@ var mx = (function () {
                 this.request(url, {}, 'GET', function (res) {
                     var versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
-                        _this.cfgData = _this.defaultCfg(res, versionRet);
+                        _this.cfgData = _this.defaultCfg(res, false);
                         console.log('版本关闭----------------', _this.cfgData);
                     }
                     else {
@@ -3272,7 +3277,7 @@ var mx = (function () {
                         if (!mistouchOn) {
                             console.log('总开关已关闭----------------', _this.cfgData);
                         }
-                        _this.cfgData = _this.defaultCfg(res, mistouchOn);
+                        _this.cfgData = _this.defaultCfg(res, !mistouchOn);
                     }
                     _this._cfgQuene.forEach(function (item) {
                         item(_this.cfgData);
