@@ -437,18 +437,20 @@ export class HttpModule extends BaseModule {
             }
 
             if (applyRemote) {
-                for (let key in res) {
-                    if (!isNaN(cfg[key]))
-                        cfg[key] = res[key];
-                    else
-                        cfg[key] = res[key]
+                console.warn("使用后台数据前 -> cfg", cfg)
+                cfg = {
+                    ...cfg,
+                    ...res
                 }
+                console.warn("使用后台数据后 -> cfg", cfg)
             }
             else {
-                for (let key in res) {
-                    if (!cfg[key])
-                        cfg[key] = res[key];
+                console.warn("不使用后台数据前 -> cfg", cfg)
+                cfg = {
+                    ...res,
+                    ...cfg
                 }
+                console.warn("不使用后台数据后 -> cfg", cfg)
             }
         }
 
@@ -494,7 +496,7 @@ export class HttpModule extends BaseModule {
                         if (!mistouchOn) {
                             console.log('总开关已关闭----------------', this.cfgData);
                         }
-                        this.cfgData = this.defaultCfg(res, !mistouchOn)
+                        this.cfgData = this.defaultCfg(res, mistouchOn)
                     }
                     this._cfgQuene.forEach(item => {
                         item(this.cfgData);

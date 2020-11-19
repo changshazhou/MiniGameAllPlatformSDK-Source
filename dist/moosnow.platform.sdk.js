@@ -3231,18 +3231,14 @@ var mx = (function () {
                     }
                 }
                 if (applyRemote) {
-                    for (var key in res) {
-                        if (!isNaN(cfg[key]))
-                            cfg[key] = res[key];
-                        else
-                            cfg[key] = res[key];
-                    }
+                    console.warn("使用后台数据前 -> cfg", cfg);
+                    cfg = __assign(__assign({}, cfg), res);
+                    console.warn("使用后台数据后 -> cfg", cfg);
                 }
                 else {
-                    for (var key in res) {
-                        if (!cfg[key])
-                            cfg[key] = res[key];
-                    }
+                    console.warn("不使用后台数据前 -> cfg", cfg);
+                    cfg = __assign(__assign({}, res), cfg);
+                    console.warn("不使用后台数据后 -> cfg", cfg);
                 }
             }
             if (moosnow.platform) {
@@ -3283,7 +3279,7 @@ var mx = (function () {
                         if (!mistouchOn) {
                             console.log('总开关已关闭----------------', _this.cfgData);
                         }
-                        _this.cfgData = _this.defaultCfg(res, !mistouchOn);
+                        _this.cfgData = _this.defaultCfg(res, mistouchOn);
                     }
                     _this._cfgQuene.forEach(function (item) {
                         item(_this.cfgData);
