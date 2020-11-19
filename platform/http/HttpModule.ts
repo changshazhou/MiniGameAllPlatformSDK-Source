@@ -414,12 +414,6 @@ export class HttpModule extends BaseModule {
     private defaultCfg(res, applyRemote: boolean) {
         let cfg: any = this.getCfg(false);
         if (res) {
-            if (applyRemote) {
-                for (let key in cfg) {
-                    if (!isNaN(cfg[key]))
-                        cfg[key] = res[key]
-                }
-            }
             console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken())
             console.warn("defaultCfg -> res.whitelist", res.whitelist)
             if (res.whitelist) {
@@ -439,6 +433,21 @@ export class HttpModule extends BaseModule {
                         ...this.getCfg(true)
                     }
                     console.warn("白名单后 -> cfg", cfg)
+                }
+            }
+
+            if (applyRemote) {
+                for (let key in res) {
+                    if (!isNaN(cfg[key]))
+                        cfg[key] = res[key];
+                    else
+                        cfg[key] = res[key]
+                }
+            }
+            else {
+                for (let key in res) {
+                    if (!cfg[key])
+                        cfg[key] = res[key];
                 }
             }
         }

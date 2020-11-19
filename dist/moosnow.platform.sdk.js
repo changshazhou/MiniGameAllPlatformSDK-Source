@@ -3188,6 +3188,8 @@ var mx = (function () {
                 showAppBox: 0,
                 zs_native_click_switch: 0,
                 zs_jump_switch: 0,
+                mx_native_click_switch: 0,
+                mx_jump_switch: 0,
                 mistouchInterval: 0,
                 nativeErrorShowInter: 0,
                 bannerErrorShowInter: 0,
@@ -3211,12 +3213,6 @@ var mx = (function () {
         HttpModule.prototype.defaultCfg = function (res, applyRemote) {
             var cfg = this.getCfg(false);
             if (res) {
-                if (applyRemote) {
-                    for (var key in cfg) {
-                        if (!isNaN(cfg[key]))
-                            cfg[key] = res[key];
-                    }
-                }
                 console.warn("defaultCfg -> moosnow.data.getToken()", moosnow.data.getToken());
                 console.warn("defaultCfg -> res.whitelist", res.whitelist);
                 if (res.whitelist) {
@@ -3232,6 +3228,20 @@ var mx = (function () {
                         console.warn("白名单前 -> cfg", cfg);
                         cfg = __assign(__assign({ inWhite: inWhite }, cfg), this.getCfg(true));
                         console.warn("白名单后 -> cfg", cfg);
+                    }
+                }
+                if (applyRemote) {
+                    for (var key in res) {
+                        if (!isNaN(cfg[key]))
+                            cfg[key] = res[key];
+                        else
+                            cfg[key] = res[key];
+                    }
+                }
+                else {
+                    for (var key in res) {
+                        if (!cfg[key])
+                            cfg[key] = res[key];
                     }
                 }
             }
