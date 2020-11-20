@@ -3982,6 +3982,10 @@ var mx = (function () {
              * 导出的名称，用来记录跳出的位置
              */
             _this.pointName = "";
+            /**
+             * 表单页面名称
+             */
+            _this.formName = "" || "loading" || "homeForm" || "gameForm" || "endForm" || "respawnForm";
             return _this;
         }
         return showAdOptions;
@@ -4428,16 +4432,18 @@ var mx = (function () {
          * @param templetes  层级
          * @param zIndex  层级
          */
-        FormUtil.prototype.showAd = function (adType, callback, points, templetes, zIndex, pointName) {
+        FormUtil.prototype.showAd = function (adType, callback, points, templetes, zIndex, pointName, formName) {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = cc.macro.MAX_ZINDEX; }
             if (pointName === void 0) { pointName = ""; }
+            if (formName === void 0) { formName = "" || "loading" || "homeForm" || "gameForm" || "endForm" || "respawnForm"; }
             var options = new showAdOptions();
             options.adType = adType;
             options.zIndex = zIndex;
             options.floatPositon = points;
             options.floatTempletes = templetes;
             options.pointName = pointName;
+            options.formName = formName;
             options.callback = callback;
             this.showAd2(options);
         };
@@ -4452,6 +4458,7 @@ var mx = (function () {
                 points: options.floatPositon,
                 templetes: options.floatTempletes,
                 pointName: options.pointName,
+                formName: options.formName,
                 callback: options.callback,
             });
         };

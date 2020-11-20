@@ -36,6 +36,12 @@ export default class showAdOptions extends loadAdOptions {
      */
     public pointName: string = "";
 
+
+    /**
+     * 表单页面名称
+     */
+    public formName: string = "" || "loadingForm" || "homeForm" || "gameForm" || "endForm" || "respawnForm";
+
 }
 
 

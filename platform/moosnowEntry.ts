@@ -45,8 +45,8 @@ export default class moosnow {
     public Common = Common
     public AD_POSITION = AD_POSITION;
     /**
-         * 获取当前的游戏平台
-         */
+    * 获取当前的游戏平台
+    */
     public getAppPlatform(): PlatformType {
         return Common.platform;
     }

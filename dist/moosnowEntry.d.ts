@@ -58,8 +58,8 @@ export default class moosnow {
         RECOVER: number;
     };
     /**
-         * 获取当前的游戏平台
-         */
+    * 获取当前的游戏平台
+    */
     getAppPlatform(): PlatformType;
     appConfig(): moosnowAppConfig;
     constructor();

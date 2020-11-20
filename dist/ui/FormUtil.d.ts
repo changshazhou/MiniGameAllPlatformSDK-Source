@@ -62,7 +62,7 @@ export default class FormUtil {
      * @param templetes  层级
      * @param zIndex  层级
      */
-    showAd(adType: number, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex?: number, pointName?: string): void;
+    showAd(adType: number, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex?: number, pointName?: string, formName?: string): void;
     /**
      * 显示广告
      * @param options

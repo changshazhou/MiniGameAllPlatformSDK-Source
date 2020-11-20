@@ -28,4 +28,8 @@ export default class showAdOptions extends loadAdOptions {
      * 导出的名称，用来记录跳出的位置
      */
     pointName: string;
+    /**
+     * 表单页面名称
+     */
+    formName: string;
 }

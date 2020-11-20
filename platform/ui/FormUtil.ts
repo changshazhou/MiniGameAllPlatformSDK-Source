@@ -11,8 +11,6 @@ import showPrizeOptions from "../model/showPrizeOptions";
 import showShareOptions from "../model/showShareOptions";
 import showPauseOptions from "../model/showPauseOptions";
 import showTryOptions from "../model/showTryOptions";
-
-import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
 import CocosFormFactory from "./cocos/helper/CocosFormFactory";
 import CocosEndForm from "./cocos/form/CocosEndForm";
 import CocosPauseForm from "./cocos/form/CocosPauseForm";
@@ -24,8 +22,6 @@ import CocosSetForm from "./cocos/form/CocosSetForm";
 import showBoxOptions from "../model/showBoxOptions";
 import CocosBoxForm from "./cocos/form/CocosBoxForm";
 import CocosShareForm from "./cocos/form/CocosShareForm";
-import { PlatformType } from "../enum/PlatformType";
-import Common from "../utils/Common";
 import CocosMistouchForm from "./cocos/form/CocosMistouchForm";
 import CocosAdForm from "./cocos/form/CocosAdForm";
 import showAdOptions from "../model/showAdOptions";
@@ -110,7 +106,7 @@ export default class FormUtil {
     public showNativeAd(options: showNativeOptions) {
         this.formFactory.showForm(new showFormOptions(FormLayout.NativeForm, CocosNativeForm, options))
     }
-    
+
     public loadAd(options: loadAdOptions) {
         let formOptions = new showFormOptions(FormLayout.AdForm, CocosAdForm, { ...new loadAdOptions(), ...options });
         formOptions.callback = (node: cc.Node) => {
@@ -127,7 +123,8 @@ export default class FormUtil {
      * @param templetes  层级
      * @param zIndex  层级
      */
-    public showAd(adType: number = AD_POSITION.NONE, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex: number = cc.macro.MAX_ZINDEX, pointName: string = "") {
+    public showAd(adType: number = AD_POSITION.NONE, callback: () => void, points?: Array<vectory>, templetes?: Array<string>, zIndex: number = cc.macro.MAX_ZINDEX,
+        pointName: string = "", formName: string = "" || "loadingForm" || "homeForm" || "gameForm" || "endForm" || "respawnForm") {
 
         let options = new showAdOptions();
         options.adType = adType;
@@ -135,6 +132,7 @@ export default class FormUtil {
         options.floatPositon = points;
         options.floatTempletes = templetes;
         options.pointName = pointName;
+        options.formName = formName;
         options.callback = callback;
         this.showAd2(options)
 
@@ -151,6 +149,7 @@ export default class FormUtil {
             points: options.floatPositon,
             templetes: options.floatTempletes,
             pointName: options.pointName,
+            formName: options.formName,
             callback: options.callback,
         })
     }

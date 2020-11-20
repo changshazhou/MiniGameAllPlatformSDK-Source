@@ -42,31 +42,7 @@ export default class UCModule extends PlatformModule {
     }
 
     public _prepareBanner() {
-        if (!window[this.platformName].createBannerAd) return;
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        //横屏模式
-        if (wxsys.windowHeight < wxsys.windowWidth) {
-            if (windowWidth < this.bannerWidth) {
-                this.bannerWidth = windowWidth;
-            }
-        }
-        else {
-            //竖屏
-            this.bannerWidth = windowWidth;
-        }
 
-        if (this.banner) {
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.destroy();
-            this.banner = null;
-        }
-        this.banner = this._createBannerAd();
-        if (this.banner) {
-            this.banner.onError(this._onBannerError.bind(this));
-            this.banner.onLoad(this._onBannerLoad.bind(this));
-        }
     }
 
     public _createBannerAd() {
@@ -77,9 +53,12 @@ export default class UCModule extends PlatformModule {
         let windowHeight = wxsys.windowHeight;
         let left = (windowWidth - this.bannerWidth) / 2;
         this.bannerShowTime = Date.now();
+        let gravity = this.mGravity[`${this.bannerHorizontal}_${this.bannerVertical}`];
+        if (isNaN(gravity))
+            gravity = 7
         let banner = window[this.platformName].createBannerAd({
             style: {
-                gravity: this.mGravity[`${this.bannerHorizontal}_${this.bannerVertical}`],
+                gravity,
                 width: this.bannerWidth
             }
         });
@@ -118,15 +97,49 @@ export default class UCModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    if (this.banner) {
-                        this.banner.show();
-                    }
+                    this._showBanner();
                 }
             })
         else {
-            if (this.banner) {
-                this.banner.show();
+            this._showBanner();
+        }
+    }
+
+    public _showBanner() {
+        if (!window[this.platformName].createBannerAd) return;
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        //横屏模式
+        if (wxsys.windowHeight < wxsys.windowWidth) {
+            if (windowWidth < this.bannerWidth) {
+                this.bannerWidth = windowWidth;
             }
+        }
+        else {
+            //竖屏
+            this.bannerWidth = windowWidth;
+        }
+        if (this.banner) {
+            this.banner.hide();
+            this.banner.destroy();
+            this.banner = null;
+        }
+        this.banner = this._createBannerAd();
+        if (this.banner) {
+            this.banner.onError(this._onBannerError.bind(this));
+            this.banner.onLoad(this._onBannerLoad.bind(this));
+            this.banner.show();
+        }
+    }
+
+    /**
+    * 隐藏banner
+    */
+    public hideBanner() {
+        if (this.banner) {
+            this.banner.hide();
+            this.banner.destroy();
+            this.banner = null;
         }
     }
 

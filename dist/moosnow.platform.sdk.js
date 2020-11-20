@@ -7040,31 +7040,6 @@ var mx = (function () {
             return _this;
         }
         UCModule.prototype._prepareBanner = function () {
-            if (!window[this.platformName].createBannerAd)
-                return;
-            var wxsys = this.getSystemInfoSync();
-            var windowWidth = wxsys.windowWidth;
-            //横屏模式
-            if (wxsys.windowHeight < wxsys.windowWidth) {
-                if (windowWidth < this.bannerWidth) {
-                    this.bannerWidth = windowWidth;
-                }
-            }
-            else {
-                //竖屏
-                this.bannerWidth = windowWidth;
-            }
-            if (this.banner) {
-                this.banner.offError(this._onBannerError);
-                this.banner.offLoad(this._onBannerLoad);
-                this.banner.destroy();
-                this.banner = null;
-            }
-            this.banner = this._createBannerAd();
-            if (this.banner) {
-                this.banner.onError(this._onBannerError.bind(this));
-                this.banner.onLoad(this._onBannerLoad.bind(this));
-            }
         };
         UCModule.prototype._createBannerAd = function () {
             if (!window[this.platformName])
@@ -7076,9 +7051,12 @@ var mx = (function () {
             var windowHeight = wxsys.windowHeight;
             var left = (windowWidth - this.bannerWidth) / 2;
             this.bannerShowTime = Date.now();
+            var gravity = this.mGravity[this.bannerHorizontal + "_" + this.bannerVertical];
+            if (isNaN(gravity))
+                gravity = 7;
             var banner = window[this.platformName].createBannerAd({
                 style: {
-                    gravity: this.mGravity[this.bannerHorizontal + "_" + this.bannerVertical],
+                    gravity: gravity,
                     width: this.bannerWidth
                 }
             });
@@ -7117,15 +7095,48 @@ var mx = (function () {
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
-                        if (_this.banner) {
-                            _this.banner.show();
-                        }
+                        _this._showBanner();
                     }
                 });
             else {
-                if (this.banner) {
-                    this.banner.show();
+                this._showBanner();
+            }
+        };
+        UCModule.prototype._showBanner = function () {
+            if (!window[this.platformName].createBannerAd)
+                return;
+            var wxsys = this.getSystemInfoSync();
+            var windowWidth = wxsys.windowWidth;
+            //横屏模式
+            if (wxsys.windowHeight < wxsys.windowWidth) {
+                if (windowWidth < this.bannerWidth) {
+                    this.bannerWidth = windowWidth;
                 }
+            }
+            else {
+                //竖屏
+                this.bannerWidth = windowWidth;
+            }
+            if (this.banner) {
+                this.banner.hide();
+                this.banner.destroy();
+                this.banner = null;
+            }
+            this.banner = this._createBannerAd();
+            if (this.banner) {
+                this.banner.onError(this._onBannerError.bind(this));
+                this.banner.onLoad(this._onBannerLoad.bind(this));
+                this.banner.show();
+            }
+        };
+        /**
+        * 隐藏banner
+        */
+        UCModule.prototype.hideBanner = function () {
+            if (this.banner) {
+                this.banner.hide();
+                this.banner.destroy();
+                this.banner = null;
             }
         };
         UCModule.prototype.createRewardAD = function (show) {
@@ -7209,8 +7220,8 @@ var mx = (function () {
             this.mAudio = new AudioModule();
         }
         /**
-             * 获取当前的游戏平台
-             */
+        * 获取当前的游戏平台
+        */
         moosnow.prototype.getAppPlatform = function () {
             return Common.platform;
         };

@@ -15,5 +15,10 @@ export default class UCModule extends PlatformModule {
      * @param style 自定义样式
      */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
+    _showBanner(): void;
+    /**
+    * 隐藏banner
+    */
+    hideBanner(): void;
     createRewardAD(show: any): void;
 }
