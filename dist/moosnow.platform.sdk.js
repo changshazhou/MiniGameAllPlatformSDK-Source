@@ -3072,7 +3072,8 @@ var mx = (function () {
                     window['wx'].aldSendEvent(name, data);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                window["tt"].reportAnalytics(name, data);
+                if (window['tt'] && window["tt"].reportAnalytics)
+                    window["tt"].reportAnalytics(name, data);
             }
         };
         /**
@@ -3092,8 +3093,7 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                if (window["tt"].reportAnalytics)
-                    window["tt"].reportAnalytics("关卡", e);
+                this.point("开始游戏", e);
             }
             else
                 console.log("startGame -> e", e);
@@ -3122,8 +3122,7 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                if (window["tt"].reportAnalytics)
-                    window["tt"].reportAnalytics(desc, e);
+                this.point(desc, e);
             }
             else
                 console.log("startGame -> e", e);
@@ -3144,8 +3143,7 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                if (window["tt"].reportAnalytics)
-                    window["tt"].reportAnalytics(name, e);
+                this.point(name, e);
             }
             else
                 console.log("startGame -> e", e);
