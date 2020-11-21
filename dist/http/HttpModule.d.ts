@@ -5,6 +5,7 @@ export declare class HttpModule extends BaseModule {
     private versionNumber;
     version: string;
     baseUrl: string;
+    private instanceTime;
     constructor();
     private mLaunchOptions;
     private get appLaunchOptions();
@@ -21,8 +22,8 @@ export declare class HttpModule extends BaseModule {
     _object2Query(obj: any): string;
     isDisableArea(callback: any): void;
     /**
-       * Loading加载完成
-       */
+     * Loading加载完成
+     */
     finishLoading(): void;
     /**
       * 点击了banner

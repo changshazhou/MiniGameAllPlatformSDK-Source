@@ -2876,11 +2876,13 @@ var mx = (function () {
             _this.versionNumber = "";
             _this.version = "2.1.0";
             _this.baseUrl = "https://api.liteplay.com.cn/";
+            _this.instanceTime = 0;
             _this.mLaunchOptions = {};
             _this.cfgData = null;
             _this.areaData = null;
             _this._cfgQuene = [];
             _this._localQuene = [];
+            _this.instanceTime = Date.now();
             var versionUrl = ROOT_CONFIG.HTTP_ROOT + "/SDK/version.json?t=" + Date.now();
             if (Common.platform == PlatformType.PC) {
                 _this.request(versionUrl, {}, 'GET', function (res) {
@@ -2983,28 +2985,32 @@ var mx = (function () {
         HttpModule.prototype.isDisableArea = function (callback) {
         };
         /**
-           * Loading加载完成
-           */
+         * Loading加载完成
+         */
         HttpModule.prototype.finishLoading = function () {
-            this.postData('api/channel/validUser.html');
+            this.point("加载完成", {
+                time: Date.now() - this.instanceTime
+            });
         };
         /**
           * 点击了banner
           */
         HttpModule.prototype.clickBanner = function () {
-            this.postData('api/channel/clickBanner.html');
+            // this.point("点击了banner", {
+            // });
         };
         /**
          * 看完了视频
          */
         HttpModule.prototype.clickVideo = function () {
-            this.postData('api/channel/clickVideo.html');
+            // this.point("点击视频", {
+            // });
         };
         /**
          * 导出跳转
          */
         HttpModule.prototype.exportUser = function () {
-            this.postData('api/channel/exportUser.html');
+            // this.postData('api/channel/exportUser.html')
         };
         /**
          * 跳转记录
@@ -3086,7 +3092,8 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                window["tt"].reportAnalytics(name, e);
+                if (window["tt"].reportAnalytics)
+                    window["tt"].reportAnalytics("关卡", e);
             }
             else
                 console.log("startGame -> e", e);
@@ -3115,7 +3122,8 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                window["tt"].reportAnalytics(desc, e);
+                if (window["tt"].reportAnalytics)
+                    window["tt"].reportAnalytics(desc, e);
             }
             else
                 console.log("startGame -> e", e);
@@ -3136,7 +3144,8 @@ var mx = (function () {
                     console.warn(MSG.ALD_FILE_NO_IMPORT);
             }
             else if (Common.platform == PlatformType.BYTEDANCE) {
-                window["tt"].reportAnalytics(name, e);
+                if (window["tt"].reportAnalytics)
+                    window["tt"].reportAnalytics(name, e);
             }
             else
                 console.log("startGame -> e", e);

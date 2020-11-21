@@ -26,12 +26,10 @@ export class HttpModule extends BaseModule {
     private versionNumber: string = "";
     public version: string = "2.1.0";
     public baseUrl: string = "https://api.liteplay.com.cn/";
-
+    private instanceTime: number = 0
     constructor() {
         super();
-
-
-
+        this.instanceTime = Date.now();
         let versionUrl = `${ROOT_CONFIG.HTTP_ROOT}/SDK/version.json?t=` + Date.now();
         if (Common.platform == PlatformType.PC) {
             this.request(versionUrl, {}, 'GET', (res) => {
@@ -147,30 +145,34 @@ export class HttpModule extends BaseModule {
     }
 
     /**
-       * Loading加载完成
-       */
+     * Loading加载完成
+     */
     public finishLoading() {
-        this.postData('api/channel/validUser.html')
+        this.point("加载完成", {
+            time: Date.now() - this.instanceTime
+        });
     }
     /**
       * 点击了banner
       */
     public clickBanner() {
-        this.postData('api/channel/clickBanner.html')
+        // this.point("点击了banner", {
+        // });
     }
 
     /**
      * 看完了视频
      */
     public clickVideo() {
-        this.postData('api/channel/clickVideo.html')
+        // this.point("点击视频", {
+        // });
     }
 
     /**
      * 导出跳转
      */
     public exportUser() {
-        this.postData('api/channel/exportUser.html')
+        // this.postData('api/channel/exportUser.html')
     }
 
     /**
@@ -263,7 +265,8 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            window["tt"].reportAnalytics(name, e);
+            if (window["tt"].reportAnalytics)
+                window["tt"].reportAnalytics("关卡", e);
         }
         else
             console.log("startGame -> e", e)
@@ -292,7 +295,8 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            window["tt"].reportAnalytics(desc, e);
+            if (window["tt"].reportAnalytics)
+                window["tt"].reportAnalytics(desc, e);
         }
         else
             console.log("startGame -> e", e)
@@ -314,7 +318,8 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            window["tt"].reportAnalytics(name, e);
+            if (window["tt"].reportAnalytics)
+                window["tt"].reportAnalytics(name, e);
         }
         else
             console.log("startGame -> e", e)
