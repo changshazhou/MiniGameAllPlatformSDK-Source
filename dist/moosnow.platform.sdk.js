@@ -1152,7 +1152,7 @@ var mx = (function () {
         PlatformModule.prototype.login = function (success, fail) {
             if (Common.isFunction(success)) {
                 var token = moosnow.data.getToken();
-                if (!token) {
+                if (token == "") {
                     token = Common.generateUUID();
                     token = token.replace(/-/g, '');
                     moosnow.data.setToken(token);
@@ -3225,12 +3225,13 @@ var mx = (function () {
                 if (res.whitelist) {
                     var token = moosnow.data.getToken();
                     var inWhite = false;
-                    for (var i = 0; i < res.whitelist.length; i++) {
-                        if (token == res.whitelist[i]) {
-                            inWhite = true;
-                            break;
+                    if (token != "")
+                        for (var i = 0; i < res.whitelist.length; i++) {
+                            if (token == res.whitelist[i]) {
+                                inWhite = true;
+                                break;
+                            }
                         }
-                    }
                     if (inWhite) {
                         console.warn("白名单前 -> cfg", cfg);
                         cfg = __assign(__assign({ inWhite: inWhite }, cfg), this.getCfg(true));

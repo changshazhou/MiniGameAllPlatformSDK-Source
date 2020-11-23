@@ -422,12 +422,13 @@ export class HttpModule extends BaseModule {
             if (res.whitelist) {
                 let token = moosnow.data.getToken();
                 let inWhite = false;
-                for (let i = 0; i < res.whitelist.length; i++) {
-                    if (token == res.whitelist[i]) {
-                        inWhite = true;
-                        break;
+                if (token != "")
+                    for (let i = 0; i < res.whitelist.length; i++) {
+                        if (token == res.whitelist[i]) {
+                            inWhite = true;
+                            break;
+                        }
                     }
-                }
                 if (inWhite) {
                     console.warn("白名单前 -> cfg", cfg)
                     cfg = {
