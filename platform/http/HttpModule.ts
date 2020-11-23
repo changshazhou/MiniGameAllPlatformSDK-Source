@@ -266,7 +266,7 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            this.point("开始游戏", e)
+            this.point("startgames", e)
         }
         else
             console.log("startGame -> e", e)
@@ -295,7 +295,11 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            this.point(desc, e)
+            this.point(isWin ? 'gameEnd' : 'gameFail', {
+                stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
+                stageName: "" + level,//关卡名称，该字段必传
+                userId: moosnow.data.getToken(), //用户ID
+            })
         }
         else
             console.log("startGame -> e", e)
@@ -317,7 +321,7 @@ export class HttpModule extends BaseModule {
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
         else if (Common.platform == PlatformType.BYTEDANCE) {
-            this.point(name, e)
+            this.point(type == 0 ? 'clickVideo' : 'endVideo', e)
         }
         else
             console.log("startGame -> e", e)
