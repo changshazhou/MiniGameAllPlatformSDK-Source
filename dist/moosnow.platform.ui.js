@@ -3985,7 +3985,7 @@ var mx = (function () {
             /**
              * 表单页面名称
              */
-            _this.formName = "" || "loading" || "homeForm" || "gameForm" || "endForm" || "respawnForm";
+            _this.formName = "" || "loadingForm" || "homeForm" || "gameForm" || "endForm" || "respawnForm";
             return _this;
         }
         return showAdOptions;
@@ -4436,7 +4436,7 @@ var mx = (function () {
             if (adType === void 0) { adType = AD_POSITION.NONE; }
             if (zIndex === void 0) { zIndex = cc.macro.MAX_ZINDEX; }
             if (pointName === void 0) { pointName = ""; }
-            if (formName === void 0) { formName = "" || "loading" || "homeForm" || "gameForm" || "endForm" || "respawnForm"; }
+            if (formName === void 0) { formName = "" || "loadingForm" || "homeForm" || "gameForm" || "endForm" || "respawnForm"; }
             var options = new showAdOptions();
             options.adType = adType;
             options.zIndex = zIndex;
