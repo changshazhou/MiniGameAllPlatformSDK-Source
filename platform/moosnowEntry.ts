@@ -30,73 +30,75 @@ import UCModule from "./platform/UCModule";
 import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
 import moosnowAppConfig from "./model/moosnowAppConfig";
+import FormUtil from "./ui/FormUtil";
+import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
 
 export default class moosnow {
-    public VIDEO_STATUS = VIDEO_STATUS;
-    public VIDEO_MSG = VIDEO_MSG;
-    public SHARE_MSG = SHARE_MSG;
-    public BANNER_HORIZONTAL = BANNER_HORIZONTAL;
-    public BANNER_VERTICAL = BANNER_VERTICAL;
-    public BLOCK_HORIZONTAL = BLOCK_HORIZONTAL;
-    public BLOCK_VERTICAL = BLOCK_VERTICAL;
-    public SHARE_CHANNEL = SHARE_CHANNEL;
-    public APP_PLATFORM = PlatformType;
-    public PLATFORM_EVENT = EventType;
-    public Common = Common
-    public AD_POSITION = AD_POSITION;
+    public static VIDEO_STATUS = VIDEO_STATUS;
+    public static VIDEO_MSG = VIDEO_MSG;
+    public static SHARE_MSG = SHARE_MSG;
+    public static BANNER_HORIZONTAL = BANNER_HORIZONTAL;
+    public static BANNER_VERTICAL = BANNER_VERTICAL;
+    public static BLOCK_HORIZONTAL = BLOCK_HORIZONTAL;
+    public static BLOCK_VERTICAL = BLOCK_VERTICAL;
+    public static SHARE_CHANNEL = SHARE_CHANNEL;
+    public static APP_PLATFORM = PlatformType;
+    public static PLATFORM_EVENT = EventType;
+    public static Common = Common
+    public static AD_POSITION = AD_POSITION;
     /**
     * 获取当前的游戏平台
     */
-    public getAppPlatform(): PlatformType {
+    public static getAppPlatform(): PlatformType {
         return Common.platform;
     }
-    public appConfig(): moosnowAppConfig {
+    public static appConfig(): moosnowAppConfig {
         return Common.config;
     }
     constructor() {
         (window["moosnow"]) = this;
-        this.mData = new GameDataCenter();
-        this.mSetting = new SettingModule();
+        moosnow.data = new GameDataCenter();
+        moosnow.setting = new SettingModule();
 
         this.initPlatform();
         this.initHttp();
         this.initAd();
-        this.mAudio = new AudioModule();
+        moosnow.audio = new AudioModule();
 
     }
 
     private initHttp() {
         if (Common.platform == PlatformType.WX)
-            this.mHttp = new HttpModule();
+            moosnow.http = new HttpModule();
         else if (Common.platform == PlatformType.OPPO_ZS) {
-            this.mHttp = new ZSHttpModule();
+            moosnow.http = new ZSHttpModule();
         }
         else
-            this.mHttp = new HttpModule();
+            moosnow.http = new HttpModule();
 
     }
 
     private initPlatform() {
         // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
         if (Common.platform == PlatformType.WX)
-            this.mPlatform = new WXModule();
+            moosnow.platform = new WXModule();
         else if (Common.platform == PlatformType.OPPO)
-            this.mPlatform = new OPPOModule();
+            moosnow.platform = new OPPOModule();
         else if (Common.platform == PlatformType.VIVO)
-            this.mPlatform = new VIVOModule();
+            moosnow.platform = new VIVOModule();
         else if (Common.platform == PlatformType.OPPO_ZS) {
-            this.mPlatform = new ZSOPPOModule();
+            moosnow.platform = new ZSOPPOModule();
         }
         else if (Common.platform == PlatformType.BYTEDANCE)
-            this.mPlatform = new TTModule();
+            moosnow.platform = new TTModule();
         else if (Common.platform == PlatformType.QQ)
-            this.mPlatform = new QQModule();
+            moosnow.platform = new QQModule();
         else if (Common.platform == PlatformType.BAIDU)
-            this.mPlatform = new BDModule();
+            moosnow.platform = new BDModule();
         else if (Common.platform == PlatformType.UC)
-            this.mPlatform = new UCModule();
+            moosnow.platform = new UCModule();
         else {
-            this.mPlatform = new PlatformModule();
+            moosnow.platform = new PlatformModule();
         }
 
         // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
@@ -104,75 +106,43 @@ export default class moosnow {
 
     private initAd() {
         if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
-            this.mAd = new WXAdModule();
+            moosnow.ad = new WXAdModule();
         else if (Common.platform == PlatformType.OPPO) {
-            this.mAd = new OPPOAdModule();
+            moosnow.ad = new OPPOAdModule();
         }
         else if (Common.platform == PlatformType.OPPO_ZS) {
-            this.mAd = new ZSOPPOAdModule();
+            moosnow.ad = new ZSOPPOAdModule();
         }
         else
-            this.mAd = new AdModule();
+            moosnow.ad = new AdModule();
     }
-    private mPlatform: PlatformModule;
-    public get platform() {
-        return this.mPlatform;
-    }
-
-
-    private mAd: AdModule;
+    public static platform: PlatformModule
     /**
      * 墨雪广告
      */
-    public get ad() {
-        return this.mAd;
-    }
-
-    private mHttp: HttpModule
-    public get http() {
-        return this.mHttp;
-    }
-
-
-    private mData: GameDataCenter = new GameDataCenter();
+    public static ad: AdModule
+    public static http: HttpModule;
     /**
      * 本地内存
      */
-    public get data() {
-        return this.mData;
-    }
+    public static data = new GameDataCenter();
 
-    private mResource: ResourceModule = new ResourceModule();
-    public get resource() {
-        return this.mResource;
-    }
-
-    private mSetting: SettingModule = new SettingModule();
+    public static resource = new ResourceModule();
     /**
      * 本地持久化缓存
      */
-    public get setting() {
-        return this.mSetting;
-    }
+    public static setting = new SettingModule();
     /**
      * 事件消息
      */
-    private mEvent: EventModule = new EventModule();
-    public get event() {
-        return this.mEvent;
-    }
-
-
-    private mAudio: AudioModule;
-    public get audio() {
-        return this.mAudio;
-    }
-    public set audio(value: AudioModule) {
-        this.mAudio = value;
-    }
-
+    public static event = new EventModule();
+    public static audio: AudioModule
+    public static form: FormUtil = new FormUtil();
+    public static nodeHelper = CocosNodeHelper;
 
 
 }
+
 new moosnow();
+
 

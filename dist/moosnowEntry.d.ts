@@ -12,33 +12,35 @@ import AudioModule from "./framework/AudioModule";
 import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
 import moosnowAppConfig from "./model/moosnowAppConfig";
+import FormUtil from "./ui/FormUtil";
+import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
 export default class moosnow {
-    VIDEO_STATUS: {
+    static VIDEO_STATUS: {
         END: string;
         NOTEND: string;
         ERR: string;
     };
-    VIDEO_MSG: {
+    static VIDEO_MSG: {
         ERR: string;
         NOTEND: string;
     };
-    SHARE_MSG: {
+    static SHARE_MSG: {
         FAIL: string;
     };
-    BANNER_HORIZONTAL: typeof BANNER_HORIZONTAL;
-    BANNER_VERTICAL: typeof BANNER_VERTICAL;
-    BLOCK_HORIZONTAL: typeof BLOCK_HORIZONTAL;
-    BLOCK_VERTICAL: typeof BLOCK_VERTICAL;
-    SHARE_CHANNEL: {
+    static BANNER_HORIZONTAL: typeof BANNER_HORIZONTAL;
+    static BANNER_VERTICAL: typeof BANNER_VERTICAL;
+    static BLOCK_HORIZONTAL: typeof BLOCK_HORIZONTAL;
+    static BLOCK_VERTICAL: typeof BLOCK_VERTICAL;
+    static SHARE_CHANNEL: {
         ARTICLE: string;
         VIDEO: string;
         TOKEN: string;
         LINK: string;
     };
-    APP_PLATFORM: typeof PlatformType;
-    PLATFORM_EVENT: typeof EventType;
-    Common: typeof Common;
-    AD_POSITION: {
+    static APP_PLATFORM: typeof PlatformType;
+    static PLATFORM_EVENT: typeof EventType;
+    static Common: typeof Common;
+    static AD_POSITION: {
         NONE: number;
         BANNER: number;
         FLOAT: number;
@@ -60,39 +62,32 @@ export default class moosnow {
     /**
     * 获取当前的游戏平台
     */
-    getAppPlatform(): PlatformType;
-    appConfig(): moosnowAppConfig;
+    static getAppPlatform(): PlatformType;
+    static appConfig(): moosnowAppConfig;
     constructor();
     private initHttp;
     private initPlatform;
     private initAd;
-    private mPlatform;
-    get platform(): PlatformModule;
-    private mAd;
+    static platform: PlatformModule;
     /**
      * 墨雪广告
      */
-    get ad(): AdModule;
-    private mHttp;
-    get http(): HttpModule;
-    private mData;
+    static ad: AdModule;
+    static http: HttpModule;
     /**
      * 本地内存
      */
-    get data(): GameDataCenter;
-    private mResource;
-    get resource(): ResourceModule;
-    private mSetting;
+    static data: GameDataCenter;
+    static resource: ResourceModule;
     /**
      * 本地持久化缓存
      */
-    get setting(): SettingModule;
+    static setting: SettingModule;
     /**
      * 事件消息
      */
-    private mEvent;
-    get event(): EventModule;
-    private mAudio;
-    get audio(): AudioModule;
-    set audio(value: AudioModule);
+    static event: EventModule;
+    static audio: AudioModule;
+    static form: FormUtil;
+    static nodeHelper: typeof CocosNodeHelper;
 }

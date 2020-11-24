@@ -25,24 +25,10 @@ export default class moosnowUI {
             console.log('没有引入主SDK')
             return;
         }
-        window["moosnow"].form = this.formUtil
+        window["moosnow"].form = new FormUtil();
         window["moosnow"].nodeHelper = CocosNodeHelper;
         // window["moosnow"].delay = this.delay
     }
-    /**
-     * form UI 操作
-     */
-    private mFormUtil: FormUtil = new FormUtil();
-    public get formUtil() {
-        return this.mFormUtil;
-    }
-
-    private mDelay: Delay = new Delay();
-    public get delay() {
-        return this.mDelay;
-    }
-    public set delay(value) {
-        this.mDelay = value;
-    }
+    
 }
 new moosnowUI();

@@ -1,25 +1,19 @@
-import showEndOptions from "./model/showEndOptions";
-import showPrizeOptions from "./model/showPrizeOptions";
-import showShareOptions from "./model/showShareOptions";
-import showTotalOptions from "./model/showTotalOptions";
-import showTouchOptions from "./model/showMistouchOptions";
-import showCoinOptions from "./model/showCoinOptions";
-
-import Common from "./utils/Common";
-import EventType from "./utils/EventType";
-import { PlatformType } from "./enum/PlatformType";
-import { HttpModule } from "./http/HttpModule";
-import AdModule from "./ad/AdModule";
-import SettingModule from "./framework/SettingModule";
-import GameDataCenter from "./framework/GameDataCenter";
-import EventModule from "./framework/EventModule";
-import FormUtil from "./ui/FormUtil";
-import Delay from "./framework/Delay";
-import AudioModule from "./framework/AudioModule";
-import ResourceModule from "./framework/ResourceModule";
 import PlatformModule from "./platform/PlatformModule";
-import CocosNodeHelper from "../platform/ui/cocos/helper/CocosNodeHelper";
-
+import AdModule from "./ad/AdModule";
+import { HttpModule } from "./http/HttpModule";
+import GameDataCenter from "./framework/GameDataCenter";
+import SettingModule from "./framework/SettingModule";
+import Common from "./utils/Common";
+import { PlatformType } from "./enum/PlatformType";
+import EventModule from "./framework/EventModule";
+import EventType from "./utils/EventType";
+import ResourceModule from "./framework/ResourceModule";
+import AudioModule from "./framework/AudioModule";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
+import moosnowAppConfig from "./model/moosnowAppConfig";
+import FormUtil from "./ui/FormUtil";
+import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
 declare global {
     class moosnow {
         static VIDEO_STATUS: {
@@ -34,29 +28,19 @@ declare global {
         static SHARE_MSG: {
             FAIL: string;
         };
-        static BANNER_POSITION: {
-            TOP: string;
-            CENTER: string;
-            BOTTOM: string;
-            CUSTOM: string;
-        }
+        static BANNER_HORIZONTAL: typeof BANNER_HORIZONTAL;
+        static BANNER_VERTICAL: typeof BANNER_VERTICAL;
+        static BLOCK_HORIZONTAL: typeof BLOCK_HORIZONTAL;
+        static BLOCK_VERTICAL: typeof BLOCK_VERTICAL;
         static SHARE_CHANNEL: {
             ARTICLE: string;
             VIDEO: string;
             TOKEN: string;
             LINK: string;
         };
-        static showOptions: {
-            endOptions: typeof showEndOptions,
-            prizeOptions: typeof showPrizeOptions,
-            shareOptions: typeof showShareOptions,
-            totalOptions: typeof showTotalOptions,
-            touchOptions: typeof showTouchOptions,
-            coinOptions: typeof showCoinOptions
-        };
-        static Common: typeof Common;
-        static PLATFORM_EVENT: typeof EventType;
         static APP_PLATFORM: typeof PlatformType;
+        static PLATFORM_EVENT: typeof EventType;
+        static Common: typeof Common;
         static AD_POSITION: {
             NONE: number;
             BANNER: number;
@@ -73,23 +57,40 @@ declare global {
             EXTEND2: number;
             EXTEND3: number;
             EXTEND4: number;
-            TOP: number,
-            /**
-            * 恢复到上一个状态
-            */
+            TOP: number;
             RECOVER: number;
         };
-        static getAppPlatform(): PlatformType
-        static http: HttpModule
-        static platform: PlatformModule
-        static ad: AdModule
-        static setting: SettingModule
-        static data: GameDataCenter
-        static event: EventModule
-        static form: FormUtil
-        static nodeHelper: CocosNodeHelper
-        static delay: Delay
-        static audio: AudioModule
-        static resource: ResourceModule
+        /**
+        * 获取当前的游戏平台
+        */
+        static getAppPlatform(): PlatformType;
+        static appConfig(): moosnowAppConfig;
+        constructor();
+        private initHttp;
+        private initPlatform;
+        private initAd;
+        static platform: PlatformModule;
+        /**
+         * 墨雪广告
+         */
+        static ad: AdModule;
+        static http: HttpModule;
+        /**
+         * 本地内存
+         */
+        static data: GameDataCenter;
+        static resource: ResourceModule;
+        /**
+         * 本地持久化缓存
+         */
+        static setting: SettingModule;
+        /**
+         * 事件消息
+         */
+        static event: EventModule;
+        static audio: AudioModule;
+        static form: FormUtil;
+        static nodeHelper: typeof CocosNodeHelper;
     }
+
 }

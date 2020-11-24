@@ -41,6 +41,7 @@ export default class CocosTotalForm extends CocosBaseForm {
                         this.FormData.videoCallback();
                 }
                 else if (res == moosnow.VIDEO_STATUS.ERR) {
+                    
                     moosnow.form.showToast(VIDEO_MSG.ERR)
                 }
                 else {

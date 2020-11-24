@@ -1,5 +1,3 @@
-import FormUtil from "./ui/FormUtil";
-import Delay from "./framework/Delay";
 import showEndOptions from "./model/showEndOptions";
 import showPrizeOptions from "./model/showPrizeOptions";
 import showShareOptions from "./model/showShareOptions";
@@ -16,12 +14,4 @@ export default class moosnowUI {
         coinOptions: typeof showCoinOptions;
     };
     constructor();
-    /**
-     * form UI 操作
-     */
-    private mFormUtil;
-    get formUtil(): FormUtil;
-    private mDelay;
-    get delay(): Delay;
-    set delay(value: Delay);
 }
