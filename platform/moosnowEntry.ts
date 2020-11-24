@@ -56,72 +56,68 @@ export default class moosnow {
         return Common.config;
     }
     constructor() {
-        (window["moosnow"]) = this;
-        moosnow.data = new GameDataCenter();
-        moosnow.setting = new SettingModule();
-
-        this.initPlatform();
-        this.initHttp();
-        this.initAd();
-        moosnow.audio = new AudioModule();
 
     }
 
-    private initHttp() {
-        if (Common.platform == PlatformType.WX)
-            moosnow.http = new HttpModule();
-        else if (Common.platform == PlatformType.OPPO_ZS) {
-            moosnow.http = new ZSHttpModule();
-        }
-        else
-            moosnow.http = new HttpModule();
 
+    private static mPlatform: PlatformModule
+    public static get platform(): PlatformModule {
+        if (!this.mPlatform) {
+            if (Common.platform == PlatformType.WX)
+                this.mPlatform = new WXModule();
+            else if (Common.platform == PlatformType.OPPO)
+                this.mPlatform = new OPPOModule();
+            else if (Common.platform == PlatformType.VIVO)
+                this.mPlatform = new VIVOModule();
+            else if (Common.platform == PlatformType.OPPO_ZS) {
+                this.mPlatform = new ZSOPPOModule();
+            }
+            else if (Common.platform == PlatformType.BYTEDANCE)
+                this.mPlatform = new TTModule();
+            else if (Common.platform == PlatformType.QQ)
+                this.mPlatform = new QQModule();
+            else if (Common.platform == PlatformType.BAIDU)
+                this.mPlatform = new BDModule();
+            else if (Common.platform == PlatformType.UC)
+                this.mPlatform = new UCModule();
+            else {
+                this.mPlatform = new PlatformModule();
+            }
+        }
+        return this.mPlatform;
     }
-
-    private initPlatform() {
-        // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
-        if (Common.platform == PlatformType.WX)
-            moosnow.platform = new WXModule();
-        else if (Common.platform == PlatformType.OPPO)
-            moosnow.platform = new OPPOModule();
-        else if (Common.platform == PlatformType.VIVO)
-            moosnow.platform = new VIVOModule();
-        else if (Common.platform == PlatformType.OPPO_ZS) {
-            moosnow.platform = new ZSOPPOModule();
-        }
-        else if (Common.platform == PlatformType.BYTEDANCE)
-            moosnow.platform = new TTModule();
-        else if (Common.platform == PlatformType.QQ)
-            moosnow.platform = new QQModule();
-        else if (Common.platform == PlatformType.BAIDU)
-            moosnow.platform = new BDModule();
-        else if (Common.platform == PlatformType.UC)
-            moosnow.platform = new UCModule();
-        else {
-            moosnow.platform = new PlatformModule();
-        }
-
-        // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
-    }
-
-    private initAd() {
-        if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
-            moosnow.ad = new WXAdModule();
-        else if (Common.platform == PlatformType.OPPO) {
-            moosnow.ad = new OPPOAdModule();
-        }
-        else if (Common.platform == PlatformType.OPPO_ZS) {
-            moosnow.ad = new ZSOPPOAdModule();
-        }
-        else
-            moosnow.ad = new AdModule();
-    }
-    public static platform: PlatformModule
     /**
      * 墨雪广告
      */
-    public static ad: AdModule
-    public static http: HttpModule;
+    private static mAd: AdModule
+    public static get ad(): AdModule {
+        if (!moosnow.mAd) {
+            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
+                moosnow.mAd = new WXAdModule();
+            else if (Common.platform == PlatformType.OPPO) {
+                moosnow.mAd = new OPPOAdModule();
+            }
+            else if (Common.platform == PlatformType.OPPO_ZS) {
+                moosnow.mAd = new ZSOPPOAdModule();
+            }
+            else
+                moosnow.mAd = new AdModule();
+        }
+        return moosnow.mAd;
+    }
+    private static mHttp: HttpModule
+    public static get http(): HttpModule {
+        if (!this.mHttp) {
+            if (Common.platform == PlatformType.WX)
+                this.mHttp = new HttpModule();
+            else if (Common.platform == PlatformType.OPPO_ZS) {
+                this.mHttp = new ZSHttpModule();
+            }
+            else
+                this.mHttp = new HttpModule();
+        }
+        return this.mHttp
+    }
     /**
      * 本地内存
      */
@@ -136,13 +132,12 @@ export default class moosnow {
      * 事件消息
      */
     public static event = new EventModule();
-    public static audio: AudioModule
+    public static audio: AudioModule = new AudioModule();
     public static form: FormUtil = new FormUtil();
     public static nodeHelper = CocosNodeHelper;
 
 
 }
-
-new moosnow();
+window["moosnow"] = moosnow;
 
 

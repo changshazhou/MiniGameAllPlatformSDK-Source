@@ -11,6 +11,7 @@ export default class AdModule extends BaseModule {
 
     constructor() {
         super();
+
     }
     /**
      * 随机去除重复数据

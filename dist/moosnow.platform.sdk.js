@@ -10912,13 +10912,6 @@ var mx = (function () {
 
     var moosnow$1 = /** @class */ (function () {
         function moosnow() {
-            (window["moosnow"]) = this;
-            moosnow.data = new GameDataCenter();
-            moosnow.setting = new SettingModule();
-            this.initPlatform();
-            this.initHttp();
-            this.initAd();
-            moosnow.audio = new AudioModule();
         }
         /**
         * 获取当前的游戏平台
@@ -10929,51 +10922,70 @@ var mx = (function () {
         moosnow.appConfig = function () {
             return Common.config;
         };
-        moosnow.prototype.initHttp = function () {
-            if (Common.platform == PlatformType.WX)
-                moosnow.http = new HttpModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
-                moosnow.http = new ZSHttpModule();
-            }
-            else
-                moosnow.http = new HttpModule();
-        };
-        moosnow.prototype.initPlatform = function () {
-            // console.log('初始化平台', Common.platform, 'oppo', PlatformType.OPPO, 'vivo', PlatformType.VIVO)
-            if (Common.platform == PlatformType.WX)
-                moosnow.platform = new WXModule();
-            else if (Common.platform == PlatformType.OPPO)
-                moosnow.platform = new OPPOModule();
-            else if (Common.platform == PlatformType.VIVO)
-                moosnow.platform = new VIVOModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
-                moosnow.platform = new ZSOPPOModule();
-            }
-            else if (Common.platform == PlatformType.BYTEDANCE)
-                moosnow.platform = new TTModule();
-            else if (Common.platform == PlatformType.QQ)
-                moosnow.platform = new QQModule();
-            else if (Common.platform == PlatformType.BAIDU)
-                moosnow.platform = new BDModule();
-            else if (Common.platform == PlatformType.UC)
-                moosnow.platform = new UCModule();
-            else {
-                moosnow.platform = new PlatformModule();
-            }
-            // console.log(' cc.sys.browserType ', cc.sys.browserType, ' cc.sys.platform ', cc.sys.platform)
-        };
-        moosnow.prototype.initAd = function () {
-            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
-                moosnow.ad = new WXAdModule();
-            else if (Common.platform == PlatformType.OPPO) {
-                moosnow.ad = new OPPOAdModule();
-            }
-            else if (Common.platform == PlatformType.OPPO_ZS) {
-                moosnow.ad = new ZSOPPOAdModule();
-            }
-            else
-                moosnow.ad = new AdModule();
-        };
+        Object.defineProperty(moosnow, "platform", {
+            get: function () {
+                if (!this.mPlatform) {
+                    if (Common.platform == PlatformType.WX)
+                        this.mPlatform = new WXModule();
+                    else if (Common.platform == PlatformType.OPPO)
+                        this.mPlatform = new OPPOModule();
+                    else if (Common.platform == PlatformType.VIVO)
+                        this.mPlatform = new VIVOModule();
+                    else if (Common.platform == PlatformType.OPPO_ZS) {
+                        this.mPlatform = new ZSOPPOModule();
+                    }
+                    else if (Common.platform == PlatformType.BYTEDANCE)
+                        this.mPlatform = new TTModule();
+                    else if (Common.platform == PlatformType.QQ)
+                        this.mPlatform = new QQModule();
+                    else if (Common.platform == PlatformType.BAIDU)
+                        this.mPlatform = new BDModule();
+                    else if (Common.platform == PlatformType.UC)
+                        this.mPlatform = new UCModule();
+                    else {
+                        this.mPlatform = new PlatformModule();
+                    }
+                }
+                return this.mPlatform;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(moosnow, "ad", {
+            get: function () {
+                if (!moosnow.mAd) {
+                    if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
+                        moosnow.mAd = new WXAdModule();
+                    else if (Common.platform == PlatformType.OPPO) {
+                        moosnow.mAd = new OPPOAdModule();
+                    }
+                    else if (Common.platform == PlatformType.OPPO_ZS) {
+                        moosnow.mAd = new ZSOPPOAdModule();
+                    }
+                    else
+                        moosnow.mAd = new AdModule();
+                }
+                return moosnow.mAd;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(moosnow, "http", {
+            get: function () {
+                if (!this.mHttp) {
+                    if (Common.platform == PlatformType.WX)
+                        this.mHttp = new HttpModule();
+                    else if (Common.platform == PlatformType.OPPO_ZS) {
+                        this.mHttp = new ZSHttpModule();
+                    }
+                    else
+                        this.mHttp = new HttpModule();
+                }
+                return this.mHttp;
+            },
+            enumerable: true,
+            configurable: true
+        });
         moosnow.VIDEO_STATUS = VIDEO_STATUS;
         moosnow.VIDEO_MSG = VIDEO_MSG;
         moosnow.SHARE_MSG = SHARE_MSG;
@@ -10999,11 +11011,12 @@ var mx = (function () {
          * 事件消息
          */
         moosnow.event = new EventModule();
+        moosnow.audio = new AudioModule();
         moosnow.form = new FormUtil();
         moosnow.nodeHelper = CocosNodeHelper;
         return moosnow;
     }());
-    new moosnow$1();
+    window["moosnow"] = moosnow$1;
 
     return moosnow$1;
 

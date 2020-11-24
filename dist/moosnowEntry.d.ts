@@ -65,15 +65,15 @@ export default class moosnow {
     static getAppPlatform(): PlatformType;
     static appConfig(): moosnowAppConfig;
     constructor();
-    private initHttp;
-    private initPlatform;
-    private initAd;
-    static platform: PlatformModule;
+    private static mPlatform;
+    static get platform(): PlatformModule;
     /**
      * 墨雪广告
      */
-    static ad: AdModule;
-    static http: HttpModule;
+    private static mAd;
+    static get ad(): AdModule;
+    private static mHttp;
+    static get http(): HttpModule;
     /**
      * 本地内存
      */
