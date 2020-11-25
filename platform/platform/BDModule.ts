@@ -19,12 +19,12 @@ export default class BDModule extends PlatformModule {
 
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
-        if (Common.isEmpty(this.bannerId)) {
+        if (Common.isEmpty(this.getBannerId())) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
         let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
+            adUnitId: this.getBannerId(),
             appSid: this.appSid,
             style: {
                 top: windowHeight,
@@ -48,7 +48,7 @@ export default class BDModule extends PlatformModule {
             this.video.offLoad(this._onVideoLoad);
         } else {
             this.video = window[this.platformName].createRewardedVideoAd({
-                adUnitId: this.videoId,
+                adUnitId: this.getVideoId(),
                 appSid: this.appSid
             });
         }

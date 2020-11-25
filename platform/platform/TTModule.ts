@@ -266,8 +266,9 @@ export default class TTModule extends PlatformModule {
                 console.log('share video fail ', e)
                 console.log('index of : ', e.errMsg.indexOf('short'))
                 if (e && e.errMsg && e.errMsg.indexOf('short') != -1 && this.currentShortCall) {
-                    console.log('时间太短 执行回调', this.currentShortCall)
+                    console.log('时间太短 执行回调', this.currentShortCall.toString())
                     this.currentShortCall(e);
+                    return;
                 }
                 if (this.currentShareCallback)
                     this.currentShareCallback(false);
@@ -320,7 +321,7 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, adIndex: number = 0, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log(MSG.BANNER_SHOW)

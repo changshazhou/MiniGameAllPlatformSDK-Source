@@ -1,7 +1,7 @@
 import CocosBaseForm from "../form/CocosBaseForm";
 import MathUtils from "../../../utils/MathUtils";
 import CocosBaseComponent from "./CocosBaseComponent";
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import { MSG } from "../../../config/MSG";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";

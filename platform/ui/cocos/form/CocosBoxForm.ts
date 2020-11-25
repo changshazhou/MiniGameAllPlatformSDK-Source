@@ -4,7 +4,7 @@ import CheckboxComponent from "../common/CheckboxComponent";
 import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosBoxItem from "../template/CocosBoxItem";
 import Common from "../../../utils/Common";
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";
 

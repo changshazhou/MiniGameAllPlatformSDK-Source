@@ -3,7 +3,7 @@ import moosnowAdRow from "../model/moosnowAdRow";
 import Common from "../utils/Common";
 import bannerStyle from "../model/bannerStyle";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
-import EventType from "../utils/EventType";
+import EventType from "../utils/PLATFORM_EVENT";
 import { MSG } from "../config/MSG";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 
@@ -263,14 +263,14 @@ export default class OPPOModule extends PlatformModule {
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
         let left = (windowWidth - this.bannerWidth) / 2;
-        if (Common.isEmpty(this.bannerId)) {
+        if (Common.isEmpty(this.getBannerId())) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
 
         let styleTop = windowHeight - this.bannerHeigth;
         let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
+            adUnitId: this.getBannerId(),
             style: {
                 top: styleTop,
                 left: left,
@@ -392,7 +392,7 @@ export default class OPPOModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, idIndex: number = 0, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -484,12 +484,12 @@ export default class OPPOModule extends PlatformModule {
             this.video.offError(this._onVideoError);
             this.video.offLoad(this._onVideoLoad);
         } else {
-            if (Common.isEmpty(this.videoId)) {
+            if (Common.isEmpty(this.getVideoId())) {
                 console.warn(MSG.VIDEO_KEY_IS_NULL)
                 return;
             }
             this.video = window[this.platformName].createRewardedVideoAd({
-                adUnitId: this.videoId
+                adUnitId: this.getVideoId()
             });
         }
         this.video.onError(this._onVideoError.bind(this));

@@ -1,4 +1,4 @@
-import { PlatformType } from "../enum/PlatformType";
+import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 export default class Common {
     static titleCase(s: any): any;
@@ -30,7 +30,7 @@ export default class Common {
      * PC状态下会返回debug平台
      * debug没有时 默认返回微信平台
      */
-    static get platform(): PlatformType;
+    static get platform(): APP_PLATFORM;
     static get isOnlyUI(): boolean;
     static get isPC(): boolean;
     static get config(): moosnowAppConfig;

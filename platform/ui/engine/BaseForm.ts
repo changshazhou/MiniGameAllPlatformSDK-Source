@@ -1,6 +1,6 @@
 import BaseModule from "../../framework/BaseModule";
 import Common from "../../utils/Common";
-import EventType from "../../utils/EventType";
+import EventType from "../../utils/PLATFORM_EVENT";
 
 
 export default class BaseForm extends BaseModule {

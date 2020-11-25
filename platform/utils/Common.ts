@@ -1,4 +1,4 @@
-import { PlatformType } from "../enum/PlatformType";
+import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 import { moosnowConfig } from "../../window";
 import moosnowAppConfig from "../model/moosnowAppConfig";
@@ -124,71 +124,71 @@ export default class Common {
         return Object.prototype.toString.call(obj) === "[object String]";
     }
 
-    private static mPlatform: PlatformType
+    private static mPlatform: APP_PLATFORM
     /**
      * 获取当前的运行平台
      * PC状态下会返回debug平台
      * debug没有时 默认返回微信平台
      */
-    static get platform(): PlatformType {
+    static get platform(): APP_PLATFORM {
         if (this.mPlatform) {
             return this.mPlatform;
         }
         let winCfg = window["moosnowConfig"];
         if (window['tt'])
-            this.mPlatform = PlatformType.BYTEDANCE
+            this.mPlatform = APP_PLATFORM.BYTEDANCE
         else if (window['swan'])
-            this.mPlatform = PlatformType.BAIDU
+            this.mPlatform = APP_PLATFORM.BAIDU
         else if (window['qq'])
-            this.mPlatform = PlatformType.QQ
+            this.mPlatform = APP_PLATFORM.QQ
         else if (window['qg']) {
             if (window["qg"] && window["qg"].getSystemInfoSync) {
                 let sys = window["qg"].getSystemInfoSync();
                 console.log('平台判断', JSON.stringify(sys));
                 if (sys && sys.brand && sys.brand.toLocaleLowerCase().indexOf("vivo") != -1) {
-                    this.mPlatform = PlatformType.VIVO;
+                    this.mPlatform = APP_PLATFORM.VIVO;
                 }
                 else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                    this.mPlatform = PlatformType.OPPO_ZS
+                    this.mPlatform = APP_PLATFORM.OPPO_ZS
                 else {
-                    this.mPlatform = PlatformType.OPPO
+                    this.mPlatform = APP_PLATFORM.OPPO
                 }
             }
             else if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                this.mPlatform = PlatformType.OPPO_ZS
+                this.mPlatform = APP_PLATFORM.OPPO_ZS
             else {
-                this.mPlatform = PlatformType.OPPO
+                this.mPlatform = APP_PLATFORM.OPPO
             }
 
         }
         else if (window['uc'])
-            this.mPlatform = PlatformType.UC
+            this.mPlatform = APP_PLATFORM.UC
         else if (window['wx'])
-            this.mPlatform = PlatformType.WX
+            this.mPlatform = APP_PLATFORM.WX
         else {
             if (winCfg.debug && winCfg[winCfg.debug]) {
                 if (winCfg.debug == "wx")
-                    this.mPlatform = PlatformType.WX
+                    this.mPlatform = APP_PLATFORM.WX
                 else if (winCfg.debug == "oppo")
                     if (winCfg.oppo && winCfg.oppo.url && winCfg.oppo.url.indexOf("platform.qwpo2018.com") != -1)
-                        this.mPlatform = PlatformType.OPPO_ZS
+                        this.mPlatform = APP_PLATFORM.OPPO_ZS
                     else
-                        this.mPlatform = PlatformType.OPPO
+                        this.mPlatform = APP_PLATFORM.OPPO
                 else if (winCfg.debug == "bd")
-                    this.mPlatform = PlatformType.BAIDU
+                    this.mPlatform = APP_PLATFORM.BAIDU
                 else if (winCfg.debug == "byte")
-                    this.mPlatform = PlatformType.BYTEDANCE
+                    this.mPlatform = APP_PLATFORM.BYTEDANCE
                 else if (winCfg.debug == "qq")
-                    this.mPlatform = PlatformType.QQ
+                    this.mPlatform = APP_PLATFORM.QQ
                 else if (winCfg.debug == "vivo")
-                    this.mPlatform = PlatformType.VIVO
+                    this.mPlatform = APP_PLATFORM.VIVO
                 else if (winCfg.debug == "uc")
-                    this.mPlatform = PlatformType.UC
+                    this.mPlatform = APP_PLATFORM.UC
                 else
-                    this.mPlatform = PlatformType.PC
+                    this.mPlatform = APP_PLATFORM.PC
             }
             else
-                this.mPlatform = PlatformType.PC
+                this.mPlatform = APP_PLATFORM.PC
         }
         return this.mPlatform;
 
@@ -205,17 +205,17 @@ export default class Common {
     static get config(): moosnowAppConfig {
         let winCfg = window["moosnowConfig"];
         let config;
-        if (Common.platform == PlatformType.WX)
+        if (Common.platform == APP_PLATFORM.WX)
             config = winCfg.wx;
-        else if (Common.platform == PlatformType.OPPO || Common.platform == PlatformType.OPPO_ZS)
+        else if (Common.platform == APP_PLATFORM.OPPO || Common.platform == APP_PLATFORM.OPPO_ZS)
             config = winCfg.oppo;
-        else if (Common.platform == PlatformType.VIVO)
+        else if (Common.platform == APP_PLATFORM.VIVO)
             config = winCfg.vivo;
-        else if (Common.platform == PlatformType.QQ)
+        else if (Common.platform == APP_PLATFORM.QQ)
             config = winCfg.qq;
-        else if (Common.platform == PlatformType.BAIDU)
+        else if (Common.platform == APP_PLATFORM.BAIDU)
             config = winCfg.bd;
-        else if (Common.platform == PlatformType.BYTEDANCE)
+        else if (Common.platform == APP_PLATFORM.BYTEDANCE)
             config = winCfg.byte;
         else
             config = winCfg.wx;

@@ -5,7 +5,7 @@ import { HttpModule } from "./http/HttpModule";
 import GameDataCenter from "./framework/GameDataCenter";
 import SettingModule from "./framework/SettingModule";
 import Common from "./utils/Common";
-import { PlatformType } from "./enum/PlatformType";
+import { PlatformType } from "./enum/APP_PLATFORM";
 import WXAdModule from "./ad/WXAdModule";
 
 import { BANNER_POSITION } from "./enum/BANNER_POSITION";
@@ -14,7 +14,7 @@ import { SHARE_MSG } from "./enum/SHARE_MSG";
 import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
-import EventType from "./utils/EventType";
+import EventType from "./utils/PLATFORM_EVENT";
 import { AD_POSITION } from "./enum/AD_POSITION";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";

@@ -5,7 +5,7 @@ import Common from "../../../utils/Common";
 import CocosAdViewItem from "../template/CocosAdViewItem";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import showAdOptions from "../../../model/loadAdOptions";
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 
 

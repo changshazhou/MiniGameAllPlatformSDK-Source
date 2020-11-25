@@ -1,7 +1,7 @@
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "../form/CocosBaseForm";
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import CocosNodeHelper from "../helper/CocosNodeHelper";
 import NodeAttribute from "../../attribute/NodeAttribute";
 

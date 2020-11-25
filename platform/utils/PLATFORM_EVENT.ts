@@ -1,5 +1,5 @@
 
-export default class EventType {
+export default class PLATFORM_EVENT {
 
     static readonly VIBRATESWITCH_CHANGED: string = "VIBRATESWITCH_CHANGED";
     static readonly SOUNDSWITCH_CHANGED: string = "SOUNDSWITCH_CHANGED";
@@ -15,7 +15,7 @@ export default class EventType {
     static readonly RANDOWM_NAVIGATE: string = "RANDOWM_NAVIGATE";
 
 
-    
+
 
     static readonly COMPONENT_CHECKBOX_TOGGLE: string = "COMPONENT_CHECKBOX_TOGGLE";
     static readonly PRIZE_BOX_UNLOCAK: string = "PRIZE_BOX_UNLOCAK";

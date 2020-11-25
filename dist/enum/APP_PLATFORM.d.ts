@@ -1,38 +1,38 @@
-export enum PlatformType {
+export declare enum APP_PLATFORM {
     /**
      * 微信
      */
-    WX,
+    WX = 0,
     /**
      * 字节跳动
      */
-    BYTEDANCE,
+    BYTEDANCE = 1,
     /**
      * OPPO
      */
-    OPPO,
+    OPPO = 2,
     /**
      * OPPO
      */
-    OPPO_ZS,
+    OPPO_ZS = 3,
     /**
      * 百度
      */
-    BAIDU,
+    BAIDU = 4,
     /**
      * QQ
      */
-    QQ,
+    QQ = 5,
     /**
      * PC电脑
      */
-    PC,
+    PC = 6,
     /**
      * VIVO
      */
-    VIVO,
+    VIVO = 7,
     /**
     * VIVO
     */
-    UC
+    UC = 8
 }

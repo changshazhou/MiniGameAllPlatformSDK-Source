@@ -3,7 +3,7 @@ import showBoxOptions from "../../../model/showBoxOptions";
 import CheckboxComponent from "../common/CheckboxComponent";
 import CocosFormFactory from "../helper/CocosFormFactory";
 import CocosBaseForm from "../form/CocosBaseForm";
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import Common from "../../../utils/Common";
 import { VIDEO_STATUS } from "../../../enum/VIDEO_STATUS";
 import { VIDEO_MSG } from "../../../enum/VIDEO_MSG";

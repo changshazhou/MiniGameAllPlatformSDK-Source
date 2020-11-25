@@ -1,4 +1,4 @@
-import EventType from "../utils/EventType";
+import EventType from "../utils/PLATFORM_EVENT";
 import UIFormSetting from "../config/UIFormSetting";
 import { AD_POSITION } from "../enum/AD_POSITION";
 

@@ -1,5 +1,5 @@
 
-import EventType from "../../../utils/EventType";
+import EventType from "../../../utils/PLATFORM_EVENT";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import CocosBaseForm from "./CocosBaseForm";
 import Common from "../../../utils/Common";

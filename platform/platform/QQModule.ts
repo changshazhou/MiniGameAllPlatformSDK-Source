@@ -22,7 +22,7 @@ export default class QQModule extends PlatformModule {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
-        if (Common.isEmpty(this.bannerId)) {
+        if (Common.isEmpty(this.getBannerId())) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
@@ -35,7 +35,7 @@ export default class QQModule extends PlatformModule {
         }
         console.log("QQModule -> _createBannerAd -> style", style)
         let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.bannerId,
+            adUnitId: this.getBannerId(),
             style: style
         });
         return banner;
@@ -48,7 +48,7 @@ export default class QQModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, adIndex: number = 0, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -187,7 +187,7 @@ export default class QQModule extends PlatformModule {
         let style = this._getBlockPosition()
         console.log("QQModule -> showBlock -> style", style)
         this.block = window[this.platformName].createBlockAd({
-            adUnitId: this.blockId,
+            adUnitId: this.getBannerId(),
             orientation: orientation == 1 ? "landscape" : "vertical",
             size,
             style: {

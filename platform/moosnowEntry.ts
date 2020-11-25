@@ -7,7 +7,7 @@ import GameDataCenter from "./framework/GameDataCenter";
 import SettingModule from "./framework/SettingModule";
 import OPPOAdModule from "./ad/OPPOAdModule";
 import Common from "./utils/Common";
-import { PlatformType } from "./enum/PlatformType";
+import { APP_PLATFORM } from "./enum/APP_PLATFORM";
 import WXAdModule from "./ad/WXAdModule";
 import TTModule from "./platform/TTModule";
 import QQModule from "./platform/QQModule";
@@ -21,7 +21,7 @@ import { SHARE_MSG } from "./enum/SHARE_MSG";
 import { VIDEO_MSG } from "./enum/VIDEO_MSG";
 import { SHARE_CHANNEL } from "./enum/SHARE_CHANNEL";
 import EventModule from "./framework/EventModule";
-import EventType from "./utils/EventType";
+import PLATFORM_EVENT from "./utils/PLATFORM_EVENT";
 import VIVOModule from "./platform/VIVOModule";
 import { AD_POSITION } from "./enum/AD_POSITION";
 import ResourceModule from "./framework/ResourceModule";
@@ -42,14 +42,14 @@ export default class moosnow {
     public static BLOCK_HORIZONTAL = BLOCK_HORIZONTAL;
     public static BLOCK_VERTICAL = BLOCK_VERTICAL;
     public static SHARE_CHANNEL = SHARE_CHANNEL;
-    public static APP_PLATFORM = PlatformType;
-    public static PLATFORM_EVENT = EventType;
+    public static APP_PLATFORM = APP_PLATFORM;
+    public static PLATFORM_EVENT = PLATFORM_EVENT;
     public static Common = Common
     public static AD_POSITION = AD_POSITION;
     /**
     * 获取当前的游戏平台
     */
-    public static getAppPlatform(): PlatformType {
+    public static getAppPlatform(): APP_PLATFORM {
         return Common.platform;
     }
     public static appConfig(): moosnowAppConfig {
@@ -63,22 +63,22 @@ export default class moosnow {
     private static mPlatform: PlatformModule
     public static get platform(): PlatformModule {
         if (!this.mPlatform) {
-            if (Common.platform == PlatformType.WX)
+            if (Common.platform == APP_PLATFORM.WX)
                 this.mPlatform = new WXModule();
-            else if (Common.platform == PlatformType.OPPO)
+            else if (Common.platform == APP_PLATFORM.OPPO)
                 this.mPlatform = new OPPOModule();
-            else if (Common.platform == PlatformType.VIVO)
+            else if (Common.platform == APP_PLATFORM.VIVO)
                 this.mPlatform = new VIVOModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common.platform == APP_PLATFORM.OPPO_ZS) {
                 this.mPlatform = new ZSOPPOModule();
             }
-            else if (Common.platform == PlatformType.BYTEDANCE)
+            else if (Common.platform == APP_PLATFORM.BYTEDANCE)
                 this.mPlatform = new TTModule();
-            else if (Common.platform == PlatformType.QQ)
+            else if (Common.platform == APP_PLATFORM.QQ)
                 this.mPlatform = new QQModule();
-            else if (Common.platform == PlatformType.BAIDU)
+            else if (Common.platform == APP_PLATFORM.BAIDU)
                 this.mPlatform = new BDModule();
-            else if (Common.platform == PlatformType.UC)
+            else if (Common.platform == APP_PLATFORM.UC)
                 this.mPlatform = new UCModule();
             else {
                 this.mPlatform = new PlatformModule();
@@ -92,12 +92,12 @@ export default class moosnow {
     private static mAd: AdModule
     public static get ad(): AdModule {
         if (!moosnow.mAd) {
-            if (Common.platform == PlatformType.WX || Common.platform == PlatformType.PC || Common.platform == PlatformType.BYTEDANCE)
+            if (Common.platform == APP_PLATFORM.WX || Common.platform == APP_PLATFORM.PC || Common.platform == APP_PLATFORM.BYTEDANCE)
                 moosnow.mAd = new WXAdModule();
-            else if (Common.platform == PlatformType.OPPO) {
+            else if (Common.platform == APP_PLATFORM.OPPO) {
                 moosnow.mAd = new OPPOAdModule();
             }
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common.platform == APP_PLATFORM.OPPO_ZS) {
                 moosnow.mAd = new ZSOPPOAdModule();
             }
             else
@@ -108,9 +108,9 @@ export default class moosnow {
     private static mHttp: HttpModule
     public static get http(): HttpModule {
         if (!this.mHttp) {
-            if (Common.platform == PlatformType.WX)
+            if (Common.platform == APP_PLATFORM.WX)
                 this.mHttp = new HttpModule();
-            else if (Common.platform == PlatformType.OPPO_ZS) {
+            else if (Common.platform == APP_PLATFORM.OPPO_ZS) {
                 this.mHttp = new ZSHttpModule();
             }
             else

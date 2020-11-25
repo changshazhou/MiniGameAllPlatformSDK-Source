@@ -1,6 +1,6 @@
 import BaseModule from "./BaseModule";
 import Common from "../utils/Common";
-import EventType from "../utils/EventType";
+import PLATFORM_EVENT from "../utils/PLATFORM_EVENT";
 
 export default class GameDataCenter extends BaseModule {
 
@@ -28,19 +28,19 @@ export default class GameDataCenter extends BaseModule {
     }
     public subCoin(v: number) {
         this.mCoin -= v;
-        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.COIN_CHANGED, this.mCoin);
     }
     public addCoin(v: number) {
         this.mCoin += v
-        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.COIN_CHANGED, this.mCoin);
     }
     public setCoin(v: number) {
         this.mCoin = v;
-        moosnow.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.COIN_CHANGED, this.mCoin);
     }
     public saveCoin() {
         moosnow.setting.setValue(this.COIN, this.mCoin);
-        // Lite.event.sendEventImmediately(EventType.COIN_CHANGED, this.mCoin);
+        // Lite.event.sendEventImmediately(PLATFORM_EVENT.COIN_CHANGED, this.mCoin);
     }
 
     getToken() {
@@ -84,7 +84,7 @@ export default class GameDataCenter extends BaseModule {
     }
     setVibrateSetting(on: boolean) {
         moosnow.setting.setBool(this.VIBRATE_SWITCH, on);
-        moosnow.event.sendEventImmediately(EventType.VIBRATESWITCH_CHANGED, on);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.VIBRATESWITCH_CHANGED, on);
     }
 
     private mPrizeBox;

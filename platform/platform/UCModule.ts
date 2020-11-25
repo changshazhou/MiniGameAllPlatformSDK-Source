@@ -72,7 +72,7 @@ export default class UCModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, adIndex: number = 0, style?: bannerStyle) {
 
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
@@ -157,7 +157,7 @@ export default class UCModule extends PlatformModule {
                 moosnow.platform.videoCb(VIDEO_STATUS.END);
             return;
         }
-        let videoId = this.videoId;
+        let videoId = this.getVideoId();
         if (Common.isEmpty(videoId)) {
             console.warn(MSG.VIDEO_KEY_IS_NULL)
             if (moosnow.platform.videoCb)

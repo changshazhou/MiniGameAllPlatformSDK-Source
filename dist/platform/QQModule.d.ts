@@ -13,7 +13,7 @@ export default class QQModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, adIndex?: number, style?: bannerStyle): void;
     _showBanner(): void;
     _bottomCenterBanner(size: any): void;
     /**

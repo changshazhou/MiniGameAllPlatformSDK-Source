@@ -16,19 +16,17 @@ export default class PlatformModule extends BaseModule {
     vibrateOn: boolean;
     systemInfo: any;
     block: any;
+    currentBannerId: string;
     banner: any;
+    currentVideoId: string;
     video: any;
     inter: any;
     native: any;
     box: any;
     platformName: string;
-    mBannerId: string;
-    mBannerIndex: number;
-    get bannerId(): any;
-    get blockId(): any;
-    mVideoId: string;
-    mVideoIndex: number;
-    get videoId(): any;
+    getBannerId(idx?: number, random?: boolean): any;
+    getBlockId(idx?: number): any;
+    getVideoId(idx?: number): any;
     interId: string;
     boxId: string;
     /**
@@ -231,11 +229,11 @@ export default class PlatformModule extends BaseModule {
     private _onHideCallback;
     initBanner(): void;
     _prepareBanner(): void;
-    _createBannerAd(): any;
+    _createBannerAd(adIndex: number): any;
     _onBannerLoad(): void;
-    _onBannerError(err: any): void;
-    _bottomCenterBanner(size: any): void;
-    _resetBanenrStyle(size: any): void;
+    _onBannerError(bannerId: any, err: any): void;
+    _bottomCenterBanner(bannerId: any, size: any): void;
+    _resetBanenrStyle(e: any): void;
     private applyCustomStyle;
     _getBannerPosition(): {
         left: number;
@@ -245,11 +243,13 @@ export default class PlatformModule extends BaseModule {
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
       * @param callback 点击回调
-      * @param position banner的位置，默认底部
+      * @param horizontal banner的位置，默认底部
+      * @param vertical banner的位置，默认底部
+      * @param idIndex id顺序 -1 会随机
       * @param style 自定义样式
       */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, style?: bannerStyle): void;
-    _showBanner(): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
+    _showBanner(idIndex: any): void;
     mTimeoutId: number;
     /**
      * 会自动隐藏的banner
@@ -272,15 +272,16 @@ export default class PlatformModule extends BaseModule {
      */
     hideBanner(): void;
     initVideo(): void;
-    createRewardAD(show: any): void;
+    createRewardAD(show: boolean, idIndex?: number): void;
     _onVideoError(msg: any, code: any): void;
     _onVideoClose(isEnd: any): void;
     _onVideoLoad(): void;
     /**
      * 唤起视频
      * @param completeCallback
+     * @param position
      */
-    showVideo(completeCallback?: any): void;
+    showVideo(completeCallback?: any, idIndex?: number): void;
     initInter(): void;
     prepareInter(): void;
     showInter(): void;
@@ -315,7 +316,7 @@ export default class PlatformModule extends BaseModule {
      * 目前只有OPPO平台有此功能
      * 用户点击了展示原生广告的图片时，使用此方法
      * 例如 cocos
-     * this.node.on(cc.Node.EventType.TOUCH_END, () => {
+     * this.node.on(cc.Node.PLATFORM_EVENT.TOUCH_END, () => {
      *     moosnow.platform.clickNative();
      * }, this)
      *

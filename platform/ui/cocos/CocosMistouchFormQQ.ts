@@ -1,6 +1,6 @@
 
 import MistouchForm from "../engine/MistouchForm";
-import EventType from "../../utils/EventType";
+import EventType from "../../utils/PLATFORM_EVENT";
 import { MISTOUCH_BANNER_TYPE } from "../../enum/MISTOUCH_BANNER_TYPE";
 import UIFormSetting from "../../config/UIFormSetting";
 import MistouchFormQQ from "../engine/MistouchFormQQ";

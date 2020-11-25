@@ -4,9 +4,9 @@ import { HttpModule } from "./http/HttpModule";
 import GameDataCenter from "./framework/GameDataCenter";
 import SettingModule from "./framework/SettingModule";
 import Common from "./utils/Common";
-import { PlatformType } from "./enum/PlatformType";
+import { APP_PLATFORM } from "./enum/APP_PLATFORM";
 import EventModule from "./framework/EventModule";
-import EventType from "./utils/EventType";
+import PLATFORM_EVENT from "./utils/PLATFORM_EVENT";
 import ResourceModule from "./framework/ResourceModule";
 import AudioModule from "./framework/AudioModule";
 import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
@@ -37,8 +37,8 @@ export default class moosnow {
         TOKEN: string;
         LINK: string;
     };
-    static APP_PLATFORM: typeof PlatformType;
-    static PLATFORM_EVENT: typeof EventType;
+    static APP_PLATFORM: typeof APP_PLATFORM;
+    static PLATFORM_EVENT: typeof PLATFORM_EVENT;
     static Common: typeof Common;
     static AD_POSITION: {
         NONE: number;
@@ -62,7 +62,7 @@ export default class moosnow {
     /**
     * 获取当前的游戏平台
     */
-    static getAppPlatform(): PlatformType;
+    static getAppPlatform(): APP_PLATFORM;
     static appConfig(): moosnowAppConfig;
     constructor();
     private static mPlatform;

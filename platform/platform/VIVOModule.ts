@@ -4,7 +4,7 @@ import Common from "../utils/Common";
 import bannerStyle from "../model/bannerStyle";
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 import { VIDEO_STATUS } from "../enum/VIDEO_STATUS";
-import EventType from "../utils/EventType";
+import EventType from "../utils/PLATFORM_EVENT";
 import { MSG } from "../config/MSG";
 
 export default class VIVOModule extends PlatformModule {
@@ -280,14 +280,14 @@ export default class VIVOModule extends PlatformModule {
         }
         this.mShowTime = Date.now();
 
-        if (Common.isEmpty(this.bannerId)) {
+        if (Common.isEmpty(this.getBannerId())) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
 
         let style = this._getBannerPosition();
         let banner = window[this.platformName].createBannerAd({
-            posId: this.bannerId,
+            posId: this.getBannerId(),
             style: {
                 left: style.left,
                 top: style.top,
@@ -329,7 +329,7 @@ export default class VIVOModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = 0, style?: bannerStyle) {
 
 
         this.bannerCb = callback;
@@ -428,7 +428,7 @@ export default class VIVOModule extends PlatformModule {
         if (!window[this.platformName].createRewardedVideoAd) {
             return;
         }
-        if (Common.isEmpty(this.videoId)) {
+        if (Common.isEmpty(this.getVideoId())) {
             console.warn(MSG.VIDEO_KEY_IS_NULL)
             return;
         }
@@ -451,7 +451,7 @@ export default class VIVOModule extends PlatformModule {
         if (!this.video) {
             moosnow.platform.videoLoading = true;
             this.video = window[this.platformName].createRewardedVideoAd({
-                posId: this.videoId
+                posId: this.getVideoId()
             });
             this.video.onError(this._onVideoError.bind(this));
             this.video.onClose(this._onVideoClose.bind(this));

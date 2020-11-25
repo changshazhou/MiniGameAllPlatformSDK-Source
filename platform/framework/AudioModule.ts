@@ -1,5 +1,5 @@
 import BaseModule from "./BaseModule";
-import EventType from "../utils/EventType";
+import EventType from "../utils/PLATFORM_EVENT";
 import Common from "../utils/Common";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 

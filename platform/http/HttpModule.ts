@@ -1,6 +1,6 @@
 import BaseModule from "../framework/BaseModule";
 import Common from "../utils/Common";
-import { PlatformType } from "../enum/PlatformType";
+import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import { MSG } from "../config/MSG";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
@@ -31,7 +31,7 @@ export class HttpModule extends BaseModule {
         super();
         this.instanceTime = Date.now();
         let versionUrl = `${ROOT_CONFIG.HTTP_ROOT}/SDK/version.json?t=` + Date.now();
-        if (Common.platform == PlatformType.PC) {
+        if (Common.platform == APP_PLATFORM.PC) {
             this.request(versionUrl, {}, 'GET', (res) => {
                 if (this.version < res.version) {
                     console.warn(`您的SDK版本号[${this.version}]不是最新版本，请尽快升级，最新版本[${res.version}]  下载地址：${res.download}`)
@@ -41,7 +41,7 @@ export class HttpModule extends BaseModule {
 
             })
         }
-        else if (Common.platform == PlatformType.WX && window["wx"]) {
+        else if (Common.platform == APP_PLATFORM.WX && window["wx"]) {
             this.request(versionUrl, {}, 'GET', (res) => {
                 let aldVersion = window["wx"]["aldVersion"]
                 if (!aldVersion || (aldVersion && aldVersion < res.aldVersion))
@@ -180,31 +180,31 @@ export class HttpModule extends BaseModule {
      * @param jump_appid 
      * @param callback 
      */
-    public navigate(jump_appid: string, callback: Function) {
-        let userToken = moosnow.data.getToken();
-        this.request(`${this.baseUrl}api/jump/record`, {
-            appid: Common.config.moosnowAppId,
-            uid: userToken,
-            jump_appid,
-        }, "POST", (respone) => {
-            console.log('navigate', respone)
-            if (callback)
-                callback(respone.data)
-        });
-    }
+    // public navigate(jump_appid: string, callback: Function) {
+    //     let userToken = moosnow.data.getToken();
+    //     this.request(`${this.baseUrl}api/jump/record`, {
+    //         appid: Common.config.moosnowAppId,
+    //         uid: userToken,
+    //         jump_appid,
+    //     }, "POST", (respone) => {
+    //         console.log('navigate', respone)
+    //         if (callback)
+    //             callback(respone.data)
+    //     });
+    // }
 
 
     /**
      * 跳转完成
      * @param code 
      */
-    public navigateEnd(code: string) {
-        this.request(`${this.baseUrl}api/jump/status`, {
-            code
-        }, "POST", (respone) => {
-            console.log('navigateEnd code ', code, respone)
-        });
-    }
+    // public navigateEnd(code: string) {
+    //     this.request(`${this.baseUrl}api/jump/status`, {
+    //         code
+    //     }, "POST", (respone) => {
+    //         console.log('navigateEnd code ', code, respone)
+    //     });
+    // }
 
 
     /**
@@ -239,11 +239,11 @@ export class HttpModule extends BaseModule {
      * @param name  打点名称
      */
     public point(name: string, data: any = null) {
-        if (Common.platform == PlatformType.WX) {
+        if (Common.platform == APP_PLATFORM.WX) {
             if (window['wx'] && window['wx'].aldSendEvent)
                 (window['wx'] as any).aldSendEvent(name, data);
         }
-        else if (Common.platform == PlatformType.BYTEDANCE) {
+        else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
             if (window['tt'] && window["tt"].reportAnalytics)
                 window["tt"].reportAnalytics(name, data);
         }
@@ -259,14 +259,14 @@ export class HttpModule extends BaseModule {
             stageName: "" + level,//关卡名称，该字段必传
             userId: moosnow.data.getToken() //用户ID
         }
-        if (Common.platform == PlatformType.WX) {
+        if (Common.platform == APP_PLATFORM.WX) {
             if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onStart(e);
             else
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
-        else if (Common.platform == PlatformType.BYTEDANCE) {
-            this.point("startgames", e)
+        else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
+            this.point("startgame", e)
         }
         else
             console.log("startGame -> e", e)
@@ -288,13 +288,13 @@ export class HttpModule extends BaseModule {
                 desc: desc   //描述
             }
         }
-        if (Common.platform == PlatformType.WX) {
+        if (Common.platform == APP_PLATFORM.WX) {
             if (window['wx'] && window['wx'].aldStage)
                 window['wx'].aldStage.onEnd(e);
             else
                 console.warn(MSG.ALD_FILE_NO_IMPORT)
         }
-        else if (Common.platform == PlatformType.BYTEDANCE) {
+        else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
             this.point(isWin ? 'gameEnd' : 'gameFail', {
                 stageId: "" + level, //关卡ID， 必须是1 || 2 || 1.1 || 12.2 格式  该字段必传
                 stageName: "" + level,//关卡名称，该字段必传
@@ -314,13 +314,10 @@ export class HttpModule extends BaseModule {
     public videoPoint(type, info: string, level: string) {
         var name = type == 0 ? "点击视频" : "观看完成视频";
         let e = { info, level: level + "" }
-        if (Common.platform == PlatformType.WX) {
-            if (window['wx'] && window['wx'].aldSendEvent)
-                window['wx'].aldSendEvent(name, e);
-            else
-                console.warn(MSG.ALD_FILE_NO_IMPORT)
+        if (Common.platform == APP_PLATFORM.WX) {
+            this.point(name, e)
         }
-        else if (Common.platform == PlatformType.BYTEDANCE) {
+        else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
             this.point(type == 0 ? 'clickVideo' : 'endVideo', e)
         }
         else
