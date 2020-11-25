@@ -401,6 +401,7 @@ export class HttpModule extends BaseModule {
             isStartMistouch: 0,
             isStartVideo: 0,
             loadingAdOn: 0,
+            isBlockClose: 0
         }
         if (open) {
             for (let key in cfg) {

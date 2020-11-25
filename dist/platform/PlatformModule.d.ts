@@ -254,9 +254,11 @@ export default class PlatformModule extends BaseModule {
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
-     * @param position banner的位置，默认底部
+     * @param horizontal banner的位置，默认底部
+     * @param vertical banner的位置，默认底部
+     * @param idIndex id顺序 -1 会随机
      */
-    showAutoBanner(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): void;
+    showAutoBanner(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number): void;
     exitApplication(): void;
     /**
      * 连续不断的显示和隐藏 banner
@@ -370,7 +372,12 @@ export default class PlatformModule extends BaseModule {
     openAwemeUserProile(success: (hasFollowed: any) => void, fail: (err: any) => void): void;
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
-    onDisable(): void;
     showBlock(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL, orientation?: number, size?: number): void;
     hideBlock(): void;
+    private isLoaded;
+    /**
+     * 屏蔽iphone关闭退出按钮
+     */
+    hideExitButton(): void;
+    onDisable(): void;
 }

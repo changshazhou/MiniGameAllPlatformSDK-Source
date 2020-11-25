@@ -1184,13 +1184,15 @@ export default class PlatformModule extends BaseModule {
     /**
      * 会自动隐藏的banner
      * 一般用游戏中
-     * @param position banner的位置，默认底部
+     * @param horizontal banner的位置，默认底部
+     * @param vertical banner的位置，默认底部
+     * @param idIndex id顺序 -1 会随机
      */
-    public showAutoBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE) {
+    public showAutoBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, idIndex: number = -1) {
         console.log('执行自动显示和隐藏Banner功能')
         moosnow.http.getAllConfig(res => {
             if (res && res.gameBanner == 1) {
-                this.showBanner(true, () => { }, horizontal, vertical, this.getBannerId(0, true))
+                this.showBanner(true, () => { }, horizontal, vertical, this.getBannerId(idIndex))
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                 this.mTimeoutId = setTimeout(() => {
                     console.log('自动隐藏时间已到，开始隐藏Banner')
@@ -1529,9 +1531,6 @@ export default class PlatformModule extends BaseModule {
     public installShortcut(success: (res) => void, message: string = "方便下次快速启动", fail: (err) => void) {
 
     }
-    onDisable() {
-    }
-
     public showBlock(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE, orientation: number = 1, size: number = 5) {
 
     }
@@ -1539,4 +1538,53 @@ export default class PlatformModule extends BaseModule {
     public hideBlock() {
 
     }
+    private isLoaded: boolean = false;
+    /**
+     * 屏蔽iphone关闭退出按钮
+     */
+    public hideExitButton() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createVideo) return;
+        if (!this.isIphone()) return;
+
+        if (this.isLoaded) {
+            return;
+        }
+        this.isLoaded = true;
+        moosnow.http.getAllConfig(res => {
+            let isBlockClose = res && res.isBlockClose == 1;
+            if (isBlockClose) {
+                let sysInfo = this.getSystemInfoSync();
+                var width: number = sysInfo.screenWidth;
+                var height: number = sysInfo.screenHeight;
+                var url: String = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/video/1.mp4";
+
+                var video: any = (window['wx'] as any).createVideo({
+                    x: 0,
+                    y: 0,
+                    width: width,
+                    height: height,
+                    src: url,
+                    objectFit: "contain",
+                    controls: !1,
+                    autoplay: !0,
+                    showCenterPlayBtn: !1,
+                    enableProgressGesture: !1
+                });
+                if (sysInfo.model.indexOf("iPhone") != -1) {
+                    console.log("苹果手机 播放视频");
+                    video.requestFullScreen();
+                }
+                video.onEnded(function (e): void {
+                    video.destroy();
+                    console.log("video.destroy");
+                });
+            }
+        })
+    }
+
+
+    onDisable() {
+    }
+
 }

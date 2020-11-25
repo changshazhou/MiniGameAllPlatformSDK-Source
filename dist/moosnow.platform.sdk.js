@@ -909,6 +909,7 @@ var mx = (function () {
             _this.shareInfoArr = [];
             _this.versionRet = null;
             _this.prevNavigate = Date.now();
+            _this.isLoaded = false;
             _this.initAppConfig();
             // this._regisiterWXCallback();
             _this.initShare(true);
@@ -1964,16 +1965,19 @@ var mx = (function () {
         /**
          * 会自动隐藏的banner
          * 一般用游戏中
-         * @param position banner的位置，默认底部
+         * @param horizontal banner的位置，默认底部
+         * @param vertical banner的位置，默认底部
+         * @param idIndex id顺序 -1 会随机
          */
-        PlatformModule.prototype.showAutoBanner = function (horizontal, vertical) {
+        PlatformModule.prototype.showAutoBanner = function (horizontal, vertical, idIndex) {
             var _this = this;
             if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
             if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
+            if (idIndex === void 0) { idIndex = -1; }
             console.log('执行自动显示和隐藏Banner功能');
             moosnow.http.getAllConfig(function (res) {
                 if (res && res.gameBanner == 1) {
-                    _this.showBanner(true, function () { }, horizontal, vertical, _this.getBannerId(0, true));
+                    _this.showBanner(true, function () { }, horizontal, vertical, _this.getBannerId(idIndex));
                     var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');
@@ -2293,8 +2297,6 @@ var mx = (function () {
         PlatformModule.prototype.installShortcut = function (success, message, fail) {
             if (message === void 0) { message = "方便下次快速启动"; }
         };
-        PlatformModule.prototype.onDisable = function () {
-        };
         PlatformModule.prototype.showBlock = function (horizontal, vertical, orientation, size) {
             if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.NONE; }
             if (vertical === void 0) { vertical = BLOCK_VERTICAL.NONE; }
@@ -2302,6 +2304,53 @@ var mx = (function () {
             if (size === void 0) { size = 5; }
         };
         PlatformModule.prototype.hideBlock = function () {
+        };
+        /**
+         * 屏蔽iphone关闭退出按钮
+         */
+        PlatformModule.prototype.hideExitButton = function () {
+            var _this = this;
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createVideo)
+                return;
+            if (!this.isIphone())
+                return;
+            if (this.isLoaded) {
+                return;
+            }
+            this.isLoaded = true;
+            moosnow.http.getAllConfig(function (res) {
+                var isBlockClose = res && res.isBlockClose == 1;
+                if (isBlockClose) {
+                    var sysInfo = _this.getSystemInfoSync();
+                    var width = sysInfo.screenWidth;
+                    var height = sysInfo.screenHeight;
+                    var url = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/video/1.mp4";
+                    var video = window['wx'].createVideo({
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height,
+                        src: url,
+                        objectFit: "contain",
+                        controls: !1,
+                        autoplay: !0,
+                        showCenterPlayBtn: !1,
+                        enableProgressGesture: !1
+                    });
+                    if (sysInfo.model.indexOf("iPhone") != -1) {
+                        console.log("苹果手机 播放视频");
+                        video.requestFullScreen();
+                    }
+                    video.onEnded(function (e) {
+                        video.destroy();
+                        console.log("video.destroy");
+                    });
+                }
+            });
+        };
+        PlatformModule.prototype.onDisable = function () {
         };
         return PlatformModule;
     }(BaseModule));
@@ -3145,6 +3194,7 @@ var mx = (function () {
                 isStartMistouch: 0,
                 isStartVideo: 0,
                 loadingAdOn: 0,
+                isBlockClose: 0
             };
             if (open) {
                 for (var key in cfg) {
