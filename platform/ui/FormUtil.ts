@@ -32,13 +32,13 @@ import CocosBaseForm from "./cocos/form/CocosBaseForm";
 import FormFactory from "./engine/FormFactory";
 import CocosNativeForm from "./cocos/form/CocosNativeForm";
 import showNativeOptions from "../model/showNativeOptions";
-import vectory from "../../dist/model/Vectory";
 import CocosRespawnForm from "./cocos/form/CocosRespawnForm";
 import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
 import CocosFailForm from "./cocos/form/CocosFailForm";
 import CheckboxComponent from "./cocos/common/CheckboxComponent";
 import showFormOptions from "../model/showFormOptions";
+import vectory from "../model/Vectory";
 
 /**
  * 广告结果

@@ -12,10 +12,10 @@ import showAdOptions from "../model/showAdOptions";
 import loadAdOptions from "../model/loadAdOptions";
 import FormFactory from "./engine/FormFactory";
 import showNativeOptions from "../model/showNativeOptions";
-import vectory from "../../dist/model/Vectory";
 import showRespawnOptions from "../model/showRespawnOptions";
 import showFailOptions from "../model/showFailOptions";
 import CheckboxComponent from "./cocos/common/CheckboxComponent";
+import vectory from "../model/Vectory";
 /**
  * 广告结果
  */
