@@ -86,22 +86,40 @@ export default class SettingModule extends BaseModule {
     //-------------------------------------------------
 
     removeValueOfKey(key: string) {
-        window.localStorage.removeItem(key);
+        if (cc && cc.sys && cc.sys.localStorage) {
+            cc.sys.localStorage.removeItem(key);
+        }
+        else if (Laya && Laya.LocalStorage)
+            Laya.LocalStorage.removeItem(key);
+        else
+            window.localStorage.removeItem(key);
     }
 
     removeAll() {
-        window.localStorage.clear();
+        if (cc && cc.sys && cc.sys.localStorage) {
+
+        }
+        else if (Laya && Laya.LocalStorage)
+            Laya.LocalStorage.clear();
+        else
+            window.localStorage.clear();
     }
 
     //-------------------------------------------------
 
     _getValue(k, defaultValue) {
-
-        let value = window.localStorage.getItem(k);
+        let value = ""
+        if (cc && cc.sys && cc.sys.localStorage)
+            value = cc.sys.localStorage.getItem(k);
+        else if (Laya && Laya.LocalStorage)
+            value = Laya.LocalStorage.getItem(k);
+        else
+            value = window.localStorage.getItem(k);
         if (value == null || value == '') {
             value = defaultValue;
         }
         return value;
+
     }
 
 }

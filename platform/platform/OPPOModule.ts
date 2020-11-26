@@ -220,7 +220,7 @@ export default class OPPOModule extends PlatformModule {
         console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
         if (this.banner) {
             this.banner.hide();
-            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offResize(this._onBannerResize);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
             this.banner.offHide();
@@ -245,13 +245,13 @@ export default class OPPOModule extends PlatformModule {
             this.bannerWidth = windowWidth;
         }
         if (this.banner) {
-            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offResize(this._onBannerResize);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
             this.banner.offHide();
         }
         this.banner = this._createBannerAd();
-        this.banner.onResize(this._bottomCenterBanner.bind(this));
+        this.banner.onResize(this._onBannerResize.bind(this));
         this.banner.onError(this._onBannerError.bind(this));
         this.banner.onLoad(this._onBannerLoad.bind(this));
         this.banner.onHide(this._onBannerHide.bind(this));
@@ -279,7 +279,7 @@ export default class OPPOModule extends PlatformModule {
         });
         return banner;
     }
-    public _bottomCenterBanner(size) {
+    public _onBannerResize(size) {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
@@ -376,7 +376,7 @@ export default class OPPOModule extends PlatformModule {
     public destroyBanner() {
         if (this.banner) {
             this.banner.hide();
-            this.banner.offResize(this._bottomCenterBanner);
+            this.banner.offResize(this._onBannerResize);
             this.banner.offError(this._onBannerError);
             this.banner.offLoad(this._onBannerLoad);
             this.banner.offHide();
@@ -450,7 +450,7 @@ export default class OPPOModule extends PlatformModule {
             if (this.bannerShowCount >= this.bannerShowCountLimit) {
                 console.log('banner destroy');
                 this.banner.hide();
-                this.banner.offResize(this._bottomCenterBanner);
+                this.banner.offResize(this._onBannerResize);
                 this.banner.offError(this._onBannerError);
                 this.banner.offLoad(this._onBannerLoad);
                 this.banner.offHide();

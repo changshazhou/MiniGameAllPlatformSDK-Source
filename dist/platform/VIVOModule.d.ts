@@ -41,7 +41,7 @@ export default class VIVOModule extends PlatformModule {
     private mMinInterval;
     _createBannerAd(): any;
     private getNotchHeight;
-    _bottomCenterBanner(size: any): void;
+    _onBannerResize(size: any): void;
     _onBannerClose(): void;
     _onBannerHide(): void;
     /**

@@ -229,12 +229,17 @@ export default class PlatformModule extends BaseModule {
     private _onHideCallback;
     initBanner(): void;
     _prepareBanner(): void;
-    _createBannerAd(adIndex: number): any;
-    _onBannerLoad(): void;
+    /**
+     * 创建banner
+     * @param adIndex
+     * @return bannerId
+     */
+    _createBannerAd(adIndex: number): string;
+    _onBannerLoad(bannerId: any): void;
     _onBannerError(bannerId: any, err: any): void;
-    _bottomCenterBanner(bannerId: any, size: any): void;
+    _onBannerResize(bannerId: any, size: any): void;
     _resetBanenrStyle(e: any): void;
-    private applyCustomStyle;
+    applyCustomStyle(e: any): void;
     _getBannerPosition(): {
         left: number;
         top: number;
@@ -270,9 +275,10 @@ export default class PlatformModule extends BaseModule {
      */
     clearIntervalBanner(): void;
     /**
-     * 隐藏banner
-     */
-    hideBanner(): void;
+    * 隐藏banner
+    * @param destroy
+    */
+    hideBanner(destroy?: boolean): void;
     initVideo(): void;
     createRewardAD(show: boolean, idIndex?: number): void;
     _onVideoError(msg: any, code: any): void;

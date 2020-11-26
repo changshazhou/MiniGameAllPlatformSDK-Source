@@ -34,7 +34,7 @@ export default class OPPOModule extends PlatformModule {
     _onBannerError(err: any): void;
     _prepareBanner(): void;
     _createBannerAd(): any;
-    _bottomCenterBanner(size: any): void;
+    _onBannerResize(size: any): void;
     _getBannerPosition(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL): {
         left: number;
         top: number;

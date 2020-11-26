@@ -11,7 +11,7 @@ export default class TTModule extends PlatformModule {
     constructor();
     private _registerTTCallback;
     showInter(): void;
-    _bottomCenterBanner(size: any): void;
+    _onBannerResize(bannerId: any, size: any): void;
     initRecord(): void;
     /**
      * 裁剪视频
@@ -55,8 +55,7 @@ export default class TTModule extends PlatformModule {
         fail: (e: any) => void;
     };
     navigate2Video(videoId: any): void;
-    private mBannerLoaded;
-    _onBannerLoad(): void;
+    _onBannerLoad(bannerId: any): void;
     _prepareBanner(): void;
     /**
      * 显示平台的banner广告
@@ -65,8 +64,9 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, adIndex?: number, style?: bannerStyle): void;
-    _showBanner(): void;
+    showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
+    _showBanner(idIndex: any): void;
+    _resetBanenrStyle(e: any): void;
     /**
     * 盒子广告
     * @param callback 关闭回调

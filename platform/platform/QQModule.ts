@@ -90,7 +90,7 @@ export default class QQModule extends PlatformModule {
         }
     }
 
-    public _bottomCenterBanner(size) {
+    public _onBannerResize(size) {
         // 尺寸调整时会触发回调         
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
         console.log('Resize后正式宽高:', size.width, size.height);

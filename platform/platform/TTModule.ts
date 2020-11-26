@@ -25,13 +25,10 @@ export default class TTModule extends PlatformModule {
         super();
         this._regisiterWXCallback();
         this._registerTTCallback();
-        this.initBanner();
         this.initRecord();
-        // 
-        this.scheduleOnce(() => {
-            this.initVideo();
-        }, 1)
+
         this.bannerWidth = 208;
+        this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
     }
 
     private _registerTTCallback() {
@@ -78,13 +75,15 @@ export default class TTModule extends PlatformModule {
             });
     }
 
-    public _bottomCenterBanner(size) {
+    public _onBannerResize(bannerId, size) {
+        console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ bannerId", bannerId)
+        console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ size", size)
         // if (this.bannerWidth != size.width) {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        this.bannerWidth = size.width;
-        this.bannerHeigth = size.height;// (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+        // this.bannerWidth = size.width;
+
         let top = windowHeight - this.bannerHeigth
         //     console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
         if (this.banner) {
@@ -301,17 +300,15 @@ export default class TTModule extends PlatformModule {
         })
     }
 
-    private mBannerLoaded: boolean = false
-    public _onBannerLoad() {
-        this.bannerShowCount = 0;
-        this.mBannerLoaded = true;
-        if (this.isBannerShow) {
-            this.showBanner();
+    public _onBannerLoad(bannerId) {
+        if (this.banner[bannerId] && !this.banner[bannerId].isLoaded) {
+            this.banner[bannerId].isLoaded = true;
+            this.banner[bannerId].show()
         }
+
     }
 
     public _prepareBanner() {
-        this.mBannerLoaded = false;
         super._prepareBanner();
     }
     /**
@@ -321,16 +318,11 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, adIndex: number = 0, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, idIndex: number = 0, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
-
-        this.isBannerShow = true;
-        if (!this.mBannerLoaded) {
-            return;
-        }
 
         if (!window[this.platformName]) {
             return;
@@ -338,9 +330,8 @@ export default class TTModule extends PlatformModule {
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
-        this.bannerStyle = style;
 
-
+        this.currentBannerId = this._createBannerAd(idIndex);
 
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
@@ -350,32 +341,58 @@ export default class TTModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    this._showBanner();
+                    this._showBanner(idIndex);
                 }
             })
         else
-            this._showBanner();
+            this._showBanner(idIndex);
+    }
+
+
+    public _showBanner(idIndex) {
+        let banner = this.banner[this.getBannerId(idIndex)]
+        if (banner) {
+            banner.hide();
+            /**
+             * 先设置位置
+             */
+            this._resetBanenrStyle({
+                banner,
+                width: banner.style.width,
+                height: banner.style.realHeight
+            })
+            if (banner.isLoaded) {
+                let showPromise = banner.show();
+                showPromise && showPromise
+                    .then(() => {
+                        /**
+                         * 再微调，banner 大小可能跟上一个有变化
+                         */
+                        this._resetBanenrStyle({
+                            banner,
+                            width: banner.style.width,
+                            height: banner.style.realHeight
+                        })
+                    })
+            }
+
+        }
     }
 
 
 
-    public _showBanner() {
-        if (this.banner) {
-            console.log('show banner style ', this.banner.style)
-            this.banner.hide();
-            this._resetBanenrStyle({
-                width: this.banner.style.width,
-                height: this.banner.style.realHeight
-            })
-            let showPromise = this.banner.show();
+    public _resetBanenrStyle(e) {
+        console.log("🚀 ~ file: TTModule.ts ~ line 376 ~ TTModule ~ _resetBanenrStyle ~ e", e)
 
-            showPromise && showPromise
-                .then(() => {
-                    this._resetBanenrStyle({
-                        width: this.banner.style.width,
-                        height: this.banner.style.realHeight
-                    })
-                })
+
+        if (this.bannerStyle) {
+            this.applyCustomStyle(e);
+        }
+        else {
+            let style = this._getBannerPosition();
+            console.log("🚀 ~ file: TTModule.ts ~ line 384 ~ TTModule ~ _resetBanenrStyle ~ style", style)
+            e.banner.style.top = style.top;
+            e.banner.style.left = style.left;
         }
     }
 
@@ -458,7 +475,7 @@ export default class TTModule extends PlatformModule {
                 })
 
             })
-            const banner = window[this.platformName].createMoreGamesBanner({
+            const moreGames = window[this.platformName].createMoreGamesBanner({
                 style: {
                     left: 20,
                     top: 0,
@@ -473,8 +490,8 @@ export default class TTModule extends PlatformModule {
                     console.log("show app box fail", res.errMsg);
                 }
             });
-            banner.show();
-            banner.onTap(() => {
+            moreGames.show();
+            moreGames.onTap(() => {
                 console.log("点击跳转游戏盒子");
             });
         }

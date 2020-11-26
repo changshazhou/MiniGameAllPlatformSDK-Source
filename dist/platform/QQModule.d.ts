@@ -15,7 +15,7 @@ export default class QQModule extends PlatformModule {
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, adIndex?: number, style?: bannerStyle): void;
     _showBanner(): void;
-    _bottomCenterBanner(size: any): void;
+    _onBannerResize(size: any): void;
     /**
      * 盒子广告
      * @param callback 关闭回调

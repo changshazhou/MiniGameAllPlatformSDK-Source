@@ -51,11 +51,11 @@ window.moosnowConfig = {
         url: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/config/tp_zzxhcar_config.json",//游戏的配置json，如果用到了getMistouchNum,后台必须配置mistouchNum字段
     },
     byte: {
-        bannerId: "168776",
-        videoId: "168781",
+        bannerId: ["1dcg253kngk3kbk39q", "amhf8omnfif23jcw85"],
+        videoId: ["fsceug9ogfdy4jaiy1", "5222hng9m46l94fgp6"],
         interId: "168777",
         nativeId: ["168779", "168780"],
-        moosnowAppId: "tt07e4715998dfbc8b",
+        moosnowAppId: "ttccd7ba6a53fd8cfe",
         version: "1.1.0",
     },
     uc: {

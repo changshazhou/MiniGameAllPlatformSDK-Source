@@ -305,7 +305,7 @@ export default class VIVOModule extends PlatformModule {
         return retVal;
     }
 
-    public _bottomCenterBanner(size) {
+    public _onBannerResize(size) {
         this.bannerHeight = size.realHeight
         this.bannerWidth = size.realWidth
 

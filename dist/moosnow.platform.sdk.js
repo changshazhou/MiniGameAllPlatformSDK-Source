@@ -1777,6 +1777,11 @@ var mx = (function () {
         };
         PlatformModule.prototype._prepareBanner = function () {
         };
+        /**
+         * 创建banner
+         * @param adIndex
+         * @return bannerId
+         */
         PlatformModule.prototype._createBannerAd = function (adIndex) {
             if (!window[this.platformName])
                 return;
@@ -1787,11 +1792,11 @@ var mx = (function () {
                 console.warn(MSG.BANNER_KEY_IS_NULL);
                 return;
             }
-            console.log("🚀 ~ file: PlatformModule.ts ~ line 993 ~ PlatformModule ~ _createBannerAd ~ bannerId", bannerId);
             if (this.banner[bannerId])
                 return this.banner[bannerId];
             this.bannerShowTime = Date.now();
             var style = this._getBannerPosition();
+            console.log("🚀 ~ file: PlatformModule.ts ~ line 995 ~ PlatformModule ~ _createBannerAd ~ style", style);
             if (!this.banner[bannerId]) {
                 this.banner[bannerId] = window[this.platformName].createBannerAd({
                     adUnitId: bannerId,
@@ -1802,15 +1807,16 @@ var mx = (function () {
                         width: this.bannerWidth
                     }
                 });
+                this.banner[bannerId].isLoaded = false;
                 if (this.banner[bannerId]) {
-                    this.banner[bannerId].onResize(this._bottomCenterBanner.bind(this, bannerId));
+                    this.banner[bannerId].onResize(this._onBannerResize.bind(this, bannerId));
                     this.banner[bannerId].onError(this._onBannerError.bind(this, bannerId));
-                    this.banner[bannerId].onLoad(this._onBannerLoad.bind(this));
+                    this.banner[bannerId].onLoad(this._onBannerLoad.bind(this, bannerId));
                 }
             }
-            return this.banner[bannerId];
+            return bannerId;
         };
-        PlatformModule.prototype._onBannerLoad = function () {
+        PlatformModule.prototype._onBannerLoad = function (bannerId) {
             this.bannerShowCount = 0;
         };
         PlatformModule.prototype._onBannerError = function (bannerId, err) {
@@ -1820,7 +1826,7 @@ var mx = (function () {
             moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
             moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, null);
         };
-        PlatformModule.prototype._bottomCenterBanner = function (bannerId, size) {
+        PlatformModule.prototype._onBannerResize = function (bannerId, size) {
             console.log("_bottomCenterBanner -> size", size);
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
@@ -1916,7 +1922,7 @@ var mx = (function () {
             this.bannerStyle = style;
             if (!window[this.platformName].createBannerAd)
                 return;
-            this._createBannerAd(idIndex);
+            this.currentBannerId = this._createBannerAd(idIndex);
             if (this.mTimeoutId) {
                 clearTimeout(this.mTimeoutId);
                 this.mTimeoutId = null;
@@ -2016,13 +2022,22 @@ var mx = (function () {
             this.unschedule(this.showAutoBanner);
         };
         /**
-         * 隐藏banner
-         */
-        PlatformModule.prototype.hideBanner = function () {
+        * 隐藏banner
+        * @param destroy
+        */
+        PlatformModule.prototype.hideBanner = function (destroy) {
+            if (destroy === void 0) { destroy = false; }
             for (var k in this.banner) {
-                if (this.banner[k] && this.banner[k].hide) {
-                    this.banner[k].hide();
+                if (this.banner[k]) {
+                    if (this.banner[k].hide) {
+                        this.banner[k].hide();
+                    }
                 }
+            }
+            if (destroy && this.banner[this.currentBannerId] && this.banner[this.currentBannerId].destroy) {
+                this.banner[this.currentBannerId].hide();
+                this.banner[this.currentBannerId].destroy();
+                this.banner[this.currentBannerId] = null;
             }
         };
         //------------广告video------------
@@ -3656,7 +3671,7 @@ var mx = (function () {
             console.warn('banner___error:', err.errCode, ' msg ', err.errMsg);
             if (this.banner) {
                 this.banner.hide();
-                this.banner.offResize(this._bottomCenterBanner);
+                this.banner.offResize(this._onBannerResize);
                 this.banner.offError(this._onBannerError);
                 this.banner.offLoad(this._onBannerLoad);
                 this.banner.offHide();
@@ -3680,13 +3695,13 @@ var mx = (function () {
                 this.bannerWidth = windowWidth;
             }
             if (this.banner) {
-                this.banner.offResize(this._bottomCenterBanner);
+                this.banner.offResize(this._onBannerResize);
                 this.banner.offError(this._onBannerError);
                 this.banner.offLoad(this._onBannerLoad);
                 this.banner.offHide();
             }
             this.banner = this._createBannerAd();
-            this.banner.onResize(this._bottomCenterBanner.bind(this));
+            this.banner.onResize(this._onBannerResize.bind(this));
             this.banner.onError(this._onBannerError.bind(this));
             this.banner.onLoad(this._onBannerLoad.bind(this));
             this.banner.onHide(this._onBannerHide.bind(this));
@@ -3715,7 +3730,7 @@ var mx = (function () {
             });
             return banner;
         };
-        OPPOModule.prototype._bottomCenterBanner = function (size) {
+        OPPOModule.prototype._onBannerResize = function (size) {
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
@@ -3800,7 +3815,7 @@ var mx = (function () {
         OPPOModule.prototype.destroyBanner = function () {
             if (this.banner) {
                 this.banner.hide();
-                this.banner.offResize(this._bottomCenterBanner);
+                this.banner.offResize(this._onBannerResize);
                 this.banner.offError(this._onBannerError);
                 this.banner.offLoad(this._onBannerLoad);
                 this.banner.offHide();
@@ -3875,7 +3890,7 @@ var mx = (function () {
                 if (this.bannerShowCount >= this.bannerShowCountLimit) {
                     console.log('banner destroy');
                     this.banner.hide();
-                    this.banner.offResize(this._bottomCenterBanner);
+                    this.banner.offResize(this._onBannerResize);
                     this.banner.offError(this._onBannerError);
                     this.banner.offLoad(this._onBannerLoad);
                     this.banner.offHide();
@@ -4359,14 +4374,31 @@ var mx = (function () {
         };
         //-------------------------------------------------
         SettingModule.prototype.removeValueOfKey = function (key) {
-            window.localStorage.removeItem(key);
+            if (cc && cc.sys && cc.sys.localStorage) {
+                cc.sys.localStorage.removeItem(key);
+            }
+            else if (Laya && Laya.LocalStorage)
+                Laya.LocalStorage.removeItem(key);
+            else
+                window.localStorage.removeItem(key);
         };
         SettingModule.prototype.removeAll = function () {
-            window.localStorage.clear();
+            if (cc && cc.sys && cc.sys.localStorage) {
+            }
+            else if (Laya && Laya.LocalStorage)
+                Laya.LocalStorage.clear();
+            else
+                window.localStorage.clear();
         };
         //-------------------------------------------------
         SettingModule.prototype._getValue = function (k, defaultValue) {
-            var value = window.localStorage.getItem(k);
+            var value = "";
+            if (cc && cc.sys && cc.sys.localStorage)
+                value = cc.sys.localStorage.getItem(k);
+            else if (Laya && Laya.LocalStorage)
+                value = Laya.LocalStorage.getItem(k);
+            else
+                value = window.localStorage.getItem(k);
             if (value == null || value == '') {
                 value = defaultValue;
             }
@@ -4470,16 +4502,11 @@ var mx = (function () {
             _this.recordCb = null;
             _this.recordNumber = 0;
             _this.moreGameCb = null;
-            _this.mBannerLoaded = false;
             _this._regisiterWXCallback();
             _this._registerTTCallback();
-            _this.initBanner();
             _this.initRecord();
-            // 
-            _this.scheduleOnce(function () {
-                _this.initVideo();
-            }, 1);
             _this.bannerWidth = 208;
+            _this.bannerHeigth = (_this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
             return _this;
         }
         TTModule.prototype._registerTTCallback = function () {
@@ -4528,13 +4555,14 @@ var mx = (function () {
                 console.log(err);
             });
         };
-        TTModule.prototype._bottomCenterBanner = function (size) {
+        TTModule.prototype._onBannerResize = function (bannerId, size) {
+            console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ bannerId", bannerId);
+            console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ size", size);
             // if (this.bannerWidth != size.width) {
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
-            this.bannerWidth = size.width;
-            this.bannerHeigth = size.height; // (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+            // this.bannerWidth = size.width;
             var top = windowHeight - this.bannerHeigth;
             //     console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
             if (this.banner) {
@@ -4752,15 +4780,13 @@ var mx = (function () {
                 },
             });
         };
-        TTModule.prototype._onBannerLoad = function () {
-            this.bannerShowCount = 0;
-            this.mBannerLoaded = true;
-            if (this.isBannerShow) {
-                this.showBanner();
+        TTModule.prototype._onBannerLoad = function (bannerId) {
+            if (this.banner[bannerId] && !this.banner[bannerId].isLoaded) {
+                this.banner[bannerId].isLoaded = true;
+                this.banner[bannerId].show();
             }
         };
         TTModule.prototype._prepareBanner = function () {
-            this.mBannerLoaded = false;
             _super.prototype._prepareBanner.call(this);
         };
         /**
@@ -4770,27 +4796,23 @@ var mx = (function () {
          * @param position banner的位置，默认底部
          * @param style 自定义样式
          */
-        TTModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, adIndex, style) {
+        TTModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, idIndex, style) {
             var _this = this;
             if (remoteOn === void 0) { remoteOn = true; }
             if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
             if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
-            if (adIndex === void 0) { adIndex = 0; }
+            if (idIndex === void 0) { idIndex = 0; }
             // if (this.isBannerShow)
             //     return;
             console.log(MSG.BANNER_SHOW);
             this.bannerCb = callback;
-            this.isBannerShow = true;
-            if (!this.mBannerLoaded) {
-                return;
-            }
             if (!window[this.platformName]) {
                 return;
             }
             this.bannerHorizontal = horizontal;
             this.bannerVertical = vertical;
             this.bannerStyle = style;
-            this.bannerStyle = style;
+            this.currentBannerId = this._createBannerAd(idIndex);
             if (remoteOn)
                 moosnow.http.getAllConfig(function (res) {
                     if (res.mistouchNum == 0) {
@@ -4799,29 +4821,51 @@ var mx = (function () {
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
-                        _this._showBanner();
+                        _this._showBanner(idIndex);
                     }
                 });
             else
-                this._showBanner();
+                this._showBanner(idIndex);
         };
-        TTModule.prototype._showBanner = function () {
+        TTModule.prototype._showBanner = function (idIndex) {
             var _this = this;
-            if (this.banner) {
-                console.log('show banner style ', this.banner.style);
-                this.banner.hide();
+            var banner = this.banner[this.getBannerId(idIndex)];
+            if (banner) {
+                banner.hide();
+                /**
+                 * 先设置位置
+                 */
                 this._resetBanenrStyle({
-                    width: this.banner.style.width,
-                    height: this.banner.style.realHeight
+                    banner: banner,
+                    width: banner.style.width,
+                    height: banner.style.realHeight
                 });
-                var showPromise = this.banner.show();
-                showPromise && showPromise
-                    .then(function () {
-                    _this._resetBanenrStyle({
-                        width: _this.banner.style.width,
-                        height: _this.banner.style.realHeight
+                if (banner.isLoaded) {
+                    var showPromise = banner.show();
+                    showPromise && showPromise
+                        .then(function () {
+                        /**
+                         * 再微调，banner 大小可能跟上一个有变化
+                         */
+                        _this._resetBanenrStyle({
+                            banner: banner,
+                            width: banner.style.width,
+                            height: banner.style.realHeight
+                        });
                     });
-                });
+                }
+            }
+        };
+        TTModule.prototype._resetBanenrStyle = function (e) {
+            console.log("🚀 ~ file: TTModule.ts ~ line 376 ~ TTModule ~ _resetBanenrStyle ~ e", e);
+            if (this.bannerStyle) {
+                this.applyCustomStyle(e);
+            }
+            else {
+                var style = this._getBannerPosition();
+                console.log("🚀 ~ file: TTModule.ts ~ line 384 ~ TTModule ~ _resetBanenrStyle ~ style", style);
+                e.banner.style.top = style.top;
+                e.banner.style.left = style.left;
             }
         };
         /**
@@ -4907,7 +4951,7 @@ var mx = (function () {
                         appLaunchOptions_1.push(opt);
                     });
                 });
-                var banner = window[this.platformName].createMoreGamesBanner({
+                var moreGames = window[this.platformName].createMoreGamesBanner({
                     style: {
                         left: 20,
                         top: 0,
@@ -4922,8 +4966,8 @@ var mx = (function () {
                         console.log("show app box fail", res.errMsg);
                     }
                 });
-                banner.show();
-                banner.onTap(function () {
+                moreGames.show();
+                moreGames.onTap(function () {
                     console.log("点击跳转游戏盒子");
                 });
             }
@@ -5146,7 +5190,7 @@ var mx = (function () {
                     });
             }
         };
-        QQModule.prototype._bottomCenterBanner = function (size) {
+        QQModule.prototype._onBannerResize = function (size) {
             // 尺寸调整时会触发回调         
             // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
             console.log('Resize后正式宽高:', size.width, size.height);
@@ -6230,7 +6274,7 @@ var mx = (function () {
                 retVal = window[this.platformName].getNotchHeightSync().height;
             return retVal;
         };
-        VIVOModule.prototype._bottomCenterBanner = function (size) {
+        VIVOModule.prototype._onBannerResize = function (size) {
             this.bannerHeight = size.realHeight;
             this.bannerWidth = size.realWidth;
             console.log('onSize callback  ', size);

@@ -977,7 +977,12 @@ export default class PlatformModule extends BaseModule {
 
     }
 
-    public _createBannerAd(adIndex: number) {
+    /**
+     * 创建banner 
+     * @param adIndex 
+     * @return bannerId
+     */
+    public _createBannerAd(adIndex: number): string {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
         let bannerId = this.getBannerId(adIndex)
@@ -985,13 +990,12 @@ export default class PlatformModule extends BaseModule {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
-
-        console.log("🚀 ~ file: PlatformModule.ts ~ line 993 ~ PlatformModule ~ _createBannerAd ~ bannerId", bannerId)
         if (this.banner[bannerId])
             return this.banner[bannerId];
 
         this.bannerShowTime = Date.now();
         let style = this._getBannerPosition();
+        console.log("🚀 ~ file: PlatformModule.ts ~ line 995 ~ PlatformModule ~ _createBannerAd ~ style", style)
         if (!this.banner[bannerId]) {
             this.banner[bannerId] = window[this.platformName].createBannerAd({
                 adUnitId: bannerId,
@@ -1002,16 +1006,16 @@ export default class PlatformModule extends BaseModule {
                     width: this.bannerWidth
                 }
             });
-
+            this.banner[bannerId].isLoaded = false;
             if (this.banner[bannerId]) {
-                this.banner[bannerId].onResize(this._bottomCenterBanner.bind(this, bannerId));
+                this.banner[bannerId].onResize(this._onBannerResize.bind(this, bannerId));
                 this.banner[bannerId].onError(this._onBannerError.bind(this, bannerId));
-                this.banner[bannerId].onLoad(this._onBannerLoad.bind(this));
+                this.banner[bannerId].onLoad(this._onBannerLoad.bind(this, bannerId));
             }
         }
-        return this.banner[bannerId];
+        return bannerId;
     }
-    public _onBannerLoad() {
+    public _onBannerLoad(bannerId) {
         this.bannerShowCount = 0;
     }
     public _onBannerError(bannerId, err) {
@@ -1022,7 +1026,7 @@ export default class PlatformModule extends BaseModule {
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, null);
 
     }
-    public _bottomCenterBanner(bannerId, size) {
+    public _onBannerResize(bannerId, size) {
         console.log("_bottomCenterBanner -> size", size)
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
@@ -1057,7 +1061,7 @@ export default class PlatformModule extends BaseModule {
         }
     }
 
-    private applyCustomStyle(e) {
+    public applyCustomStyle(e) {
         for (let key in this.bannerStyle) {
             e.banner.style[key] = this.bannerStyle[key]
         }
@@ -1131,7 +1135,8 @@ export default class PlatformModule extends BaseModule {
 
         if (!window[this.platformName].createBannerAd) return;
 
-        this._createBannerAd(idIndex);
+        this.currentBannerId = this._createBannerAd(idIndex);
+
 
         if (this.mTimeoutId) {
             clearTimeout(this.mTimeoutId);
@@ -1235,13 +1240,22 @@ export default class PlatformModule extends BaseModule {
     }
 
     /**
-     * 隐藏banner
-     */
-    public hideBanner() {
+    * 隐藏banner
+    * @param destroy 
+    */
+    public hideBanner(destroy: boolean = false) {
+
         for (let k in this.banner) {
-            if (this.banner[k] && this.banner[k].hide) {
-                this.banner[k].hide();
+            if (this.banner[k]) {
+                if (this.banner[k].hide) {
+                    this.banner[k].hide();
+                }
             }
+        }
+        if (destroy && this.banner[this.currentBannerId] && this.banner[this.currentBannerId].destroy) {
+            this.banner[this.currentBannerId].hide();
+            this.banner[this.currentBannerId].destroy();
+            this.banner[this.currentBannerId] = null;
         }
     }
 
