@@ -1923,10 +1923,16 @@ var mx = (function () {
                 top: top,
             };
         };
+        PlatformModule.prototype.preloadBanner = function (idIndex) {
+            if (idIndex === void 0) { idIndex = -1; }
+            var bannerId = this.getBannerId(idIndex);
+            if (!this.banner[bannerId])
+                this._createBannerAd(idIndex);
+        };
         /**
           * 显示平台的banner广告
           * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
-          * @param callback 点击回调
+        * @param callback 点击回调
           * @param horizontal banner的位置，默认底部
           * @param vertical banner的位置，默认底部
           * @param idIndex id顺序 -1 会随机
@@ -2003,13 +2009,13 @@ var mx = (function () {
          */
         PlatformModule.prototype.showAutoBanner = function (horizontal, vertical, idIndex) {
             var _this = this;
-            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
             if (idIndex === void 0) { idIndex = -1; }
             console.log('执行自动显示和隐藏Banner功能');
             moosnow.http.getAllConfig(function (res) {
                 if (res && res.gameBanner == 1) {
-                    _this.showBanner(true, function () { }, horizontal, vertical, _this.getBannerId(idIndex));
+                    _this.showBanner(true, function () { }, horizontal, vertical, idIndex);
                     var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');
@@ -6053,7 +6059,7 @@ var mx = (function () {
             var _this = _super.call(this) || this;
             _this.platformName = "qg";
             _this.appSid = "";
-            _this.bannerWidth = 720;
+            _this.mBannerWidth = 720;
             _this.bannerHeight = 114;
             _this.interLoadedShow = false;
             _this.prevNavigate = Date.now();
@@ -6222,17 +6228,17 @@ var mx = (function () {
         VIVOModule.prototype._getBannerPosition = function () {
             var horizontal = this.bannerHorizontal;
             var vertical = this.bannerVertical;
-            console.log("VIVOModule -> _getBannerPosition -> vertical", vertical);
-            console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal);
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.screenWidth;
             var windowHeight = wxsys.screenHeight;
             var statusBarHeight = wxsys.statusBarHeight;
             var notchHeight = wxsys.notchHeight || 0;
-            if (!isNaN(this.bannerWidth) && this.banner)
-                this.banner.style.width = this.bannerWidth;
-            if (!isNaN(this.bannerHeight) && this.banner)
-                this.banner.style.height = this.bannerHeight;
+            if (this.banner && this.banner.style) {
+                if (!isNaN(this.bannerWidth))
+                    this.banner.style.width = this.bannerWidth;
+                if (!isNaN(this.bannerHeight))
+                    this.banner.style.height = this.bannerHeight;
+            }
             var top = 0;
             var left = 0;
             if (vertical == BANNER_VERTICAL.TOP) {
@@ -6249,18 +6255,13 @@ var mx = (function () {
             }
             if (horizontal == BANNER_HORIZONTAL.LEFT) {
                 left = 0;
-                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.LEFT");
             }
             else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
                 left = windowWidth - this.bannerWidth;
-                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.RIGHT");
             }
             else if (horizontal == BANNER_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.bannerWidth) / 2;
-                console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.CENTER");
             }
-            else
-                console.log("VIVOModule -> _getBannerPosition -> left ERROR ");
             console.log("VIVOModule -> _getBannerPosition -> top,left", top, left);
             // return {
             //     left: 16,
@@ -6353,7 +6354,7 @@ var mx = (function () {
         };
         VIVOModule.prototype._showBanner = function () {
             var _this = this;
-            if (this.banner) {
+            if (this.banner && this.banner.hide) {
                 this.banner.hide();
                 this.banner.destroy();
                 this.banner = null;
@@ -6401,14 +6402,15 @@ var mx = (function () {
                 console.log("banner\u9690\u85CF\u592A\u9891\u7E41\u4E86 " + this.mMinHideInterval + "\u79D2\u5185\u53EA\u9690\u85CF\u4E00\u6B21");
                 return;
             }
-            if (this.banner) {
+            if (this.banner && this.banner.hide) {
                 console.log("隐藏和销毁banner");
                 this.banner.hide();
                 this.banner.destroy();
                 this.banner = null;
             }
         };
-        VIVOModule.prototype.createRewardAD = function (show) {
+        VIVOModule.prototype.createRewardAD = function (show, idIndex) {
+            if (idIndex === void 0) { idIndex = 0; }
             if (moosnow.platform.videoLoading) {
                 return;
             }
@@ -6437,17 +6439,18 @@ var mx = (function () {
                     this.mVideoTime = Date.now();
                 }
             }
-            if (!this.video) {
+            var videoId = this.getVideoId(idIndex);
+            if (!this.video[videoId]) {
                 moosnow.platform.videoLoading = true;
                 this.video = window[this.platformName].createRewardedVideoAd({
-                    posId: this.getVideoId()
+                    posId: videoId
                 });
                 this.video.onError(this._onVideoError.bind(this));
                 this.video.onClose(this._onVideoClose.bind(this));
                 this.video.onLoad(this._onVideoLoad.bind(this));
             }
             else
-                this.video.load();
+                this.video[videoId].load();
         };
         VIVOModule.prototype._onVideoLoad = function () {
             var _this = this;

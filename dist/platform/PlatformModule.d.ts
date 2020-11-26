@@ -246,10 +246,11 @@ export default class PlatformModule extends BaseModule {
         left: number;
         top: number;
     };
+    preloadBanner(idIndex?: number): void;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
-      * @param callback 点击回调
+    * @param callback 点击回调
       * @param horizontal banner的位置，默认底部
       * @param vertical banner的位置，默认底部
       * @param idIndex id顺序 -1 会随机

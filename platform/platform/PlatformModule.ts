@@ -1136,11 +1136,16 @@ export default class PlatformModule extends BaseModule {
             top,
         }
     }
+    public preloadBanner(idIndex: number = -1) {
+        let bannerId = this.getBannerId(idIndex)
+        if (!this.banner[bannerId])
+            this._createBannerAd(idIndex);
+    }
 
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
-      * @param callback 点击回调
+    * @param callback 点击回调
       * @param horizontal banner的位置，默认底部
       * @param vertical banner的位置，默认底部
       * @param idIndex id顺序 -1 会随机
@@ -1217,11 +1222,11 @@ export default class PlatformModule extends BaseModule {
      * @param vertical banner的位置，默认底部
      * @param idIndex id顺序 -1 会随机
      */
-    public showAutoBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, idIndex: number = -1) {
+    public showAutoBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1) {
         console.log('执行自动显示和隐藏Banner功能')
         moosnow.http.getAllConfig(res => {
             if (res && res.gameBanner == 1) {
-                this.showBanner(true, () => { }, horizontal, vertical, this.getBannerId(idIndex))
+                this.showBanner(true, () => { }, horizontal, vertical, idIndex)
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                 this.mTimeoutId = setTimeout(() => {
                     console.log('自动隐藏时间已到，开始隐藏Banner')

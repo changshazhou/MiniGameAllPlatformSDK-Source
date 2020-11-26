@@ -11,7 +11,7 @@ export default class VIVOModule extends PlatformModule {
 
     public platformName: string = "qg";
     public appSid: string = "";
-    public bannerWidth: number = 720;
+    public mBannerWidth: number = 720;
     public bannerHeight: number = 114;
 
     private interLoadedShow: boolean = false;
@@ -210,19 +210,19 @@ export default class VIVOModule extends PlatformModule {
         let horizontal: BANNER_HORIZONTAL = this.bannerHorizontal
         let vertical: BANNER_VERTICAL = this.bannerVertical
 
-        console.log("VIVOModule -> _getBannerPosition -> vertical", vertical)
-        console.log("VIVOModule -> _getBannerPosition -> horizontal", horizontal)
-
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
         let statusBarHeight = wxsys.statusBarHeight;
         let notchHeight = wxsys.notchHeight || 0
 
-        if (!isNaN(this.bannerWidth) && this.banner)
-            this.banner.style.width = this.bannerWidth;
-        if (!isNaN(this.bannerHeight) && this.banner)
-            this.banner.style.height = this.bannerHeight;
+        if (this.banner && this.banner.style) {
+            if (!isNaN(this.bannerWidth))
+                this.banner.style.width = this.bannerWidth;
+            if (!isNaN(this.bannerHeight))
+                this.banner.style.height = this.bannerHeight;
+        }
+
 
         let top = 0;
         let left = 0;
@@ -241,18 +241,13 @@ export default class VIVOModule extends PlatformModule {
 
         if (horizontal == BANNER_HORIZONTAL.LEFT) {
             left = 0;
-            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.LEFT")
         }
         else if (horizontal == BANNER_HORIZONTAL.RIGHT) {
             left = windowWidth - this.bannerWidth;
-            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.RIGHT")
         }
         else if (horizontal == BANNER_HORIZONTAL.CENTER) {
             left = (windowWidth - this.bannerWidth) / 2;
-            console.log("VIVOModule -> _getBannerPosition -> left BANNER_HORIZONTAL.CENTER")
         }
-        else
-            console.log("VIVOModule -> _getBannerPosition -> left ERROR ")
 
         console.log("VIVOModule -> _getBannerPosition -> top,left", top, left)
         // return {
@@ -340,6 +335,7 @@ export default class VIVOModule extends PlatformModule {
         this.bannerVertical = vertical;
         this.bannerStyle = style;
 
+
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {
@@ -357,7 +353,7 @@ export default class VIVOModule extends PlatformModule {
     }
 
     public _showBanner() {
-        if (this.banner) {
+        if (this.banner && this.banner.hide) {
             this.banner.hide();
             this.banner.destroy()
             this.banner = null;
@@ -408,7 +404,7 @@ export default class VIVOModule extends PlatformModule {
             console.log(`banner隐藏太频繁了 ${this.mMinHideInterval}秒内只隐藏一次`);
             return;
         }
-        if (this.banner) {
+        if (this.banner && this.banner.hide) {
             console.log("隐藏和销毁banner")
             this.banner.hide();
             this.banner.destroy();
@@ -416,7 +412,7 @@ export default class VIVOModule extends PlatformModule {
         }
     }
     private mVideoTime: number;
-    public createRewardAD(show) {
+    public createRewardAD(show: boolean, idIndex: number = 0) {
 
         if (moosnow.platform.videoLoading) {
             return;
@@ -447,18 +443,18 @@ export default class VIVOModule extends PlatformModule {
                 this.mVideoTime = Date.now();
             }
         }
-
-        if (!this.video) {
+        let videoId = this.getVideoId(idIndex);
+        if (!this.video[videoId]) {
             moosnow.platform.videoLoading = true;
             this.video = window[this.platformName].createRewardedVideoAd({
-                posId: this.getVideoId()
+                posId: videoId
             });
             this.video.onError(this._onVideoError.bind(this));
             this.video.onClose(this._onVideoClose.bind(this));
             this.video.onLoad(this._onVideoLoad.bind(this));
         }
         else
-            this.video.load();
+            this.video[videoId].load();
 
     }
     public _onVideoLoad() {

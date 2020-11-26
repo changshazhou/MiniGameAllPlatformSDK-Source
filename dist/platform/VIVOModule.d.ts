@@ -5,7 +5,7 @@ import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "../enum/BANNER_POSITION";
 export default class VIVOModule extends PlatformModule {
     platformName: string;
     appSid: string;
-    bannerWidth: number;
+    mBannerWidth: number;
     bannerHeight: number;
     private interLoadedShow;
     constructor();
@@ -57,7 +57,7 @@ export default class VIVOModule extends PlatformModule {
     private mMinHideInterval;
     hideBanner(): void;
     private mVideoTime;
-    createRewardAD(show: any): void;
+    createRewardAD(show: boolean, idIndex?: number): void;
     _onVideoLoad(): void;
     _onVideoClose(isEnd: any): void;
     prepareInter(): void;
