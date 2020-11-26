@@ -12,33 +12,40 @@ export default class QQModule extends PlatformModule {
         super();
         this._regisiterWXCallback();
         this.initBanner();
-
     }
-    public _createBannerAd() {
+    public mBannerWidth = 320;
+    public bannerHeigth = Math.round(this.bannerWidth / 300 * 72.8071);
+    public _createBannerAd(adIndex: number): string {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
-
-        let height = this.bannerHeigth = Math.round(this.bannerWidth / 300 * 72.8071);
-        let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.screenWidth;
-        let windowHeight = wxsys.screenHeight;
-        if (Common.isEmpty(this.getBannerId())) {
+        let bannerId = this.getBannerId(adIndex);
+        if (Common.isEmpty(bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
+        if (this.banner[bannerId])
+            return bannerId;
+
         let bannerStyle = this._getBannerPosition();
         let style = {
             top: bannerStyle.top,
             left: bannerStyle.left,
             width: this.bannerWidth,
-            height: height
+            height: this.bannerHeigth
         }
         console.log("QQModule -> _createBannerAd -> style", style)
-        let banner = window[this.platformName].createBannerAd({
-            adUnitId: this.getBannerId(),
+        this.banner[bannerId] = window[this.platformName].createBannerAd({
+            adUnitId: bannerId,
             style: style
         });
-        return banner;
+
+        if (this.banner[bannerId]) {
+            this.banner[bannerId].isLoaded = false;
+            this.banner[bannerId].onResize(this._onBannerResize);
+            this.banner[bannerId].onError(this._onBannerError);
+            this.banner[bannerId].onLoad(moosnow.platform._onBannerLoad.bind(this, bannerId));
+        }
+        return bannerId;
     }
 
     /**
@@ -48,7 +55,7 @@ export default class QQModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, adIndex: number = 0, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = 0, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -58,7 +65,7 @@ export default class QQModule extends PlatformModule {
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
-
+        this.currentBannerId = this._createBannerAd(idIndex);
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {
@@ -67,33 +74,53 @@ export default class QQModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    this._showBanner();
+                    this._showBanner(idIndex);
                 }
             })
         else
-            this._showBanner();
+            this._showBanner(idIndex);
 
     }
 
-    public _showBanner() {
-        if (this.banner) {
+    public _showBanner(idIndex) {
+        let bannerId = this.getBannerId(idIndex)
+        let banner = this.banner[bannerId]
+        if (banner && banner.isLoaded) {
             this._resetBanenrStyle({
-
+                banner,
+                width: banner.style.width,
+                height: banner.style.realHeight
             });
-            let t = this.banner.show();
+            let t = banner.show();
             if (t)
-                t.then(() => {
+                t.then((e) => {
+                    console.log("banner show 成功", e)
                     this._resetBanenrStyle({
-
+                        banner,
+                        width: banner.style.width,
+                        height: banner.style.realHeight
                     });
+                }).catch((e) => {
+                    console.log("banner show 出错", e)
                 })
         }
+        else {
+            console.log('banner 不存在')
+        }
     }
+    public _onBannerLoad(bannerId) {
+        console.log("banner 加载结束 bannerId", bannerId)
+        this.bannerShowCount = 0;
+        if (this.banner[bannerId] && !this.banner[bannerId].isLoaded) {
+            this.banner[bannerId].isLoaded = true;
+            this.banner[bannerId].show();
 
+        }
+    }
     public _onBannerResize(size) {
         // 尺寸调整时会触发回调         
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
-        console.log('Resize后正式宽高:', size.width, size.height);
+        console.log('Resize后正式宽高:', size);
         // this._resetBanenrStyle(size);
     }
 
@@ -225,9 +252,6 @@ export default class QQModule extends PlatformModule {
         let horizontal: BLOCK_HORIZONTAL = this.blockHorizontal;
         let vertical: BLOCK_VERTICAL = this.blockVertical;
 
-        console.log("QQModule -> _getBlockPosition -> vertical", vertical)
-        console.log("QQModule -> _getBlockPosition -> horizontal", horizontal)
-
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
@@ -268,6 +292,6 @@ export default class QQModule extends PlatformModule {
         console.log("QQModule -> _onBlockResize -> style", style)
         this.block.style.top = style.top;
         this.block.style.left = style.left;
-        console.log(MSG.BANNER_RESIZE, this.block.style, 'set top ', top)
+        console.log('重置block位置', style)
     }
 }
