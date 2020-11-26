@@ -86,20 +86,21 @@ export default class SettingModule extends BaseModule {
     //-------------------------------------------------
 
     removeValueOfKey(key: string) {
-        if (cc && cc.sys && cc.sys.localStorage) {
-            cc.sys.localStorage.removeItem(key);
+        if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage) {
+            window["cc"].sys.localStorage.removeItem(key);
         }
-        else if (Laya && Laya.LocalStorage)
-            Laya.LocalStorage.removeItem(key);
+        else if (window["Laya"] && window["Laya"].LocalStorage)
+            window["Laya"].LocalStorage.removeItem(key);
         else
             window.localStorage.removeItem(key);
     }
 
     removeAll() {
-        if (cc && cc.sys && cc.sys.localStorage) {
+
+        if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage) {
 
         }
-        else if (Laya && Laya.LocalStorage)
+        else if (window["Laya"] && window["Laya"].LocalStorage)
             Laya.LocalStorage.clear();
         else
             window.localStorage.clear();
@@ -109,10 +110,10 @@ export default class SettingModule extends BaseModule {
 
     _getValue(k, defaultValue) {
         let value = ""
-        if (cc && cc.sys && cc.sys.localStorage)
-            value = cc.sys.localStorage.getItem(k);
-        else if (Laya && Laya.LocalStorage)
-            value = Laya.LocalStorage.getItem(k);
+        if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage)
+            value = window["cc"].sys.localStorage.getItem(k);
+        else if (window["Laya"] && window["Laya"].LocalStorage)
+            value = window["Laya"].LocalStorage.getItem(k);
         else
             value = window.localStorage.getItem(k);
         if (value == null || value == '') {

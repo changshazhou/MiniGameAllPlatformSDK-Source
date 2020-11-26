@@ -28,6 +28,8 @@ export default class PlatformModule extends BaseModule {
 
         this.updateProgram();
         this.initRecord();
+
+
     }
 
     public baseUrl = "https://api.liteplay.com.cn/";
@@ -112,7 +114,28 @@ export default class PlatformModule extends BaseModule {
     public nativeId: Array<number> = [];
     public nativeIdIndex: number = 0;
 
-    public bannerWidth: number = 300;
+    public mBannerWidth: number = 300;
+    public get bannerWidth(): number {
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        //横屏模式
+        if (wxsys.windowHeight < wxsys.windowWidth) {
+            if (windowWidth < 300) {
+                this.mBannerWidth = windowWidth;
+            }
+            else {
+                this.mBannerWidth = 300
+            }
+        }
+        else {
+            //竖屏
+            this.mBannerWidth = windowWidth;
+        }
+        return this.mBannerWidth;
+    };
+    public set bannerWidth(value) {
+        this.mBannerWidth = value
+    }
     public bannerHeigth: number = 96;
     public bannerHorizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE;
     public bannerVertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE
@@ -997,6 +1020,7 @@ export default class PlatformModule extends BaseModule {
         let style = this._getBannerPosition();
         console.log("🚀 ~ file: PlatformModule.ts ~ line 995 ~ PlatformModule ~ _createBannerAd ~ style", style)
         if (!this.banner[bannerId]) {
+
             this.banner[bannerId] = window[this.platformName].createBannerAd({
                 adUnitId: bannerId,
                 adIntervals: 30,
@@ -1072,8 +1096,8 @@ export default class PlatformModule extends BaseModule {
         let horizontal: BANNER_HORIZONTAL = this.bannerHorizontal
         let vertical: BANNER_VERTICAL = this.bannerVertical
 
-        console.log("_getBannerPosition -> horizontal", horizontal)
-        console.log("_getBannerPosition -> vertical", vertical)
+        // console.log("_getBannerPosition -> horizontal", horizontal)
+        // console.log("_getBannerPosition -> vertical", vertical)
 
 
 
@@ -1102,7 +1126,7 @@ export default class PlatformModule extends BaseModule {
             left = (windowWidth - this.bannerWidth) / 2;
         }
 
-        console.log("QQModule -> _getBannerPosition -> left", left, 'top', top)
+        console.log("TTModule -> _getBannerPosition -> left", left, 'top', top)
         // return {
         //     left: 16,
         //     top: 16,
@@ -1201,14 +1225,12 @@ export default class PlatformModule extends BaseModule {
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                 this.mTimeoutId = setTimeout(() => {
                     console.log('自动隐藏时间已到，开始隐藏Banner')
-                    if (this.isBannerShow) {
-                        this.hideBanner();
-                    }
-                    else {
-                        this.hideBanner();
-                    }
+                    this.hideBanner(true);
 
                 }, time * 1000)
+            }
+            else {
+                console.log('后台关闭了auto banner')
             }
         })
     }

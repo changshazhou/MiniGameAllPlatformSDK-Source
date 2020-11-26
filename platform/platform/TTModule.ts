@@ -20,6 +20,14 @@ export default class TTModule extends PlatformModule {
 
 
     public moreGameCb: Function = null;
+    public get bannerWidth(): number {
+        return this.mBannerWidth;
+    }
+    public set bannerWidth(value) {
+        this.mBannerWidth = value
+    }
+
+
 
     constructor() {
         super();
@@ -27,8 +35,7 @@ export default class TTModule extends PlatformModule {
         this._registerTTCallback();
         this.initRecord();
 
-        this.bannerWidth = 208;
-        this.bannerHeigth = (this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
+
     }
 
     private _registerTTCallback() {
@@ -76,19 +83,18 @@ export default class TTModule extends PlatformModule {
     }
 
     public _onBannerResize(bannerId, size) {
-        console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ bannerId", bannerId)
-        console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ size", size)
         // if (this.bannerWidth != size.width) {
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
         let windowHeight = wxsys.windowHeight;
-        // this.bannerWidth = size.width;
-
+        this.bannerWidth = size.width;
+        this.bannerHeigth = isNaN(size.height) ? (this.bannerWidth / 16) * 9 : size.height // 根据系统约定尺寸计算出广告高度
         let top = windowHeight - this.bannerHeigth
         //     console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
-        if (this.banner) {
-            this.banner.style.top = top;
-            this.banner.style.left = (windowWidth - this.bannerWidth) / 2;
+        let style = this._getBannerPosition()
+        if (this.banner[bannerId]) {
+            this.banner[bannerId].style.top = style.top;
+            this.banner[bannerId].style.left = style.left;
         }
 
         // }
@@ -318,7 +324,7 @@ export default class TTModule extends PlatformModule {
      * @param position banner的位置，默认底部
      * @param style 自定义样式
      */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.NONE, vertical: BANNER_VERTICAL = BANNER_VERTICAL.NONE, idIndex: number = 0, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = 0, style?: bannerStyle) {
         // if (this.isBannerShow)
         //     return;
         console.log(MSG.BANNER_SHOW)

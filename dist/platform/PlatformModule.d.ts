@@ -34,7 +34,9 @@ export default class PlatformModule extends BaseModule {
      */
     nativeId: Array<number>;
     nativeIdIndex: number;
-    bannerWidth: number;
+    mBannerWidth: number;
+    get bannerWidth(): number;
+    set bannerWidth(value: number);
     bannerHeigth: number;
     bannerHorizontal: BANNER_HORIZONTAL;
     bannerVertical: BANNER_VERTICAL;

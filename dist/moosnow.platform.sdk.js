@@ -880,7 +880,7 @@ var mx = (function () {
              */
             _this.nativeId = [];
             _this.nativeIdIndex = 0;
-            _this.bannerWidth = 300;
+            _this.mBannerWidth = 300;
             _this.bannerHeigth = 96;
             _this.bannerHorizontal = BANNER_HORIZONTAL.NONE;
             _this.bannerVertical = BANNER_VERTICAL.NONE;
@@ -970,6 +970,32 @@ var mx = (function () {
                 return id;
             }
         };
+        ;
+        Object.defineProperty(PlatformModule.prototype, "bannerWidth", {
+            get: function () {
+                var wxsys = this.getSystemInfoSync();
+                var windowWidth = wxsys.windowWidth;
+                //横屏模式
+                if (wxsys.windowHeight < wxsys.windowWidth) {
+                    if (windowWidth < 300) {
+                        this.mBannerWidth = windowWidth;
+                    }
+                    else {
+                        this.mBannerWidth = 300;
+                    }
+                }
+                else {
+                    //竖屏
+                    this.mBannerWidth = windowWidth;
+                }
+                return this.mBannerWidth;
+            },
+            set: function (value) {
+                this.mBannerWidth = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         ;
         PlatformModule.prototype.onEnable = function () {
         };
@@ -1862,8 +1888,8 @@ var mx = (function () {
         PlatformModule.prototype._getBannerPosition = function () {
             var horizontal = this.bannerHorizontal;
             var vertical = this.bannerVertical;
-            console.log("_getBannerPosition -> horizontal", horizontal);
-            console.log("_getBannerPosition -> vertical", vertical);
+            // console.log("_getBannerPosition -> horizontal", horizontal)
+            // console.log("_getBannerPosition -> vertical", vertical)
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
@@ -1887,7 +1913,7 @@ var mx = (function () {
             else if (horizontal == BANNER_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.bannerWidth) / 2;
             }
-            console.log("QQModule -> _getBannerPosition -> left", left, 'top', top);
+            console.log("TTModule -> _getBannerPosition -> left", left, 'top', top);
             // return {
             //     left: 16,
             //     top: 16,
@@ -1987,13 +2013,11 @@ var mx = (function () {
                     var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');
-                        if (_this.isBannerShow) {
-                            _this.hideBanner();
-                        }
-                        else {
-                            _this.hideBanner();
-                        }
+                        _this.hideBanner(true);
                     }, time * 1000);
+                }
+                else {
+                    console.log('后台关闭了auto banner');
                 }
             });
         };
@@ -4374,18 +4398,18 @@ var mx = (function () {
         };
         //-------------------------------------------------
         SettingModule.prototype.removeValueOfKey = function (key) {
-            if (cc && cc.sys && cc.sys.localStorage) {
-                cc.sys.localStorage.removeItem(key);
+            if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage) {
+                window["cc"].sys.localStorage.removeItem(key);
             }
-            else if (Laya && Laya.LocalStorage)
-                Laya.LocalStorage.removeItem(key);
+            else if (window["Laya"] && window["Laya"].LocalStorage)
+                window["Laya"].LocalStorage.removeItem(key);
             else
                 window.localStorage.removeItem(key);
         };
         SettingModule.prototype.removeAll = function () {
-            if (cc && cc.sys && cc.sys.localStorage) {
+            if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage) {
             }
-            else if (Laya && Laya.LocalStorage)
+            else if (window["Laya"] && window["Laya"].LocalStorage)
                 Laya.LocalStorage.clear();
             else
                 window.localStorage.clear();
@@ -4393,10 +4417,10 @@ var mx = (function () {
         //-------------------------------------------------
         SettingModule.prototype._getValue = function (k, defaultValue) {
             var value = "";
-            if (cc && cc.sys && cc.sys.localStorage)
-                value = cc.sys.localStorage.getItem(k);
-            else if (Laya && Laya.LocalStorage)
-                value = Laya.LocalStorage.getItem(k);
+            if (window["cc"] && window["cc"].sys && window["cc"].sys.localStorage)
+                value = window["cc"].sys.localStorage.getItem(k);
+            else if (window["Laya"] && window["Laya"].LocalStorage)
+                value = window["Laya"].LocalStorage.getItem(k);
             else
                 value = window.localStorage.getItem(k);
             if (value == null || value == '') {
@@ -4505,10 +4529,18 @@ var mx = (function () {
             _this._regisiterWXCallback();
             _this._registerTTCallback();
             _this.initRecord();
-            _this.bannerWidth = 208;
-            _this.bannerHeigth = (_this.bannerWidth / 16) * 9; // 根据系统约定尺寸计算出广告高度
             return _this;
         }
+        Object.defineProperty(TTModule.prototype, "bannerWidth", {
+            get: function () {
+                return this.mBannerWidth;
+            },
+            set: function (value) {
+                this.mBannerWidth = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         TTModule.prototype._registerTTCallback = function () {
             var _this = this;
             if (!window[this.platformName])
@@ -4556,18 +4588,18 @@ var mx = (function () {
             });
         };
         TTModule.prototype._onBannerResize = function (bannerId, size) {
-            console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ bannerId", bannerId);
-            console.log("🚀 ~ file: TTModule.ts ~ line 78 ~ TTModule ~ _onBannerResize ~ size", size);
             // if (this.bannerWidth != size.width) {
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
             var windowHeight = wxsys.windowHeight;
-            // this.bannerWidth = size.width;
+            this.bannerWidth = size.width;
+            this.bannerHeigth = isNaN(size.height) ? (this.bannerWidth / 16) * 9 : size.height; // 根据系统约定尺寸计算出广告高度
             var top = windowHeight - this.bannerHeigth;
             //     console.log('bannerWidth ', this.bannerWidth, 'bannerHeigth', this.bannerHeigth, 'top', top)
-            if (this.banner) {
-                this.banner.style.top = top;
-                this.banner.style.left = (windowWidth - this.bannerWidth) / 2;
+            var style = this._getBannerPosition();
+            if (this.banner[bannerId]) {
+                this.banner[bannerId].style.top = style.top;
+                this.banner[bannerId].style.left = style.left;
             }
             // }
         };
@@ -4799,8 +4831,8 @@ var mx = (function () {
         TTModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, idIndex, style) {
             var _this = this;
             if (remoteOn === void 0) { remoteOn = true; }
-            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BANNER_VERTICAL.NONE; }
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
             if (idIndex === void 0) { idIndex = 0; }
             // if (this.isBannerShow)
             //     return;
