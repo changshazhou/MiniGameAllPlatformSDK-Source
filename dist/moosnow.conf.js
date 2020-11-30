@@ -5,7 +5,7 @@ window.moosnowConfig = {
      * 微信平台
      */
     wx: {
-        bannerId: "adunit-e51b3123060eec9e",   //请填写你自己的APP banner id
+        bannerId: ["adunit-e51b3123060eec9e"],   //请填写你自己的APP banner id
         videoId: "adunit-a322f5ee40076372",    //请填写你自己的APP video id
         interId: "adunit-7c61767905a3940a", //请填写你自己的APP inter id   
         nativeId: "",

@@ -2021,7 +2021,7 @@ var mx = (function () {
                     var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');
-                        _this.hideBanner(true);
+                        _this.hideBanner();
                     }, time * 1000);
                 }
                 else {
@@ -2055,18 +2055,9 @@ var mx = (function () {
         };
         /**
         * 隐藏banner
-        * @param destroy
         */
-        PlatformModule.prototype.hideBanner = function (destroy) {
-            if (destroy === void 0) { destroy = false; }
-            for (var k in this.banner) {
-                if (this.banner[k]) {
-                    if (this.banner[k].hide) {
-                        this.banner[k].hide();
-                    }
-                }
-            }
-            if (destroy && this.banner[this.currentBannerId] && this.banner[this.currentBannerId].destroy) {
+        PlatformModule.prototype.hideBanner = function () {
+            if (this.banner[this.currentBannerId]) {
                 this.banner[this.currentBannerId].hide();
                 this.banner[this.currentBannerId].destroy();
                 this.banner[this.currentBannerId] = null;

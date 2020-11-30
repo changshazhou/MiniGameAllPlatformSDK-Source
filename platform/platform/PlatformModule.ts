@@ -1232,7 +1232,7 @@ export default class PlatformModule extends BaseModule {
                 let time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
                 this.mTimeoutId = setTimeout(() => {
                     console.log('自动隐藏时间已到，开始隐藏Banner')
-                    this.hideBanner(true);
+                    this.hideBanner();
 
                 }, time * 1000)
             }
@@ -1270,18 +1270,9 @@ export default class PlatformModule extends BaseModule {
 
     /**
     * 隐藏banner
-    * @param destroy 
     */
-    public hideBanner(destroy: boolean = false) {
-
-        for (let k in this.banner) {
-            if (this.banner[k]) {
-                if (this.banner[k].hide) {
-                    this.banner[k].hide();
-                }
-            }
-        }
-        if (destroy && this.banner[this.currentBannerId] && this.banner[this.currentBannerId].destroy) {
+    public hideBanner() {
+        if (this.banner[this.currentBannerId]) {
             this.banner[this.currentBannerId].hide();
             this.banner[this.currentBannerId].destroy();
             this.banner[this.currentBannerId] = null;

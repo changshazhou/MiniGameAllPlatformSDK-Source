@@ -279,9 +279,8 @@ export default class PlatformModule extends BaseModule {
     clearIntervalBanner(): void;
     /**
     * 隐藏banner
-    * @param destroy
     */
-    hideBanner(destroy?: boolean): void;
+    hideBanner(): void;
     initVideo(): void;
     createRewardAD(show: boolean, idIndex?: number): void;
     _onVideoError(msg: any, code: any): void;
