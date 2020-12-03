@@ -6419,12 +6419,13 @@ var mx = (function () {
                 return;
             }
             var nowTime = Date.now();
-            if (!this.mShowTime)
-                this.mShowTime = nowTime;
-            if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
+            if (!this.mHideTime)
+                this.mHideTime = nowTime;
+            else if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
                 console.log("banner\u9690\u85CF\u592A\u9891\u7E41\u4E86 " + this.mMinHideInterval + "\u79D2\u5185\u53EA\u9690\u85CF\u4E00\u6B21");
                 return;
             }
+            this.mHideTime = nowTime;
             if (this.banner && this.banner.hide) {
                 console.log("隐藏和销毁banner");
                 this.banner.hide();

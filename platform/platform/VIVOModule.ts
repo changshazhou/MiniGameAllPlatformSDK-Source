@@ -398,12 +398,13 @@ export default class VIVOModule extends PlatformModule {
             return;
         }
         let nowTime = Date.now();
-        if (!this.mShowTime)
-            this.mShowTime = nowTime;
-        if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
+        if (!this.mHideTime)
+            this.mHideTime = nowTime;
+        else if (this.mHideTime && nowTime - this.mHideTime <= this.mMinHideInterval * 1000) {
             console.log(`banner隐藏太频繁了 ${this.mMinHideInterval}秒内只隐藏一次`);
             return;
         }
+        this.mHideTime = nowTime;
         if (this.banner && this.banner.hide) {
             console.log("隐藏和销毁banner")
             this.banner.hide();
