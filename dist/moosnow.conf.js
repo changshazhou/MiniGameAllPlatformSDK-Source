@@ -65,5 +65,13 @@ window.moosnowConfig = {
         nativeId: ["168779", "168780"],
         moosnowAppId: "tt07e4715998dfbc8b",
         version: "1.1.0",
+    },
+    hw: {
+        bannerId: "168776",
+        videoId: "168781",
+        interId: "168777",
+        nativeId: ["168779", "168780"],
+        moosnowAppId: "tt07e4715998dfbc8b",
+        version: "1.1.0",
     }
 }

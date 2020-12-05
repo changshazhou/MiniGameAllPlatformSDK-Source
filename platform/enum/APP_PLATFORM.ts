@@ -34,5 +34,9 @@ export enum APP_PLATFORM {
     /**
     * VIVO
     */
-    UC
+    UC,
+    /**
+    * VIVO
+    */
+    HW
 }

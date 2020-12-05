@@ -291,6 +291,10 @@ var mx = (function () {
         * VIVO
         */
         APP_PLATFORM[APP_PLATFORM["UC"] = 8] = "UC";
+        /**
+        * VIVO
+        */
+        APP_PLATFORM[APP_PLATFORM["HW"] = 9] = "HW";
     })(APP_PLATFORM || (APP_PLATFORM = {}));
 
     var ENGINE_TYPE = {
@@ -452,6 +456,8 @@ var mx = (function () {
                 }
                 else if (window['uc'])
                     this.mPlatform = APP_PLATFORM.UC;
+                else if (window['hbs'])
+                    this.mPlatform = APP_PLATFORM.HW;
                 else if (window['wx'])
                     this.mPlatform = APP_PLATFORM.WX;
                 else {
@@ -473,6 +479,8 @@ var mx = (function () {
                             this.mPlatform = APP_PLATFORM.VIVO;
                         else if (winCfg.debug == "uc")
                             this.mPlatform = APP_PLATFORM.UC;
+                        else if (winCfg.debug == "hw")
+                            this.mPlatform = APP_PLATFORM.HW;
                         else
                             this.mPlatform = APP_PLATFORM.PC;
                     }
@@ -514,6 +522,8 @@ var mx = (function () {
                     config = winCfg.bd;
                 else if (Common.platform == APP_PLATFORM.BYTEDANCE)
                     config = winCfg.byte;
+                else if (Common.platform == APP_PLATFORM.HW)
+                    config = winCfg.hw;
                 else
                     config = winCfg.wx;
                 return config;
@@ -11026,6 +11036,188 @@ var mx = (function () {
         return FormUtil;
     }());
 
+    var HWModule = /** @class */ (function (_super) {
+        __extends(HWModule, _super);
+        function HWModule() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.platformName = "hbs";
+            _this.mIsClickedNative = false;
+            return _this;
+        }
+        HWModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, idIndex, style) {
+            if (remoteOn === void 0) { remoteOn = true; }
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
+            if (idIndex === void 0) { idIndex = -1; }
+        };
+        HWModule.prototype.createRewardAD = function (show, idIndex) {
+            var _this = this;
+            if (idIndex === void 0) { idIndex = 0; }
+            if (this.videoLoading) {
+                return;
+            }
+            if (!window[this.platformName]) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            if (!window[this.platformName].createRewardedVideoAd) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            var videoId = this.getVideoId(idIndex);
+            if (Common.isEmpty(videoId)) {
+                console.warn(MSG.VIDEO_KEY_IS_NULL);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            if (!this.video[videoId]) {
+                console.log(" HWModule ~ createRewardAD ~ videoId", videoId);
+                this.video[videoId] = window[this.platformName].createRewardedVideoAd({
+                    adUnitId: videoId
+                });
+                if (!this.video[videoId]) {
+                    console.warn('创建视频广告失败');
+                    return;
+                }
+                this.video[videoId].onError(this._onVideoError);
+                this.video[videoId].onClose(this._onVideoClose);
+                this.video[videoId].onLoad(function () {
+                    moosnow.platform.videoLoading = false;
+                    if (_this.video[videoId]) {
+                        _this.video[videoId].show();
+                    }
+                });
+            }
+            moosnow.platform.videoLoading = true;
+            moosnow.platform.videoPlaying = false;
+            this.video[videoId].load();
+        };
+        HWModule.prototype._onVideoError = function (e) {
+            console.warn(MSG.VIDEO_ERROR_COMPLETED, JSON.stringify(e));
+        };
+        HWModule.prototype.showNativeAd = function (callback) {
+            var _this = this;
+            if (!this.native)
+                this._prepareNative(true);
+            this.nativeCb = callback;
+            if (this.native) {
+                var ret = this.native.load();
+                ret && ret.then(function () {
+                    console.log('原生广告加载完成');
+                }).catch(function (err) {
+                    console.log('原生广告加载失败');
+                    moosnow.http.getAllConfig(function (res) {
+                        if (res.nativeErrorShowInter == 1) {
+                            console.log('原生加载出错，用插屏代替');
+                            _this.nativeCb(null);
+                            _this.showInter();
+                        }
+                        else {
+                            _this.nativeCb(null);
+                        }
+                    });
+                });
+            }
+        };
+        HWModule.prototype._prepareNative = function (isLoad) {
+            if (isLoad === void 0) { isLoad = false; }
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createNativeAd)
+                return;
+            if (this.native)
+                return;
+            var adUnitId = this.nativeId[this.nativeIdIndex];
+            console.log(" HWModule ~ _prepareNative ~ adUnitId", adUnitId);
+            this.native = window[this.platformName].createNativeAd({
+                adUnitId: adUnitId,
+                success: function (code) {
+                    console.log("_prepareNative loadNativeAd : success", code);
+                },
+                fail: function (data, code) {
+                    console.log("_prepareNative loadNativeAd fail: " + data + "," + code);
+                }
+            });
+            this.native.onLoad(this._onNativeLoad.bind(this));
+            this.native.onError(this._onNativeError.bind(this));
+        };
+        HWModule.prototype._onNativeLoad = function (res) {
+            var _this = this;
+            console.log(" HWModule ~ _onNativeLoad ~ res", JSON.stringify(res));
+            this.nativeLoading = false;
+            console.log(MSG.NATIVE_LOAD_COMPLETED, res);
+            if (res && res.adList && res.adList.length > 0) {
+                this.nativeAdResult = res.adList[res.adList.length - 1];
+                if (!Common.isEmpty(this.nativeAdResult.adId)) {
+                    console.log(MSG.NATIVE_REPORT);
+                    this.native.reportAdShow({
+                        adId: this.nativeAdResult.adId
+                    });
+                }
+                if (Common.isFunction(this.nativeCb)) {
+                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                }
+            }
+            else {
+                console.log(MSG.NATIVE_LIST_NULL);
+                if (Common.isFunction(this.nativeCb)) {
+                    moosnow.http.getAllConfig(function (res) {
+                        if (res.nativeErrorShowInter == 1) {
+                            console.log('原生加载出错，用插屏代替');
+                            _this.showInter();
+                        }
+                        else {
+                            _this.nativeCb(null);
+                        }
+                    });
+                }
+            }
+        };
+        HWModule.prototype._onNativeError = function (err) {
+            var _this = this;
+            this.nativeLoading = false;
+            this.nativeAdResult = null;
+            if (err.code == 20003) {
+                if (this.nativeIdIndex < this.nativeId.length - 1) {
+                    console.log(MSG.NATIVE_ERROR, err);
+                    this.nativeIdIndex += 1;
+                    this._destroyNative();
+                }
+                else {
+                    console.log(MSG.NATIVE_NOT_ID_USE);
+                    this.nativeIdIndex = 0;
+                }
+            }
+            else {
+                console.log(MSG.NATIVE_ERROR2, err);
+            }
+            moosnow.http.getAllConfig(function (res) {
+                if (res.nativeErrorShowInter == 1) {
+                    console.log('原生加载出错，用插屏代替');
+                    _this.showInter();
+                }
+                else {
+                    if (_this.nativeCb)
+                        _this.nativeCb(null);
+                }
+            });
+        };
+        HWModule.prototype.clickNative = function (callback) {
+            if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
+                this.mClickedNativeCallback = callback;
+                this.mIsClickedNative = true;
+                console.log(MSG.NATIVE_CLICK, this.nativeAdResult.adId);
+                this.native.reportAdClick({
+                    adId: this.nativeAdResult.adId
+                });
+            }
+        };
+        return HWModule;
+    }(PlatformModule));
+
     var moosnow$1 = /** @class */ (function () {
         function moosnow() {
         }
@@ -11058,6 +11250,8 @@ var mx = (function () {
                         this.mPlatform = new BDModule();
                     else if (Common.platform == APP_PLATFORM.UC)
                         this.mPlatform = new UCModule();
+                    else if (Common.platform == APP_PLATFORM.HW)
+                        this.mPlatform = new HWModule();
                     else {
                         this.mPlatform = new PlatformModule();
                     }

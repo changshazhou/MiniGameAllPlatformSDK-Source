@@ -32,6 +32,7 @@ import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
 import moosnowAppConfig from "./model/moosnowAppConfig";
 import FormUtil from "./ui/FormUtil";
 import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
+import HWModule from "./platform/HWModule";
 
 export default class moosnow {
     public static VIDEO_STATUS = VIDEO_STATUS;
@@ -80,6 +81,8 @@ export default class moosnow {
                 this.mPlatform = new BDModule();
             else if (Common.platform == APP_PLATFORM.UC)
                 this.mPlatform = new UCModule();
+            else if (Common.platform == APP_PLATFORM.HW)
+                this.mPlatform = new HWModule();
             else {
                 this.mPlatform = new PlatformModule();
             }

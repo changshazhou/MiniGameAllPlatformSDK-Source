@@ -163,6 +163,8 @@ export default class Common {
         }
         else if (window['uc'])
             this.mPlatform = APP_PLATFORM.UC
+        else if (window['hbs'])
+            this.mPlatform = APP_PLATFORM.HW
         else if (window['wx'])
             this.mPlatform = APP_PLATFORM.WX
         else {
@@ -184,6 +186,8 @@ export default class Common {
                     this.mPlatform = APP_PLATFORM.VIVO
                 else if (winCfg.debug == "uc")
                     this.mPlatform = APP_PLATFORM.UC
+                else if (winCfg.debug == "hw")
+                    this.mPlatform = APP_PLATFORM.HW
                 else
                     this.mPlatform = APP_PLATFORM.PC
             }
@@ -217,6 +221,8 @@ export default class Common {
             config = winCfg.bd;
         else if (Common.platform == APP_PLATFORM.BYTEDANCE)
             config = winCfg.byte;
+        else if (Common.platform == APP_PLATFORM.HW)
+            config = winCfg.hw;
         else
             config = winCfg.wx;
         return config;
