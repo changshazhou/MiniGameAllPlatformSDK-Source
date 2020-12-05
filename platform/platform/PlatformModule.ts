@@ -61,7 +61,7 @@ export default class PlatformModule extends BaseModule {
         let id = Common.config["bannerId"] as any;
         if (id instanceof Array) {
             if (random || idx < 0) {
-                return MathUtils.randomNumBoth(0, id.length - 1)
+                return id[MathUtils.randomNumBoth(0, id.length - 1)];
             }
             else {
                 if (id.length - 1 < idx) {
@@ -1014,7 +1014,7 @@ export default class PlatformModule extends BaseModule {
             return;
         }
         if (this.banner[bannerId])
-            return this.banner[bannerId];
+            return bannerId;
 
         this.bannerShowTime = Date.now();
         let style = this._getBannerPosition();
@@ -1073,7 +1073,7 @@ export default class PlatformModule extends BaseModule {
 
     public _resetBanenrStyle(e) {
 
-        console.log("🚀 ~ file: PlatformModule.ts ~ line 1045 ~ PlatformModule ~ _resetBanenrStyle ~ size", e)
+        console.log("PlatformModule ~ _resetBanenrStyle ~ size", e)
 
         if (this.bannerStyle) {
             this.applyCustomStyle(e);
@@ -1127,8 +1127,8 @@ export default class PlatformModule extends BaseModule {
             left = (windowWidth - this.bannerWidth) / 2;
         }
 
-        console.log("TTModule -> _getBannerPosition -> left", left, 'top', top)
         // return {
+        console.log("🚀 ~ file: PlatformModule.ts ~ line 1132 ~ PlatformModule ~ _getBannerPosition ~ left", left, top)
         //     left: 16,
         //     top: 16,
         // }
@@ -1137,11 +1137,9 @@ export default class PlatformModule extends BaseModule {
             top,
         }
     }
+    private preloadBannerId: string = "";
     public preloadBanner(idIndex: number = -1) {
-        return
-        let bannerId = this.getBannerId(idIndex)
-        if (!this.banner[bannerId])
-            this._createBannerAd(idIndex);
+        this.preloadBannerId = this._createBannerAd(idIndex);
     }
 
     /**
@@ -1164,8 +1162,7 @@ export default class PlatformModule extends BaseModule {
         this.bannerVertical = vertical;
         this.bannerStyle = style;
 
-        if (!window[this.platformName].createBannerAd) return;
-
+        this.hideBanner();
         this.currentBannerId = this._createBannerAd(idIndex);
 
 
@@ -1272,10 +1269,21 @@ export default class PlatformModule extends BaseModule {
     * 隐藏banner
     */
     public hideBanner() {
-        if (this.banner[this.currentBannerId]) {
-            this.banner[this.currentBannerId].hide();
-            this.banner[this.currentBannerId].destroy();
-            this.banner[this.currentBannerId] = null;
+        console.log(" hideBanner ~ this.banner", this.banner)
+
+        for (let k in this.banner) {
+            if (k != this.preloadBannerId) {
+                if (this.banner[k]) {
+                    this.banner[k].hide();
+                    this.banner[k].destroy();
+                    this.banner[k] = null;
+                }
+            }
+            else {
+                if (this.banner[k]) {
+                    this.banner[k].hide();
+                }
+            }
         }
     }
 

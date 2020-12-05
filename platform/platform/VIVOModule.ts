@@ -211,6 +211,7 @@ export default class VIVOModule extends PlatformModule {
         let vertical: BANNER_VERTICAL = this.bannerVertical
 
         let wxsys = this.getSystemInfoSync();
+        // console.log("🚀 ~ file: VIVOModule.ts ~ line 214 ~ VIVOModule ~ _getBannerPosition ~ wxsys", wxsys)
         let windowWidth = wxsys.screenWidth;
         let windowHeight = wxsys.screenHeight;
         let statusBarHeight = wxsys.statusBarHeight;
@@ -227,10 +228,10 @@ export default class VIVOModule extends PlatformModule {
         let top = 0;
         let left = 0;
         if (vertical == BANNER_VERTICAL.TOP) {
-            // if (this.isLandscape(wxsys.windowHeight, wxsys.windowWidth))
-            //     top = 0
-            // else
-            top = statusBarHeight + notchHeight
+            if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
+                top = 0
+            else
+                top = statusBarHeight + notchHeight
         }
         else if (vertical == BANNER_VERTICAL.CENTER) {
             top = (windowHeight - this.bannerHeigth) / 2;

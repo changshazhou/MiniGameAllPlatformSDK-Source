@@ -246,6 +246,7 @@ export default class PlatformModule extends BaseModule {
         left: number;
         top: number;
     };
+    private preloadBannerId;
     preloadBanner(idIndex?: number): void;
     /**
       * 显示平台的banner广告

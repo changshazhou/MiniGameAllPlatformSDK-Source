@@ -14,8 +14,30 @@ export default class QQModule extends PlatformModule {
         this.initBanner();
     }
     public mBannerWidth = 320;
+    public get bannerWidth(): number {
+        let wxsys = this.getSystemInfoSync();
+        let windowWidth = wxsys.windowWidth;
+        //横屏模式
+        if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth)) {
+            if (windowWidth < 320) {
+                this.mBannerWidth = windowWidth;
+            }
+            else {
+                this.mBannerWidth = 320
+            }
+        }
+        else {
+            //竖屏
+            this.mBannerWidth = windowWidth;
+        }
+        return this.mBannerWidth;
+    };
+    public set bannerWidth(value) {
+        this.mBannerWidth = value
+    }
     public bannerHeigth = Math.round(this.bannerWidth / 300 * 72.8071);
-    public _createBannerAd(adIndex: number): string {
+
+    public _createBannerAd(adIndex: number, loadShow: boolean = true): string {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
         let bannerId = this.getBannerId(adIndex);
@@ -23,27 +45,26 @@ export default class QQModule extends PlatformModule {
             console.warn(MSG.BANNER_KEY_IS_NULL)
             return;
         }
-        if (this.banner[bannerId])
-            return bannerId;
-
+        let height = this.bannerHeigth = Math.round(320 / 300 * 72.8071);
         let bannerStyle = this._getBannerPosition();
         let style = {
             top: bannerStyle.top,
             left: bannerStyle.left,
-            width: this.bannerWidth,
-            height: this.bannerHeigth
+            width: 320,
+            height: height
         }
-        console.log("QQModule -> _createBannerAd -> style", style)
+
+        this.hideBanner();
+        console.log(" QQModule ~ _createBannerAd ~ style", style, bannerId)
         this.banner[bannerId] = window[this.platformName].createBannerAd({
             adUnitId: bannerId,
-            style: style
+            style
         });
 
         if (this.banner[bannerId]) {
-            this.banner[bannerId].isLoaded = false;
             this.banner[bannerId].onResize(this._onBannerResize);
             this.banner[bannerId].onError(this._onBannerError);
-            this.banner[bannerId].onLoad(moosnow.platform._onBannerLoad.bind(this, bannerId));
+            this.banner[bannerId].onLoad(this._onBannerLoad.bind(this));
         }
         return bannerId;
     }
@@ -55,7 +76,7 @@ export default class QQModule extends PlatformModule {
       * @param position banner的位置，默认底部
       * @param style 自定义样式
       */
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = 0, style?: bannerStyle) {
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1, style?: bannerStyle) {
         console.log(MSG.BANNER_SHOW)
         this.bannerCb = callback;
         this.isBannerShow = true;
@@ -65,7 +86,7 @@ export default class QQModule extends PlatformModule {
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
-        this.currentBannerId = this._createBannerAd(idIndex);
+        this.hideBanner();
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {
@@ -74,47 +95,38 @@ export default class QQModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    this._showBanner(idIndex);
+                    this.currentBannerId = this._createBannerAd(idIndex);
+                    this._showBanner();
                 }
             })
-        else
-            this._showBanner(idIndex);
+        else {
+            this.currentBannerId = this._createBannerAd(idIndex);
+            this._showBanner();
+        }
 
     }
 
-    public _showBanner(idIndex) {
-        let bannerId = this.getBannerId(idIndex)
-        let banner = this.banner[bannerId]
-        if (banner && banner.isLoaded) {
-            this._resetBanenrStyle({
-                banner,
-                width: banner.style.width,
-                height: banner.style.realHeight
-            });
-            let t = banner.show();
-            if (t)
-                t.then((e) => {
-                    console.log("banner show 成功", e)
-                    this._resetBanenrStyle({
-                        banner,
-                        width: banner.style.width,
-                        height: banner.style.realHeight
-                    });
-                }).catch((e) => {
-                    console.log("banner show 出错", e)
-                })
+    public _showBanner() {
+        setTimeout(() => {
+            let banner = this.banner[this.currentBannerId]
+            if (banner) {
+                banner.show();
+            }
+            else {
+                console.log('banner 不存在')
+            }
+            console.log('延迟显示banner 250 ms')
+        }, 250)
+
+    }
+    public _onBannerLoad() {
+        console.log("banner 加载结束 bannerId")
+        let banner = this.banner[this.currentBannerId]
+        if (banner) {
+            banner.show();
         }
         else {
             console.log('banner 不存在')
-        }
-    }
-    public _onBannerLoad(bannerId) {
-        console.log("banner 加载结束 bannerId", bannerId)
-        this.bannerShowCount = 0;
-        if (this.banner[bannerId] && !this.banner[bannerId].isLoaded) {
-            this.banner[bannerId].isLoaded = true;
-            this.banner[bannerId].show();
-
         }
     }
     public _onBannerResize(size) {
@@ -170,7 +182,18 @@ export default class QQModule extends PlatformModule {
             }
         })
     }
-
+    /**
+     * 隐藏banner
+     */
+    public hideBanner() {
+        console.log(" hideBanner ~ this.banner", this.banner)
+        if (this.banner)
+            for (let k in this.banner) {
+                this.banner[k].hide();
+                this.banner[k].destroy();
+                delete this.banner[k]
+            }
+    }
     public hideAppBox(callback?: Function) {
         if (this.box) {
             this.box.offClose(this.onBoxClose)
@@ -214,7 +237,7 @@ export default class QQModule extends PlatformModule {
         let style = this._getBlockPosition()
         console.log("QQModule -> showBlock -> style", style)
         this.block = window[this.platformName].createBlockAd({
-            adUnitId: this.getBannerId(),
+            adUnitId: this.getBlockId(),
             orientation: orientation == 1 ? "landscape" : "vertical",
             size,
             style: {

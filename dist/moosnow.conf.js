@@ -31,7 +31,7 @@ window.moosnowConfig = {
         url: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/config/tp_zzxhc_user_vivo.json",//游戏的配置json，如果用到了getMistouchNum,后台必须配置mistouchNum字段
     },
     qq: {
-        bannerId: "34c452729bdb7803449ea3ecb964adb5",
+        bannerId: ["34c452729bdb7803449ea3ecb964adb5", "69f3e4307a8705f64df08c872be9002c", "88f654f5096c1bf9f68fac27a16c3180", "78b1a0cf5269d54d2ea642da472fc62f"],
         videoId: "e8b4dafd255989e8978949a0207c66c7",
         interId: "",
         boxId: "51aa10cf3cbeb175be37cf7a1a336513",
