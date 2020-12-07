@@ -265,17 +265,22 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
 
-        let style = this._getBannerPosition();
-        console.log(" OPPOModule ~ _createBannerAd ~ style", style)
+        let style = {
+            left: 0,// style.left,
+            top: 0,// style.top,
+            width: this.bannerWidth,
+            height: this.bannerHeight
+        }
+        let pos = this._getBannerPosition();
+        let finalStyle = {
+            ...style,
+            ...pos
+        }
         let banner = window[this.platformName].createBannerAd({
             adUnitId: this.getBannerId(),
-            style: {
-                left: style.left,
-                top: style.top,
-                width: this.bannerWidth,
-                height: this.bannerHeight
-            }
+            style: finalStyle
         });
+        console.log(" create banner ", banner, 'param style ', finalStyle)
         return banner;
     }
     public _onBannerResize(size) {
@@ -303,25 +308,17 @@ export default class OPPOModule extends PlatformModule {
         // else
         //     styleTop = this.bannerStyle.top;
         // this.banner.style.top = styleTop;
-        console.log('_bottomCenterBanner  ', this.banner.style)
+        console.log('_bottomCenterBanner  ', this.banner)
     }
 
     public _getBannerPosition() {
 
 
         let wxsys = this.getSystemInfoSync();
-        let windowWidth = wxsys.windowWidth;
-        let windowHeight = wxsys.windowHeight;
+        let windowWidth = wxsys.screenWidth;
+        let windowHeight = wxsys.screenHeight;
         let statusBarHeight = wxsys.statusBarHeight;
         let notchHeight = wxsys.notchHeight || 0
-
-        if (this.banner && this.banner.style) {
-            if (!isNaN(this.bannerWidth))
-                this.banner.style.width = this.bannerWidth;
-            if (!isNaN(this.bannerHeight))
-                this.banner.style.height = this.bannerHeight;
-        }
-
 
         let horizontal: BANNER_HORIZONTAL = this.bannerHorizontal
         let vertical: BANNER_VERTICAL = this.bannerVertical
@@ -329,10 +326,10 @@ export default class OPPOModule extends PlatformModule {
         let top = 0;
         let left = 0;
         if (vertical == BANNER_VERTICAL.TOP) {
-            if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
-                top = 0
-            else
-                top = statusBarHeight + notchHeight
+            // if (this.isLandscape(wxsys.screenHeight, wxsys.screenWidth))
+            //     top = 0
+            // else
+            top = statusBarHeight + notchHeight
         }
         else if (vertical == BANNER_VERTICAL.CENTER) {
             top = (windowHeight - this.bannerHeigth) / 2;
@@ -365,13 +362,14 @@ export default class OPPOModule extends PlatformModule {
 
     public _resetBanenrStyle(size) {
         let style = this._getBannerPosition();
-        this.banner.style = {
-            top: style.top,
-            left: style.left,
-            width: size.width,
-            height: size.height
-        }
-        console.log('_resetBanenrStyle ', this.banner.style, 'set style ', style)
+        if (this.banner)
+            this.banner.style = {
+                top: style.top,
+                left: style.left,
+                width: size.width,
+                height: size.height
+            }
+        console.log('_resetBanenrStyle this.banner ', this.banner, 'set style ', style)
     }
 
     public _onBannerHide() {
@@ -421,12 +419,14 @@ export default class OPPOModule extends PlatformModule {
             let t = this.banner.show()
             if (t) {
                 t.then(() => {
-                    this.scheduleOnce(() => {
-                        this._resetBanenrStyle({
-                            width: this.banner.style.width,
-                            height: this.banner.style.height
-                        });
-                    }, 0.5)
+                    console.log('显示成功后')
+                    // this.scheduleOnce(() => {
+                    //     
+                    //     this._resetBanenrStyle({
+                    //         width: this.banner.style.width,
+                    //         height: this.banner.style.height
+                    //     });
+                    // }, 0.5)
                 })
             }
         }
@@ -439,10 +439,10 @@ export default class OPPOModule extends PlatformModule {
         }
         if (this.banner && this.banner.hide) {
             this.banner.hide();
-            this.banner.offResize(this._onBannerResize);
-            this.banner.offError(this._onBannerError);
-            this.banner.offLoad(this._onBannerLoad);
-            this.banner.offHide();
+            this.banner.offResize(null);
+            this.banner.offError(null);
+            this.banner.offLoad(null);
+            this.banner.offHide(null);
             this.banner.destroy();
             this.banner = null;
         }
