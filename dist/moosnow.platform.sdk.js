@@ -1868,17 +1868,20 @@ var mx = (function () {
             console.log("_bottomCenterBanner -> size", size);
             var wxsys = this.getSystemInfoSync();
             var windowWidth = wxsys.windowWidth;
-            if (!isNaN(this.banner[bannerId].style.realWidth))
-                this.bannerWidth = this.banner[bannerId].style.realWidth;
-            if (!isNaN(this.banner[bannerId].style.realHeight))
-                this.bannerHeigth = this.banner[bannerId].style.realHeight;
+            if (this.banner[bannerId]) {
+                if (!isNaN(this.banner[bannerId].style.realWidth))
+                    this.bannerWidth = this.banner[bannerId].style.realWidth;
+                if (!isNaN(this.banner[bannerId].style.realHeight))
+                    this.bannerHeigth = this.banner[bannerId].style.realHeight;
+            }
             console.log("_bottomCenterBanner -> this.banner.style", this.banner[bannerId].style);
             if (this.bannerStyle)
                 this.applyCustomStyle({
                     banner: this.banner[bannerId]
                 });
-            else
+            else if (this.banner[bannerId]) {
                 this.banner[bannerId].style.left = (windowWidth - size.width) / 2;
+            }
         };
         PlatformModule.prototype._resetBanenrStyle = function (e) {
             console.log("PlatformModule ~ _resetBanenrStyle ~ size", e);
@@ -1887,14 +1890,17 @@ var mx = (function () {
             }
             else {
                 var style = this._getBannerPosition();
-                e.banner.style.top = style.top;
-                e.banner.style.left = style.left;
-                console.log(MSG.BANNER_RESIZE, e.banner.style, 'set top ', top);
+                if (e.banner) {
+                    e.banner.style.top = style.top;
+                    e.banner.style.left = style.left;
+                    console.log(MSG.BANNER_RESIZE, e.banner.style, 'set top ', top);
+                }
             }
         };
         PlatformModule.prototype.applyCustomStyle = function (e) {
             for (var key in this.bannerStyle) {
-                e.banner.style[key] = this.bannerStyle[key];
+                if (e.banner)
+                    e.banner.style[key] = this.bannerStyle[key];
             }
         };
         PlatformModule.prototype._getBannerPosition = function () {

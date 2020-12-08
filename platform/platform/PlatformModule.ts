@@ -1055,10 +1055,13 @@ export default class PlatformModule extends BaseModule {
         console.log("_bottomCenterBanner -> size", size)
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
-        if (!isNaN(this.banner[bannerId].style.realWidth))
-            this.bannerWidth = this.banner[bannerId].style.realWidth;
-        if (!isNaN(this.banner[bannerId].style.realHeight))
-            this.bannerHeigth = this.banner[bannerId].style.realHeight;
+        if (this.banner[bannerId]) {
+            if (!isNaN(this.banner[bannerId].style.realWidth))
+                this.bannerWidth = this.banner[bannerId].style.realWidth;
+            if (!isNaN(this.banner[bannerId].style.realHeight))
+                this.bannerHeigth = this.banner[bannerId].style.realHeight;
+        }
+
 
         console.log("_bottomCenterBanner -> this.banner.style", this.banner[bannerId].style)
 
@@ -1066,8 +1069,10 @@ export default class PlatformModule extends BaseModule {
             this.applyCustomStyle({
                 banner: this.banner[bannerId]
             });
-        else
+        else if (this.banner[bannerId]) {
             this.banner[bannerId].style.left = (windowWidth - size.width) / 2;
+        }
+
 
     }
 
@@ -1080,15 +1085,19 @@ export default class PlatformModule extends BaseModule {
         }
         else {
             let style = this._getBannerPosition();
-            e.banner.style.top = style.top;
-            e.banner.style.left = style.left;
-            console.log(MSG.BANNER_RESIZE, e.banner.style, 'set top ', top)
+            if (e.banner) {
+                e.banner.style.top = style.top;
+                e.banner.style.left = style.left;
+                console.log(MSG.BANNER_RESIZE, e.banner.style, 'set top ', top)
+            }
+
         }
     }
 
     public applyCustomStyle(e) {
         for (let key in this.bannerStyle) {
-            e.banner.style[key] = this.bannerStyle[key]
+            if (e.banner)
+                e.banner.style[key] = this.bannerStyle[key]
         }
     }
 
