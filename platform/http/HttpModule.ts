@@ -64,7 +64,7 @@ export class HttpModule extends BaseModule {
 
     private mLaunchOptions: any = {};
     private get appLaunchOptions() {
-        if (!this.mLaunchOptions) {
+        if (Common.isEmpty(this.mLaunchOptions)) {
             if (moosnow.platform && moosnow.platform.getLaunchOption)
                 this.mLaunchOptions = moosnow.platform.getLaunchOption();
         }
@@ -667,6 +667,7 @@ export class HttpModule extends BaseModule {
 
             console.log('后台禁止场景 1 ', res.seachEntryScene);
             console.log('后台禁止场景 2 ', res.shareEntryScene);
+            console.log('进入时的场景 ', this.appLaunchOptions.scene);
 
             if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
                 || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {

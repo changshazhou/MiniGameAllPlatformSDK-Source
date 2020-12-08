@@ -57,7 +57,7 @@ export default class OPPOModule extends PlatformModule {
                     console.log(`初始化广告`);
                     // self.initBanner();
                     // self.initInter();
-                    // self._prepareNative();
+                    self._prepareNative();
                 },
                 fail: (res) => {
                     console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
@@ -71,7 +71,7 @@ export default class OPPOModule extends PlatformModule {
             console.log(`初始化广告`);
             // self.initBanner();
             // self.initInter();
-            // self._prepareNative();
+            self._prepareNative();
         }
 
 
