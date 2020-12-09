@@ -3946,7 +3946,7 @@ var mx = (function () {
             if (!window[this.platformName].createRewardedVideoAd) {
                 return;
             }
-            if (this.video) {
+            if (!Common.isEmpty(this.video)) {
                 this.video.offClose(this._onVideoClose);
                 this.video.offError(this._onVideoError);
                 this.video.offLoad(this._onVideoLoad);

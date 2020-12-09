@@ -1,19 +1,19 @@
-import PlatformModule from "./platform/PlatformModule";
-import AdModule from "./ad/AdModule";
-import { HttpModule } from "./http/HttpModule";
-import GameDataCenter from "./framework/GameDataCenter";
-import SettingModule from "./framework/SettingModule";
-import Common from "./utils/Common";
+import PlatformModule from "./dist/platform/PlatformModule";
+import AdModule from "./dist/ad/AdModule";
+import { HttpModule } from "./dist/http/HttpModule";
+import GameDataCenter from "./dist/framework/GameDataCenter";
+import SettingModule from "./dist/framework/SettingModule";
+import Common from "./dist/utils/Common";
 import { PlatformType } from "./enum/PlatformType";
-import EventModule from "./framework/EventModule";
+import EventModule from "./dist/framework/EventModule";
 import EventType from "./utils/EventType";
-import ResourceModule from "./framework/ResourceModule";
-import AudioModule from "./framework/AudioModule";
-import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./enum/BLOCK_POSITION";
-import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./enum/BANNER_POSITION";
-import moosnowAppConfig from "./model/moosnowAppConfig";
-import FormUtil from "./ui/FormUtil";
-import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
+import ResourceModule from "./dist/framework/ResourceModule";
+import AudioModule from "./dist/framework/AudioModule";
+import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from "./dist/enum/BLOCK_POSITION";
+import { BANNER_HORIZONTAL, BANNER_VERTICAL } from "./dist/enum/BANNER_POSITION";
+import moosnowAppConfig from "./dist/model/moosnowAppConfig";
+import FormUtil from "./dist/ui/FormUtil";
+import CocosNodeHelper from "./dist/ui/cocos/helper/CocosNodeHelper";
 declare global {
     class moosnow {
         static VIDEO_STATUS: {
