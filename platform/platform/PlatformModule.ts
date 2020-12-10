@@ -449,26 +449,30 @@ export default class PlatformModule extends BaseModule {
             wxgamecid: launchOption.query.wxgamecid
         }
         moosnow.http.point("打开跳转", param)
-        window[this.platformName].navigateToMiniProgram({
-            appId: appid,
-            path: path,
-            extraData: extraData,
-            success: () => {
-                console.log('跳转参数', param)
-                moosnow.http.point("跳转", param)
-                if (success)
-                    success();
-            },
-            fail: (err) => {
-                console.log('跳转失败 ', err, ' fail callback ', !!fail)
-                if (fail)
-                    fail();
-            },
-            complete: () => {
-                if (complete)
-                    complete();
-            }
+        moosnow.http.navigate(row, (res) => {
+            window[this.platformName].navigateToMiniProgram({
+                appId: appid,
+                path: path,
+                extraData: extraData,
+                success: () => {
+                    console.log('跳转参数', param)
+                    moosnow.http.point("跳转", param)
+                    moosnow.http.navigateEnd(res.code)
+                    if (success)
+                        success();
+                },
+                fail: (err) => {
+                    console.log('跳转失败 ', err, ' fail callback ', !!fail)
+                    if (fail)
+                        fail();
+                },
+                complete: () => {
+                    if (complete)
+                        complete();
+                }
+            })
         })
+
 
     }
     /**
@@ -695,7 +699,7 @@ export default class PlatformModule extends BaseModule {
             lang: 'en',
         })
     }
-
+    private mLaunchOption
     /**
      * 获取游戏启动参数
      * 返回值
@@ -705,10 +709,15 @@ export default class PlatformModule extends BaseModule {
      * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量 
      */
     public getLaunchOption() {
-        if (window[this.platformName] && window[this.platformName].getLaunchOptionsSync)
-            return window[this.platformName].getLaunchOptionsSync();
-        else
-            return {}
+        if (!this.mLaunchOption) {
+            if (window[this.platformName]) {
+                if (window[this.platformName].getEnterOptionsSync)
+                    this.mLaunchOption = window[this.platformName].getEnterOptionsSync();
+                if (window[this.platformName].getLaunchOptionsSync)
+                    this.mLaunchOption = window[this.platformName].getLaunchOptionsSync();
+            }
+        }
+        return this.mLaunchOption;
     }
 
     /**

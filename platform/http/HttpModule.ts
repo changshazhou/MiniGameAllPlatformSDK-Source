@@ -180,73 +180,63 @@ export class HttpModule extends BaseModule {
      * @param jump_appid 
      * @param callback 
      */
-    // public navigate(jump_appid: string, callback: Function) {
-    //     let userToken = moosnow.data.getToken();
-    //     this.request(`${this.baseUrl}api/jump/record`, {
-    //         appid: Common.config.moosnowAppId,
-    //         uid: userToken,
-    //         jump_appid,
-    //     }, "POST", (respone) => {
-    //         console.log('navigate', respone)
-    //         if (callback)
-    //             callback(respone.data)
-    //     });
-    // }
+    public navigate(row: any, callback: (res) => void) {
+        let userToken = moosnow.data.getToken();
+        let options = moosnow.platform.getLaunchOption();
+        let fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知'
+        let wxgamecid = options.query.wxgamecid
+        let query = options.query;
+        let appid = Common.config.moosnowAppId;
+        let navigateData = {
+            scene: options.scene,
+            fromAppId,
+            query,
+            wxgamecid,
+            title: row.title,
+            position: row.position,
+            img: row.atlas || row.img,
+            appid,
+            uid: userToken,
+            jump_appid: row.appid,
+        }
+        console.log('navigate navigateData', navigateData)
+        this.request(`${this.baseUrl}api/jump/record`, navigateData, "POST", (respone) => {
+            console.log('navigate success ', respone)
+            if (callback)
+                callback(respone.data)
+        });
+    }
 
 
     /**
      * 跳转完成
      * @param code 
      */
-    // public navigateEnd(code: string) {
-    //     this.request(`${this.baseUrl}api/jump/status`, {
-    //         code
-    //     }, "POST", (respone) => {
-    //         console.log('navigateEnd code ', code, respone)
-    //     });
-    // }
-
-
-    /**
-     * 
-     * @param url 
-     */
-    private postData(url) {
-        let userToken = moosnow.data.getToken();
-
-        if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
-            try {
-                this.request(`${this.baseUrl}${url}`, {
-                    appid: Common.config.moosnowAppId,
-                    user_id: userToken,
-                    channel_id: moosnow.data.getChannelId(),
-                    channel_appid: moosnow.data.getChannelAppId()
-                }, "POST", (respone) => {
-
-                });
-            }
-            catch (e) {
-                console.log('postData error ', e)
-            }
-
-        }
+    public navigateEnd(code: string) {
+        this.request(`${this.baseUrl}api/jump/status`, {
+            code
+        }, "POST", (respone) => {
+            console.log('navigateEnd code ', code, respone)
+        });
     }
-
-
 
     /**
      * 数据打点
      * @param name  打点名称
      */
     public point(name: string, data: any = null) {
-        if (Common.platform == APP_PLATFORM.WX) {
-            if (window['wx'] && window['wx'].aldSendEvent)
-                (window['wx'] as any).aldSendEvent(name, data);
-        }
-        else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
-            if (window['tt'] && window["tt"].reportAnalytics)
-                window["tt"].reportAnalytics(name, data);
-        }
+        this.getAllConfig(res => {
+            if (!(res && res.aldMonitorOn == 0)) {
+                if (Common.platform == APP_PLATFORM.WX) {
+                    if (window['wx'] && window['wx'].aldSendEvent)
+                        (window['wx'] as any).aldSendEvent(name, data);
+                }
+                else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
+                    if (window['tt'] && window["tt"].reportAnalytics)
+                        window["tt"].reportAnalytics(name, data);
+                }
+            }
+        })
     }
 
     /**

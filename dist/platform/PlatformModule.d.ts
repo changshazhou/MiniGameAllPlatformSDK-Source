@@ -139,6 +139,7 @@ export default class PlatformModule extends BaseModule {
     private showUserInfoButton;
     private getSetting;
     private getUserInfo;
+    private mLaunchOption;
     /**
      * 获取游戏启动参数
      * 返回值

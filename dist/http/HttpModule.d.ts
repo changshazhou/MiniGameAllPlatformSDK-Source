@@ -42,15 +42,12 @@ export declare class HttpModule extends BaseModule {
      * @param jump_appid
      * @param callback
      */
+    navigate(row: any, callback: (res: any) => void): void;
     /**
      * 跳转完成
      * @param code
      */
-    /**
-     *
-     * @param url
-     */
-    private postData;
+    navigateEnd(code: string): void;
     /**
      * 数据打点
      * @param name  打点名称

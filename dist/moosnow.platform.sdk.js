@@ -1242,6 +1242,7 @@ var mx = (function () {
          * @param complete  跳转完成
          */
         PlatformModule.prototype.navigate2Mini = function (row, success, fail, complete) {
+            var _this = this;
             console.log(MSG.NAVIGATE_DATA, row);
             if (Date.now() - this.prevNavigate < 300) {
                 console.log(MSG.NAVIGATE_FAST);
@@ -1266,25 +1267,28 @@ var mx = (function () {
                 wxgamecid: launchOption.query.wxgamecid
             };
             moosnow.http.point("打开跳转", param);
-            window[this.platformName].navigateToMiniProgram({
-                appId: appid,
-                path: path,
-                extraData: extraData,
-                success: function () {
-                    console.log('跳转参数', param);
-                    moosnow.http.point("跳转", param);
-                    if (success)
-                        success();
-                },
-                fail: function (err) {
-                    console.log('跳转失败 ', err, ' fail callback ', !!fail);
-                    if (fail)
-                        fail();
-                },
-                complete: function () {
-                    if (complete)
-                        complete();
-                }
+            moosnow.http.navigate(row, function (res) {
+                window[_this.platformName].navigateToMiniProgram({
+                    appId: appid,
+                    path: path,
+                    extraData: extraData,
+                    success: function () {
+                        console.log('跳转参数', param);
+                        moosnow.http.point("跳转", param);
+                        moosnow.http.navigateEnd(res.code);
+                        if (success)
+                            success();
+                    },
+                    fail: function (err) {
+                        console.log('跳转失败 ', err, ' fail callback ', !!fail);
+                        if (fail)
+                            fail();
+                    },
+                    complete: function () {
+                        if (complete)
+                            complete();
+                    }
+                });
             });
         };
         /**
@@ -1514,10 +1518,15 @@ var mx = (function () {
          * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量
          */
         PlatformModule.prototype.getLaunchOption = function () {
-            if (window[this.platformName] && window[this.platformName].getLaunchOptionsSync)
-                return window[this.platformName].getLaunchOptionsSync();
-            else
-                return {};
+            if (!this.mLaunchOption) {
+                if (window[this.platformName]) {
+                    if (window[this.platformName].getEnterOptionsSync)
+                        this.mLaunchOption = window[this.platformName].getEnterOptionsSync();
+                    if (window[this.platformName].getLaunchOptionsSync)
+                        this.mLaunchOption = window[this.platformName].getLaunchOptionsSync();
+                }
+            }
+            return this.mLaunchOption;
         };
         /**
          * return obj
@@ -3068,49 +3077,42 @@ var mx = (function () {
          * @param jump_appid
          * @param callback
          */
-        // public navigate(jump_appid: string, callback: Function) {
-        //     let userToken = moosnow.data.getToken();
-        //     this.request(`${this.baseUrl}api/jump/record`, {
-        //         appid: Common.config.moosnowAppId,
-        //         uid: userToken,
-        //         jump_appid,
-        //     }, "POST", (respone) => {
-        //         console.log('navigate', respone)
-        //         if (callback)
-        //             callback(respone.data)
-        //     });
-        // }
+        HttpModule.prototype.navigate = function (row, callback) {
+            var userToken = moosnow.data.getToken();
+            var options = moosnow.platform.getLaunchOption();
+            var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
+            var wxgamecid = options.query.wxgamecid;
+            var query = options.query;
+            var appid = Common.config.moosnowAppId;
+            var navigateData = {
+                scene: options.scene,
+                fromAppId: fromAppId,
+                query: query,
+                wxgamecid: wxgamecid,
+                title: row.title,
+                position: row.position,
+                img: row.atlas || row.img,
+                appid: appid,
+                uid: userToken,
+                jump_appid: row.appid,
+            };
+            console.log('navigate navigateData', navigateData);
+            this.request(this.baseUrl + "api/jump/record", navigateData, "POST", function (respone) {
+                console.log('navigate success ', respone);
+                if (callback)
+                    callback(respone.data);
+            });
+        };
         /**
          * 跳转完成
          * @param code
          */
-        // public navigateEnd(code: string) {
-        //     this.request(`${this.baseUrl}api/jump/status`, {
-        //         code
-        //     }, "POST", (respone) => {
-        //         console.log('navigateEnd code ', code, respone)
-        //     });
-        // }
-        /**
-         *
-         * @param url
-         */
-        HttpModule.prototype.postData = function (url) {
-            var userToken = moosnow.data.getToken();
-            if (!Common.isEmpty(userToken) && moosnow.data.getChannelId() != "0" && moosnow.data.getChannelAppId() != "0") {
-                try {
-                    this.request("" + this.baseUrl + url, {
-                        appid: Common.config.moosnowAppId,
-                        user_id: userToken,
-                        channel_id: moosnow.data.getChannelId(),
-                        channel_appid: moosnow.data.getChannelAppId()
-                    }, "POST", function (respone) {
-                    });
-                }
-                catch (e) {
-                    console.log('postData error ', e);
-                }
-            }
+        HttpModule.prototype.navigateEnd = function (code) {
+            this.request(this.baseUrl + "api/jump/status", {
+                code: code
+            }, "POST", function (respone) {
+                console.log('navigateEnd code ', code, respone);
+            });
         };
         /**
          * 数据打点
@@ -3118,14 +3120,18 @@ var mx = (function () {
          */
         HttpModule.prototype.point = function (name, data) {
             if (data === void 0) { data = null; }
-            if (Common.platform == APP_PLATFORM.WX) {
-                if (window['wx'] && window['wx'].aldSendEvent)
-                    window['wx'].aldSendEvent(name, data);
-            }
-            else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
-                if (window['tt'] && window["tt"].reportAnalytics)
-                    window["tt"].reportAnalytics(name, data);
-            }
+            this.getAllConfig(function (res) {
+                if (!(res && res.aldMonitorOn == 0)) {
+                    if (Common.platform == APP_PLATFORM.WX) {
+                        if (window['wx'] && window['wx'].aldSendEvent)
+                            window['wx'].aldSendEvent(name, data);
+                    }
+                    else if (Common.platform == APP_PLATFORM.BYTEDANCE) {
+                        if (window['tt'] && window["tt"].reportAnalytics)
+                            window["tt"].reportAnalytics(name, data);
+                    }
+                }
+            });
         };
         /**
         * 统计开始游戏
@@ -5252,17 +5258,13 @@ var mx = (function () {
             }
         };
         QQModule.prototype._showBanner = function () {
-            var _this = this;
-            setTimeout(function () {
-                var banner = _this.banner[_this.currentBannerId];
-                if (banner) {
-                    banner.show();
-                }
-                else {
-                    console.log('banner 不存在');
-                }
-                console.log('延迟显示banner 250 ms');
-            }, 250);
+            var banner = this.banner[this.currentBannerId];
+            if (banner) {
+                banner.show();
+            }
+            else {
+                console.log('banner 不存在');
+            }
         };
         QQModule.prototype._onBannerLoad = function () {
             console.log("banner 加载结束 bannerId");

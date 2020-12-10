@@ -107,17 +107,13 @@ export default class QQModule extends PlatformModule {
     }
 
     public _showBanner() {
-        setTimeout(() => {
-            let banner = this.banner[this.currentBannerId]
-            if (banner) {
-                banner.show();
-            }
-            else {
-                console.log('banner 不存在')
-            }
-            console.log('延迟显示banner 250 ms')
-        }, 250)
-
+        let banner = this.banner[this.currentBannerId]
+        if (banner) {
+            banner.show();
+        }
+        else {
+            console.log('banner 不存在')
+        }
     }
     public _onBannerLoad() {
         console.log("banner 加载结束 bannerId")
