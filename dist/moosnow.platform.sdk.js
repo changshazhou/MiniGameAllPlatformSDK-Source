@@ -11209,6 +11209,8 @@ var mx = (function () {
                 }
             }
             else {
+                if (this.nativeCb)
+                    this.nativeCb(null);
                 console.log(MSG.NATIVE_ERROR2, err);
             }
             moosnow.http.getAllConfig(function (res) {
