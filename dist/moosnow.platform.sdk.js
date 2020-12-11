@@ -1525,6 +1525,9 @@ var mx = (function () {
                     if (window[this.platformName].getLaunchOptionsSync)
                         this.mLaunchOption = window[this.platformName].getLaunchOptionsSync();
                 }
+                else {
+                    this.mLaunchOption = {};
+                }
             }
             return this.mLaunchOption;
         };
@@ -11166,7 +11169,7 @@ var mx = (function () {
                     });
                 }
                 if (Common.isFunction(this.nativeCb)) {
-                    this.nativeCb(Common.deepCopy(this.nativeAdResult));
+                    this.nativeCb(__assign(__assign({}, Common.deepCopy(this.nativeAdResult)), { desc: this.nativeAdResult && this.nativeAdResult.desc ? this.nativeAdResult.desc : "", title: this.nativeAdResult && this.nativeAdResult.title ? this.nativeAdResult.title : "" }));
                 }
             }
             else {

@@ -716,6 +716,9 @@ export default class PlatformModule extends BaseModule {
                 if (window[this.platformName].getLaunchOptionsSync)
                     this.mLaunchOption = window[this.platformName].getLaunchOptionsSync();
             }
+            else {
+                this.mLaunchOption = {}
+            }
         }
         return this.mLaunchOption;
     }

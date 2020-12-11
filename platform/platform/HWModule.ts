@@ -122,7 +122,11 @@ export default class HWModule extends PlatformModule {
 
             }
             if (Common.isFunction(this.nativeCb)) {
-                this.nativeCb(Common.deepCopy(this.nativeAdResult))
+                this.nativeCb({
+                    ...Common.deepCopy(this.nativeAdResult),
+                    desc: this.nativeAdResult && this.nativeAdResult.desc ? this.nativeAdResult.desc : "",
+                    title: this.nativeAdResult && this.nativeAdResult.title ? this.nativeAdResult.title : "",
+                })
             }
         }
         else {
