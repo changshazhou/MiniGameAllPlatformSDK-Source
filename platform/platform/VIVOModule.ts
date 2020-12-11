@@ -551,7 +551,7 @@ export default class VIVOModule extends PlatformModule {
         if (!window[this.platformName].createNativeAd) return;
         this._destroyNative();
         this.native = window[this.platformName].createNativeAd({
-            posId: this.nativeId[this.nativeIdIndex]
+            posId: this.nativeId
         })
         this.native.onLoad(this._onNativeLoad.bind(this));
         this.native.onError(this._onNativeError.bind(this));

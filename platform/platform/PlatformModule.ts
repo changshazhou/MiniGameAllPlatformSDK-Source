@@ -19,7 +19,6 @@ export default class PlatformModule extends BaseModule {
 
     constructor() {
         super();
-        this.initAppConfig();
         // this._regisiterWXCallback();
         this.initShare(true);
         this.share_clickTime = null; //分享拉起时间
@@ -54,64 +53,52 @@ export default class PlatformModule extends BaseModule {
     public native: any = null;
     public box: any = null;
 
-
     public platformName: string = "wx";
 
-    public getBannerId(idx: number = 0, random: boolean = false) {
-        let id = Common.config["bannerId"] as any;
-        if (id instanceof Array) {
-            if (random || idx < 0) {
-                return id[MathUtils.randomNumBoth(0, id.length - 1)];
+
+    public getAdId(idArray: Array<string> | string, index: number = 0) {
+        if (idArray instanceof Array) {
+            if (idArray.length > 0) {
+                if (index < 0) {
+                    return idArray[Common.randomNumBoth(0, idArray.length - 1)];
+                }
+                else if (idArray.length - 1 < index) {
+                    console.warn(' id数组小于传入索引值，请检查代码')
+                    return idArray[0]
+                }
+                return idArray[index]
             }
             else {
-                if (id.length - 1 < idx) {
-                    console.warn('banner id数组小于传入索引值，请检查代码')
-                    return null
-                }
-                return id[idx]
+                console.warn('Id 配置为空')
+                return null;
             }
         }
         else {
-            return id;
+            return idArray;
         }
+    }
+
+    public getBannerId(idx: number = 0) {
+        return this.getAdId(Common.config.bannerId, idx)
     };
 
     public getBlockId(idx: number = 0) {
-        let id = Common.config["blockId"] as any;
-        if (id instanceof Array) {
-            if (id.length - 1 < idx) {
-                console.warn('block id数组小于传入索引值，请检查代码')
-                return null
-            }
-            return id[idx]
-        }
-        else {
-            return id;
-        }
+        return this.getAdId(Common.config.blockId, idx)
     };
-
 
     public getVideoId(idx: number = 0) {
-        let id = Common.config["videoId"] as any;
-        if (id instanceof Array) {
-            if (id.length - 1 < idx) {
-                console.warn('video id数组小于传入索引值，请检查代码')
-                return null
-            }
-            return id[idx]
-        }
-        else {
-            return id;
-        }
+        return this.getAdId(Common.config.videoId, idx)
     };
-    public interId = "";
-    public boxId = "";
+    public get interId() {
+        return this.getAdId(Common.config.interId, -1)
+    };
+    public get boxId() {
+        return this.getAdId(Common.config.boxId, -1)
+    };
+    public get nativeId() {
+        return this.getAdId(Common.config.nativeId, -1)
+    };
 
-
-    /**
-     * https://u.oppomobile.com/main/app.html 广告联盟网站中媒体管理 > 广告管理中广告名称下面的 id 即为 adUnitId
-     */
-    public nativeId: Array<number> = [];
     public nativeIdIndex: number = 0;
 
     public mBannerWidth: number = 300;
@@ -182,22 +169,6 @@ export default class PlatformModule extends BaseModule {
         this.vibrateOn = on;
     }
 
-    // lateStart() {
-    //     this.updateProgram();
-
-    //     if (!window[this.platformName]) return;
-    //     Lite.event.sendEventImmediately('OnWXShow', this.getLaunchOption());
-    // }
-
-    public initAppConfig() {
-        this.moosnowConfig = Common.config;
-
-        this.interId = this.moosnowConfig["interId"];
-        this.boxId = this.moosnowConfig["boxId"];
-        this.nativeId = this.moosnowConfig["nativeId"] as [];
-
-        console.log('moosnowConfig ', JSON.stringify(this.moosnowConfig))
-    }
     /***
      * 检测IphoneX
      */
@@ -304,7 +275,7 @@ export default class PlatformModule extends BaseModule {
     private _checkRemoteVersion(callback: Function) {
         var url = this.baseUrl + 'admin/wx_list/getAppConfig';
         var signParams = {
-            appid: this.moosnowConfig.moosnowAppId,
+            appid: Common.config.moosnowAppId,
         };
         let data = signParams;
         moosnow.http.request(url, data, 'POST',
@@ -334,7 +305,7 @@ export default class PlatformModule extends BaseModule {
     }
 
     public checkLog(remoteVersion) {
-        let configVersion = moosnow.platform.moosnowConfig.version
+        let configVersion = Common.config.version
         let versionRet = remoteVersion != configVersion;
         console.log(`版本检查 后台版本${remoteVersion} 配置文件版本${configVersion}`)
         console.log("获取广告开关：", versionRet);

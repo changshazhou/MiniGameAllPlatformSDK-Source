@@ -1,12 +1,13 @@
 import AdModule from "./AdModule";
 import moosnowAdRow from "../model/moosnowAdRow";
+import Common from "../utils/Common";
 
 export default class ZSOPPOAdModule extends AdModule {
 
     public getRemoteAd(cb: Function) {
         let url = 'https://platform.qwpo2018.com/api/apk_ad/index';
         var signParams = {
-            apk_id: moosnow.platform.moosnowConfig.moosnowAppId,
+            apk_id: Common.config.moosnowAppId,
         };
         let data = signParams;
         moosnow.http.request(url, data, 'POST',

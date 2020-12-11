@@ -149,7 +149,7 @@ export default class QQModule extends PlatformModule {
                 if (res && res.showAppBox == 1) {
                     if (!this.box) {
                         this.box = window[this.platformName].createAppBox({
-                            adUnitId: this.moosnowConfig.boxId
+                            adUnitId: this.boxId
                         })
                         this.box.onClose(this.onBoxClose.bind(this))
                     }
@@ -167,7 +167,7 @@ export default class QQModule extends PlatformModule {
             else {
                 if (!this.box) {
                     this.box = window[this.platformName].createAppBox({
-                        adUnitId: this.moosnowConfig.boxId
+                        adUnitId: this.boxId
                     })
                     this.box.onClose(this.onBoxClose.bind(this))
                 }

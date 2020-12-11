@@ -29,7 +29,7 @@ export default class ZSOPPOModule extends OPPOModule {
                     // console.log(res.data.token);
                     var url = "https://platform.qwpo2018.com/api/oppo_login/index";
                     moosnow.http.request(url, {
-                        apk_id: moosnow.platform.moosnowConfig.moosnowAppId,
+                        apk_id: Common.config.moosnowAppId,
                         code: res.data.token
                     }, 'POST', (res2) => {
                         moosnow.data.setToken(res2.data.user_id)
@@ -75,7 +75,7 @@ export default class ZSOPPOModule extends OPPOModule {
         let openId = moosnow.data.getToken();
         var signParams = {
             user_id: openId,
-            apk_id: moosnow.platform.moosnowConfig.moosnowAppId,
+            apk_id: Common.config.moosnowAppId,
             appid: appId,
             link_id: appId,
         };

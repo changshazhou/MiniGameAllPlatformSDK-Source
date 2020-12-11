@@ -91,7 +91,7 @@ export default class HWModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createNativeAd) return;
         if (this.native) return;
-        let adUnitId = this.nativeId[this.nativeIdIndex]
+        let adUnitId = this.nativeId
         console.log(" HWModule ~ _prepareNative ~ adUnitId", adUnitId)
         this.native = window[this.platformName].createNativeAd({
             adUnitId,
@@ -99,6 +99,8 @@ export default class HWModule extends PlatformModule {
                 console.log("_prepareNative loadNativeAd : success", code);
             },
             fail: (data, code) => {
+                if (this.nativeCb)
+                    this.nativeCb(null);
                 console.log("_prepareNative loadNativeAd fail: " + data + "," + code);
             }
         })

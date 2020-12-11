@@ -1,6 +1,5 @@
 import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
-import { moosnowConfig } from "../../window";
 import moosnowAppConfig from "../model/moosnowAppConfig";
 
 export default class Common {
@@ -227,6 +226,7 @@ export default class Common {
             config = winCfg.wx;
         return config;
     }
+
     static colorRGB2Hex(color) {
         var rgb = color.split(',');
         var r = parseInt(rgb[0].split('(')[1]);

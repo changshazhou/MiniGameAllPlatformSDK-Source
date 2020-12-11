@@ -52,7 +52,7 @@ export default class OPPOModule extends PlatformModule {
         if (window[this.platformName].initAdService) {
             window[this.platformName].initAdService({
                 isDebug: true,
-                appId: this.moosnowConfig.moosnowAppId,
+                appId: Common.config.moosnowAppId,
                 success: (res) => {
                     console.log(`初始化广告`);
                     // self.initBanner();
@@ -557,7 +557,7 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (typeof window[this.platformName].createNativeAd != "function") return;
         this.native = window[this.platformName].createNativeAd({
-            adUnitId: parseInt("" + this.nativeId[this.nativeIdIndex])
+            adUnitId: parseInt("" + this.nativeId)
         })
         this.native.onLoad(this._onNativeLoad.bind(this));
         this.native.onError(this._onNativeError.bind(this));

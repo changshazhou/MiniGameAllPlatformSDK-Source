@@ -6,6 +6,7 @@ export default class moosnowAppConfig {
     public videoId: string;
     public interId: string;
     public boxId: string;
+    public blockId: string;
     public nativeId: Array<string>;
     public moosnowAppId: string;
     public version: string;

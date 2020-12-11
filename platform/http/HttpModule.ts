@@ -479,9 +479,22 @@ export class HttpModule extends BaseModule {
             else
                 url = `${ROOT_CONFIG.HTTP_ROOT}/config/${Common.config.moosnowAppId}.json?t=${Date.now()}`;
 
-
             this.request(url, {}, 'GET',
                 (res) => {
+
+                    if (res.bannerId)
+                        Common.config.bannerId = res.bannerId;
+                    if (res.interId)
+                        Common.config.interId = res.interId;
+                    if (res.blockId)
+                        Common.config.blockId = res.blockId;
+                    if (res.boxId)
+                        Common.config.boxId = res.boxId;
+                    if (res.nativeId)
+                        Common.config.nativeId = res.nativeId;
+                    if (res.videoId)
+                        Common.config.videoId = res.videoId;
+
                     let versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
                         this.cfgData = this.defaultCfg(res, false)

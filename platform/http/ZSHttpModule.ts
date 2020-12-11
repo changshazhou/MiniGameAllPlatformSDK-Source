@@ -47,13 +47,13 @@ export class ZSHttpModule extends HttpModule {
             callback(this.cfgData);
         }
         else {
-            var url = moosnow.platform.moosnowConfig.url + "?t=" + Date.now();
-            console.log('appid ', moosnow.platform.moosnowConfig.moosnowAppId)
+            var url = Common.config.url + "?t=" + Date.now();
+            console.log('appid ', Common.config.moosnowAppId)
             this.request(url, {
-                apk_id: moosnow.platform.moosnowConfig.moosnowAppId
+                apk_id: Common.config.moosnowAppId
             }, 'POST',
                 (res) => {
-                    let enabled = res.data.zs_version == moosnow.platform.moosnowConfig.version;
+                    let enabled = res.data.zs_version == Common.config.version;
                     this.cfgData = {
 
                         ...Common.deepCopy(res.data),
