@@ -1261,18 +1261,18 @@ export default class PlatformModule extends BaseModule {
     * 隐藏banner
     */
     public hideBanner() {
-        console.log(" hideBanner ~ this.banner", this.banner)
+        console.log("hideBanner ~ this.banner", this.banner)
 
         for (let k in this.banner) {
-            if (k != this.preloadBannerId) {
-                if (this.banner[k]) {
+            if (k != this.preloadBannerId || this.currentBannerId == this.preloadBannerId) {
+                if (this.banner[k] && this.banner[k].hide) {
                     this.banner[k].hide();
                     this.banner[k].destroy();
                     this.banner[k] = null;
                 }
             }
             else {
-                if (this.banner[k]) {
+                if (this.banner[k] && this.banner[k].hide) {
                     this.banner[k].hide();
                 }
             }
