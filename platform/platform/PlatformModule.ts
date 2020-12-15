@@ -420,30 +420,30 @@ export default class PlatformModule extends BaseModule {
             wxgamecid: launchOption.query.wxgamecid
         }
         moosnow.http.point("打开跳转", param)
-        moosnow.http.navigate(row, (res) => {
-            window[this.platformName].navigateToMiniProgram({
-                appId: appid,
-                path: path,
-                extraData: extraData,
-                success: () => {
-                    console.log('跳转参数', param)
-                    moosnow.http.point("跳转", param)
-                    moosnow.http.navigateEnd(res.code)
-                    if (success)
-                        success();
-                },
-                fail: (err) => {
-                    console.log('跳转失败 ', err, ' fail callback ', !!fail)
-                    if (fail)
-                        fail();
-                },
-                complete: () => {
-                    if (complete)
-                        complete();
-                }
-            })
+        moosnow.http.navigate(row, (res) => { })
+        window[this.platformName].navigateToMiniProgram({
+            appId: appid,
+            path: path,
+            extraData: extraData,
+            success: () => {
+                console.log('跳转参数', param)
+                moosnow.http.point("跳转", param)
+                moosnow.http.navigateEnd((moosnow.data as any).getNavigateToken(appid));
+                if (success)
+                    success();
+            },
+            fail: (err) => {
+                (moosnow.data as any).resetNavigateToken()
+                console.log('跳转失败 ', err, ' fail callback ', !!fail)
+                if (fail)
+                    fail();
+            },
+            complete: () => {
+                (moosnow.data as any).resetNavigateToken()
+                if (complete)
+                    complete();
+            }
         })
-
 
     }
     /**
@@ -1001,7 +1001,7 @@ export default class PlatformModule extends BaseModule {
 
         this.bannerShowTime = Date.now();
         let style = this._getBannerPosition();
-        console.log("🚀 ~ file: PlatformModule.ts ~ line 995 ~ PlatformModule ~ _createBannerAd ~ style", style)
+        console.log("PlatformModule ~ _createBannerAd ~ style", style)
         if (!this.banner[bannerId]) {
 
             this.banner[bannerId] = window[this.platformName].createBannerAd({
@@ -1030,7 +1030,7 @@ export default class PlatformModule extends BaseModule {
         console.warn('banner___error:', err.errCode, err.errMsg);
         this.banner[bannerId] = null;
         this.isBannerShow = false;
-        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, null);
 
     }

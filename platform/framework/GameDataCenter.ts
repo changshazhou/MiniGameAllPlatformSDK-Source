@@ -6,6 +6,7 @@ export default class GameDataCenter extends BaseModule {
 
     private TOKEN: string = "MOOSNOW_SDK_TOKEN";
     private COIN: string = "MOOSNOW_SDK_COIN";
+    private NAVIGATE_TOKEN: string = "MOOSNOW_SDK_NAVIGATE_TOKEN";
 
     private mUserToken: string = "";
     private VIBRATE_SWITCH: string = "MOOSNOW_VIBRATE_SWITCH";
@@ -51,6 +52,18 @@ export default class GameDataCenter extends BaseModule {
     setToken(v) {
         moosnow.setting.setValue(this.TOKEN, v);
     }
+    private mNavigateToken: string
+    getNavigateToken(appid) {
+        if (Common.isEmpty(this.mNavigateToken)) {
+            this.mNavigateToken = `${Date.now()}_${appid}_${this.getToken()}`
+        }
+        return this.mNavigateToken
+    }
+    resetNavigateToken() {
+        this.mNavigateToken = null;
+    }
+
+
 
     private mCurrentMisTouchCount: number = 0;
     getCurrentMisTouchCount() {

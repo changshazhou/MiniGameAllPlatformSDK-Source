@@ -4,6 +4,7 @@ import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import { MSG } from "../config/MSG";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
 import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
+import { isLiteralExpression } from "../../node_modules/typescript/lib/typescript";
 
 
 let ErrorType = {
@@ -184,20 +185,22 @@ export class HttpModule extends BaseModule {
         let userToken = moosnow.data.getToken();
         let options = moosnow.platform.getLaunchOption();
         let fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知'
-        let wxgamecid = options.query.wxgamecid
+        let wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid
         let query = options.query;
         let appid = Common.config.moosnowAppId;
+        let tag = (moosnow.data as any).getNavigateToken(appid)
         let navigateData = {
-            scene: options.scene,
-            fromAppId,
+            scene_no: Common.isEmpty(options.scene) ? "" : options.scene,
+            source_appid: Common.isEmpty(fromAppId) ? "" : fromAppId,
             query,
-            wxgamecid,
+            wechat_channel: wxgamecid,
             title: row.title,
             position: row.position,
-            img: row.atlas || row.img,
+            jump_appid_icon: row.atlas || row.img,
             appid,
             uid: userToken,
             jump_appid: row.appid,
+            tag
         }
         console.log('navigate navigateData', navigateData)
         this.request(`${this.baseUrl}api/jump/record`, navigateData, "POST", (respone) => {
@@ -213,8 +216,8 @@ export class HttpModule extends BaseModule {
      * @param code 
      */
     public navigateEnd(code: string) {
-        this.request(`${this.baseUrl}api/jump/status`, {
-            code
+        this.request(`${this.baseUrl}api/jump/success`, {
+            tag: code
         }, "POST", (respone) => {
             console.log('navigateEnd code ', code, respone)
         });

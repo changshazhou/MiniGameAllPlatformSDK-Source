@@ -1233,7 +1233,6 @@ var mx = (function () {
          * @param complete  跳转完成
          */
         PlatformModule.prototype.navigate2Mini = function (row, success, fail, complete) {
-            var _this = this;
             console.log(MSG.NAVIGATE_DATA, row);
             if (Date.now() - this.prevNavigate < 300) {
                 console.log(MSG.NAVIGATE_FAST);
@@ -1258,28 +1257,29 @@ var mx = (function () {
                 wxgamecid: launchOption.query.wxgamecid
             };
             moosnow.http.point("打开跳转", param);
-            moosnow.http.navigate(row, function (res) {
-                window[_this.platformName].navigateToMiniProgram({
-                    appId: appid,
-                    path: path,
-                    extraData: extraData,
-                    success: function () {
-                        console.log('跳转参数', param);
-                        moosnow.http.point("跳转", param);
-                        moosnow.http.navigateEnd(res.code);
-                        if (success)
-                            success();
-                    },
-                    fail: function (err) {
-                        console.log('跳转失败 ', err, ' fail callback ', !!fail);
-                        if (fail)
-                            fail();
-                    },
-                    complete: function () {
-                        if (complete)
-                            complete();
-                    }
-                });
+            moosnow.http.navigate(row, function (res) { });
+            window[this.platformName].navigateToMiniProgram({
+                appId: appid,
+                path: path,
+                extraData: extraData,
+                success: function () {
+                    console.log('跳转参数', param);
+                    moosnow.http.point("跳转", param);
+                    moosnow.http.navigateEnd(moosnow.data.getNavigateToken(appid));
+                    if (success)
+                        success();
+                },
+                fail: function (err) {
+                    moosnow.data.resetNavigateToken();
+                    console.log('跳转失败 ', err, ' fail callback ', !!fail);
+                    if (fail)
+                        fail();
+                },
+                complete: function () {
+                    moosnow.data.resetNavigateToken();
+                    if (complete)
+                        complete();
+                }
             });
         };
         /**
@@ -1836,7 +1836,7 @@ var mx = (function () {
                 return bannerId;
             this.bannerShowTime = Date.now();
             var style = this._getBannerPosition();
-            console.log("🚀 ~ file: PlatformModule.ts ~ line 995 ~ PlatformModule ~ _createBannerAd ~ style", style);
+            console.log("PlatformModule ~ _createBannerAd ~ style", style);
             if (!this.banner[bannerId]) {
                 this.banner[bannerId] = window[this.platformName].createBannerAd({
                     adUnitId: bannerId,
@@ -3075,20 +3075,22 @@ var mx = (function () {
             var userToken = moosnow.data.getToken();
             var options = moosnow.platform.getLaunchOption();
             var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
-            var wxgamecid = options.query.wxgamecid;
+            var wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid;
             var query = options.query;
             var appid = Common.config.moosnowAppId;
+            var tag = moosnow.data.getNavigateToken(appid);
             var navigateData = {
-                scene: options.scene,
-                fromAppId: fromAppId,
+                scene_no: Common.isEmpty(options.scene) ? "" : options.scene,
+                source_appid: Common.isEmpty(fromAppId) ? "" : fromAppId,
                 query: query,
-                wxgamecid: wxgamecid,
+                wechat_channel: wxgamecid,
                 title: row.title,
                 position: row.position,
-                img: row.atlas || row.img,
+                jump_appid_icon: row.atlas || row.img,
                 appid: appid,
                 uid: userToken,
                 jump_appid: row.appid,
+                tag: tag
             };
             console.log('navigate navigateData', navigateData);
             this.request(this.baseUrl + "api/jump/record", navigateData, "POST", function (respone) {
@@ -3102,8 +3104,8 @@ var mx = (function () {
          * @param code
          */
         HttpModule.prototype.navigateEnd = function (code) {
-            this.request(this.baseUrl + "api/jump/status", {
-                code: code
+            this.request(this.baseUrl + "api/jump/success", {
+                tag: code
             }, "POST", function (respone) {
                 console.log('navigateEnd code ', code, respone);
             });
@@ -4228,6 +4230,7 @@ var mx = (function () {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.TOKEN = "MOOSNOW_SDK_TOKEN";
             _this.COIN = "MOOSNOW_SDK_COIN";
+            _this.NAVIGATE_TOKEN = "MOOSNOW_SDK_NAVIGATE_TOKEN";
             _this.mUserToken = "";
             _this.VIBRATE_SWITCH = "MOOSNOW_VIBRATE_SWITCH";
             _this.USER_PRIZE_KEY = "MOOSNOW_USER_PRIZE_KEY";
@@ -4272,6 +4275,15 @@ var mx = (function () {
         };
         GameDataCenter.prototype.setToken = function (v) {
             moosnow.setting.setValue(this.TOKEN, v);
+        };
+        GameDataCenter.prototype.getNavigateToken = function (appid) {
+            if (Common.isEmpty(this.mNavigateToken)) {
+                this.mNavigateToken = Date.now() + "_" + appid + "_" + this.getToken();
+            }
+            return this.mNavigateToken;
+        };
+        GameDataCenter.prototype.resetNavigateToken = function () {
+            this.mNavigateToken = null;
         };
         GameDataCenter.prototype.getCurrentMisTouchCount = function () {
             // if (!this.mCurrentMisTouchCount)

@@ -57,7 +57,7 @@ export default class moosnow {
         return Common.config;
     }
     constructor() {
-
+       
     }
 
 

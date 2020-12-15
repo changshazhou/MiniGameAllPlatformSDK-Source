@@ -2,6 +2,7 @@ import BaseModule from "./BaseModule";
 export default class GameDataCenter extends BaseModule {
     private TOKEN;
     private COIN;
+    private NAVIGATE_TOKEN;
     private mUserToken;
     private VIBRATE_SWITCH;
     private USER_PRIZE_KEY;
@@ -17,6 +18,9 @@ export default class GameDataCenter extends BaseModule {
     saveCoin(): void;
     getToken(): string;
     setToken(v: any): void;
+    private mNavigateToken;
+    getNavigateToken(appid: any): string;
+    resetNavigateToken(): void;
     private mCurrentMisTouchCount;
     getCurrentMisTouchCount(): number;
     setCurrentMisTouchCount(num: number): void;
