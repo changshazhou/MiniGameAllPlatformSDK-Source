@@ -314,9 +314,9 @@ export default class TTModule extends PlatformModule {
 
     }
 
-    public _prepareBanner() {
-        super._prepareBanner();
-    }
+    // public _prepareBanner() {
+    //     super._prepareBanner();
+    // }
     /**
      * 显示平台的banner广告
      * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -347,16 +347,16 @@ export default class TTModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    this._showBanner(idIndex);
+                    this._showBanner();
                 }
             })
         else
-            this._showBanner(idIndex);
+            this._showBanner();
     }
 
 
-    public _showBanner(idIndex) {
-        let banner = this.banner[this.getBannerId(idIndex)]
+    public _showBanner() {
+        let banner = this.banner[this.currentBannerId]
         if (banner) {
             banner.hide();
             /**

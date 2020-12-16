@@ -228,7 +228,7 @@ export default class PlatformModule extends BaseModule {
     private _regisiterOnHide;
     private _onHideCallback;
     initBanner(): void;
-    _prepareBanner(): void;
+    _prepareBanner(bannerId: string): void;
     /**
      * 创建banner
      * @param adIndex
@@ -256,7 +256,7 @@ export default class PlatformModule extends BaseModule {
       * @param style 自定义样式
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
-    _showBanner(idIndex: any): void;
+    _showBanner(): void;
     mTimeoutId: number;
     /**
      * 会自动隐藏的banner
@@ -280,6 +280,8 @@ export default class PlatformModule extends BaseModule {
     * 隐藏banner
     */
     hideBanner(): void;
+    private _hideBanner;
+    private destroyBanner;
     initVideo(): void;
     createRewardAD(show: boolean, idIndex?: number): void;
     _onVideoError(msg: any, code: any): void;

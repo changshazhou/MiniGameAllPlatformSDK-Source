@@ -932,7 +932,7 @@ var mx = (function () {
                         return idArray[Common.randomNumBoth(0, idArray.length - 1)];
                     }
                     else if (idArray.length - 1 < index) {
-                        console.warn(' id数组小于传入索引值，请检查代码');
+                        console.warn(' id数组小于传入索引值，请检查代码', idArray, index);
                         return idArray[0];
                     }
                     return idArray[index];
@@ -1813,9 +1813,33 @@ var mx = (function () {
         PlatformModule.prototype.initBanner = function () {
             if (!window[this.platformName])
                 return;
-            this._prepareBanner();
+            // this._prepareBanner()
         };
-        PlatformModule.prototype._prepareBanner = function () {
+        PlatformModule.prototype._prepareBanner = function (bannerId) {
+            if (!window[this.platformName].createBannerAd)
+                return;
+            var style = this._getBannerPosition();
+            console.log("PlatformModule ~ _createBannerAd ~ style", style);
+            if (!Common.isEmpty(this.banner[bannerId])) {
+                this.destroyBanner(bannerId);
+            }
+            this.banner[bannerId] = window[this.platformName].createBannerAd({
+                adUnitId: bannerId,
+                adIntervals: 30,
+                style: {
+                    top: style.top,
+                    left: style.left,
+                    width: this.bannerWidth
+                }
+            });
+            this.banner[bannerId].isLoaded = false;
+            this.banner[bannerId].bannerShowCount = 0;
+            this.banner[bannerId].bannerShowTime = Date.now();
+            if (this.banner[bannerId]) {
+                this.banner[bannerId].onResize(this._onBannerResize.bind(this, bannerId));
+                this.banner[bannerId].onError(this._onBannerError.bind(this, bannerId));
+                this.banner[bannerId].onLoad(this._onBannerLoad.bind(this, bannerId));
+            }
         };
         /**
          * 创建banner
@@ -1834,30 +1858,12 @@ var mx = (function () {
             }
             if (this.banner[bannerId])
                 return bannerId;
-            this.bannerShowTime = Date.now();
-            var style = this._getBannerPosition();
-            console.log("PlatformModule ~ _createBannerAd ~ style", style);
-            if (!this.banner[bannerId]) {
-                this.banner[bannerId] = window[this.platformName].createBannerAd({
-                    adUnitId: bannerId,
-                    adIntervals: 30,
-                    style: {
-                        top: style.top,
-                        left: style.left,
-                        width: this.bannerWidth
-                    }
-                });
-                this.banner[bannerId].isLoaded = false;
-                if (this.banner[bannerId]) {
-                    this.banner[bannerId].onResize(this._onBannerResize.bind(this, bannerId));
-                    this.banner[bannerId].onError(this._onBannerError.bind(this, bannerId));
-                    this.banner[bannerId].onLoad(this._onBannerLoad.bind(this, bannerId));
-                }
-            }
+            else
+                this._prepareBanner(bannerId);
             return bannerId;
         };
         PlatformModule.prototype._onBannerLoad = function (bannerId) {
-            console.log("🚀 ~ file: PlatformModule.ts ~ line 1043 ~ PlatformModule ~ _onBannerLoad ~ bannerId", bannerId);
+            console.log("PlatformModule ~ _onBannerLoad ~ bannerId", bannerId);
             this.bannerShowCount = 0;
         };
         PlatformModule.prototype._onBannerError = function (bannerId, err) {
@@ -1935,7 +1941,7 @@ var mx = (function () {
                 left = (windowWidth - this.bannerWidth) / 2;
             }
             // return {
-            console.log("🚀 ~ file: PlatformModule.ts ~ line 1132 ~ PlatformModule ~ _getBannerPosition ~ left", left, top);
+            console.log("PlatformModule ~ _getBannerPosition ~ left", left, top);
             //     left: 16,
             //     top: 16,
             // }
@@ -1971,7 +1977,7 @@ var mx = (function () {
             this.bannerHorizontal = horizontal;
             this.bannerVertical = vertical;
             this.bannerStyle = style;
-            this.hideBanner();
+            this._hideBanner();
             this.currentBannerId = this._createBannerAd(idIndex);
             if (this.mTimeoutId) {
                 clearTimeout(this.mTimeoutId);
@@ -1985,15 +1991,15 @@ var mx = (function () {
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
-                        _this._showBanner(idIndex);
+                        _this._showBanner();
                     }
                 });
             else
-                this._showBanner(idIndex);
+                this._showBanner();
         };
-        PlatformModule.prototype._showBanner = function (idIndex) {
+        PlatformModule.prototype._showBanner = function () {
             var _this = this;
-            var banner = this.banner[this.getBannerId(idIndex)];
+            var banner = this.banner[this.currentBannerId];
             if (banner) {
                 banner.hide();
                 /**
@@ -2034,7 +2040,7 @@ var mx = (function () {
             moosnow.http.getAllConfig(function (res) {
                 if (res && res.gameBanner == 1) {
                     _this.showBanner(true, function () { }, horizontal, vertical, idIndex);
-                    var time = isNaN(res.gameBanenrHideTime) ? 1 : parseFloat(res.gameBanenrHideTime);
+                    var time = isNaN(res.gameBanenrHideTime) ? 1.5 : parseFloat(res.gameBanenrHideTime);
                     _this.mTimeoutId = setTimeout(function () {
                         console.log('自动隐藏时间已到，开始隐藏Banner');
                         _this.hideBanner();
@@ -2074,20 +2080,40 @@ var mx = (function () {
         */
         PlatformModule.prototype.hideBanner = function () {
             console.log("hideBanner ~ this.banner", this.banner);
-            for (var k in this.banner) {
-                if (k != this.preloadBannerId || this.currentBannerId == this.preloadBannerId) {
-                    if (this.banner[k] && this.banner[k].hide) {
-                        this.banner[k].hide();
-                        this.banner[k].destroy();
-                        this.banner[k] = null;
-                    }
-                }
-                else {
-                    if (this.banner[k] && this.banner[k].hide) {
-                        this.banner[k].hide();
-                    }
+            if (!this.banner)
+                return;
+            this._hideBanner();
+            if (!this.banner[this.currentBannerId])
+                return;
+            this.banner[this.currentBannerId].bannerShowCount++;
+            if (this.bannerLimitType == 0) {
+                if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
+                    console.log('次数满足,销毁banner');
+                    this.destroyBanner(this.currentBannerId);
+                    this._prepareBanner(this.currentBannerId);
                 }
             }
+            else {
+                if (Date.now() - this.banner[this.currentBannerId].bannerShowTime > this.bannerShowTimeLimit * 1000) {
+                    console.log('时间满足，销毁banner');
+                    this.destroyBanner(this.currentBannerId);
+                    this._prepareBanner(this.currentBannerId);
+                }
+            }
+        };
+        PlatformModule.prototype._hideBanner = function () {
+            for (var k in this.banner) {
+                if (this.banner[k] && this.banner[k].hide) {
+                    this.banner[k].hide();
+                }
+            }
+        };
+        PlatformModule.prototype.destroyBanner = function (bannerId) {
+            this.banner[bannerId].offResize(this._onBannerResize);
+            this.banner[bannerId].offError(this._onBannerError);
+            this.banner[bannerId].offLoad(this._onBannerLoad);
+            this.banner[bannerId].destroy();
+            this.banner[bannerId] = null;
         };
         //------------广告video------------
         PlatformModule.prototype.initVideo = function () {
@@ -4845,9 +4871,9 @@ var mx = (function () {
                 this.banner[bannerId].show();
             }
         };
-        TTModule.prototype._prepareBanner = function () {
-            _super.prototype._prepareBanner.call(this);
-        };
+        // public _prepareBanner() {
+        //     super._prepareBanner();
+        // }
         /**
          * 显示平台的banner广告
          * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -4880,15 +4906,15 @@ var mx = (function () {
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
-                        _this._showBanner(idIndex);
+                        _this._showBanner();
                     }
                 });
             else
-                this._showBanner(idIndex);
+                this._showBanner();
         };
-        TTModule.prototype._showBanner = function (idIndex) {
+        TTModule.prototype._showBanner = function () {
             var _this = this;
-            var banner = this.banner[this.getBannerId(idIndex)];
+            var banner = this.banner[this.currentBannerId];
             if (banner) {
                 banner.hide();
                 /**
