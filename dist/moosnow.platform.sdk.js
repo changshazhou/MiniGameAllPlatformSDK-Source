@@ -932,7 +932,7 @@ var mx = (function () {
                         return idArray[Common.randomNumBoth(0, idArray.length - 1)];
                     }
                     else if (idArray.length - 1 < index) {
-                        console.warn(' id数组小于传入索引值，请检查代码', idArray, index);
+                        console.warn("id\u6570\u7EC4\u5C0F\u4E8E\u4F20\u5165\u7D22\u5F15\u503C\uFF0C\u672C\u6B21\u4F7F\u7528" + idArray[0] + "\uFF0C\u8BF7\u68C0\u67E5\u4EE3\u7801", idArray, index);
                         return idArray[0];
                     }
                     return idArray[index];
@@ -1856,7 +1856,7 @@ var mx = (function () {
                 console.warn(MSG.BANNER_KEY_IS_NULL);
                 return;
             }
-            if (this.banner[bannerId])
+            if (!Common.isEmpty(this.banner[bannerId]))
                 return bannerId;
             else
                 this._prepareBanner(bannerId);

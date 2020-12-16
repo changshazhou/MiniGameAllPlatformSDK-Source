@@ -63,7 +63,7 @@ export default class PlatformModule extends BaseModule {
                     return idArray[Common.randomNumBoth(0, idArray.length - 1)];
                 }
                 else if (idArray.length - 1 < index) {
-                    console.warn(' id数组小于传入索引值，请检查代码', idArray, index)
+                    console.warn(`id数组小于传入索引值，本次使用${idArray[0]}，请检查代码`, idArray, index)
                     return idArray[0]
                 }
                 return idArray[index]
