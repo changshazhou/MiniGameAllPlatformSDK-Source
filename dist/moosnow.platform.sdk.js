@@ -666,11 +666,15 @@ var mx = (function () {
             }
         };
         BaseModule.prototype.scheduleOnce = function (callback, time) {
+            var arg = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                arg[_i - 2] = arguments[_i];
+            }
             var self = this;
             var handle = setTimeout(function () {
                 clearTimeout(handle);
                 if (callback)
-                    callback.apply(self);
+                    callback.apply.apply(callback, __spreadArrays([self], arg));
             }, time * 1000);
             this.mTimeoutArr[this.mScheduleIndex] = {
                 handle: handle,
@@ -2051,6 +2055,37 @@ var mx = (function () {
                 }
             });
         };
+        /**
+         * 游戏结束时的自动banner
+         * @param horizontal banner的位置，默认底部
+         * @param vertical banner的位置，默认底部
+         * @param idIndex id顺序 -1 会随机
+         */
+        PlatformModule.prototype.showFlashBanner = function (horizontal, vertical, idIndex) {
+            var _this = this;
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
+            if (idIndex === void 0) { idIndex = -1; }
+            moosnow.http.getAllConfig(function (res) {
+                if (!res)
+                    return;
+                var flashBannerDelayTime = isNaN(res.FlashBannerDelayTime) ? 0 : res.FlashBannerDelayTime;
+                var flashBannerContinueTime = isNaN(res.FlashBannerContinueTime) ? 1.5 : parseFloat(res.FlashBannerContinueTime);
+                _this.unscheduleOnce(_this.showFlashBannerCallback);
+                _this.scheduleOnce(_this.showFlashBannerCallback, flashBannerDelayTime, [flashBannerContinueTime, horizontal, vertical, idIndex]);
+            });
+        };
+        PlatformModule.prototype.showFlashBannerCallback = function (continueTime, horizontal, vertical, idIndex) {
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
+            if (idIndex === void 0) { idIndex = -1; }
+            this.showBanner(true, function () { }, horizontal, vertical, idIndex);
+            this.unscheduleOnce(this.hideFlashBannerCallback);
+            this.scheduleOnce(this.hideFlashBannerCallback, continueTime);
+        };
+        PlatformModule.prototype.hideFlashBannerCallback = function () {
+            this.hideBanner();
+        };
         PlatformModule.prototype.exitApplication = function () {
         };
         /**
@@ -3112,10 +3147,11 @@ var mx = (function () {
                 wechat_channel: wxgamecid,
                 title: row.title,
                 position: row.position,
-                jump_appid_icon: row.atlas || row.img,
+                jump_app_icon: row.atlas || row.img,
                 appid: appid,
                 uid: userToken,
                 jump_appid: row.appid,
+                jump_app_name: row.title,
                 tag: tag
             };
             console.log('navigate navigateData', navigateData);
@@ -3143,7 +3179,7 @@ var mx = (function () {
         HttpModule.prototype.point = function (name, data) {
             if (data === void 0) { data = null; }
             this.getAllConfig(function (res) {
-                if (!(res && res.aldMonitorOn == 0)) {
+                if ((res && res.aldMonitorOn == 1)) {
                     if (Common.platform == APP_PLATFORM.WX) {
                         if (window['wx'] && window['wx'].aldSendEvent)
                             window['wx'].aldSendEvent(name, data);

@@ -266,6 +266,15 @@ export default class PlatformModule extends BaseModule {
      * @param idIndex id顺序 -1 会随机
      */
     showAutoBanner(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number): void;
+    /**
+     * 游戏结束时的自动banner
+     * @param horizontal banner的位置，默认底部
+     * @param vertical banner的位置，默认底部
+     * @param idIndex id顺序 -1 会随机
+     */
+    showFlashBanner(horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number): void;
+    private showFlashBannerCallback;
+    private hideFlashBannerCallback;
     exitApplication(): void;
     /**
      * 连续不断的显示和隐藏 banner

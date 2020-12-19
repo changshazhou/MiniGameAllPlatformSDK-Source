@@ -34,13 +34,12 @@ export default class BaseModule {
         }
     }
 
-    public scheduleOnce(callback: Function, time: number) {
+    public scheduleOnce(callback: Function, time: number, ...arg) {
         let self = this;
         let handle = setTimeout(() => {
             clearTimeout(handle);
             if (callback)
-                callback.apply(self)
-
+                callback.apply(self, ...arg);
         }, time * 1000)
         this.mTimeoutArr[this.mScheduleIndex] = {
             handle,

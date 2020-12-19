@@ -196,10 +196,11 @@ export class HttpModule extends BaseModule {
             wechat_channel: wxgamecid,
             title: row.title,
             position: row.position,
-            jump_appid_icon: row.atlas || row.img,
+            jump_app_icon: row.atlas || row.img,
             appid,
             uid: userToken,
             jump_appid: row.appid,
+            jump_app_name: row.title,
             tag
         }
         console.log('navigate navigateData', navigateData)
@@ -229,7 +230,7 @@ export class HttpModule extends BaseModule {
      */
     public point(name: string, data: any = null) {
         this.getAllConfig(res => {
-            if (!(res && res.aldMonitorOn == 0)) {
+            if ((res && res.aldMonitorOn == 1)) {
                 if (Common.platform == APP_PLATFORM.WX) {
                     if (window['wx'] && window['wx'].aldSendEvent)
                         (window['wx'] as any).aldSendEvent(name, data);

@@ -1034,7 +1034,6 @@ export default class PlatformModule extends BaseModule {
         this.isBannerShow = false;
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, null);
-
     }
     public _onBannerResize(bannerId, size) {
         console.log("_bottomCenterBanner -> size", size)
@@ -1231,6 +1230,32 @@ export default class PlatformModule extends BaseModule {
                 console.log('后台关闭了auto banner')
             }
         })
+    }
+
+
+
+    /**
+     * 游戏结束时的自动banner
+     * @param horizontal banner的位置，默认底部
+     * @param vertical banner的位置，默认底部
+     * @param idIndex id顺序 -1 会随机
+     */
+    public showFlashBanner(horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1) {
+        moosnow.http.getAllConfig(res => {
+            if (!res) return;
+            let flashBannerDelayTime = isNaN(res.FlashBannerDelayTime) ? 0 : res.FlashBannerDelayTime;
+            let flashBannerContinueTime = isNaN(res.FlashBannerContinueTime) ? 1.5 : parseFloat(res.FlashBannerContinueTime);
+            this.unscheduleOnce(this.showFlashBannerCallback)
+            this.scheduleOnce(this.showFlashBannerCallback, flashBannerDelayTime, [flashBannerContinueTime, horizontal, vertical, idIndex])
+        })
+    }
+    private showFlashBannerCallback(continueTime: number, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1) {
+        this.showBanner(true, () => { }, horizontal, vertical, idIndex)
+        this.unscheduleOnce(this.hideFlashBannerCallback)
+        this.scheduleOnce(this.hideFlashBannerCallback, continueTime)
+    }
+    private hideFlashBannerCallback() {
+        this.hideBanner();
     }
 
 

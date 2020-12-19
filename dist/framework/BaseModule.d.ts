@@ -9,7 +9,7 @@ export default class BaseModule {
     private mMaping;
     schedule(callback: Function, time: number, ...arg: any[]): void;
     unschedule(callback: any): void;
-    scheduleOnce(callback: Function, time: number): void;
+    scheduleOnce(callback: Function, time: number, ...arg: any[]): void;
     unscheduleOnce(callback: any): void;
     static schedule(callback: Function, time: number, ...arg: any[]): void;
     static unschedule(callback: any): void;
