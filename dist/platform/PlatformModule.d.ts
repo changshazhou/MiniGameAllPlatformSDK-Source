@@ -256,6 +256,9 @@ export default class PlatformModule extends BaseModule {
       * @param style 自定义样式
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
+    private mScreenOutBanner;
+    showScreenOutBanner(): void;
+    hideScreenOutBanner(): void;
     _showBanner(): void;
     mTimeoutId: number;
     /**

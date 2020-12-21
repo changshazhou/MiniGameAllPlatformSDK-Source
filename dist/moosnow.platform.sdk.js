@@ -1944,11 +1944,7 @@ var mx = (function () {
             else if (horizontal == BANNER_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.bannerWidth) / 2;
             }
-            // return {
             console.log("PlatformModule ~ _getBannerPosition ~ left", left, top);
-            //     left: 16,
-            //     top: 16,
-            // }
             return {
                 left: left,
                 top: top,
@@ -2000,6 +1996,38 @@ var mx = (function () {
                 });
             else
                 this._showBanner();
+        };
+        PlatformModule.prototype.showScreenOutBanner = function () {
+            if (!window[this.platformName].createBannerAd)
+                return;
+            this.hideScreenOutBanner();
+            var bannerId = this.getBannerId(-1);
+            this.mScreenOutBanner = window[this.platformName].createBannerAd({
+                adUnitId: bannerId,
+                adIntervals: 30,
+                style: {
+                    top: -300,
+                    left: -300,
+                    width: this.bannerWidth
+                }
+            });
+            this.mScreenOutBanner.onResize(function (res) {
+                console.log('外部banner onResize', res);
+            });
+            this.mScreenOutBanner.onError(function (err) {
+                console.log('外部banner onError', err);
+            });
+            this.mScreenOutBanner.onLoad(function (err) {
+                console.log('外部banner onLoad', err);
+            });
+            this.mScreenOutBanner.show();
+        };
+        PlatformModule.prototype.hideScreenOutBanner = function () {
+            if (this.mScreenOutBanner) {
+                this.mScreenOutBanner.hide();
+                this.mScreenOutBanner.destroy();
+                this.mScreenOutBanner = null;
+            }
         };
         PlatformModule.prototype._showBanner = function () {
             var _this = this;

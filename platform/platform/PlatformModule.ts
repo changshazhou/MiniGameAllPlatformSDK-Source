@@ -1120,11 +1120,9 @@ export default class PlatformModule extends BaseModule {
             left = (windowWidth - this.bannerWidth) / 2;
         }
 
-        // return {
+
         console.log("PlatformModule ~ _getBannerPosition ~ left", left, top)
-        //     left: 16,
-        //     top: 16,
-        // }
+
         return {
             left,
             top,
@@ -1177,6 +1175,39 @@ export default class PlatformModule extends BaseModule {
             })
         else
             this._showBanner();
+    }
+    private mScreenOutBanner
+    public showScreenOutBanner() {
+        if (!window[this.platformName].createBannerAd) return;
+        this.hideScreenOutBanner();
+        let bannerId = this.getBannerId(-1);
+        this.mScreenOutBanner = window[this.platformName].createBannerAd({
+            adUnitId: bannerId,
+            adIntervals: 30,
+            style: {
+                top: -300,
+                left: -300,
+                width: this.bannerWidth
+            }
+        });
+
+        this.mScreenOutBanner.onResize((res) => {
+            console.log('外部banner onResize', res)
+        });
+        this.mScreenOutBanner.onError((err) => {
+            console.log('外部banner onError', err)
+        });
+        this.mScreenOutBanner.onLoad((err) => {
+            console.log('外部banner onLoad', err)
+        });
+        this.mScreenOutBanner.show();
+    }
+    public hideScreenOutBanner() {
+        if (this.mScreenOutBanner) {
+            this.mScreenOutBanner.hide();
+            this.mScreenOutBanner.destroy();
+            this.mScreenOutBanner = null;
+        }
     }
 
     public _showBanner() {
