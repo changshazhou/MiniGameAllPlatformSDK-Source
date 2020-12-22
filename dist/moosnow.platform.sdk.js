@@ -917,6 +917,7 @@ var mx = (function () {
             _this.shareInfoArr = [];
             _this.versionRet = null;
             _this.prevNavigate = Date.now();
+            _this.navigateEnd = true;
             _this.preloadBannerId = "";
             _this.isLoaded = false;
             // this._regisiterWXCallback();
@@ -1237,13 +1238,22 @@ var mx = (function () {
          * @param complete  跳转完成
          */
         PlatformModule.prototype.navigate2Mini = function (row, success, fail, complete) {
+            var _this = this;
             console.log(MSG.NAVIGATE_DATA, row);
-            if (Date.now() - this.prevNavigate < 300) {
+            if (Date.now() - this.prevNavigate < 500) {
                 console.log(MSG.NAVIGATE_FAST);
                 return;
             }
             this.prevNavigate = Date.now();
+            if (!this.navigateEnd) {
+                console.log("跳转未结束");
+                return;
+            }
+            this.navigateEnd = false;
             if (!window[this.platformName]) {
+                this.scheduleOnce(function () {
+                    _this.navigateEnd = true;
+                }, 2);
                 if (fail)
                     fail();
                 // if (success)
@@ -1280,6 +1290,7 @@ var mx = (function () {
                         fail();
                 },
                 complete: function () {
+                    _this.navigateEnd = true;
                     moosnow.data.resetNavigateToken();
                     if (complete)
                         complete();
@@ -4051,9 +4062,9 @@ var mx = (function () {
                 return;
             }
             if (!Common.isEmpty(this.video)) {
-                this.video.offClose(this._onVideoClose);
-                this.video.offError(this._onVideoError);
-                this.video.offLoad(this._onVideoLoad);
+                this.video.offClose(moosnow.platform._onVideoClose);
+                this.video.offError(moosnow.platform._onVideoError);
+                this.video.offLoad(moosnow.platform._onVideoLoad);
             }
             else {
                 if (Common.isEmpty(this.getVideoId())) {
@@ -4064,9 +4075,9 @@ var mx = (function () {
                     adUnitId: this.getVideoId()
                 });
             }
-            this.video.onError(this._onVideoError.bind(this));
-            this.video.onClose(this._onVideoClose.bind(this));
-            this.video.onLoad(this._onVideoLoad.bind(this));
+            this.video.onError(moosnow.platform._onVideoError);
+            this.video.onClose(moosnow.platform._onVideoClose);
+            this.video.onLoad(moosnow.platform._onVideoLoad);
             moosnow.platform.videoLoading = true;
             this.video.load();
         };

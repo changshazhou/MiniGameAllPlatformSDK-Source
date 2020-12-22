@@ -460,9 +460,9 @@ export default class OPPOModule extends PlatformModule {
             return;
         }
         if (!Common.isEmpty(this.video)) {
-            this.video.offClose(this._onVideoClose);
-            this.video.offError(this._onVideoError);
-            this.video.offLoad(this._onVideoLoad);
+            this.video.offClose(moosnow.platform._onVideoClose);
+            this.video.offError(moosnow.platform._onVideoError);
+            this.video.offLoad(moosnow.platform._onVideoLoad);
         } else {
             if (Common.isEmpty(this.getVideoId())) {
                 console.warn(MSG.VIDEO_KEY_IS_NULL)
@@ -472,9 +472,9 @@ export default class OPPOModule extends PlatformModule {
                 adUnitId: this.getVideoId()
             });
         }
-        this.video.onError(this._onVideoError.bind(this));
-        this.video.onClose(this._onVideoClose.bind(this));
-        this.video.onLoad(this._onVideoLoad.bind(this));
+        this.video.onError(moosnow.platform._onVideoError);
+        this.video.onClose(moosnow.platform._onVideoClose);
+        this.video.onLoad(moosnow.platform._onVideoLoad);
         moosnow.platform.videoLoading = true;
         this.video.load();
 

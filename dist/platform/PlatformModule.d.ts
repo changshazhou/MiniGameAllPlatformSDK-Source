@@ -107,6 +107,7 @@ export default class PlatformModule extends BaseModule {
     getClipboardData(success: (res: any) => void, fail: (res: any) => void): void;
     setClipboardData(msg: string, success: (res: any) => void, fail: (res: any) => void): void;
     prevNavigate: number;
+    navigateEnd: boolean;
     /**
      * 跳转到指定App
      * @param row  跳转数据

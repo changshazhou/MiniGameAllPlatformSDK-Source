@@ -386,6 +386,7 @@ export default class PlatformModule extends BaseModule {
 
     }
     public prevNavigate = Date.now();
+    public navigateEnd: boolean = true
     /**
      * 跳转到指定App
      * @param row  跳转数据
@@ -396,13 +397,22 @@ export default class PlatformModule extends BaseModule {
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
 
         console.log(MSG.NAVIGATE_DATA, row)
-        if (Date.now() - this.prevNavigate < 300) {
+        if (Date.now() - this.prevNavigate < 500) {
             console.log(MSG.NAVIGATE_FAST)
             return;
         }
         this.prevNavigate = Date.now();
+        if (!this.navigateEnd) {
+            console.log("跳转未结束")
+            return;
+        }
+        this.navigateEnd = false;
+
 
         if (!window[this.platformName]) {
+            this.scheduleOnce(() => {
+                this.navigateEnd = true
+            }, 2)
             if (fail)
                 fail();
             // if (success)
@@ -439,6 +449,7 @@ export default class PlatformModule extends BaseModule {
                     fail();
             },
             complete: () => {
+                this.navigateEnd = true;
                 (moosnow.data as any).resetNavigateToken()
                 if (complete)
                     complete();
