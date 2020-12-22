@@ -2009,6 +2009,8 @@ var mx = (function () {
                 this._showBanner();
         };
         PlatformModule.prototype.showScreenOutBanner = function () {
+            if (!window[this.platformName])
+                return;
             if (!window[this.platformName].createBannerAd)
                 return;
             this.hideScreenOutBanner();

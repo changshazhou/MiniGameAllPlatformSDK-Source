@@ -1189,6 +1189,7 @@ export default class PlatformModule extends BaseModule {
     }
     private mScreenOutBanner
     public showScreenOutBanner() {
+        if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
         this.hideScreenOutBanner();
         let bannerId = this.getBannerId(-1);
