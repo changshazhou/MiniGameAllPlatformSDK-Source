@@ -246,7 +246,16 @@ export default class PlatformModule extends BaseModule {
         top: number;
     };
     private preloadBannerId;
-    preloadBanner(idIndex?: number): void;
+    /**
+     * @ 预加载banner ，返回 banner id 的 index
+     * @ 随机banner的时候有用
+     * @param idIndex
+     */
+    preloadBanner(idIndex?: number): number;
+    /**
+     * 获取preload
+     */
+    private getPreloadBannerIndex;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false

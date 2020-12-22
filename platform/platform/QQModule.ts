@@ -53,7 +53,7 @@ export default class QQModule extends PlatformModule {
             width: 320,
             height: height
         }
-
+        console.log(" 显示前先关闭 banner ")
         this.hideBanner();
         console.log(" QQModule ~ _createBannerAd ~ style", style, bannerId)
         this.banner[bannerId] = window[this.platformName].createBannerAd({
@@ -68,7 +68,27 @@ export default class QQModule extends PlatformModule {
         }
         return bannerId;
     }
-
+    public _onBannerLoad() {
+        console.log("banner 加载结束 bannerId");
+        for (let k in this.banner) {
+            if (k != this.currentBannerId) {
+                this.banner[k].hide();
+                this.banner[k].destroy();
+                this.banner[k] = null;
+                delete this.banner[k]
+            }
+        }
+        let banner = this.banner[this.currentBannerId];
+        if (banner) {
+            banner.show();
+        }
+        else {
+            console.log('banner 不存在')
+        }
+    }
+    public _onBannerError(bannerId, err) {
+        console.warn('banner___error:', err, ' bannerId ', bannerId);
+    }
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -86,7 +106,6 @@ export default class QQModule extends PlatformModule {
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
-        this.hideBanner();
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {
@@ -115,16 +134,7 @@ export default class QQModule extends PlatformModule {
             console.log('banner 不存在')
         }
     }
-    public _onBannerLoad() {
-        console.log("banner 加载结束 bannerId")
-        let banner = this.banner[this.currentBannerId]
-        if (banner) {
-            banner.show();
-        }
-        else {
-            console.log('banner 不存在')
-        }
-    }
+
     public _onBannerResize(size) {
         // 尺寸调整时会触发回调         
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
@@ -187,6 +197,7 @@ export default class QQModule extends PlatformModule {
             for (let k in this.banner) {
                 this.banner[k].hide();
                 this.banner[k].destroy();
+                this.banner[k] = null;
                 delete this.banner[k]
             }
     }

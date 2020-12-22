@@ -1040,11 +1040,14 @@ export default class PlatformModule extends BaseModule {
         this.bannerShowCount = 0;
     }
     public _onBannerError(bannerId, err) {
-        console.warn('banner___error:', err.errCode, err.errMsg);
+        console.warn('banner___error:', err);
         this.banner[bannerId] = null;
         this.isBannerShow = false;
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
-        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, null);
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+            horizontal: this.bannerHorizontal,
+            vertical: this.bannerVertical
+        });
     }
     public _onBannerResize(bannerId, size) {
         console.log("_bottomCenterBanner -> size", size)
@@ -1140,8 +1143,24 @@ export default class PlatformModule extends BaseModule {
         }
     }
     private preloadBannerId: string = "";
-    public preloadBanner(idIndex: number = -1) {
+    /**
+     * @ 预加载banner ，返回 banner id 的 index  
+     * @ 随机banner的时候有用
+     * @param idIndex 
+     */
+    public preloadBanner(idIndex: number = -1): number {
         this.preloadBannerId = this._createBannerAd(idIndex);
+        return this.getPreloadBannerIndex()
+    }
+    /**
+     * 获取preload 
+     */
+    private getPreloadBannerIndex() {
+        let arr = Common.config.bannerId as any
+        if (arr instanceof Array) {
+            return arr.indexOf(this.preloadBannerId)
+        }
+        return 0;
     }
 
     /**

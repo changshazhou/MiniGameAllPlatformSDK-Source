@@ -395,7 +395,18 @@ export class HttpModule extends BaseModule {
             isStartMistouch: 0,
             isStartVideo: 0,
             loadingAdOn: 0,
-            isBlockClose: 0
+            isBlockClose: 0,
+            SkinForceAd: 0,
+            CancelToSkip: 0,
+            SliceSkip: 0,
+            ForceSkip02: 0,
+            ForceSkip01: 0,
+            GameCenterWudian: 0,
+            SkinWudian: 0,
+            GGPopWudian: 0,
+            GamingEndFlashBanner: 0,
+            FlashBanner01: 0,
+            RewardOffsetBanner: 0
         }
         if (open) {
             for (let key in cfg) {

@@ -10,6 +10,8 @@ export default class QQModule extends PlatformModule {
     set bannerWidth(value: number);
     bannerHeigth: number;
     _createBannerAd(adIndex: number, loadShow?: boolean): string;
+    _onBannerLoad(): void;
+    _onBannerError(bannerId: any, err: any): void;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -19,7 +21,6 @@ export default class QQModule extends PlatformModule {
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
     _showBanner(): void;
-    _onBannerLoad(): void;
     _onBannerResize(size: any): void;
     /**
      * 盒子广告
