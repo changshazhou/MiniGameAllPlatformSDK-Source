@@ -7303,8 +7303,8 @@ var mx = (function () {
             // cc.sys.localStorage.setItem(this.VOLUME_SOUND, "" + this.volumeSound);
         };
         AudioModule.prototype.getSave = function () {
-            this.isMute = moosnow.setting.getString(this.IS_MUTE, "false") == "true" ? true : false;
-            this.isMuteMusic = moosnow.setting.getString(this.IS_MUTE_MUSIC, "false") == "true" ? true : false;
+            this.isMute = moosnow.setting.getBool(this.IS_MUTE, false);
+            this.isMuteMusic = moosnow.setting.getBool(this.IS_MUTE_MUSIC, false);
         };
         return AudioModule;
     }(BaseModule));
