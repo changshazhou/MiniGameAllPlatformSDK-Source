@@ -811,6 +811,7 @@ var mx = (function () {
         PLATFORM_EVENT.ON_PLATFORM_HIDE = "ON_PLATFORM_HIDE";
         PLATFORM_EVENT.ON_BANNER_ERROR = "ON_BANNER_ERROR";
         PLATFORM_EVENT.ON_BANNER_HIDE = "ON_BANNER_HIDE";
+        PLATFORM_EVENT.ON_FLASH_BANNER_HIDE = "ON_FLASH_BANNER_HIDE";
         PLATFORM_EVENT.ON_AD_SHOW = "ON_AD_SHOW";
         PLATFORM_EVENT.AD_VIEW_CHANGE = "AD_VIEW_CHANGE";
         PLATFORM_EVENT.AD_VIEW_REFRESH = "AD_VIEW_REFRESH";
@@ -2145,6 +2146,7 @@ var mx = (function () {
         };
         PlatformModule.prototype.hideFlashBannerCallback = function () {
             this.hideBanner();
+            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_FLASH_BANNER_HIDE, null);
         };
         PlatformModule.prototype.exitApplication = function () {
         };
@@ -5598,6 +5600,9 @@ var mx = (function () {
             }
             else if (horizontal == BLOCK_HORIZONTAL.RIGHT) {
                 left = windowWidth - this.blockWidth - 16;
+                if (vertical == BLOCK_VERTICAL.TOP) {
+                    left = windowWidth - this.blockWidth - 50;
+                }
             }
             else if (horizontal == BLOCK_HORIZONTAL.CENTER) {
                 left = (windowWidth - this.blockWidth) / 2;

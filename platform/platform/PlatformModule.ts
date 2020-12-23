@@ -1318,6 +1318,7 @@ export default class PlatformModule extends BaseModule {
     }
     private hideFlashBannerCallback() {
         this.hideBanner();
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_FLASH_BANNER_HIDE, null)
     }
 
 
