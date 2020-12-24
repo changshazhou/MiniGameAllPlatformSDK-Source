@@ -303,7 +303,7 @@ export default class QQModule extends PlatformModule {
         else if (horizontal == BLOCK_HORIZONTAL.RIGHT) {
             left = windowWidth - this.blockWidth - 16;
             if (vertical == BLOCK_VERTICAL.TOP) {
-                left = windowWidth - this.blockWidth - 50;
+                left = windowWidth - this.blockWidth - 150;
             }
         }
         else if (horizontal == BLOCK_HORIZONTAL.CENTER) {

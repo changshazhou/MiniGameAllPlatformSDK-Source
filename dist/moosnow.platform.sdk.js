@@ -3635,13 +3635,13 @@ var mx = (function () {
                 }
             }
             if (this.appLaunchOptions && res) {
-                console.log('后台禁止场景 1 ', res.seachEntryScene);
-                console.log('后台禁止场景 2 ', res.shareEntryScene);
-                console.log('进入时的场景 ', this.appLaunchOptions.scene);
+                // console.log('后台禁止场景 1 ', res.seachEntryScene);
+                // console.log('后台禁止场景 2 ', res.shareEntryScene);
+                // console.log('进入时的场景 ', this.appLaunchOptions.scene);
                 if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
                     || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                     callback(true);
-                    console.log('后台禁止场景 ', this.appLaunchOptions.scene);
+                    // console.log('后台禁止场景 ', this.appLaunchOptions.scene);
                     return;
                 }
             }
@@ -4118,8 +4118,8 @@ var mx = (function () {
         OPPOModule.prototype._onVideoLoad = function () {
             console.log(MSG.VIDEO_LOAD_COMPLETED);
             moosnow.platform.videoLoading = false;
-            if (this.video) {
-                this.video.show();
+            if (moosnow.platform.video) {
+                moosnow.platform.video.show();
             }
         };
         OPPOModule.prototype.prepareInter = function () {
@@ -5601,7 +5601,7 @@ var mx = (function () {
             else if (horizontal == BLOCK_HORIZONTAL.RIGHT) {
                 left = windowWidth - this.blockWidth - 16;
                 if (vertical == BLOCK_VERTICAL.TOP) {
-                    left = windowWidth - this.blockWidth - 50;
+                    left = windowWidth - this.blockWidth - 150;
                 }
             }
             else if (horizontal == BLOCK_HORIZONTAL.CENTER) {

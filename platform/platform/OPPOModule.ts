@@ -482,8 +482,8 @@ export default class OPPOModule extends PlatformModule {
     public _onVideoLoad() {
         console.log(MSG.VIDEO_LOAD_COMPLETED)
         moosnow.platform.videoLoading = false;
-        if (this.video) {
-            this.video.show();
+        if (moosnow.platform.video) {
+            moosnow.platform.video.show();
         }
     }
 
