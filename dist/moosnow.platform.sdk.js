@@ -1835,10 +1835,10 @@ var mx = (function () {
             if (!window[this.platformName].createBannerAd)
                 return;
             var style = this._getBannerPosition();
-            console.log("PlatformModule ~ _createBannerAd ~ style", style);
             if (!Common.isEmpty(this.banner[bannerId])) {
                 this.destroyBanner(bannerId);
             }
+            console.log("\u4F7F\u7528id[" + bannerId + "]\u521B\u5EFAbanner");
             this.banner[bannerId] = window[this.platformName].createBannerAd({
                 adUnitId: bannerId,
                 adIntervals: 30,
@@ -2014,19 +2014,31 @@ var mx = (function () {
                 clearTimeout(this.mTimeoutId);
                 this.mTimeoutId = null;
             }
-            if (remoteOn)
-                moosnow.http.getAllConfig(function (res) {
+            moosnow.http.getAllConfig(function (res) {
+                if (res.BannerAll == 0) {
+                    console.log('后台关闭所有banner BannerAll == 0 发送 ON_BANNER_ERROR 事件');
+                    moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                        horizontal: _this.bannerHorizontal,
+                        vertical: _this.bannerVertical
+                    });
+                    return;
+                }
+                if (remoteOn)
                     if (res.mistouchNum == 0) {
-                        console.log('后台关闭了banner，不执行显示');
+                        console.log('后台关闭了banner 发送 ON_BANNER_ERROR 事件');
+                        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                            horizontal: _this.bannerHorizontal,
+                            vertical: _this.bannerVertical
+                        });
                         return;
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
                         _this._showBanner();
                     }
-                });
-            else
-                this._showBanner();
+                else
+                    _this._showBanner();
+            });
         };
         PlatformModule.prototype.showScreenOutBanner = function () {
             if (!window[this.platformName])
@@ -2197,6 +2209,7 @@ var mx = (function () {
                     this._prepareBanner(this.currentBannerId);
                 }
             }
+            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
         };
         PlatformModule.prototype._hideBanner = function () {
             for (var k in this.banner) {

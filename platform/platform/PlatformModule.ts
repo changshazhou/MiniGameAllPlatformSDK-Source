@@ -993,10 +993,10 @@ export default class PlatformModule extends BaseModule {
     public _prepareBanner(bannerId: string) {
         if (!window[this.platformName].createBannerAd) return;
         let style = this._getBannerPosition();
-        console.log("PlatformModule ~ _createBannerAd ~ style", style)
         if (!Common.isEmpty(this.banner[bannerId])) {
             this.destroyBanner(bannerId);
         }
+        console.log(`使用id[${bannerId}]创建banner`)
         this.banner[bannerId] = window[this.platformName].createBannerAd({
             adUnitId: bannerId,
             adIntervals: 30,
@@ -1192,19 +1192,32 @@ export default class PlatformModule extends BaseModule {
             this.mTimeoutId = null;
         }
 
-        if (remoteOn)
-            moosnow.http.getAllConfig(res => {
+        moosnow.http.getAllConfig(res => {
+            if (res.BannerAll == 0) {
+                console.log('后台关闭所有banner BannerAll == 0 发送 ON_BANNER_ERROR 事件')
+                moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                    horizontal: this.bannerHorizontal,
+                    vertical: this.bannerVertical
+                });
+                return;
+            }
+            if (remoteOn)
                 if (res.mistouchNum == 0) {
-                    console.log('后台关闭了banner，不执行显示')
+                    console.log('后台关闭了banner 发送 ON_BANNER_ERROR 事件')
+                    moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                        horizontal: this.bannerHorizontal,
+                        vertical: this.bannerVertical
+                    });
                     return;
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
                     this._showBanner();
                 }
-            })
-        else
-            this._showBanner();
+            else
+                this._showBanner();
+        })
+
     }
     private mScreenOutBanner
     public showScreenOutBanner() {
@@ -1370,6 +1383,7 @@ export default class PlatformModule extends BaseModule {
                 this._prepareBanner(this.currentBannerId);
             }
         }
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
     }
 
     private _hideBanner() {
