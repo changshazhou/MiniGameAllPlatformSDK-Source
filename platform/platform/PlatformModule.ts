@@ -56,6 +56,9 @@ export default class PlatformModule extends BaseModule {
     public platformName: string = "wx";
 
 
+    public bannerErrorQuene = [];
+
+
     public getAdId(idArray: Array<string> | string, index: number = 0) {
         if (idArray instanceof Array) {
             if (idArray.length > 0) {
@@ -1031,23 +1034,38 @@ export default class PlatformModule extends BaseModule {
         }
         if (!Common.isEmpty(this.banner[bannerId]))
             return bannerId;
-        else
+        else {
             this._prepareBanner(bannerId);
+        }
         return bannerId;
+    }
+
+    private triggerBannerError(bannerId) {
+        if (this.bannerErrorQuene[bannerId].isError
+            && this.bannerErrorQuene[bannerId].isShow) {
+            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                bannerId,
+                horizontal: this.bannerHorizontal,
+                vertical: this.bannerVertical
+            });
+            this.bannerErrorQuene[bannerId] = null;
+        }
+
+
     }
     public _onBannerLoad(bannerId) {
         console.log("PlatformModule ~ _onBannerLoad ~ bannerId", bannerId)
+        this.bannerErrorQuene[bannerId] = null;
         this.bannerShowCount = 0;
     }
     public _onBannerError(bannerId, err) {
         console.warn('banner___error:', err);
         this.banner[bannerId] = null;
         this.isBannerShow = false;
-        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
-        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
-            horizontal: this.bannerHorizontal,
-            vertical: this.bannerVertical
-        });
+        if (!this.bannerErrorQuene[bannerId])
+            this.bannerErrorQuene[bannerId] = {}
+        this.bannerErrorQuene[bannerId].isError = true;
+        this.triggerBannerError(bannerId);
     }
     public _onBannerResize(bannerId, size) {
         console.log("_bottomCenterBanner -> size", size)
@@ -1088,7 +1106,6 @@ export default class PlatformModule extends BaseModule {
                 e.banner.style.left = style.left;
                 console.log(MSG.BANNER_RESIZE, e.banner.style, 'set top ', top)
             }
-
         }
     }
 
@@ -1184,8 +1201,12 @@ export default class PlatformModule extends BaseModule {
         this.bannerStyle = style;
 
         this._hideBanner();
-        this.currentBannerId = this._createBannerAd(idIndex);
 
+        this.currentBannerId = this._createBannerAd(idIndex);
+        if (!this.bannerErrorQuene[this.currentBannerId])
+            this.bannerErrorQuene[this.currentBannerId] = {}
+        this.bannerErrorQuene[this.currentBannerId].isShow = true;
+        this.triggerBannerError(this.currentBannerId);
 
         if (this.mTimeoutId) {
             clearTimeout(this.mTimeoutId);

@@ -24,6 +24,7 @@ export default class PlatformModule extends BaseModule {
     native: any;
     box: any;
     platformName: string;
+    bannerErrorQuene: any[];
     getAdId(idArray: Array<string> | string, index?: number): string;
     getBannerId(idx?: number): string;
     getBlockId(idx?: number): string;
@@ -236,6 +237,7 @@ export default class PlatformModule extends BaseModule {
      * @return bannerId
      */
     _createBannerAd(adIndex: number): string;
+    private triggerBannerError;
     _onBannerLoad(bannerId: any): void;
     _onBannerError(bannerId: any, err: any): void;
     _onBannerResize(bannerId: any, size: any): void;

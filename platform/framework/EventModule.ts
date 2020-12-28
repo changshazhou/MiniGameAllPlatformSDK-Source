@@ -19,9 +19,10 @@ export default class EventModule extends BaseModule {
     * @param {string} eventName 监听的事件名
     * @param {typeof Class} target 监听者
     * @param {Function} callback 监听事件触发后的回调
+    * @param {boolean} once 监听事件触发后的回调
     */
-    addListener(eventName, target, callback) {
-        this._addListener(eventName, target, false, callback);
+    addListener(eventName: string, target, callback: Function, once: boolean = false) {
+        this._addListener(eventName, target, once, callback);
     }
 
     /**
@@ -150,13 +151,14 @@ export default class EventModule extends BaseModule {
                         j--;
                         continue;
                     }
-                    callback.call(target, data);
                     if (listener.once) {
                         if (this._eventList[i].listeners[j]) {
                             ArrayUtil.remove(this._eventList[i].listeners, listener);
                             i--;
                         }
                     }
+                    callback.call(target, data);
+
                 }
             }
         }

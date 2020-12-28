@@ -888,6 +888,7 @@ var mx = (function () {
             _this.native = null;
             _this.box = null;
             _this.platformName = "wx";
+            _this.bannerErrorQuene = [];
             _this.nativeIdIndex = 0;
             _this.mBannerWidth = 300;
             _this.bannerHeigth = 96;
@@ -1874,23 +1875,35 @@ var mx = (function () {
             }
             if (!Common.isEmpty(this.banner[bannerId]))
                 return bannerId;
-            else
+            else {
                 this._prepareBanner(bannerId);
+            }
             return bannerId;
+        };
+        PlatformModule.prototype.triggerBannerError = function (bannerId) {
+            if (this.bannerErrorQuene[bannerId].isError
+                && this.bannerErrorQuene[bannerId].isShow) {
+                moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
+                    bannerId: bannerId,
+                    horizontal: this.bannerHorizontal,
+                    vertical: this.bannerVertical
+                });
+                this.bannerErrorQuene[bannerId] = null;
+            }
         };
         PlatformModule.prototype._onBannerLoad = function (bannerId) {
             console.log("PlatformModule ~ _onBannerLoad ~ bannerId", bannerId);
+            this.bannerErrorQuene[bannerId] = null;
             this.bannerShowCount = 0;
         };
         PlatformModule.prototype._onBannerError = function (bannerId, err) {
             console.warn('banner___error:', err);
             this.banner[bannerId] = null;
             this.isBannerShow = false;
-            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
-            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
-                horizontal: this.bannerHorizontal,
-                vertical: this.bannerVertical
-            });
+            if (!this.bannerErrorQuene[bannerId])
+                this.bannerErrorQuene[bannerId] = {};
+            this.bannerErrorQuene[bannerId].isError = true;
+            this.triggerBannerError(bannerId);
         };
         PlatformModule.prototype._onBannerResize = function (bannerId, size) {
             console.log("_bottomCenterBanner -> size", size);
@@ -2010,6 +2023,10 @@ var mx = (function () {
             this.bannerStyle = style;
             this._hideBanner();
             this.currentBannerId = this._createBannerAd(idIndex);
+            if (!this.bannerErrorQuene[this.currentBannerId])
+                this.bannerErrorQuene[this.currentBannerId] = {};
+            this.bannerErrorQuene[this.currentBannerId].isShow = true;
+            this.triggerBannerError(this.currentBannerId);
             if (this.mTimeoutId) {
                 clearTimeout(this.mTimeoutId);
                 this.mTimeoutId = null;
@@ -6107,9 +6124,11 @@ var mx = (function () {
         * @param {string} eventName 监听的事件名
         * @param {typeof Class} target 监听者
         * @param {Function} callback 监听事件触发后的回调
+        * @param {boolean} once 监听事件触发后的回调
         */
-        EventModule.prototype.addListener = function (eventName, target, callback) {
-            this._addListener(eventName, target, false, callback);
+        EventModule.prototype.addListener = function (eventName, target, callback, once) {
+            if (once === void 0) { once = false; }
+            this._addListener(eventName, target, once, callback);
         };
         /**
          * 将事件添加到发送队列里在update里发送
@@ -6231,13 +6250,13 @@ var mx = (function () {
                             j--;
                             continue;
                         }
-                        callback.call(target, data);
                         if (listener.once) {
                             if (this._eventList[i].listeners[j]) {
                                 ArrayUtil.remove(this._eventList[i].listeners, listener);
                                 i--;
                             }
                         }
+                        callback.call(target, data);
                     }
                 }
             }

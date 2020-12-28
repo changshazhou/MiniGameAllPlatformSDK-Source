@@ -8,8 +8,9 @@ export default class EventModule extends BaseModule {
     * @param {string} eventName 监听的事件名
     * @param {typeof Class} target 监听者
     * @param {Function} callback 监听事件触发后的回调
+    * @param {boolean} once 监听事件触发后的回调
     */
-    addListener(eventName: any, target: any, callback: any): void;
+    addListener(eventName: string, target: any, callback: Function, once?: boolean): void;
     /**
      * 将事件添加到发送队列里在update里发送
      * @param {string} eventName 要发送的事件名
