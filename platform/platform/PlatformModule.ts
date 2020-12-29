@@ -1394,14 +1394,14 @@ export default class PlatformModule extends BaseModule {
             if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
                 console.log('次数满足,销毁banner');
                 this.destroyBanner(this.currentBannerId);
-                this._prepareBanner(this.currentBannerId);
+                // this._prepareBanner(this.currentBannerId);
             }
         }
         else {
             if (Date.now() - this.banner[this.currentBannerId].bannerShowTime > this.bannerShowTimeLimit * 1000) {
                 console.log('时间满足，销毁banner')
                 this.destroyBanner(this.currentBannerId);
-                this._prepareBanner(this.currentBannerId);
+                // this._prepareBanner(this.currentBannerId);
             }
         }
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)

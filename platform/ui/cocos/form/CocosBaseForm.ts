@@ -6,8 +6,8 @@ import Common from "../../../utils/Common";
 
 
 
-export default class CocosBaseForm extends BaseForm {
 
+export default class CocosBaseForm extends BaseForm {
 
     private downAnim(node) {
         node.scale = 1;
