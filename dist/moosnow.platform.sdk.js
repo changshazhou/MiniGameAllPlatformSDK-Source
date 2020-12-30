@@ -3667,13 +3667,13 @@ var mx = (function () {
                 }
             }
             if (this.appLaunchOptions && res) {
-                // console.log('后台禁止场景 1 ', res.seachEntryScene);
-                // console.log('后台禁止场景 2 ', res.shareEntryScene);
-                // console.log('进入时的场景 ', this.appLaunchOptions.scene);
+                console.log('后台禁止场景 1 ', res.seachEntryScene);
+                console.log('后台禁止场景 2 ', res.shareEntryScene);
+                console.log('进入时的场景 ', this.appLaunchOptions.scene);
                 if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
                     || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
                     callback(true);
-                    // console.log('后台禁止场景 ', this.appLaunchOptions.scene);
+                    console.log('后台禁止场景 ', this.appLaunchOptions.scene);
                     return;
                 }
             }
@@ -8395,14 +8395,25 @@ var mx = (function () {
             this.addToSrcQuene(sprite, imgCfg, callback);
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
-                if (isRemote)
-                    cc.loader.load(imgCfg.url, function (err, tex) {
-                        if (err) {
-                            console.log(' cc.loader.load ', err);
-                            return;
-                        }
-                        _this.applySrcQuene(sprite, tex, imgCfg);
-                    });
+                if (isRemote) {
+                    if (cc.assetManager.loadRemote) {
+                        cc.assetManager.loadRemote(imgCfg.url, cc.Texture2D, function (err, tex) {
+                            if (err) {
+                                console.log(' cc.assetManager.loadRemote ', err);
+                                return;
+                            }
+                            _this.applySrcQuene(sprite, tex, imgCfg);
+                        });
+                    }
+                    else
+                        cc.loader.load(imgCfg.url, function (err, tex) {
+                            if (err) {
+                                console.log(' cc.loader.load ', err);
+                                return;
+                            }
+                            _this.applySrcQuene(sprite, tex, imgCfg);
+                        });
+                }
                 else {
                     var res = cc.loader.getRes(imgCfg.url);
                     if (res) {

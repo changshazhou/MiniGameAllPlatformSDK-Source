@@ -271,7 +271,7 @@ export default class CocosNodeHelper extends NodeHelper {
         if (queneItem && queneItem.imgCfg == imgCfg) {
             // console.log('applySrcQuene', image.node.name, tex.url)
             this.updateSprite(image, tex);
-            
+
             this.checkSize(image, this.convertWidth(queneItem.imgCfg.width), this.convertHeight(queneItem.imgCfg.height));
             // this.schedule(this.checkSize, 0.16, [image, queneItem.imgCfg.width, queneItem.imgCfg.height])
             this.setSpriteGrid(queneItem.imgCfg, image);
@@ -297,14 +297,25 @@ export default class CocosNodeHelper extends NodeHelper {
         this.addToSrcQuene(sprite, imgCfg, callback);
         if (imgCfg.url) {
             let isRemote = imgCfg.url.indexOf("http") != -1;
-            if (isRemote)
-                cc.loader.load(imgCfg.url, (err, tex) => {
-                    if (err) {
-                        console.log(' cc.loader.load ', err)
-                        return;
-                    }
-                    this.applySrcQuene(sprite, tex, imgCfg);
-                });
+            if (isRemote) {
+                if (cc.assetManager.loadRemote) {
+                    cc.assetManager.loadRemote(imgCfg.url, cc.Texture2D, (err, tex: cc.Texture2D) => {
+                        if (err) {
+                            console.log(' cc.assetManager.loadRemote ', err)
+                            return;
+                        }
+                        this.applySrcQuene(sprite, tex, imgCfg);
+                    })
+                }
+                else
+                    cc.loader.load(imgCfg.url, (err, tex) => {
+                        if (err) {
+                            console.log(' cc.loader.load ', err)
+                            return;
+                        }
+                        this.applySrcQuene(sprite, tex, imgCfg);
+                    });
+            }
             else {
                 let res = cc.loader.getRes(imgCfg.url);
                 if (res) {

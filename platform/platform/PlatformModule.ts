@@ -1079,7 +1079,7 @@ export default class PlatformModule extends BaseModule {
         }
 
 
-        console.log("_bottomCenterBanner -> this.banner.style", this.banner[bannerId].style)
+        // console.log("_bottomCenterBanner -> this.banner.style", this.banner[bannerId].style)
 
         if (this.bannerStyle)
             this.applyCustomStyle({

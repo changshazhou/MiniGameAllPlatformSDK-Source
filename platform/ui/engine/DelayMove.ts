@@ -1,5 +1,6 @@
 import BaseModule from "../../framework/BaseModule";
 
+
 export default class DelayMove extends BaseModule {
 
 
@@ -68,7 +69,7 @@ export default class DelayMove extends BaseModule {
     }
 
     public copyNode() {
-        
+
     }
 
     public onPosCallback(tempButtom) {
