@@ -1071,25 +1071,30 @@ export default class PlatformModule extends BaseModule {
         console.log("_bottomCenterBanner -> size", size)
         let wxsys = this.getSystemInfoSync();
         let windowWidth = wxsys.windowWidth;
-        if (this.banner[bannerId]) {
-            if (!isNaN(this.banner[bannerId].style.realWidth))
-                this.bannerWidth = this.banner[bannerId].style.realWidth;
-            if (!isNaN(this.banner[bannerId].style.realHeight))
-                this.bannerHeigth = this.banner[bannerId].style.realHeight;
+        let owner = this.banner[bannerId]
+        if (owner) {
+            if (owner.style) {
+                if (!isNaN(owner.style.realWidth))
+                    this.bannerWidth = owner.style.realWidth;
+                if (!isNaN(owner.style.realHeight))
+                    this.bannerHeigth = owner.style.realHeight;
+            }
+            else {
+                console.warn("_onBannerResize -> owner 1", owner)
+            }
+
         }
-
-
-        // console.log("_bottomCenterBanner -> this.banner.style", this.banner[bannerId].style)
 
         if (this.bannerStyle)
             this.applyCustomStyle({
-                banner: this.banner[bannerId]
+                banner: owner
             });
-        else if (this.banner[bannerId]) {
-            this.banner[bannerId].style.left = (windowWidth - size.width) / 2;
+        else if (owner && owner.style) {
+            owner.style.left = (windowWidth - size.width) / 2;
         }
-
-
+        else {
+            console.warn("_onBannerResize -> owner 2", owner)
+        }
     }
 
     public _resetBanenrStyle(e) {
