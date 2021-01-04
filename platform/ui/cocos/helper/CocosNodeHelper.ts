@@ -298,7 +298,7 @@ export default class CocosNodeHelper extends NodeHelper {
         if (imgCfg.url) {
             let isRemote = imgCfg.url.indexOf("http") != -1;
             if (isRemote) {
-                if (cc.assetManager.loadRemote) {
+                if (cc.assetManager && cc.assetManager.loadRemote) {
                     cc.assetManager.loadRemote(imgCfg.url, cc.Texture2D, (err, tex: cc.Texture2D) => {
                         if (err) {
                             console.log(' cc.assetManager.loadRemote ', err)

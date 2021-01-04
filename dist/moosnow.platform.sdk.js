@@ -8404,7 +8404,7 @@ var mx = (function () {
             if (imgCfg.url) {
                 var isRemote = imgCfg.url.indexOf("http") != -1;
                 if (isRemote) {
-                    if (cc.assetManager.loadRemote) {
+                    if (cc.assetManager && cc.assetManager.loadRemote) {
                         cc.assetManager.loadRemote(imgCfg.url, cc.Texture2D, function (err, tex) {
                             if (err) {
                                 console.log(' cc.assetManager.loadRemote ', err);
