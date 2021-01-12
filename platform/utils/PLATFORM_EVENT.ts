@@ -21,5 +21,7 @@ export default class PLATFORM_EVENT {
     static readonly COMPONENT_CHECKBOX_TOGGLE: string = "COMPONENT_CHECKBOX_TOGGLE";
     static readonly PRIZE_BOX_UNLOCAK: string = "PRIZE_BOX_UNLOCAK";
 
+    static readonly NAVIGATE_TO_MINI: string = "NAVIGATE_TO_MINI";
+
 
 }

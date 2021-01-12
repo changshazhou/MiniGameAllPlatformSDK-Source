@@ -819,6 +819,7 @@ var mx = (function () {
         PLATFORM_EVENT.RANDOWM_NAVIGATE = "RANDOWM_NAVIGATE";
         PLATFORM_EVENT.COMPONENT_CHECKBOX_TOGGLE = "COMPONENT_CHECKBOX_TOGGLE";
         PLATFORM_EVENT.PRIZE_BOX_UNLOCAK = "PRIZE_BOX_UNLOCAK";
+        PLATFORM_EVENT.NAVIGATE_TO_MINI = "NAVIGATE_TO_MINI";
         return PLATFORM_EVENT;
     }());
 
@@ -1292,6 +1293,7 @@ var mx = (function () {
                         fail();
                 },
                 complete: function () {
+                    moosnow.event.sendEventImmediately(PLATFORM_EVENT.NAVIGATE_TO_MINI, param);
                     _this.navigateEnd = true;
                     moosnow.data.resetNavigateToken();
                     if (complete)

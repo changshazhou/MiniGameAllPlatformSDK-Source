@@ -433,7 +433,7 @@ export default class PlatformModule extends BaseModule {
             wxgamecid: launchOption.query.wxgamecid
         }
         moosnow.http.point("打开跳转", param)
-        moosnow.http.navigate(row, (res) => { })
+        moosnow.http.navigate(row, (res) => { });
         window[this.platformName].navigateToMiniProgram({
             appId: appid,
             path: path,
@@ -452,6 +452,7 @@ export default class PlatformModule extends BaseModule {
                     fail();
             },
             complete: () => {
+                moosnow.event.sendEventImmediately(PLATFORM_EVENT.NAVIGATE_TO_MINI, param)
                 this.navigateEnd = true;
                 (moosnow.data as any).resetNavigateToken()
                 if (complete)

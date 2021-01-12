@@ -14,4 +14,5 @@ export default class PLATFORM_EVENT {
     static readonly RANDOWM_NAVIGATE: string;
     static readonly COMPONENT_CHECKBOX_TOGGLE: string;
     static readonly PRIZE_BOX_UNLOCAK: string;
+    static readonly NAVIGATE_TO_MINI: string;
 }
