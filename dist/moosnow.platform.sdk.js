@@ -3916,10 +3916,6 @@ var mx = (function () {
             }
             moosnow.http.point("打开跳转", row);
             moosnow.http.navigate(row, function (res) { });
-            this.scheduleOnce(function () {
-                moosnow.http.navigateEnd(moosnow.data.getNavigateToken(appid));
-            }, 5);
-            return;
             window[this.platformName].navigateToMiniGame({
                 appId: appid,
                 path: path,
@@ -3927,6 +3923,7 @@ var mx = (function () {
                 extraData: extraData,
                 success: function () {
                     moosnow.http.point("跳转", row);
+                    moosnow.http.navigateEnd(moosnow.data.getNavigateToken(appid));
                     if (window[_this.platformName] && window[_this.platformName].aldSendEvent) {
                         window[_this.platformName].aldSendEvent('跳转', {
                             position: row.position,

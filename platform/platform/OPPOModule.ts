@@ -205,6 +205,7 @@ export default class OPPOModule extends PlatformModule {
             extraData: extraData,
             success: () => {
                 moosnow.http.point("跳转", row)
+                moosnow.http.navigateEnd((moosnow.data as any).getNavigateToken(appid));
                 if (window[this.platformName] && window[this.platformName].aldSendEvent) {
                     window[this.platformName].aldSendEvent('跳转', {
                         position: row.position,
