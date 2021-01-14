@@ -68,7 +68,9 @@ export default class WXModule extends PlatformModule {
         let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
         let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
         let fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知'
-        let wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid
+        let wxgamecid = "";
+        if (options && options.query)
+            wxgamecid = options.query.wxgamecid
         moosnow.data.setChannelAppId(channel_appid);
         moosnow.data.setChannelId(channel_id);
         if (window[this.platformName] && window[this.platformName].aldSendEvent) {
