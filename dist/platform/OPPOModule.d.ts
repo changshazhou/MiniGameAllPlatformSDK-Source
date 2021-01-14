@@ -12,6 +12,19 @@ export default class OPPOModule extends PlatformModule {
     private interLoadedShow;
     constructor();
     private initAdService;
+    /**
+      * 游戏登录
+      * @param callback
+      * @param fail
+      */
+    login(callback?: Function, fail?: Function): void;
+    /**
+     *
+     * @param code
+     * @param user_id
+     * @param callback
+     */
+    private getUserToken;
     prevNavigate: number;
     /**
      * 跳转到指定App

@@ -185,7 +185,9 @@ export class HttpModule extends BaseModule {
         let userToken = moosnow.data.getToken();
         let options = moosnow.platform.getLaunchOption();
         let fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知'
-        let wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid
+        let wxgamecid = "";
+        if (options.query && options.query.wxgamecid)
+            wxgamecid = options.query.wxgamecid
         let query = options.query;
         let appid = Common.config.moosnowAppId;
         let tag = (moosnow.data as any).getNavigateToken(appid)
@@ -203,8 +205,15 @@ export class HttpModule extends BaseModule {
             jump_app_name: row.title,
             tag
         }
-        console.log('navigate navigateData', navigateData)
-        this.request(`${this.baseUrl}api/jump/record`, navigateData, "POST", (respone) => {
+        console.log('navigate navigateData', navigateData);
+
+        let url = `${this.baseUrl}api/jump/record`;
+
+        if (Common.platform == APP_PLATFORM.OPPO) {
+            url = `${this.baseUrl}api/jump_oppo/record`;
+        }
+
+        this.request(url, navigateData, "POST", (respone) => {
             console.log('navigate success ', respone)
             if (callback)
                 callback(respone.data)
@@ -217,7 +226,12 @@ export class HttpModule extends BaseModule {
      * @param code 
      */
     public navigateEnd(code: string) {
-        this.request(`${this.baseUrl}api/jump/success`, {
+        let url = `${this.baseUrl}api/jump/success`
+        if (Common.platform == APP_PLATFORM.OPPO) {
+            url = `${this.baseUrl}api/jump_oppo/success`;
+        }
+        console.log('navigateEnd code ', code)
+        this.request(url, {
             tag: code
         }, "POST", (respone) => {
             console.log('navigateEnd code ', code, respone)

@@ -78,6 +78,94 @@ export default class OPPOModule extends PlatformModule {
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
+
+    /**
+      * 游戏登录
+      * @param callback 
+      * @param fail 
+      */
+    public login(callback?: Function, fail?: Function) {
+        moosnow.http.getAllConfig(res => {
+
+        });
+
+        let userToken: any = moosnow.data.getToken();
+        if (userToken && !isNaN(userToken)) {
+            this.getUserToken("", userToken, callback)
+        }
+        else {
+            if (window[this.platformName] && window[this.platformName].login)
+                window[this.platformName].login({
+                    success: (res) => {
+                        console.log("login ~ res.data.token", res.data.token)
+                        this.getUserToken(res.data.token, "", callback)
+                    },
+                    fail: (res) => {
+                        // errCode、errMsg
+                        super.login(callback, fail);
+                    }
+                }).then((res) => {
+                    if (res.data.token) {
+
+                        // 使用token进行服务端对接
+                        this.getUserToken(res.data.token, "", callback)
+                    }
+                }, (err) => {
+                    super.login(callback, fail);
+                });
+        }
+    }
+
+    /**
+     * 
+     * @param code 
+     * @param user_id 
+     * @param callback 
+     */
+    private getUserToken(code, user_id, callback?) {
+
+        let options = this.getLaunchOption();
+        let scene = options.scene || "";
+        let channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
+        let channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
+        let fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知'
+        let wxgamecid = "";
+        if (options.query && options.query.wxgamecid)
+            wxgamecid = options.query.wxgamecid;
+        moosnow.data.setChannelAppId(channel_appid);
+        moosnow.data.setChannelId(channel_id);
+        if (window[this.platformName] && window[this.platformName].aldSendEvent) {
+            window[this.platformName].aldSendEvent("来源", {
+                origin: fromAppId,
+                path: options.query.from || 0
+            })
+        }
+        let params = {
+            appid: Common.config.moosnowAppId,
+            code: code,
+            user_id: user_id,
+            channel_id: channel_id,
+            channel_appid: channel_appid,
+            wxgamecid,
+            scene,
+            fromApp: fromAppId
+        }
+        console.log('token params', params)
+        moosnow.http.request(`${this.baseUrl}api/login/oppo`, params, "POST", (respone) => {
+            console.log("WXModule -> getUserToken -> respone.data", respone.data)
+            if (respone.code == 0 && respone.data && respone.data.user_id) {
+                moosnow.data.setToken(respone.data.user_id);
+            }
+            if (Common.isFunction(callback))
+                callback(respone)
+        }, () => {
+            //如果出错，不影响游戏
+            if (Common.isFunction(callback))
+                callback()
+        });
+
+    }
+
     public prevNavigate = Date.now();
     /**
      * 跳转到指定App
@@ -108,12 +196,15 @@ export default class OPPOModule extends PlatformModule {
             console.log(MSG.PLATFORM_UNSUPPORT)
             return
         }
+        moosnow.http.point("打开跳转", row)
+        moosnow.http.navigate(row, (res) => { });
         window[this.platformName].navigateToMiniGame({
             appId: appid,
             path: path,
             pkgName: pkgName || appid,
             extraData: extraData,
             success: () => {
+                moosnow.http.point("跳转", row)
                 if (window[this.platformName] && window[this.platformName].aldSendEvent) {
                     window[this.platformName].aldSendEvent('跳转', {
                         position: row.position,
@@ -126,11 +217,13 @@ export default class OPPOModule extends PlatformModule {
                     success();
             },
             fail: (err) => {
+                (moosnow.data as any).resetNavigateToken()
                 console.log('navigateToMiniProgram error ', err)
                 if (fail)
                     fail();
             },
             complete: () => {
+                (moosnow.data as any).resetNavigateToken()
                 if (complete)
                     complete();
             }

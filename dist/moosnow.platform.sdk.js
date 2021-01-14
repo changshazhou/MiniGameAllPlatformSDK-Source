@@ -3240,7 +3240,9 @@ var mx = (function () {
             var userToken = moosnow.data.getToken();
             var options = moosnow.platform.getLaunchOption();
             var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
-            var wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid;
+            var wxgamecid = "";
+            if (options.query && options.query.wxgamecid)
+                wxgamecid = options.query.wxgamecid;
             var query = options.query;
             var appid = Common.config.moosnowAppId;
             var tag = moosnow.data.getNavigateToken(appid);
@@ -3259,7 +3261,11 @@ var mx = (function () {
                 tag: tag
             };
             console.log('navigate navigateData', navigateData);
-            this.request(this.baseUrl + "api/jump/record", navigateData, "POST", function (respone) {
+            var url = this.baseUrl + "api/jump/record";
+            if (Common.platform == APP_PLATFORM.OPPO) {
+                url = this.baseUrl + "api/jump_oppo/record";
+            }
+            this.request(url, navigateData, "POST", function (respone) {
                 console.log('navigate success ', respone);
                 if (callback)
                     callback(respone.data);
@@ -3270,7 +3276,12 @@ var mx = (function () {
          * @param code
          */
         HttpModule.prototype.navigateEnd = function (code) {
-            this.request(this.baseUrl + "api/jump/success", {
+            var url = this.baseUrl + "api/jump/success";
+            if (Common.platform == APP_PLATFORM.OPPO) {
+                url = this.baseUrl + "api/jump_oppo/success";
+            }
+            console.log('navigateEnd code ', code);
+            this.request(url, {
                 tag: code
             }, "POST", function (respone) {
                 console.log('navigateEnd code ', code, respone);
@@ -3796,6 +3807,87 @@ var mx = (function () {
             moosnow.event.addListener(PLATFORM_EVENT.ON_PLATFORM_SHOW, this, this.onAppShow);
         };
         /**
+          * 游戏登录
+          * @param callback
+          * @param fail
+          */
+        OPPOModule.prototype.login = function (callback, fail) {
+            var _this = this;
+            moosnow.http.getAllConfig(function (res) {
+            });
+            var userToken = moosnow.data.getToken();
+            if (userToken && !isNaN(userToken)) {
+                this.getUserToken("", userToken, callback);
+            }
+            else {
+                if (window[this.platformName] && window[this.platformName].login)
+                    window[this.platformName].login({
+                        success: function (res) {
+                            console.log("login ~ res.data.token", res.data.token);
+                            _this.getUserToken(res.data.token, "", callback);
+                        },
+                        fail: function (res) {
+                            // errCode、errMsg
+                            _super.prototype.login.call(_this, callback, fail);
+                        }
+                    }).then(function (res) {
+                        if (res.data.token) {
+                            // 使用token进行服务端对接
+                            _this.getUserToken(res.data.token, "", callback);
+                        }
+                    }, function (err) {
+                        _super.prototype.login.call(_this, callback, fail);
+                    });
+            }
+        };
+        /**
+         *
+         * @param code
+         * @param user_id
+         * @param callback
+         */
+        OPPOModule.prototype.getUserToken = function (code, user_id, callback) {
+            var options = this.getLaunchOption();
+            var scene = options.scene || "";
+            var channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
+            var channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
+            var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
+            var wxgamecid = "";
+            if (options.query && options.query.wxgamecid)
+                wxgamecid = options.query.wxgamecid;
+            moosnow.data.setChannelAppId(channel_appid);
+            moosnow.data.setChannelId(channel_id);
+            if (window[this.platformName] && window[this.platformName].aldSendEvent) {
+                window[this.platformName].aldSendEvent("来源", {
+                    origin: fromAppId,
+                    path: options.query.from || 0
+                });
+            }
+            var params = {
+                appid: Common.config.moosnowAppId,
+                code: code,
+                user_id: user_id,
+                channel_id: channel_id,
+                channel_appid: channel_appid,
+                wxgamecid: wxgamecid,
+                scene: scene,
+                fromApp: fromAppId
+            };
+            console.log('token params', params);
+            moosnow.http.request(this.baseUrl + "api/login/oppo", params, "POST", function (respone) {
+                console.log("WXModule -> getUserToken -> respone.data", respone.data);
+                if (respone.code == 0 && respone.data && respone.data.user_id) {
+                    moosnow.data.setToken(respone.data.user_id);
+                }
+                if (Common.isFunction(callback))
+                    callback(respone);
+            }, function () {
+                //如果出错，不影响游戏
+                if (Common.isFunction(callback))
+                    callback();
+            });
+        };
+        /**
          * 跳转到指定App
          * @param row
          * @param success
@@ -3822,12 +3914,19 @@ var mx = (function () {
                 console.log(MSG.PLATFORM_UNSUPPORT);
                 return;
             }
+            moosnow.http.point("打开跳转", row);
+            moosnow.http.navigate(row, function (res) { });
+            this.scheduleOnce(function () {
+                moosnow.http.navigateEnd(moosnow.data.getNavigateToken(appid));
+            }, 5);
+            return;
             window[this.platformName].navigateToMiniGame({
                 appId: appid,
                 path: path,
                 pkgName: pkgName || appid,
                 extraData: extraData,
                 success: function () {
+                    moosnow.http.point("跳转", row);
                     if (window[_this.platformName] && window[_this.platformName].aldSendEvent) {
                         window[_this.platformName].aldSendEvent('跳转', {
                             position: row.position,
@@ -3840,11 +3939,13 @@ var mx = (function () {
                         success();
                 },
                 fail: function (err) {
+                    moosnow.data.resetNavigateToken();
                     console.log('navigateToMiniProgram error ', err);
                     if (fail)
                         fail();
                 },
                 complete: function () {
+                    moosnow.data.resetNavigateToken();
                     if (complete)
                         complete();
                 }

@@ -461,6 +461,8 @@ export default class PlatformModule extends BaseModule {
         })
 
     }
+
+
     /**
      * 更新版本
      */
