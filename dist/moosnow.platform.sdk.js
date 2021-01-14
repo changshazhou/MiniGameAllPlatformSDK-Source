@@ -2646,7 +2646,9 @@ var mx = (function () {
             var channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
             var channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
             var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
-            var wxgamecid = Common.isEmpty(options.query.wxgamecid) ? "" : options.query.wxgamecid;
+            var wxgamecid = "";
+            if (options && options.query)
+                wxgamecid = options.query.wxgamecid;
             moosnow.data.setChannelAppId(channel_appid);
             moosnow.data.setChannelId(channel_id);
             if (window[this.platformName] && window[this.platformName].aldSendEvent) {
