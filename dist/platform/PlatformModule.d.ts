@@ -271,7 +271,8 @@ export default class PlatformModule extends BaseModule {
     private mScreenOutBanner;
     showScreenOutBanner(): void;
     hideScreenOutBanner(): void;
-    _showBanner(): void;
+    _showBanner(auto?: boolean): void;
+    private refreshBanner;
     mTimeoutId: number;
     /**
      * 会自动隐藏的banner

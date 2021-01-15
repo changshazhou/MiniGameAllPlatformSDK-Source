@@ -2101,8 +2101,9 @@ var mx = (function () {
                 this.mScreenOutBanner = null;
             }
         };
-        PlatformModule.prototype._showBanner = function () {
+        PlatformModule.prototype._showBanner = function (auto) {
             var _this = this;
+            if (auto === void 0) { auto = true; }
             var banner = this.banner[this.currentBannerId];
             if (banner) {
                 banner.hide();
@@ -2114,9 +2115,8 @@ var mx = (function () {
                     width: banner.style.width,
                     height: banner.style.realHeight
                 });
-                var showPromise = banner.show();
-                showPromise && showPromise
-                    .then(function () {
+                var p = banner.show();
+                p && p.then(function () {
                     /**
                      * 再微调，banner 大小可能跟上一个有变化
                      */
@@ -2126,7 +2126,13 @@ var mx = (function () {
                         height: banner.style.realHeight
                     });
                 });
+                if (auto)
+                    this.schedule(this.refreshBanner, this.bannerShowTimeLimit, [this.currentBannerId]);
             }
+        };
+        PlatformModule.prototype.refreshBanner = function (bannerId) {
+            this._prepareBanner(bannerId);
+            this._showBanner(false);
         };
         /**
          * 会自动隐藏的banner
@@ -2215,6 +2221,7 @@ var mx = (function () {
         * 隐藏banner
         */
         PlatformModule.prototype.hideBanner = function () {
+            this.unschedule(this.refreshBanner);
             console.log("hideBanner ~ this.banner", this.banner);
             if (!this.banner)
                 return;
@@ -2222,19 +2229,9 @@ var mx = (function () {
             if (!this.banner[this.currentBannerId])
                 return;
             this.banner[this.currentBannerId].bannerShowCount++;
-            if (this.bannerLimitType == 0) {
-                if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
-                    console.log('次数满足,销毁banner');
-                    this.destroyBanner(this.currentBannerId);
-                    // this._prepareBanner(this.currentBannerId);
-                }
-            }
-            else {
-                if (Date.now() - this.banner[this.currentBannerId].bannerShowTime > this.bannerShowTimeLimit * 1000) {
-                    console.log('时间满足，销毁banner');
-                    this.destroyBanner(this.currentBannerId);
-                    // this._prepareBanner(this.currentBannerId);
-                }
+            if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
+                console.log('次数满足,销毁banner');
+                this.destroyBanner(this.currentBannerId);
             }
             moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
         };

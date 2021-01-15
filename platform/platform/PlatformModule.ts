@@ -1022,6 +1022,9 @@ export default class PlatformModule extends BaseModule {
         }
     }
 
+
+
+
     /**
      * 创建banner 
      * @param adIndex 
@@ -1069,6 +1072,9 @@ export default class PlatformModule extends BaseModule {
             this.bannerErrorQuene[bannerId] = {}
         this.bannerErrorQuene[bannerId].isError = true;
         this.triggerBannerError(bannerId);
+        if (err && err.errCode != 1004) {
+            this.unschedule(this.refreshBanner);
+        }
     }
     public _onBannerResize(bannerId, size) {
         console.log("_bottomCenterBanner -> size", size)
@@ -1283,8 +1289,8 @@ export default class PlatformModule extends BaseModule {
         }
     }
 
-    public _showBanner() {
-        let banner = this.banner[this.currentBannerId]
+    public _showBanner(auto: boolean = true) {
+        let banner = this.banner[this.currentBannerId];
         if (banner) {
             banner.hide();
             /**
@@ -1295,20 +1301,29 @@ export default class PlatformModule extends BaseModule {
                 width: banner.style.width,
                 height: banner.style.realHeight
             })
-            let showPromise = banner.show();
-            showPromise && showPromise
-                .then(() => {
-                    /**
-                     * 再微调，banner 大小可能跟上一个有变化
-                     */
-                    this._resetBanenrStyle({
-                        banner,
-                        width: banner.style.width,
-                        height: banner.style.realHeight
-                    })
+
+
+            let p = banner.show();
+            p && p.then(() => {
+                /**
+                 * 再微调，banner 大小可能跟上一个有变化
+                 */
+                this._resetBanenrStyle({
+                    banner,
+                    width: banner.style.width,
+                    height: banner.style.realHeight
                 })
+            })
+            if (auto)
+                this.schedule(this.refreshBanner, this.bannerShowTimeLimit, [this.currentBannerId])
         }
     }
+
+    private refreshBanner(bannerId) {
+        this._prepareBanner(bannerId)
+        this._showBanner(false);
+    }
+
 
     public mTimeoutId: number
     /**
@@ -1393,24 +1408,15 @@ export default class PlatformModule extends BaseModule {
     * 隐藏banner
     */
     public hideBanner() {
+        this.unschedule(this.refreshBanner);
         console.log("hideBanner ~ this.banner", this.banner)
         if (!this.banner) return;
         this._hideBanner();
         if (!this.banner[this.currentBannerId]) return;
         this.banner[this.currentBannerId].bannerShowCount++;
-        if (this.bannerLimitType == 0) {
-            if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
-                console.log('次数满足,销毁banner');
-                this.destroyBanner(this.currentBannerId);
-                // this._prepareBanner(this.currentBannerId);
-            }
-        }
-        else {
-            if (Date.now() - this.banner[this.currentBannerId].bannerShowTime > this.bannerShowTimeLimit * 1000) {
-                console.log('时间满足，销毁banner')
-                this.destroyBanner(this.currentBannerId);
-                // this._prepareBanner(this.currentBannerId);
-            }
+        if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
+            console.log('次数满足,销毁banner');
+            this.destroyBanner(this.currentBannerId);
         }
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
     }
