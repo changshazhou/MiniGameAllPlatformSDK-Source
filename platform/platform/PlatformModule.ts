@@ -329,15 +329,14 @@ export default class PlatformModule extends BaseModule {
     }
 
     public login(success?: Function, fail?: Function) {
+        let token = moosnow.data.getToken()
+        if (token == "") {
+            token = Common.generateUUID();
+            token = token.replace(/-/g, '')
+            moosnow.data.setToken(token);
+        }
         if (Common.isFunction(success)) {
-            let token = moosnow.data.getToken()
-            if (token == "") {
-                token = Common.generateUUID();
-                token = token.replace(/-/g, '')
-                moosnow.data.setToken(token);
-            }
             success(token);
-
         }
     }
 
@@ -1388,7 +1387,7 @@ export default class PlatformModule extends BaseModule {
      * 连续不断的显示和隐藏 banner
      * @param position 
      */
-    public showIntervalBanner(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.NONE, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.NONE) {
+    public showIntervalBanner(horizontal: BLOCK_HORIZONTAL = BLOCK_HORIZONTAL.CENTER, vertical: BLOCK_VERTICAL = BLOCK_VERTICAL.BOTTOM) {
         console.log('执行 showIntervalBanner')
         moosnow.http.getAllConfig(res => {
             let gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;

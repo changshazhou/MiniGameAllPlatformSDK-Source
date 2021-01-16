@@ -1176,13 +1176,13 @@ var mx = (function () {
             return false;
         };
         PlatformModule.prototype.login = function (success, fail) {
+            var token = moosnow.data.getToken();
+            if (token == "") {
+                token = Common.generateUUID();
+                token = token.replace(/-/g, '');
+                moosnow.data.setToken(token);
+            }
             if (Common.isFunction(success)) {
-                var token = moosnow.data.getToken();
-                if (token == "") {
-                    token = Common.generateUUID();
-                    token = token.replace(/-/g, '');
-                    moosnow.data.setToken(token);
-                }
                 success(token);
             }
         };
@@ -1906,6 +1906,9 @@ var mx = (function () {
                 this.bannerErrorQuene[bannerId] = {};
             this.bannerErrorQuene[bannerId].isError = true;
             this.triggerBannerError(bannerId);
+            if (err && err.errCode != 1004) {
+                this.unschedule(this.refreshBanner);
+            }
         };
         PlatformModule.prototype._onBannerResize = function (bannerId, size) {
             console.log("_bottomCenterBanner -> size", size);
@@ -2201,8 +2204,8 @@ var mx = (function () {
          */
         PlatformModule.prototype.showIntervalBanner = function (horizontal, vertical) {
             var _this = this;
-            if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.NONE; }
-            if (vertical === void 0) { vertical = BLOCK_VERTICAL.NONE; }
+            if (horizontal === void 0) { horizontal = BLOCK_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BLOCK_VERTICAL.BOTTOM; }
             console.log('执行 showIntervalBanner');
             moosnow.http.getAllConfig(function (res) {
                 var gameBannerInterval = res && !isNaN(res.gameBannerInterval) ? parseFloat(res.gameBannerInterval) : 20;
