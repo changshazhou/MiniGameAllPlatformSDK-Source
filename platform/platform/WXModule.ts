@@ -29,8 +29,8 @@ export default class WXModule extends PlatformModule {
 
         let self = this;
 
-        let userToken = moosnow.data.getToken();
-        if (userToken) {
+        let userToken: any = moosnow.data.getToken();
+        if (!isNaN(userToken)) {
             self.getUserToken("", userToken, callback)
         }
         else {

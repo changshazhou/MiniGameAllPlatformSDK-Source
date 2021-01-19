@@ -1885,12 +1885,12 @@ var mx = (function () {
         PlatformModule.prototype.triggerBannerError = function (bannerId) {
             if (this.bannerErrorQuene[bannerId].isError
                 && this.bannerErrorQuene[bannerId].isShow) {
+                this.bannerErrorQuene[bannerId] = null;
                 moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
                     bannerId: bannerId,
                     horizontal: this.bannerHorizontal,
                     vertical: this.bannerVertical
                 });
-                this.bannerErrorQuene[bannerId] = null;
             }
         };
         PlatformModule.prototype._onBannerLoad = function (bannerId) {
@@ -2610,7 +2610,7 @@ var mx = (function () {
             });
             var self = this;
             var userToken = moosnow.data.getToken();
-            if (userToken) {
+            if (!isNaN(userToken)) {
                 self.getUserToken("", userToken, callback);
             }
             else {

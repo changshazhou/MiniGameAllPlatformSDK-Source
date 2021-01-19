@@ -1048,12 +1048,13 @@ export default class PlatformModule extends BaseModule {
     private triggerBannerError(bannerId) {
         if (this.bannerErrorQuene[bannerId].isError
             && this.bannerErrorQuene[bannerId].isShow) {
+            this.bannerErrorQuene[bannerId] = null;
             moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
                 bannerId,
                 horizontal: this.bannerHorizontal,
                 vertical: this.bannerVertical
             });
-            this.bannerErrorQuene[bannerId] = null;
+
         }
 
 
@@ -1413,6 +1414,7 @@ export default class PlatformModule extends BaseModule {
         this._hideBanner();
         if (!this.banner[this.currentBannerId]) return;
         this.banner[this.currentBannerId].bannerShowCount++;
+        this.bannerErrorQuene[this.currentBannerId].isShow = false;
         if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
             console.log('次数满足,销毁banner');
             this.destroyBanner(this.currentBannerId);

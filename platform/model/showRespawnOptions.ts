@@ -9,7 +9,7 @@ export default class showRespawnOptions extends showOptions {
 
 
     /**
-     * 不试用 回调
+     * 不试用 回调p
      */
     callback?: Function
     /**
