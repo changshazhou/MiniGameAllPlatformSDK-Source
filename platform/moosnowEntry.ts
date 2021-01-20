@@ -33,6 +33,7 @@ import moosnowAppConfig from "./model/moosnowAppConfig";
 import FormUtil from "./ui/FormUtil";
 import CocosNodeHelper from "./ui/cocos/helper/CocosNodeHelper";
 import HWModule from "./platform/HWModule";
+import KuaiModule from "./platform/KuaiModule";
 
 export default class moosnow {
     public static VIDEO_STATUS = VIDEO_STATUS;
@@ -83,6 +84,8 @@ export default class moosnow {
                 this.mPlatform = new UCModule();
             else if (Common.platform == APP_PLATFORM.HW)
                 this.mPlatform = new HWModule();
+            else if (Common.platform == APP_PLATFORM.KUAI)
+                this.mPlatform = new KuaiModule();
             else {
                 this.mPlatform = new PlatformModule();
             }

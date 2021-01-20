@@ -292,9 +292,13 @@ var mx = (function () {
         */
         APP_PLATFORM[APP_PLATFORM["UC"] = 8] = "UC";
         /**
-        * VIVO
+        * HW
         */
         APP_PLATFORM[APP_PLATFORM["HW"] = 9] = "HW";
+        /**
+         * 快手
+         */
+        APP_PLATFORM[APP_PLATFORM["KUAI"] = 10] = "KUAI";
     })(APP_PLATFORM || (APP_PLATFORM = {}));
 
     var ENGINE_TYPE = {
@@ -458,6 +462,8 @@ var mx = (function () {
                     this.mPlatform = APP_PLATFORM.UC;
                 else if (window['hbs'])
                     this.mPlatform = APP_PLATFORM.HW;
+                else if (window['kwaigame'])
+                    this.mPlatform = APP_PLATFORM.KUAI;
                 else if (window['wx'])
                     this.mPlatform = APP_PLATFORM.WX;
                 else {
@@ -481,6 +487,8 @@ var mx = (function () {
                             this.mPlatform = APP_PLATFORM.UC;
                         else if (winCfg.debug == "hw")
                             this.mPlatform = APP_PLATFORM.HW;
+                        else if (winCfg.debug == "kuai")
+                            this.mPlatform = APP_PLATFORM.KUAI;
                         else
                             this.mPlatform = APP_PLATFORM.PC;
                     }
@@ -524,6 +532,8 @@ var mx = (function () {
                     config = winCfg.byte;
                 else if (Common.platform == APP_PLATFORM.HW)
                     config = winCfg.hw;
+                else if (Common.platform == APP_PLATFORM.KUAI)
+                    config = winCfg.kuai;
                 else
                     config = winCfg.wx;
                 return config;
@@ -2229,14 +2239,15 @@ var mx = (function () {
             if (!this.banner)
                 return;
             this._hideBanner();
+            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
             if (!this.banner[this.currentBannerId])
                 return;
             this.banner[this.currentBannerId].bannerShowCount++;
+            this.bannerErrorQuene[this.currentBannerId].isShow = false;
             if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
                 console.log('次数满足,销毁banner');
                 this.destroyBanner(this.currentBannerId);
             }
-            moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null);
         };
         PlatformModule.prototype._hideBanner = function () {
             for (var k in this.banner) {
@@ -3209,6 +3220,8 @@ var mx = (function () {
          * Loading加载完成
          */
         HttpModule.prototype.finishLoading = function () {
+            if (window["kwaigame"])
+                window["kwaigame"].readyGo();
             this.point("加载完成", {
                 time: Date.now() - this.instanceTime
             });
@@ -9688,6 +9701,197 @@ var mx = (function () {
         return HWModule;
     }(PlatformModule));
 
+    var KuaiModule = /** @class */ (function (_super) {
+        __extends(KuaiModule, _super);
+        function KuaiModule() {
+            var _this = _super.call(this) || this;
+            _this.platformName = "kwaigame";
+            _this.recordRes = null;
+            _this.recordCb = null;
+            _this.recordNumber = 0;
+            _this.platformName = "kwaigame";
+            window[_this.platformName].init({
+                "appId": Common.config.moosnowAppId
+            });
+            return _this;
+        }
+        /**
+       * 显示平台的banner广告
+       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
+       * @param callback 点击回调
+       * @param horizontal banner的位置，默认底部
+       * @param vertical banner的位置，默认底部
+       * @param idIndex id顺序 -1 会随机
+       * @param style 自定义样式
+       */
+        KuaiModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, idIndex, style) {
+            if (remoteOn === void 0) { remoteOn = true; }
+            if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
+            if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
+            if (idIndex === void 0) { idIndex = -1; }
+            console.log('快手没有banner');
+        };
+        KuaiModule.prototype.createRewardAD = function (show, idIndex) {
+            var _this = this;
+            if (idIndex === void 0) { idIndex = 0; }
+            if (this.videoLoading) {
+                return;
+            }
+            if (!window[this.platformName]) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            if (!window[this.platformName].createRewardedVideoAd) {
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            var videoId = this.getVideoId(idIndex);
+            if (Common.isEmpty(videoId)) {
+                console.warn(MSG.VIDEO_KEY_IS_NULL);
+                if (moosnow.platform.videoCb)
+                    moosnow.platform.videoCb(VIDEO_STATUS.END);
+                return;
+            }
+            this.video[videoId] = window[this.platformName].createRewardedVideoAd({
+                adUnitId: videoId
+            });
+            if (!this.video[videoId]) {
+                console.warn('创建视频广告失败');
+                return;
+            }
+            this.video[videoId].onClose(this._onVideoClose);
+            this.video[videoId].onReward(this._onVideoReward);
+            moosnow.platform.videoLoading = true;
+            moosnow.platform.videoPlaying = false;
+            this.video[videoId].show({
+                success: function () {
+                    console.log("激励视频播放成功");
+                    moosnow.platform.videoPlaying = true;
+                },
+                fail: function (result) {
+                    console.log("激励视频播放失败: " + JSON.stringify(result));
+                    _this._onVideoError(result, result);
+                }
+            });
+        };
+        KuaiModule.prototype._onVideoReward = function (result) {
+            moosnow.platform.videoLoading = false;
+            console.log("激励视频奖励回调: " + JSON.stringify(result));
+            moosnow.platform.videoCb(VIDEO_STATUS.END);
+        };
+        KuaiModule.prototype._onVideoClose = function (result) {
+            moosnow.platform.videoLoading = false;
+            console.log("激励视频关闭回调: " + JSON.stringify(result));
+            moosnow.platform.videoCb(VIDEO_STATUS.NOTEND);
+        };
+        //-----------------录屏 具体逻辑在子类实现------------------
+        KuaiModule.prototype.initRecord = function () {
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createMediaRecorder)
+                return;
+            // if (!this.isDouyin()) return;
+            this.recordObj = window[this.platformName].createMediaRecorder();
+        };
+        /**
+         * 裁剪视频
+         * @param timeRange 默认[2,2] 裁剪视频时保留的前后时长
+         * @param callback 剪切完成时回调
+         */
+        KuaiModule.prototype.clipRecord = function (timeRange, callback) {
+            if (timeRange === void 0) { timeRange = [2, 2]; }
+        };
+        ;
+        /**
+         * 开始录屏
+         * @param duration 录屏时长
+         * @param callback 如果不是抖音回调参数=false
+         */
+        KuaiModule.prototype.startRecord = function (duration, callback) {
+            var _this = this;
+            if (duration === void 0) { duration = 300; }
+            if (callback === void 0) { callback = null; }
+            if (!this.recordObj) {
+                if (callback)
+                    callback(false);
+                return;
+            }
+            this.recordNumber = 0;
+            this.recordCb = null;
+            this.recordRes = null;
+            this.recordObj.onStart(function (res) {
+                console.log('record onStart');
+                if (callback)
+                    callback(res);
+            });
+            this.recordObj.onStop(function (res) {
+                console.log('on stop ', res);
+                _this.recordRes = res;
+                if (_this.recordCb)
+                    _this.recordCb(res);
+            });
+            this.recordObj.start();
+        };
+        /**
+         * 停止录屏
+         * @param callback 如果不是抖音回调参数=false，如果录制成功，回调参数中录屏地址=res.videoPath
+         */
+        KuaiModule.prototype.stopRecord = function (callback) {
+            if (callback === void 0) { callback = null; }
+            if (!this.recordObj) {
+                if (callback)
+                    callback(false);
+                return;
+            }
+            console.log('record stop recordRes ', this.recordRes);
+            if (this.recordRes) {
+                if (Common.isFunction(callback))
+                    callback(this.recordRes);
+            }
+            else {
+                this.recordCb = callback;
+                this.recordObj.stop();
+                console.log('record stop  ', this.recordRes);
+            }
+        };
+        KuaiModule.prototype.pauseRecord = function () {
+            if (this.recordObj)
+                this.recordObj.pause();
+        };
+        KuaiModule.prototype.resumeRecord = function () {
+            if (this.recordObj)
+                this.recordObj.resume();
+        };
+        /**
+          * 分享
+          * @param query 分享参数 { channel:moosnow.SHARE_CHANNEL.LINK }
+          * SHARE_CHANNEL.LINK, SHARE_CHANNEL.ARTICLE, SHARE_CHANNEL.TOKEN, SHARE_CHANNEL.VIDEO 可选 仅字节跳动有效
+          * @param callback 分享成功回调参数 = true, 分享失败回调参数 = false,
+          * @param shortCall 时间过短时回调 ,err 是具体错误信息，目前只在头条分享录屏时用到
+          */
+        KuaiModule.prototype.share = function (query, callback, shortCall) {
+            if (query === void 0) { query = {}; }
+            this.currentShareCallback = callback;
+            this.currentShortCall = shortCall;
+            console.log('是否有回调：', shortCall);
+            this.recordObj.publishVideo({
+                video: this.recordRes.videoID,
+                callback: function (error) {
+                    if (error != null && error != undefined) {
+                        callback(false, "分享录屏失败: " + JSON.stringify(error));
+                        console.log("分享录屏失败: " + JSON.stringify(error));
+                        return;
+                    }
+                    callback(true, "分享录屏成功: ");
+                    console.log("分享录屏成功");
+                }
+            });
+        };
+        return KuaiModule;
+    }(PlatformModule));
+
     var moosnow$1 = /** @class */ (function () {
         function moosnow() {
         }
@@ -9722,6 +9926,8 @@ var mx = (function () {
                         this.mPlatform = new UCModule();
                     else if (Common.platform == APP_PLATFORM.HW)
                         this.mPlatform = new HWModule();
+                    else if (Common.platform == APP_PLATFORM.KUAI)
+                        this.mPlatform = new KuaiModule();
                     else {
                         this.mPlatform = new PlatformModule();
                     }

@@ -1412,6 +1412,7 @@ export default class PlatformModule extends BaseModule {
         console.log("hideBanner ~ this.banner", this.banner)
         if (!this.banner) return;
         this._hideBanner();
+        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
         if (!this.banner[this.currentBannerId]) return;
         this.banner[this.currentBannerId].bannerShowCount++;
         this.bannerErrorQuene[this.currentBannerId].isShow = false;
@@ -1419,7 +1420,6 @@ export default class PlatformModule extends BaseModule {
             console.log('次数满足,销毁banner');
             this.destroyBanner(this.currentBannerId);
         }
-        moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
     }
 
     private _hideBanner() {

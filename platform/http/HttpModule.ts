@@ -149,6 +149,8 @@ export class HttpModule extends BaseModule {
      * Loading加载完成
      */
     public finishLoading() {
+        if (window["kwaigame"])
+            window["kwaigame"].readyGo();
         this.point("加载完成", {
             time: Date.now() - this.instanceTime
         });

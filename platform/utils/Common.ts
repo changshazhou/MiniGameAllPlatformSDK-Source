@@ -164,6 +164,8 @@ export default class Common {
             this.mPlatform = APP_PLATFORM.UC
         else if (window['hbs'])
             this.mPlatform = APP_PLATFORM.HW
+        else if (window['kwaigame'])
+            this.mPlatform = APP_PLATFORM.KUAI
         else if (window['wx'])
             this.mPlatform = APP_PLATFORM.WX
         else {
@@ -187,6 +189,8 @@ export default class Common {
                     this.mPlatform = APP_PLATFORM.UC
                 else if (winCfg.debug == "hw")
                     this.mPlatform = APP_PLATFORM.HW
+                else if (winCfg.debug == "kuai")
+                    this.mPlatform = APP_PLATFORM.KUAI
                 else
                     this.mPlatform = APP_PLATFORM.PC
             }
@@ -222,6 +226,8 @@ export default class Common {
             config = winCfg.byte;
         else if (Common.platform == APP_PLATFORM.HW)
             config = winCfg.hw;
+        else if (Common.platform == APP_PLATFORM.KUAI)
+            config = winCfg.kuai;
         else
             config = winCfg.wx;
         return config;

@@ -36,7 +36,11 @@ export enum APP_PLATFORM {
     */
     UC,
     /**
-    * VIVO
+    * HW
     */
-    HW
+    HW,
+    /**
+     * 快手
+     */
+    KUAI
 }
