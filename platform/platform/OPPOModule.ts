@@ -104,15 +104,7 @@ export default class OPPOModule extends PlatformModule {
                         // errCode、errMsg
                         super.login(callback, fail);
                     }
-                }).then((res) => {
-                    if (res.data.token) {
-
-                        // 使用token进行服务端对接
-                        this.getUserToken(res.data.token, "", callback)
-                    }
-                }, (err) => {
-                    super.login(callback, fail);
-                });
+                })
         }
     }
 
@@ -153,7 +145,7 @@ export default class OPPOModule extends PlatformModule {
         console.log('token params', params)
         moosnow.http.request(`${this.baseUrl}api/login/oppo`, params, "POST", (respone) => {
             console.log("WXModule -> getUserToken -> respone.data", respone.data)
-            if (respone.code == 0 && respone.data && respone.data.user_id) {
+            if (respone.data && !isNaN(respone.data.user_id)) {
                 moosnow.data.setToken(respone.data.user_id);
             }
             if (Common.isFunction(callback))

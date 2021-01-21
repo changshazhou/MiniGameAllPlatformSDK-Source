@@ -931,6 +931,7 @@ var mx = (function () {
             _this.versionRet = null;
             _this.prevNavigate = Date.now();
             _this.navigateEnd = true;
+            _this.mLaunchOption = undefined;
             _this.preloadBannerId = "";
             _this.isLoaded = false;
             // this._regisiterWXCallback();
@@ -1538,7 +1539,7 @@ var mx = (function () {
          * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量
          */
         PlatformModule.prototype.getLaunchOption = function () {
-            if (!this.mLaunchOption) {
+            if (this.mLaunchOption == undefined) {
                 if (window[this.platformName]) {
                     if (window[this.platformName].getEnterOptionsSync)
                         this.mLaunchOption = window[this.platformName].getEnterOptionsSync();
@@ -3845,13 +3846,6 @@ var mx = (function () {
                             // errCode、errMsg
                             _super.prototype.login.call(_this, callback, fail);
                         }
-                    }).then(function (res) {
-                        if (res.data.token) {
-                            // 使用token进行服务端对接
-                            _this.getUserToken(res.data.token, "", callback);
-                        }
-                    }, function (err) {
-                        _super.prototype.login.call(_this, callback, fail);
                     });
             }
         };
@@ -3891,7 +3885,7 @@ var mx = (function () {
             console.log('token params', params);
             moosnow.http.request(this.baseUrl + "api/login/oppo", params, "POST", function (respone) {
                 console.log("WXModule -> getUserToken -> respone.data", respone.data);
-                if (respone.code == 0 && respone.data && respone.data.user_id) {
+                if (respone.data && !isNaN(respone.data.user_id)) {
                     moosnow.data.setToken(respone.data.user_id);
                 }
                 if (Common.isFunction(callback))

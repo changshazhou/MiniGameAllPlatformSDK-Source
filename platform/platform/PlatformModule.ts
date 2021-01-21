@@ -686,7 +686,7 @@ export default class PlatformModule extends BaseModule {
             lang: 'en',
         })
     }
-    private mLaunchOption
+    private mLaunchOption: any = undefined
     /**
      * 获取游戏启动参数
      * 返回值
@@ -696,7 +696,7 @@ export default class PlatformModule extends BaseModule {
      * shareTicket	string	shareTicket   分享到群后点击进入小游戏会有此变量 
      */
     public getLaunchOption() {
-        if (!this.mLaunchOption) {
+        if (this.mLaunchOption == undefined) {
             if (window[this.platformName]) {
                 if (window[this.platformName].getEnterOptionsSync)
                     this.mLaunchOption = window[this.platformName].getEnterOptionsSync();
