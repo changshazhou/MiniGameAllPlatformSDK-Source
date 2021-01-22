@@ -1415,6 +1415,8 @@ export default class PlatformModule extends BaseModule {
         moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_HIDE, null)
         if (!this.banner[this.currentBannerId]) return;
         this.banner[this.currentBannerId].bannerShowCount++;
+        if (!this.bannerErrorQuene[this.currentBannerId])
+            this.bannerErrorQuene[this.currentBannerId] = {}
         this.bannerErrorQuene[this.currentBannerId].isShow = false;
         if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
             console.log('次数满足,销毁banner');
