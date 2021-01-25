@@ -2244,6 +2244,8 @@ var mx = (function () {
             if (!this.banner[this.currentBannerId])
                 return;
             this.banner[this.currentBannerId].bannerShowCount++;
+            if (!this.bannerErrorQuene[this.currentBannerId])
+                this.bannerErrorQuene[this.currentBannerId] = {};
             this.bannerErrorQuene[this.currentBannerId].isShow = false;
             if (this.banner[this.currentBannerId].bannerShowCount >= this.bannerShowCountLimit) {
                 console.log('次数满足,销毁banner');
@@ -2622,7 +2624,7 @@ var mx = (function () {
             });
             var self = this;
             var userToken = moosnow.data.getToken();
-            if (!isNaN(userToken)) {
+            if (userToken && !isNaN(userToken)) {
                 self.getUserToken("", userToken, callback);
             }
             else {
