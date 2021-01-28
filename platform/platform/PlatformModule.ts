@@ -43,7 +43,7 @@ export default class PlatformModule extends BaseModule {
     public block: any = null;
     public currentBannerId: string;
     public banner: any = {
-
+        
     };
     public currentVideoId: string;
     public video: any = {

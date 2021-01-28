@@ -629,49 +629,6 @@ export class HttpModule extends BaseModule {
         }
     }
 
-
-
-    /**
-     * 获取误点间隔次数，启动游戏时调用
-     * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
-     */
-    public getMisTouchNum(callback) {
-        this.loadCfg(res => {
-            this.loadArea(res2 => {
-                this.disableAd(res, res2, (disable) => {
-                    if (disable) {
-                        callback(0)
-                        console.log('getMisTouchNum', 0, 'disableAd', disable)
-                    }
-                    else {
-                        callback(parseInt(res.mistouchNum))
-                        console.log('getMisTouchNum', res.mistouchNum, 'disableAd', disable)
-                    }
-                })
-            })
-        })
-    }
-    /**
-      * 获取位移间隔次数，启动游戏时调用
-      * @param {Funtion} callback 回调参数为mistouchPosNum:int，当misTouchNum=0时关闭误点，当mistouchPosNum=n(0除外)时，每隔n次，触发误点1次
-      */
-    public getMistouchPosNum(callback) {
-        this.loadCfg(res => {
-            this.loadArea(res2 => {
-                this.disableAd(res, res2, (disable) => {
-                    if (disable) {
-                        callback(0)
-                        console.log('getMistouchPosNum', 0, 'disableAd', disable)
-                    }
-                    else {
-                        callback(parseInt(res.mistouchPosNum))
-                        console.log('getMistouchPosNum', res.mistouchPosNum, 'disableAd', disable)
-                    }
-                })
-            })
-        })
-    }
-
     public getBannerShowCountLimit(callback) {
         this.loadCfg(res => {
             if (isNaN(res.bannerShowCountLimit))
