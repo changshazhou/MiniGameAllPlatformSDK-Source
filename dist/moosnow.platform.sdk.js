@@ -3641,48 +3641,6 @@ var mx = (function () {
                 callback(false);
             }
         };
-        /**
-         * 获取误点间隔次数，启动游戏时调用
-         * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
-         */
-        HttpModule.prototype.getMisTouchNum = function (callback) {
-            var _this = this;
-            this.loadCfg(function (res) {
-                _this.loadArea(function (res2) {
-                    _this.disableAd(res, res2, function (disable) {
-                        if (disable) {
-                            callback(0);
-                            console.log('getMisTouchNum', 0, 'disableAd', disable);
-                        }
-                        else {
-                            callback(parseInt(res.mistouchNum));
-                            console.log('getMisTouchNum', res.mistouchNum, 'disableAd', disable);
-                        }
-                    });
-                });
-            });
-        };
-        /**
-          * 获取位移间隔次数，启动游戏时调用
-          * @param {Funtion} callback 回调参数为mistouchPosNum:int，当misTouchNum=0时关闭误点，当mistouchPosNum=n(0除外)时，每隔n次，触发误点1次
-          */
-        HttpModule.prototype.getMistouchPosNum = function (callback) {
-            var _this = this;
-            this.loadCfg(function (res) {
-                _this.loadArea(function (res2) {
-                    _this.disableAd(res, res2, function (disable) {
-                        if (disable) {
-                            callback(0);
-                            console.log('getMistouchPosNum', 0, 'disableAd', disable);
-                        }
-                        else {
-                            callback(parseInt(res.mistouchPosNum));
-                            console.log('getMistouchPosNum', res.mistouchPosNum, 'disableAd', disable);
-                        }
-                    });
-                });
-            });
-        };
         HttpModule.prototype.getBannerShowCountLimit = function (callback) {
             this.loadCfg(function (res) {
                 if (isNaN(res.bannerShowCountLimit))
