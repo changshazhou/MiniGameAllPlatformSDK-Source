@@ -43,7 +43,7 @@ export default class PlatformModule extends BaseModule {
     public block: any = null;
     public currentBannerId: string;
     public banner: any = {
-        
+
     };
     public currentVideoId: string;
     public video: any = {
@@ -1045,10 +1045,13 @@ export default class PlatformModule extends BaseModule {
         return bannerId;
     }
 
-    private triggerBannerError(bannerId) {
-        if (this.bannerErrorQuene[bannerId].isError
-            && this.bannerErrorQuene[bannerId].isShow) {
-            this.bannerErrorQuene[bannerId] = null;
+    public triggerBannerError(bannerId) {
+        if (
+            moosnow.platform.bannerErrorQuene
+            && moosnow.platform.bannerErrorQuene[bannerId]
+            && moosnow.platform.bannerErrorQuene[bannerId].isError
+            && moosnow.platform.bannerErrorQuene[bannerId].isShow) {
+            moosnow.platform.bannerErrorQuene[bannerId] = {};
             moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
                 bannerId,
                 horizontal: this.bannerHorizontal,
@@ -1061,19 +1064,20 @@ export default class PlatformModule extends BaseModule {
     }
     public _onBannerLoad(bannerId) {
         console.log("PlatformModule ~ _onBannerLoad ~ bannerId", bannerId)
-        this.bannerErrorQuene[bannerId] = null;
+        this.bannerErrorQuene[bannerId] = {};
         this.bannerShowCount = 0;
     }
     public _onBannerError(bannerId, err) {
         console.warn('banner___error:', err);
-        this.banner[bannerId] = null;
-        this.isBannerShow = false;
-        if (!this.bannerErrorQuene[bannerId])
-            this.bannerErrorQuene[bannerId] = {}
-        this.bannerErrorQuene[bannerId].isError = true;
+        moosnow.platform.banner[bannerId] = null;
+        moosnow.platform.isBannerShow = false;
+        if (!moosnow.platform.bannerErrorQuene[bannerId])
+            moosnow.platform.bannerErrorQuene[bannerId] = {}
+        moosnow.platform.bannerErrorQuene[bannerId].isError = true;
         this.triggerBannerError(bannerId);
         if (err && err.errCode != 1004) {
-            this.unschedule(this.refreshBanner);
+            moosnow.platform.unschedule(this.refreshBanner);
+
         }
     }
     public _onBannerResize(bannerId, size) {

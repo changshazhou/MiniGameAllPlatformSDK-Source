@@ -327,4 +327,50 @@ export default class QQModule extends PlatformModule {
         this.block.style.left = style.left;
         console.log('重置block位置', style)
     }
+
+    //--------------插屏广告---------------
+    public initInter() {
+
+    }
+    public prepareInter() {
+
+    }
+    public showInter() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createInterstitialAd) return;
+        if (Common.isEmpty(this.interId)) {
+            console.warn(MSG.INTER_KEY_IS_NULL);
+            return;
+        }
+        if (!this.inter) {
+            this.inter = window[this.platformName].createInterstitialAd({
+                adUnitId: this.interId
+            });
+            console.log('创建插屏')
+            this.inter.onLoad(this._onInterLoad);
+            this.inter.onClose(this._onInterClose);
+            this.inter.onError(this._onInterError)
+        }
+
+        let p = this.inter.load();
+        if (p) {
+            p.then((res) => {
+                this.inter.show();
+                // console.error('load ok ', res)
+            }).catch((err) => {
+                console.error('load error ', err)
+            })
+
+        }
+    }
+    public _onInterError(res) {
+        console.log('插屏加载错误', res)
+    }
+    public _onInterLoad() {
+
+        console.log('插屏加载完成')
+    }
+    public _onInterClose() {
+        // this.inter.load();
+    }
 }

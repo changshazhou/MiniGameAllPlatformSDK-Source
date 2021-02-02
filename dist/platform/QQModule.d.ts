@@ -41,4 +41,10 @@ export default class QQModule extends PlatformModule {
     _onBlockError(res: any): void;
     private _getBlockPosition;
     _onBlockResize(size: any): void;
+    initInter(): void;
+    prepareInter(): void;
+    showInter(): void;
+    _onInterError(res: any): void;
+    _onInterLoad(): void;
+    _onInterClose(): void;
 }

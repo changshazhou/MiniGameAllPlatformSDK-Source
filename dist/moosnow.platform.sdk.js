@@ -1894,9 +1894,11 @@ var mx = (function () {
             return bannerId;
         };
         PlatformModule.prototype.triggerBannerError = function (bannerId) {
-            if (this.bannerErrorQuene[bannerId].isError
-                && this.bannerErrorQuene[bannerId].isShow) {
-                this.bannerErrorQuene[bannerId] = null;
+            if (moosnow.platform.bannerErrorQuene
+                && moosnow.platform.bannerErrorQuene[bannerId]
+                && moosnow.platform.bannerErrorQuene[bannerId].isError
+                && moosnow.platform.bannerErrorQuene[bannerId].isShow) {
+                moosnow.platform.bannerErrorQuene[bannerId] = {};
                 moosnow.event.sendEventImmediately(PLATFORM_EVENT.ON_BANNER_ERROR, {
                     bannerId: bannerId,
                     horizontal: this.bannerHorizontal,
@@ -1906,19 +1908,19 @@ var mx = (function () {
         };
         PlatformModule.prototype._onBannerLoad = function (bannerId) {
             console.log("PlatformModule ~ _onBannerLoad ~ bannerId", bannerId);
-            this.bannerErrorQuene[bannerId] = null;
+            this.bannerErrorQuene[bannerId] = {};
             this.bannerShowCount = 0;
         };
         PlatformModule.prototype._onBannerError = function (bannerId, err) {
             console.warn('banner___error:', err);
-            this.banner[bannerId] = null;
-            this.isBannerShow = false;
-            if (!this.bannerErrorQuene[bannerId])
-                this.bannerErrorQuene[bannerId] = {};
-            this.bannerErrorQuene[bannerId].isError = true;
+            moosnow.platform.banner[bannerId] = null;
+            moosnow.platform.isBannerShow = false;
+            if (!moosnow.platform.bannerErrorQuene[bannerId])
+                moosnow.platform.bannerErrorQuene[bannerId] = {};
+            moosnow.platform.bannerErrorQuene[bannerId].isError = true;
             this.triggerBannerError(bannerId);
             if (err && err.errCode != 1004) {
-                this.unschedule(this.refreshBanner);
+                moosnow.platform.unschedule(this.refreshBanner);
             }
         };
         PlatformModule.prototype._onBannerResize = function (bannerId, size) {
@@ -5733,6 +5735,49 @@ var mx = (function () {
             this.block.style.left = style.left;
             console.log('重置block位置', style);
         };
+        //--------------插屏广告---------------
+        QQModule.prototype.initInter = function () {
+        };
+        QQModule.prototype.prepareInter = function () {
+        };
+        QQModule.prototype.showInter = function () {
+            var _this = this;
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createInterstitialAd)
+                return;
+            if (Common.isEmpty(this.interId)) {
+                console.warn(MSG.INTER_KEY_IS_NULL);
+                return;
+            }
+            if (!this.inter) {
+                this.inter = window[this.platformName].createInterstitialAd({
+                    adUnitId: this.interId
+                });
+                console.log('创建插屏');
+                this.inter.onLoad(this._onInterLoad);
+                this.inter.onClose(this._onInterClose);
+                this.inter.onError(this._onInterError);
+            }
+            var p = this.inter.load();
+            if (p) {
+                p.then(function (res) {
+                    _this.inter.show();
+                    // console.error('load ok ', res)
+                }).catch(function (err) {
+                    console.error('load error ', err);
+                });
+            }
+        };
+        QQModule.prototype._onInterError = function (res) {
+            console.log('插屏加载错误', res);
+        };
+        QQModule.prototype._onInterLoad = function () {
+            console.log('插屏加载完成');
+        };
+        QQModule.prototype._onInterClose = function () {
+            // this.inter.load();
+        };
         return QQModule;
     }(PlatformModule));
 
@@ -6042,24 +6087,6 @@ var mx = (function () {
         function ZSHttpModule() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        /**
-         * 获取误点间隔次数，启动游戏时调用
-         * @param {Funtion} callback 回调参数为misTouchNum:int，当misTouchNum=0时关闭误点，当misTouchNum=n(0除外)时，每隔n次，触发误点1次
-         */
-        ZSHttpModule.prototype.getMisTouchNum = function (callback) {
-            this.loadCfg(function (res) {
-                callback(parseInt(res.mistouchNum));
-            });
-        };
-        /**
-         * 获取位移间隔次数，启动游戏时调用
-         * @param {Funtion} callback 回调参数为mistouchPosNum:int，当misTouchNum=0时关闭误点，当mistouchPosNum=n(0除外)时，每隔n次，触发误点1次
-         */
-        ZSHttpModule.prototype.getMistouchPosNum = function (callback) {
-            this.loadCfg(function (res) {
-                callback(parseInt(res.mistouchPosNum));
-            });
-        };
         ZSHttpModule.prototype.getBannerShowCountLimit = function (callback) {
             this.loadCfg(function (res) {
                 if (isNaN(res.bannerShowCountLimit))

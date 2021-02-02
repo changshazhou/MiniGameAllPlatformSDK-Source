@@ -237,7 +237,7 @@ export default class PlatformModule extends BaseModule {
      * @return bannerId
      */
     _createBannerAd(adIndex: number): string;
-    private triggerBannerError;
+    triggerBannerError(bannerId: any): void;
     _onBannerLoad(bannerId: any): void;
     _onBannerError(bannerId: any, err: any): void;
     _onBannerResize(bannerId: any, size: any): void;
