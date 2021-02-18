@@ -58,6 +58,7 @@ export default class PlatformModule extends BaseModule {
     interShowCountLimit: number;
     isInterLoaded: boolean;
     nativeAdResult: nativeAdRow;
+    nativeAdList: Array<nativeAdRow>;
     nativeCb: Function;
     nativeLoading: boolean;
     recordObj: any;

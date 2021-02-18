@@ -157,6 +157,7 @@ export default class PlatformModule extends BaseModule {
 
 
     public nativeAdResult: nativeAdRow = null;
+    public nativeAdList: Array<nativeAdRow> = [];
     public nativeCb: Function = null;
     public nativeLoading: boolean = false;
 

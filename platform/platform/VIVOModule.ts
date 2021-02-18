@@ -37,54 +37,8 @@ export default class VIVOModule extends PlatformModule {
      * @param complete 
      */
     public navigate2Mini(row: moosnowAdRow, success?: Function, fail?: Function, complete?: Function) {
-
-
-        console.log(MSG.NAVIGATE_DATA, row)
-        if (Date.now() - this.prevNavigate < 300) {
-            console.log(MSG.NAVIGATE_FAST)
-            return;
-        }
-        this.prevNavigate = Date.now();
-
-        if (!window[this.platformName]) {
-            if (success)
-                success();
-            return;
-        }
-        let { appid, path, extraData, pkgName } = row;
-        extraData = extraData || {};
-        // 跳转小游戏按钮，支持最低平台版本号'1044' (minPlatformVersion>='1044')
-        if (!this.supportVersion(1044)) {
-            console.log(MSG.PLATFORM_UNSUPPORT)
-            return
-        }
-        window[this.platformName].navigateToMiniGame({
-            appId: appid,
-            path: path,
-            pkgName: pkgName || appid,
-            extraData: extraData,
-            success: () => {
-                if (window[this.platformName] && window[this.platformName].aldSendEvent) {
-                    window[this.platformName].aldSendEvent('跳转', {
-                        position: row.position,
-                        appid,
-                        img: row.atlas || row.img
-                    })
-                }
-                moosnow.http.exportUser();
-                if (success)
-                    success();
-            },
-            fail: (err) => {
-                console.log('navigateToMiniProgram error ', err)
-                if (fail)
-                    fail();
-            },
-            complete: () => {
-                if (complete)
-                    complete();
-            }
-        })
+        if (Common.isFunction(success))
+            success();
     }
 
     public supportVersion(version: string | number) {
@@ -564,7 +518,16 @@ export default class VIVOModule extends PlatformModule {
         this.nativeLoading = false;
         console.log(MSG.NATIVE_LOAD_COMPLETED, res)
         if (res && res.adList && res.adList.length > 0) {
-            this.nativeAdResult = res.adList[res.adList.length - 1];
+            let temp = [];
+            res.adList.forEach((item, idx) => {
+                temp.push({
+                    ...item,
+                    hasClick: idx > this.nativeAdList.length - 1 ? false : (this.nativeAdList[idx] as any).hasClick
+                })
+            })
+            this.nativeAdList = temp;
+
+            this.nativeAdResult = this.nativeAdList[this.nativeAdList.length - 1];
             if (!Common.isEmpty(this.nativeAdResult.adId)) {
                 console.log(MSG.NATIVE_REPORT)
                 this.native.reportAdShow({
@@ -577,24 +540,12 @@ export default class VIVOModule extends PlatformModule {
         }
         else {
             console.log(MSG.NATIVE_LIST_NULL)
-            if (Common.isFunction(this.nativeCb)) {
-                moosnow.http.getAllConfig(res => {
-                    if (res.nativeErrorShowInter == 1) {
-                        console.log('原生加载出错，用插屏代替')
-                        this.showInter();
-                    }
-                    else {
-                        this.nativeCb(null)
-                    }
-                })
-
-            }
+            this._nativeCallback();
         }
     }
 
     public _onNativeError(err) {
         this.nativeLoading = false;
-        this.nativeAdResult = null;
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
                 console.log(MSG.NATIVE_ERROR, err,)
@@ -609,14 +560,28 @@ export default class VIVOModule extends PlatformModule {
         else {
             console.log(MSG.NATIVE_ERROR2, err)
         }
+        this._nativeCallback();
+    }
+
+    private _nativeCallback() {
+
         moosnow.http.getAllConfig(res => {
             if (res.nativeErrorShowInter == 1) {
                 console.log('原生加载出错，用插屏代替')
                 this.showInter();
             }
             else {
-                if (this.nativeCb)
-                    this.nativeCb(null)
+                if (this.nativeCb) {
+                    let no_click_list = this.nativeAdList.filter((item: any) => !item.hasClick)
+                    if (no_click_list.length > 0)
+                        this.nativeCb(no_click_list[0])
+                    else {
+                        if (this.nativeAdList.length > 0)
+                            this.nativeCb(this.nativeAdList[Common.randomNumBoth(0, this.nativeAdList.length - 1)])
+                        else
+                            this.nativeCb(null);
+                    }
+                }
             }
         })
     }
@@ -703,6 +668,11 @@ export default class VIVOModule extends PlatformModule {
             console.log(MSG.NATIVE_CLICK, this.nativeAdResult.adId)
             this.native.reportAdClick({
                 adId: this.nativeAdResult.adId
+            })
+            this.nativeAdList.forEach((item) => {
+                if (item == this.nativeAdResult) {
+                    (item as any).hasClick = true;
+                }
             })
         }
     }

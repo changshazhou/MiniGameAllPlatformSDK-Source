@@ -69,6 +69,7 @@ export default class VIVOModule extends PlatformModule {
     _prepareNative(isLoad?: boolean): void;
     _onNativeLoad(res: any): void;
     _onNativeError(err: any): void;
+    private _nativeCallback;
     _destroyNative(): void;
     /**
     * 目前只有OPPO VIVO 平台有此功能

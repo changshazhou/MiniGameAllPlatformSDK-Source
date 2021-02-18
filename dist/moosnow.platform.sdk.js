@@ -924,6 +924,7 @@ var mx = (function () {
             _this.interShowCountLimit = 3;
             _this.isInterLoaded = false;
             _this.nativeAdResult = null;
+            _this.nativeAdList = [];
             _this.nativeCb = null;
             _this.nativeLoading = false;
             _this.recordObj = null;
@@ -6448,52 +6449,8 @@ var mx = (function () {
          * @param complete
          */
         VIVOModule.prototype.navigate2Mini = function (row, success, fail, complete) {
-            var _this = this;
-            console.log(MSG.NAVIGATE_DATA, row);
-            if (Date.now() - this.prevNavigate < 300) {
-                console.log(MSG.NAVIGATE_FAST);
-                return;
-            }
-            this.prevNavigate = Date.now();
-            if (!window[this.platformName]) {
-                if (success)
-                    success();
-                return;
-            }
-            var appid = row.appid, path = row.path, extraData = row.extraData, pkgName = row.pkgName;
-            extraData = extraData || {};
-            // 跳转小游戏按钮，支持最低平台版本号'1044' (minPlatformVersion>='1044')
-            if (!this.supportVersion(1044)) {
-                console.log(MSG.PLATFORM_UNSUPPORT);
-                return;
-            }
-            window[this.platformName].navigateToMiniGame({
-                appId: appid,
-                path: path,
-                pkgName: pkgName || appid,
-                extraData: extraData,
-                success: function () {
-                    if (window[_this.platformName] && window[_this.platformName].aldSendEvent) {
-                        window[_this.platformName].aldSendEvent('跳转', {
-                            position: row.position,
-                            appid: appid,
-                            img: row.atlas || row.img
-                        });
-                    }
-                    moosnow.http.exportUser();
-                    if (success)
-                        success();
-                },
-                fail: function (err) {
-                    console.log('navigateToMiniProgram error ', err);
-                    if (fail)
-                        fail();
-                },
-                complete: function () {
-                    if (complete)
-                        complete();
-                }
-            });
+            if (Common.isFunction(success))
+                success();
         };
         VIVOModule.prototype.supportVersion = function (version) {
             var oppoSys = this.getSystemInfoSync();
@@ -6922,7 +6879,12 @@ var mx = (function () {
             this.nativeLoading = false;
             console.log(MSG.NATIVE_LOAD_COMPLETED, res);
             if (res && res.adList && res.adList.length > 0) {
-                this.nativeAdResult = res.adList[res.adList.length - 1];
+                var temp_1 = [];
+                res.adList.forEach(function (item, idx) {
+                    temp_1.push(__assign(__assign({}, item), { hasClick: idx > _this.nativeAdList.length - 1 ? false : _this.nativeAdList[idx].hasClick }));
+                });
+                this.nativeAdList = temp_1;
+                this.nativeAdResult = this.nativeAdList[this.nativeAdList.length - 1];
                 if (!Common.isEmpty(this.nativeAdResult.adId)) {
                     console.log(MSG.NATIVE_REPORT);
                     this.native.reportAdShow({
@@ -6935,23 +6897,11 @@ var mx = (function () {
             }
             else {
                 console.log(MSG.NATIVE_LIST_NULL);
-                if (Common.isFunction(this.nativeCb)) {
-                    moosnow.http.getAllConfig(function (res) {
-                        if (res.nativeErrorShowInter == 1) {
-                            console.log('原生加载出错，用插屏代替');
-                            _this.showInter();
-                        }
-                        else {
-                            _this.nativeCb(null);
-                        }
-                    });
-                }
+                this._nativeCallback();
             }
         };
         VIVOModule.prototype._onNativeError = function (err) {
-            var _this = this;
             this.nativeLoading = false;
-            this.nativeAdResult = null;
             if (err.code == 20003) {
                 if (this.nativeIdIndex < this.nativeId.length - 1) {
                     console.log(MSG.NATIVE_ERROR, err);
@@ -6966,14 +6916,27 @@ var mx = (function () {
             else {
                 console.log(MSG.NATIVE_ERROR2, err);
             }
+            this._nativeCallback();
+        };
+        VIVOModule.prototype._nativeCallback = function () {
+            var _this = this;
             moosnow.http.getAllConfig(function (res) {
                 if (res.nativeErrorShowInter == 1) {
                     console.log('原生加载出错，用插屏代替');
                     _this.showInter();
                 }
                 else {
-                    if (_this.nativeCb)
-                        _this.nativeCb(null);
+                    if (_this.nativeCb) {
+                        var no_click_list = _this.nativeAdList.filter(function (item) { return !item.hasClick; });
+                        if (no_click_list.length > 0)
+                            _this.nativeCb(no_click_list[0]);
+                        else {
+                            if (_this.nativeAdList.length > 0)
+                                _this.nativeCb(_this.nativeAdList[Common.randomNumBoth(0, _this.nativeAdList.length - 1)]);
+                            else
+                                _this.nativeCb(null);
+                        }
+                    }
                 }
             });
         };
@@ -7048,12 +7011,18 @@ var mx = (function () {
          *
          */
         VIVOModule.prototype.clickNative = function (callback) {
+            var _this = this;
             if (this.nativeAdResult && !Common.isEmpty(this.nativeAdResult.adId)) {
                 this.mClickedNativeCallback = callback;
                 this.mIsClickedNative = true;
                 console.log(MSG.NATIVE_CLICK, this.nativeAdResult.adId);
                 this.native.reportAdClick({
                     adId: this.nativeAdResult.adId
+                });
+                this.nativeAdList.forEach(function (item) {
+                    if (item == _this.nativeAdResult) {
+                        item.hasClick = true;
+                    }
                 });
             }
         };
