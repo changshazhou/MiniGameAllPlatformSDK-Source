@@ -3794,7 +3794,7 @@ var mx = (function () {
                         console.log("\u521D\u59CB\u5316\u5E7F\u544A");
                         moosnow.http.getAllConfig(function (res) {
                             for (var k in Common.config) {
-                                if (res && res.hasOwnProperty(k)) {
+                                if (res && res.hasOwnProperty(k) && "version" != k) {
                                     Common.config[k] = res[k];
                                 }
                                 self._prepareNative();

@@ -57,7 +57,7 @@ export default class OPPOModule extends PlatformModule {
                     console.log(`初始化广告`);
                     moosnow.http.getAllConfig(res => {
                         for (let k in Common.config) {
-                            if (res && res.hasOwnProperty(k)) {
+                            if (res && res.hasOwnProperty(k) && "version" != k) {
                                 Common.config[k] = res[k]
                             }
                             self._prepareNative();
