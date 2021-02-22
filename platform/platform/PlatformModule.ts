@@ -101,7 +101,12 @@ export default class PlatformModule extends BaseModule {
     public get nativeId() {
         return this.getAdId(Common.config.nativeId, -1)
     };
-
+    public get gameBannerId() {
+        return this.getAdId(Common.config.gameBannerId, -1)
+    };
+    public get gamePortalId() {
+        return this.getAdId(Common.config.gamePortalId, -1)
+    };
     public nativeIdIndex: number = 0;
 
     public mBannerWidth: number = 300;
@@ -1781,6 +1786,24 @@ export default class PlatformModule extends BaseModule {
                 });
             }
         })
+    }
+
+    public gameBannerAd: any;
+    public gamePortalAd: any;
+    public showGameBannerAd() {
+
+    }
+    public hideGameBannerAd() {
+
+    }
+
+    public showGamePortalAd(onClose?: () => void) {
+        if (onClose)
+            onClose();
+    }
+
+    public hideGamePortalAd() {
+
     }
 
 

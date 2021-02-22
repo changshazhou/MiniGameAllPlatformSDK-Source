@@ -1005,6 +1005,22 @@ var mx = (function () {
             configurable: true
         });
         ;
+        Object.defineProperty(PlatformModule.prototype, "gameBannerId", {
+            get: function () {
+                return this.getAdId(Common.config.gameBannerId, -1);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(PlatformModule.prototype, "gamePortalId", {
+            get: function () {
+                return this.getAdId(Common.config.gamePortalId, -1);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
         Object.defineProperty(PlatformModule.prototype, "bannerWidth", {
             get: function () {
                 var wxsys = this.getSystemInfoSync();
@@ -2594,6 +2610,16 @@ var mx = (function () {
                 }
             });
         };
+        PlatformModule.prototype.showGameBannerAd = function () {
+        };
+        PlatformModule.prototype.hideGameBannerAd = function () {
+        };
+        PlatformModule.prototype.showGamePortalAd = function (onClose) {
+            if (onClose)
+                onClose();
+        };
+        PlatformModule.prototype.hideGamePortalAd = function () {
+        };
         PlatformModule.prototype.onDisable = function () {
         };
         return PlatformModule;
@@ -3180,8 +3206,9 @@ var mx = (function () {
                         }
                         catch (e) {
                             console.error('json parse error ', response);
-                            if (fail)
-                                fail(e);
+                            // if (fail)
+                            //     fail(e);
+                            result = response;
                         }
                         // }
                         if (success)
@@ -3765,9 +3792,14 @@ var mx = (function () {
                     appId: Common.config.moosnowAppId,
                     success: function (res) {
                         console.log("\u521D\u59CB\u5316\u5E7F\u544A");
-                        // self.initBanner();
-                        // self.initInter();
-                        self._prepareNative();
+                        moosnow.http.getAllConfig(function (res) {
+                            for (var k in Common.config) {
+                                if (res && res.hasOwnProperty(k)) {
+                                    Common.config[k] = res[k];
+                                }
+                                self._prepareNative();
+                            }
+                        });
                     },
                     fail: function (res) {
                         console.warn("\u521D\u59CB\u5316\u5E7F\u544A\u9519\u8BEF " + res.code + "  " + res.msg);
@@ -4467,6 +4499,72 @@ var mx = (function () {
             if (!window[this.platformName].exitApplication)
                 return;
             window[this.platformName].exitApplication();
+        };
+        OPPOModule.prototype.showGameBannerAd = function () {
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createGameBannerAd)
+                return;
+            if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+                if (!this.gameBannerAd) {
+                    this.gameBannerAd = window[this.platformName].createGameBannerAd({
+                        adUnitId: this.gameBannerId
+                    });
+                    this.gameBannerAd.onError(function (err) {
+                        console.log('showGameBannerAd', err);
+                    });
+                }
+                this.gameBannerAd.show().then(function () {
+                    console.log('showGameBannerAd success');
+                }).catch(function (error) {
+                    console.log('showGameBannerAd fail with:' + error.errCode + ',' + error.errMsg);
+                });
+            }
+        };
+        OPPOModule.prototype.hideGameBannerAd = function () {
+            if (this.gameBannerAd)
+                this.gameBannerAd.hide();
+        };
+        OPPOModule.prototype.showGamePortalAd = function (onClose) {
+            var _this = this;
+            if (!window[this.platformName])
+                return;
+            if (!window[this.platformName].createGamePortalAd)
+                return;
+            if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+                if (!this.gamePortalAd) {
+                    this.gamePortalAd = window[this.platformName].createGamePortalAd({
+                        adUnitId: this.gamePortalId
+                    });
+                    this.gamePortalAd.onClose(function () {
+                        if (onClose && Common.isFunction(onClose))
+                            onClose();
+                        console.log('互推盒子九宫格广告关闭');
+                    });
+                    this.gamePortalAd.onError(function (err) {
+                        console.log('showGamePortalAd err', err);
+                    });
+                    this.gamePortalAd.onLoad(function () {
+                        console.log('互推盒子九宫格广告加载成功');
+                        _this.gamePortalAd.show()
+                            .then(function () {
+                            console.log('showGamePortalAd success');
+                        }).catch(function (error) {
+                            console.log('showGamePortalAd fail with:' + error.errCode + ',' + error.errMsg);
+                        });
+                    });
+                }
+                else
+                    this.gamePortalAd.load().then(function () {
+                        console.log('load success');
+                    }).catch(function (error) {
+                        console.log('load fail with:' + error.errCode + ',' + error.errMsg);
+                    });
+            }
+        };
+        OPPOModule.prototype.hideGamePortalAd = function () {
+            if (this.gamePortalAd)
+                this.gamePortalAd.hide();
         };
         return OPPOModule;
     }(PlatformModule));

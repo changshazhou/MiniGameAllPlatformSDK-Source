@@ -32,6 +32,8 @@ export default class PlatformModule extends BaseModule {
     get interId(): string;
     get boxId(): string;
     get nativeId(): string;
+    get gameBannerId(): string;
+    get gamePortalId(): string;
     nativeIdIndex: number;
     mBannerWidth: number;
     get bannerWidth(): number;
@@ -414,5 +416,11 @@ export default class PlatformModule extends BaseModule {
      * 屏蔽iphone关闭退出按钮
      */
     hideExitButton(): void;
+    gameBannerAd: any;
+    gamePortalAd: any;
+    showGameBannerAd(): void;
+    hideGameBannerAd(): void;
+    showGamePortalAd(onClose?: () => void): void;
+    hideGamePortalAd(): void;
     onDisable(): void;
 }

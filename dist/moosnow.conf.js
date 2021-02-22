@@ -36,6 +36,8 @@ window.moosnowConfig = {
         interId: "",
         boxId: "51aa10cf3cbeb175be37cf7a1a336513",
         nativeId: ["", ""],
+        gameBannerId: ["291455"],
+        gamePortalId: ["291456"],
         moosnowAppId: "1110464664",
         blockId: "",
         version: "1.1.0",
@@ -83,5 +85,5 @@ window.moosnowConfig = {
         version: "1.1.0",
     }
 
-    
+
 }

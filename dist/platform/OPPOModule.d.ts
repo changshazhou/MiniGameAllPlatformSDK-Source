@@ -120,4 +120,8 @@ export default class OPPOModule extends PlatformModule {
     hasShortcutInstalled(success: (has: any) => void, fail: (err: any) => void): void;
     installShortcut(success: (res: any) => void, message: string, fail: (err: any) => void): void;
     exitApplication(): void;
+    showGameBannerAd(): void;
+    hideGameBannerAd(): void;
+    showGamePortalAd(onClose: () => void): void;
+    hideGamePortalAd(): void;
 }

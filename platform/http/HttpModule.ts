@@ -99,8 +99,9 @@ export class HttpModule extends BaseModule {
                     }
                     catch (e) {
                         console.error('json parse error ', response)
-                        if (fail)
-                            fail(e);
+                        // if (fail)
+                        //     fail(e);
+                        result = response
                     }
                     // }
                     if (success)

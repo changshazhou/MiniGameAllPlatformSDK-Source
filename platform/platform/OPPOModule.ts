@@ -55,9 +55,15 @@ export default class OPPOModule extends PlatformModule {
                 appId: Common.config.moosnowAppId,
                 success: (res) => {
                     console.log(`初始化广告`);
-                    // self.initBanner();
-                    // self.initInter();
-                    self._prepareNative();
+                    moosnow.http.getAllConfig(res => {
+                        for (let k in Common.config) {
+                            if (res && res.hasOwnProperty(k)) {
+                                Common.config[k] = res[k]
+                            }
+                            self._prepareNative();
+                        }
+                    })
+
                 },
                 fail: (res) => {
                     console.warn(`初始化广告错误 ${res.code}  ${res.msg}`);
@@ -817,5 +823,72 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].exitApplication) return;
         window[this.platformName].exitApplication();
+    }
+
+
+    public showGameBannerAd() {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createGameBannerAd) return;
+        if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+            if (!this.gameBannerAd) {
+                this.gameBannerAd = window[this.platformName].createGameBannerAd({
+                    adUnitId: this.gameBannerId
+                })
+                this.gameBannerAd.onError((err) => {
+                    console.log('showGameBannerAd', err)
+                })
+            }
+            this.gameBannerAd.show().then(() => {
+                console.log('showGameBannerAd success')
+            }).catch((error) => {
+                console.log('showGameBannerAd fail with:' + error.errCode + ',' + error.errMsg)
+            })
+        }
+    }
+    public hideGameBannerAd() {
+        if (this.gameBannerAd)
+            this.gameBannerAd.hide();
+    }
+
+    public showGamePortalAd(onClose: () => void) {
+        if (!window[this.platformName]) return;
+        if (!window[this.platformName].createGamePortalAd) return;
+        if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+            if (!this.gamePortalAd) {
+                this.gamePortalAd = window[this.platformName].createGamePortalAd({
+                    adUnitId: this.gamePortalId
+                })
+                this.gamePortalAd.onClose(() => {
+                    if (onClose && Common.isFunction(onClose))
+                        onClose()
+                    console.log('互推盒子九宫格广告关闭')
+                })
+                this.gamePortalAd.onError((err) => {
+                    console.log('showGamePortalAd err', err)
+                })
+                this.gamePortalAd.onLoad(() => {
+                    console.log('互推盒子九宫格广告加载成功')
+                    this.gamePortalAd.show()
+                        .then(() => {
+                            console.log('showGamePortalAd success')
+                        }).catch((error) => {
+                            console.log('showGamePortalAd fail with:' + error.errCode + ',' + error.errMsg)
+                        })
+                })
+            }
+            else
+                this.gamePortalAd.load().then(() => {
+                    console.log('load success')
+                }).catch((error) => {
+                    console.log('load fail with:' + error.errCode + ',' + error.errMsg)
+                })
+
+        }
+
+    }
+
+    public hideGamePortalAd() {
+        if (this.gamePortalAd)
+            this.gamePortalAd.hide();
     }
 }

@@ -8,6 +8,8 @@ export default class moosnowAppConfig {
     boxId: string;
     blockId: string;
     nativeId: Array<string>;
+    gameBannerId: Array<string>;
+    gamePortalId: Array<string>;
     moosnowAppId: string;
     version: string;
     url: string;
