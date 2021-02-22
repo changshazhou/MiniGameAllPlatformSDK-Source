@@ -3797,8 +3797,8 @@ var mx = (function () {
                                 if (res && res.hasOwnProperty(k) && "version" != k) {
                                     Common.config[k] = res[k];
                                 }
-                                self._prepareNative();
                             }
+                            self._prepareNative();
                         });
                     },
                     fail: function (res) {
