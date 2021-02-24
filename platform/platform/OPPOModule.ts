@@ -849,29 +849,39 @@ export default class OPPOModule extends PlatformModule {
         if (this.gameBannerAd)
             this.gameBannerAd.hide();
     }
-
-    public showGamePortalAd(onClose: () => void) {
+    private onCloseGamePortalAd: Function;
+    private onShowGamePortalAd: Function;
+    public showGamePortalAd(onClose?: () => void, onShow?: (success) => void) {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createGamePortalAd) return;
+        this.onCloseGamePortalAd = onClose;
+        this.onShowGamePortalAd = onShow;
+        let self = this;
         if (this.getSystemInfoSync().platformVersionCode >= 1076) {
             if (!this.gamePortalAd) {
                 this.gamePortalAd = window[this.platformName].createGamePortalAd({
                     adUnitId: this.gamePortalId
                 })
                 this.gamePortalAd.onClose(() => {
-                    if (onClose && Common.isFunction(onClose))
-                        onClose()
+                    if (self.onCloseGamePortalAd && Common.isFunction(self.onCloseGamePortalAd))
+                        self.onCloseGamePortalAd()
                     console.log('互推盒子九宫格广告关闭')
                 })
                 this.gamePortalAd.onError((err) => {
                     console.log('showGamePortalAd err', err)
+                    if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                        self.onShowGamePortalAd(false);
                 })
                 this.gamePortalAd.onLoad(() => {
                     console.log('互推盒子九宫格广告加载成功')
                     this.gamePortalAd.show()
                         .then(() => {
+                            if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                                self.onShowGamePortalAd(true);
                             console.log('showGamePortalAd success')
                         }).catch((error) => {
+                            if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                                self.onShowGamePortalAd(false);
                             console.log('showGamePortalAd fail with:' + error.errCode + ',' + error.errMsg)
                         })
                 })
@@ -880,9 +890,17 @@ export default class OPPOModule extends PlatformModule {
                 this.gamePortalAd.load().then(() => {
                     console.log('load success')
                 }).catch((error) => {
+                    if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                        self.onShowGamePortalAd(false);
                     console.log('load fail with:' + error.errCode + ',' + error.errMsg)
                 })
 
+        }
+        else {
+            if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                self.onShowGamePortalAd(false);
+            if (this.onCloseGamePortalAd && Common.isFunction(this.onCloseGamePortalAd))
+                this.onCloseGamePortalAd()
         }
 
     }

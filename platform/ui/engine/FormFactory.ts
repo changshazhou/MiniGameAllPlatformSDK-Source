@@ -1,5 +1,5 @@
 import BaseForm from "./BaseForm";
-import { ROOT_CONFIG } from "../../config/ROOT_CONFIG";
+import ROOT_CONFIG from "../../config/ROOT_CONFIG";
 import Common from "../../utils/Common";
 import NodeAttribute from "../attribute/NodeAttribute";
 import showFormOptions from "../../model/showFormOptions";

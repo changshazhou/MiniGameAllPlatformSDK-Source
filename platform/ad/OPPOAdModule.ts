@@ -1,6 +1,6 @@
 import AdModule from "./AdModule";
 import Common from "../utils/Common";
-import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
+import ROOT_CONFIG from "../config/ROOT_CONFIG";
 
 export default class OPPOAdModule extends AdModule {
 

@@ -1,5 +1,5 @@
 import NodeHelper from "../../engine/NodeHelper";
-import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
+import ROOT_CONFIG from "../../../config/ROOT_CONFIG";
 import CocosNodeEvent from "../enum/CocosNodeEvent";
 import ViewAttribute from "../../attribute/ViewAttribute";
 import NodeAttribute from "../../attribute/NodeAttribute";

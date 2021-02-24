@@ -3,7 +3,7 @@ import EventType from "../../../utils/PLATFORM_EVENT";
 import moosnowAdRow from "../../../model/moosnowAdRow";
 import Common from "../../../utils/Common";
 import { EntitysName } from "../../../config/EntitysName";
-import { ROOT_CONFIG } from "../../../config/ROOT_CONFIG";
+import ROOT_CONFIG from "../../../config/ROOT_CONFIG";
 import CocosBaseForm from "../form/CocosBaseForm";
 
 export default class AdInviteBox extends CocosBaseForm {

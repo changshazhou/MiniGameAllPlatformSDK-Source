@@ -3,8 +3,7 @@ import Common from "../utils/Common";
 import { APP_PLATFORM } from "../enum/APP_PLATFORM";
 import { MSG } from "../config/MSG";
 import { ENGINE_TYPE } from "../enum/ENGINE_TYPE";
-import { ROOT_CONFIG } from "../config/ROOT_CONFIG";
-import { isLiteralExpression } from "../../node_modules/typescript/lib/typescript";
+import ROOT_CONFIG from "../config/ROOT_CONFIG";
 
 
 let ErrorType = {
@@ -359,13 +358,15 @@ export class HttpModule extends BaseModule {
                             //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
 
                             if (res.exportAutoNavigate == 1)
-                                exportAutoNavigate = 0
+                                exportAutoNavigate = 0;
                             if (res.exportAutoNavigate == 2)
-                                exportAutoNavigate = 1
+                                exportAutoNavigate = 1;
+
                             callback({
                                 isLimitArea: 1,
                                 ...res,
-                                ...this.getCfg(false)
+                                ...this.getCfg(false),
+                                site01: []
                             })
                         }
                         else {
@@ -513,19 +514,12 @@ export class HttpModule extends BaseModule {
 
             this.request(url, {}, 'GET',
                 (res) => {
-
-                    if (res.bannerId)
-                        Common.config.bannerId = res.bannerId;
-                    if (res.interId)
-                        Common.config.interId = res.interId;
-                    if (res.blockId)
-                        Common.config.blockId = res.blockId;
-                    if (res.boxId)
-                        Common.config.boxId = res.boxId;
-                    if (res.nativeId)
-                        Common.config.nativeId = res.nativeId;
-                    if (res.videoId)
-                        Common.config.videoId = res.videoId;
+                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId"]
+                        .forEach((key, idx) => {
+                            if (res[key]) {
+                                Common.config[key] = res[key]
+                            }
+                        })
 
                     let versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {

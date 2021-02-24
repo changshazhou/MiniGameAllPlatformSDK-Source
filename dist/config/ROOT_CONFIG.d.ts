@@ -1,5 +1,6 @@
-export declare const ROOT_CONFIG: {
-    UI_ROOT: string;
-    ENTITY_ROOT: string;
-    HTTP_ROOT: string;
-};
+export default class ROOT_CONFIG {
+    constructor();
+    static UI_ROOT: "moosnow/prefab/ui/";
+    static ENTITY_ROOT: "moosnow/prefab/entity/";
+    static get HTTP_ROOT(): string;
+}

@@ -122,6 +122,8 @@ export default class OPPOModule extends PlatformModule {
     exitApplication(): void;
     showGameBannerAd(): void;
     hideGameBannerAd(): void;
-    showGamePortalAd(onClose: () => void): void;
+    private onCloseGamePortalAd;
+    private onShowGamePortalAd;
+    showGamePortalAd(onClose?: () => void, onShow?: (success: any) => void): void;
     hideGamePortalAd(): void;
 }

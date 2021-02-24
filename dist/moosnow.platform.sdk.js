@@ -2614,9 +2614,11 @@ var mx = (function () {
         };
         PlatformModule.prototype.hideGameBannerAd = function () {
         };
-        PlatformModule.prototype.showGamePortalAd = function (onClose) {
-            if (onClose)
-                onClose();
+        PlatformModule.prototype.showGamePortalAd = function (onClose, onShow) {
+            if (onShow)
+                onShow(false);
+            // if (onClose)
+            //     onClose();
         };
         PlatformModule.prototype.hideGamePortalAd = function () {
         };
@@ -3114,11 +3116,22 @@ var mx = (function () {
         return AdModule;
     }(BaseModule));
 
-    var ROOT_CONFIG = {
-        UI_ROOT: "moosnow/prefab/ui/",
-        ENTITY_ROOT: "moosnow/prefab/entity/",
-        HTTP_ROOT: "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com",
-    };
+    var ROOT_CONFIG = /** @class */ (function () {
+        function ROOT_CONFIG() {
+        }
+        Object.defineProperty(ROOT_CONFIG, "HTTP_ROOT", {
+            get: function () {
+                var retValue = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
+                if (window && window["HTTP_ROOT"]) {
+                    retValue = window["HTTP_ROOT"];
+                }
+                return retValue;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ROOT_CONFIG;
+    }());
 
     var ErrorType = {
         ONERROR: "HTTP协议链接出错",
@@ -3447,7 +3460,7 @@ var mx = (function () {
                                     exportAutoNavigate = 0;
                                 if (res.exportAutoNavigate == 2)
                                     exportAutoNavigate = 1;
-                                callback(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)));
+                                callback(__assign(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)), { site01: [] }));
                             }
                             else {
                                 if (res.exportAutoNavigate == 1)
@@ -3567,18 +3580,12 @@ var mx = (function () {
                 else
                     url = ROOT_CONFIG.HTTP_ROOT + "/config/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    if (res.bannerId)
-                        Common.config.bannerId = res.bannerId;
-                    if (res.interId)
-                        Common.config.interId = res.interId;
-                    if (res.blockId)
-                        Common.config.blockId = res.blockId;
-                    if (res.boxId)
-                        Common.config.boxId = res.boxId;
-                    if (res.nativeId)
-                        Common.config.nativeId = res.nativeId;
-                    if (res.videoId)
-                        Common.config.videoId = res.videoId;
+                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId"]
+                        .forEach(function (key, idx) {
+                        if (res[key]) {
+                            Common.config[key] = res[key];
+                        }
+                    });
                     var versionRet = moosnow.platform.checkLog(res.version);
                     if (!versionRet) {
                         _this.cfgData = _this.defaultCfg(res, false);
@@ -4525,31 +4532,40 @@ var mx = (function () {
             if (this.gameBannerAd)
                 this.gameBannerAd.hide();
         };
-        OPPOModule.prototype.showGamePortalAd = function (onClose) {
+        OPPOModule.prototype.showGamePortalAd = function (onClose, onShow) {
             var _this = this;
             if (!window[this.platformName])
                 return;
             if (!window[this.platformName].createGamePortalAd)
                 return;
+            this.onCloseGamePortalAd = onClose;
+            this.onShowGamePortalAd = onShow;
+            var self = this;
             if (this.getSystemInfoSync().platformVersionCode >= 1076) {
                 if (!this.gamePortalAd) {
                     this.gamePortalAd = window[this.platformName].createGamePortalAd({
                         adUnitId: this.gamePortalId
                     });
                     this.gamePortalAd.onClose(function () {
-                        if (onClose && Common.isFunction(onClose))
-                            onClose();
+                        if (self.onCloseGamePortalAd && Common.isFunction(self.onCloseGamePortalAd))
+                            self.onCloseGamePortalAd();
                         console.log('互推盒子九宫格广告关闭');
                     });
                     this.gamePortalAd.onError(function (err) {
                         console.log('showGamePortalAd err', err);
+                        if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                            self.onShowGamePortalAd(false);
                     });
                     this.gamePortalAd.onLoad(function () {
                         console.log('互推盒子九宫格广告加载成功');
                         _this.gamePortalAd.show()
                             .then(function () {
+                            if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                                self.onShowGamePortalAd(true);
                             console.log('showGamePortalAd success');
                         }).catch(function (error) {
+                            if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                                self.onShowGamePortalAd(false);
                             console.log('showGamePortalAd fail with:' + error.errCode + ',' + error.errMsg);
                         });
                     });
@@ -4558,8 +4574,16 @@ var mx = (function () {
                     this.gamePortalAd.load().then(function () {
                         console.log('load success');
                     }).catch(function (error) {
+                        if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                            self.onShowGamePortalAd(false);
                         console.log('load fail with:' + error.errCode + ',' + error.errMsg);
                     });
+            }
+            else {
+                if (self.onShowGamePortalAd && Common.isFunction(self.onShowGamePortalAd))
+                    self.onShowGamePortalAd(false);
+                if (this.onCloseGamePortalAd && Common.isFunction(this.onCloseGamePortalAd))
+                    this.onCloseGamePortalAd();
             }
         };
         OPPOModule.prototype.hideGamePortalAd = function () {

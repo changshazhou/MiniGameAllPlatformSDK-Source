@@ -1797,9 +1797,11 @@ export default class PlatformModule extends BaseModule {
 
     }
 
-    public showGamePortalAd(onClose?: () => void) {
-        if (onClose)
-            onClose();
+    public showGamePortalAd(onClose?: () => void, onShow?: (success) => void) {
+        if (onShow)
+            onShow(false);
+        // if (onClose)
+        //     onClose();
     }
 
     public hideGamePortalAd() {

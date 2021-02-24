@@ -420,7 +420,7 @@ export default class PlatformModule extends BaseModule {
     gamePortalAd: any;
     showGameBannerAd(): void;
     hideGameBannerAd(): void;
-    showGamePortalAd(onClose?: () => void): void;
+    showGamePortalAd(onClose?: () => void, onShow?: (success: any) => void): void;
     hideGamePortalAd(): void;
     onDisable(): void;
 }
