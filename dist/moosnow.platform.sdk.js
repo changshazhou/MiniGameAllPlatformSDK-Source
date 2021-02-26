@@ -3580,9 +3580,9 @@ var mx = (function () {
                 else
                     url = ROOT_CONFIG.HTTP_ROOT + "/config/" + Common.config.moosnowAppId + ".json?t=" + Date.now();
                 this.request(url, {}, 'GET', function (res) {
-                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId"]
+                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId", "gameBannerId", "gamePortalId"]
                         .forEach(function (key, idx) {
-                        if (res[key]) {
+                        if (res.hasOwnProperty(key)) {
                             Common.config[key] = res[key];
                         }
                     });
@@ -5688,10 +5688,19 @@ var mx = (function () {
         QQModule.prototype.showAppBox = function (callback, remoteOn) {
             var _this = this;
             if (remoteOn === void 0) { remoteOn = true; }
-            if (!window[this.platformName])
+            if (!window[this.platformName]) {
+                if (callback)
+                    callback();
                 return;
-            if (!window[this.platformName].createAppBox)
+            }
+            ;
+            if (!window[this.platformName].createAppBox) {
+                if (callback)
+                    callback();
                 return;
+            }
+            ;
+            ;
             this.mOnBoxCallback = callback;
             console.log("showAppBox");
             moosnow.http.getAllConfig(function (res) {

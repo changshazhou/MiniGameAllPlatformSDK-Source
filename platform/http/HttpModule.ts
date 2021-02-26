@@ -514,9 +514,9 @@ export class HttpModule extends BaseModule {
 
             this.request(url, {}, 'GET',
                 (res) => {
-                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId"]
+                    ["bannerId", "interId", "blockId", "boxId", "nativeId", "videoId", "gameBannerId", "gamePortalId"]
                         .forEach((key, idx) => {
-                            if (res[key]) {
+                            if (res.hasOwnProperty(key)) {
                                 Common.config[key] = res[key]
                             }
                         })

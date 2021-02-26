@@ -150,8 +150,16 @@ export default class QQModule extends PlatformModule {
      * @param remoteOn 被后台开关控制
      */
     public showAppBox(callback?: Function, remoteOn: boolean = true) {
-        if (!window[this.platformName]) return;
-        if (!window[this.platformName].createAppBox) return;
+        if (!window[this.platformName]) {
+            if (callback)
+                callback();
+            return
+        };
+        if (!window[this.platformName].createAppBox) {
+            if (callback)
+                callback();
+            return
+        };;
         this.mOnBoxCallback = callback;
         console.log("showAppBox");
         moosnow.http.getAllConfig(res => {
