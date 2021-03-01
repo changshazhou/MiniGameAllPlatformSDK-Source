@@ -118,6 +118,9 @@ export default class QQModule extends PlatformModule {
         let hasShow = false;
         for (let i = 0; i < this.banner.length; i++) {
             if (this.hasStatus(this.banner[i], BANNER_STATUS.SHOW) && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                let bannerStyle = this._getBannerPosition();
+                this.banner[i].style.top = bannerStyle.top;
+                this.banner[i].style.left = bannerStyle.left;
                 hasShow = true;
                 break;
             }

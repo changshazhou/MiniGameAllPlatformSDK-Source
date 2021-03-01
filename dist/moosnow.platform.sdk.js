@@ -5672,6 +5672,9 @@ var mx = (function () {
             var hasShow = false;
             for (var i = 0; i < this.banner.length; i++) {
                 if (this.hasStatus(this.banner[i], BANNER_STATUS.SHOW) && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                    var bannerStyle_1 = this._getBannerPosition();
+                    this.banner[i].style.top = bannerStyle_1.top;
+                    this.banner[i].style.left = bannerStyle_1.left;
                     hasShow = true;
                     break;
                 }
