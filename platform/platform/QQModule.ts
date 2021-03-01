@@ -6,13 +6,85 @@ import { BLOCK_HORIZONTAL, BLOCK_VERTICAL } from '../enum/BLOCK_POSITION';
 import { BANNER_HORIZONTAL, BANNER_VERTICAL } from '../enum/BANNER_POSITION';
 
 
+
+enum BANNER_STATUS {
+    NONE = 0,
+    CREATE = 1,
+    LOADED = 2,
+    WAIT_SHOW = 4,
+    SHOW = 8,
+    WAIT_HIDE = 16,
+    HIDE = 32,
+    ERROR = 1024
+}
+
 export default class QQModule extends PlatformModule {
     public platformName: string = "qq";
     constructor() {
         super();
         this._regisiterWXCallback();
-        this.initBanner();
+        this.schedule(this.daemonTask, 0.2)
     }
+
+    private daemonTask() {
+        for (let i = 0; i < this.banner.length; i++) {
+            if (this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                this.banner[i].hide();
+                this.banner[i].destroy();
+                this.banner[i] = null;
+                this.banner.splice(i, 1);
+                i--;
+            }
+            else if (this.hasStatus(this.banner[i], BANNER_STATUS.ERROR)) {
+                this.banner[i] = null;
+                this.banner.splice(i, 1);
+                i--;
+            }
+            else if (
+                this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_SHOW)
+                && this.hasStatus(this.banner[i], BANNER_STATUS.LOADED)
+                && !this.hasStatus(this.banner[i], BANNER_STATUS.SHOW)
+            ) {
+                console.log('执行显示 banner 1')
+                if (this.banner[i].show) {
+                    this.addStatus(this.banner[i], BANNER_STATUS.SHOW)
+                    this.banner[i].show()
+                        .then(() => {
+                            let bannerStyle = this._getBannerPosition();
+                            this.banner[i].style.top = bannerStyle.top;
+                            this.banner[i].style.left = bannerStyle.left;
+                        })
+                }
+                else {
+                    this.banner.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+    }
+
+    public preloadBanner(idIndex: number = -1): number {
+        return -1;
+    }
+
+    private clearStatus(banner) {
+        banner.status = BANNER_STATUS.NONE;
+        return banner;
+    }
+
+    private addStatus(banner, ad) {
+        banner.status |= ad;
+        return banner;
+    }
+    private removeStatus(banner, ad) {
+        if (this.hasStatus(banner, ad))
+            banner.status ^= ad;
+        return banner;
+    }
+    private hasStatus(banner, ad) {
+        return (banner.status & ad) == ad;
+    }
+
     public mBannerWidth = 320;
     public get bannerWidth(): number {
         let wxsys = this.getSystemInfoSync();
@@ -36,10 +108,26 @@ export default class QQModule extends PlatformModule {
         this.mBannerWidth = value
     }
     public bannerHeigth = Math.round(this.bannerWidth / 300 * 72.8071);
-
+    public banner: Array<any> = [];
+    public bannerIndex: number = 0;
     public _createBannerAd(adIndex: number, loadShow: boolean = true): string {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createBannerAd) return;
+
+        this.daemonTask();
+        let hasShow = false;
+        for (let i = 0; i < this.banner.length; i++) {
+            if (this.hasStatus(this.banner[i], BANNER_STATUS.SHOW) && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                hasShow = true;
+                break;
+            }
+        }
+        if (hasShow) {
+            console.log('当前有banner显示  取消创建')
+            return;
+        }
+
+
         let bannerId = this.getBannerId(adIndex);
         if (Common.isEmpty(bannerId)) {
             console.warn(MSG.BANNER_KEY_IS_NULL)
@@ -53,41 +141,43 @@ export default class QQModule extends PlatformModule {
             width: 320,
             height: height
         }
-        console.log(" 显示前先关闭 banner ")
-        this.hideBanner();
         console.log(" QQModule ~ _createBannerAd ~ style", style, bannerId)
-        this.banner[bannerId] = window[this.platformName].createBannerAd({
+        let banner = window[this.platformName].createBannerAd({
             adUnitId: bannerId,
             style
         });
+        this.clearStatus(banner);
+        this.addStatus(banner, BANNER_STATUS.CREATE);
+        this.addStatus(banner, BANNER_STATUS.WAIT_SHOW);
 
-        if (this.banner[bannerId]) {
-            this.banner[bannerId].onResize(this._onBannerResize);
-            this.banner[bannerId].onError(this._onBannerError);
-            this.banner[bannerId].onLoad(this._onBannerLoad.bind(this));
+        banner.bannerShowCount = 0;
+        banner.bannerShowTime = Date.now();
+        banner.bannerIndex = this.bannerIndex;
+        if (banner) {
+            banner.onResize(this._onBannerResize.bind(this, banner.bannerIndex));
+            banner.onError(this._onBannerError.bind(this, banner.bannerIndex));
+            banner.onLoad(this._onBannerLoad.bind(this, banner.bannerIndex));
         }
-        return bannerId;
+        this.bannerIndex++;
+        this.banner.push(banner);
     }
-    public _onBannerLoad() {
-        console.log("banner 加载结束 bannerId");
-        for (let k in this.banner) {
-            if (k != this.currentBannerId) {
-                this.banner[k].hide();
-                this.banner[k].destroy();
-                this.banner[k] = null;
-                delete this.banner[k]
+    public _onBannerLoad(bannerIndex) {
+        console.log("QQModule ~ _onBannerLoad ~ this.banner", this.banner)
+        for (let i = 0; i < this.banner.length; i++) {
+            if (this.banner[i].bannerIndex == bannerIndex) {
+                this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.LOADED)
             }
         }
-        let banner = this.banner[this.currentBannerId];
-        if (banner) {
-            banner.show();
-        }
-        else {
-            console.log('banner 不存在')
-        }
+        this.daemonTask();
     }
-    public _onBannerError(bannerId, err) {
-        console.warn('banner___error:', err, ' bannerId ', bannerId);
+    public _onBannerError(bannerIndex, err) {
+        console.warn('banner___error:', err, ' bannerIndex ', bannerIndex);
+        for (let i = 0; i < this.banner.length; i++) {
+            if (this.banner[i].bannerIndex == bannerIndex) {
+                this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.ERROR)
+            }
+        }
+        this.daemonTask();
     }
     /**
       * 显示平台的banner广告
@@ -106,6 +196,7 @@ export default class QQModule extends PlatformModule {
         this.bannerHorizontal = horizontal;
         this.bannerVertical = vertical;
         this.bannerStyle = style;
+        this.daemonTask();
         if (remoteOn)
             moosnow.http.getAllConfig(res => {
                 if (res.mistouchNum == 0) {
@@ -114,32 +205,40 @@ export default class QQModule extends PlatformModule {
                 }
                 else {
                     console.log('后台开启了banner，执行显示')
-                    this.currentBannerId = this._createBannerAd(idIndex);
+                    this._createBannerAd(idIndex);
                     this._showBanner();
                 }
             })
         else {
-            this.currentBannerId = this._createBannerAd(idIndex);
+            this._createBannerAd(idIndex);
             this._showBanner();
         }
 
     }
 
     public _showBanner() {
-        let banner = this.banner[this.currentBannerId]
-        if (banner) {
-            banner.show();
-        }
-        else {
-            console.log('banner 不存在')
+        for (let i = 0; i < this.banner.length; i++) {
+            if (!this.hasStatus(this.banner[i], BANNER_STATUS.HIDE)
+                && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)
+            ) {
+                this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.WAIT_SHOW)
+            }
         }
     }
 
-    public _onBannerResize(size) {
+    public _onBannerResize(bannerIndex, size) {
         // 尺寸调整时会触发回调         
         // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
         console.log('Resize后正式宽高:', size);
-        // this._resetBanenrStyle(size);
+        let bannerStyle = this._getBannerPosition();
+        for (let i = 0; i < this.banner.length; i++) {
+            if (this.banner[i].bannerIndex == bannerIndex) {
+                this.banner[i].style.top = bannerStyle.top;
+                this.banner[i].style.left = bannerStyle.left;
+                this.banner[i].style.width = size.width;
+                this.banner[i].style.height = size.height
+            }
+        }
     }
 
 
@@ -200,14 +299,12 @@ export default class QQModule extends PlatformModule {
      * 隐藏banner
      */
     public hideBanner() {
-        console.log(" hideBanner ~ this.banner", this.banner)
-        if (this.banner)
-            for (let k in this.banner) {
-                this.banner[k].hide();
-                this.banner[k].destroy();
-                this.banner[k] = null;
-                delete this.banner[k]
-            }
+        console.log(" QQModule ~ hideBanner ~ this.banner 1", this.banner)
+        for (let i = 0; i < this.banner.length; i++) {
+            this.addStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)
+        }
+        this.daemonTask();
+        console.log(" QQModule ~ hideBanner ~ this.banner 2", this.banner)
     }
     public hideAppBox(callback?: Function) {
         if (this.box) {

@@ -5,13 +5,21 @@ import { BANNER_HORIZONTAL, BANNER_VERTICAL } from '../enum/BANNER_POSITION';
 export default class QQModule extends PlatformModule {
     platformName: string;
     constructor();
+    private daemonTask;
+    preloadBanner(idIndex?: number): number;
+    private clearStatus;
+    private addStatus;
+    private removeStatus;
+    private hasStatus;
     mBannerWidth: number;
     get bannerWidth(): number;
     set bannerWidth(value: number);
     bannerHeigth: number;
+    banner: Array<any>;
+    bannerIndex: number;
     _createBannerAd(adIndex: number, loadShow?: boolean): string;
-    _onBannerLoad(): void;
-    _onBannerError(bannerId: any, err: any): void;
+    _onBannerLoad(bannerIndex: any): void;
+    _onBannerError(bannerIndex: any, err: any): void;
     /**
       * 显示平台的banner广告
       * @param remoteOn 是否被后台开关控制 默认 true，误触的地方传 true  普通的地方传 false
@@ -21,7 +29,7 @@ export default class QQModule extends PlatformModule {
       */
     showBanner(remoteOn?: boolean, callback?: (isOpend: boolean) => void, horizontal?: BANNER_HORIZONTAL, vertical?: BANNER_VERTICAL, idIndex?: number, style?: bannerStyle): void;
     _showBanner(): void;
-    _onBannerResize(size: any): void;
+    _onBannerResize(bannerIndex: any, size: any): void;
     /**
      * 盒子广告
      * @param callback 关闭回调

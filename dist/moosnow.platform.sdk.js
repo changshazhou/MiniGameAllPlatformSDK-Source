@@ -4513,6 +4513,10 @@ var mx = (function () {
             if (!window[this.platformName].createGameBannerAd)
                 return;
             if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+                if (this.gameBannerId) {
+                    console.warn('createGameBannerAd adUnitId 为空');
+                    return;
+                }
                 if (!this.gameBannerAd) {
                     this.gameBannerAd = window[this.platformName].createGameBannerAd({
                         adUnitId: this.gameBannerId
@@ -4534,13 +4538,25 @@ var mx = (function () {
         };
         OPPOModule.prototype.showGamePortalAd = function (onClose, onShow) {
             var _this = this;
-            if (!window[this.platformName])
+            if (!window[this.platformName]) {
+                if (onShow)
+                    onShow(false);
                 return;
-            if (!window[this.platformName].createGamePortalAd)
+            }
+            ;
+            if (!window[this.platformName].createGamePortalAd) {
+                if (onShow)
+                    onShow(false);
                 return;
+            }
+            ;
             this.onCloseGamePortalAd = onClose;
             this.onShowGamePortalAd = onShow;
             var self = this;
+            if (this.gamePortalId) {
+                console.warn('showGamePortalAd adUnitId 为空');
+                return;
+            }
             if (this.getSystemInfoSync().platformVersionCode >= 1076) {
                 if (!this.gamePortalAd) {
                     this.gamePortalAd = window[this.platformName].createGamePortalAd({
@@ -5535,6 +5551,17 @@ var mx = (function () {
         return TTModule;
     }(PlatformModule));
 
+    var BANNER_STATUS;
+    (function (BANNER_STATUS) {
+        BANNER_STATUS[BANNER_STATUS["NONE"] = 0] = "NONE";
+        BANNER_STATUS[BANNER_STATUS["CREATE"] = 1] = "CREATE";
+        BANNER_STATUS[BANNER_STATUS["LOADED"] = 2] = "LOADED";
+        BANNER_STATUS[BANNER_STATUS["WAIT_SHOW"] = 4] = "WAIT_SHOW";
+        BANNER_STATUS[BANNER_STATUS["SHOW"] = 8] = "SHOW";
+        BANNER_STATUS[BANNER_STATUS["WAIT_HIDE"] = 16] = "WAIT_HIDE";
+        BANNER_STATUS[BANNER_STATUS["HIDE"] = 32] = "HIDE";
+        BANNER_STATUS[BANNER_STATUS["ERROR"] = 1024] = "ERROR";
+    })(BANNER_STATUS || (BANNER_STATUS = {}));
     var QQModule = /** @class */ (function (_super) {
         __extends(QQModule, _super);
         function QQModule() {
@@ -5542,10 +5569,73 @@ var mx = (function () {
             _this.platformName = "qq";
             _this.mBannerWidth = 320;
             _this.bannerHeigth = Math.round(_this.bannerWidth / 300 * 72.8071);
+            _this.banner = [];
+            _this.bannerIndex = 0;
             _this._regisiterWXCallback();
-            _this.initBanner();
+            _this.schedule(_this.daemonTask, 0.2);
             return _this;
         }
+        QQModule.prototype.daemonTask = function () {
+            var _this = this;
+            var _loop_1 = function (i) {
+                if (this_1.hasStatus(this_1.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                    this_1.banner[i].hide();
+                    this_1.banner[i].destroy();
+                    this_1.banner[i] = null;
+                    this_1.banner.splice(i, 1);
+                    i--;
+                }
+                else if (this_1.hasStatus(this_1.banner[i], BANNER_STATUS.ERROR)) {
+                    this_1.banner[i] = null;
+                    this_1.banner.splice(i, 1);
+                    i--;
+                }
+                else if (this_1.hasStatus(this_1.banner[i], BANNER_STATUS.WAIT_SHOW)
+                    && this_1.hasStatus(this_1.banner[i], BANNER_STATUS.LOADED)
+                    && !this_1.hasStatus(this_1.banner[i], BANNER_STATUS.SHOW)) {
+                    console.log('执行显示 banner 1');
+                    if (this_1.banner[i].show) {
+                        this_1.addStatus(this_1.banner[i], BANNER_STATUS.SHOW);
+                        this_1.banner[i].show()
+                            .then(function () {
+                            var bannerStyle = _this._getBannerPosition();
+                            _this.banner[i].style.top = bannerStyle.top;
+                            _this.banner[i].style.left = bannerStyle.left;
+                        });
+                    }
+                    else {
+                        this_1.banner.splice(i, 1);
+                        i--;
+                    }
+                }
+                out_i_1 = i;
+            };
+            var this_1 = this, out_i_1;
+            for (var i = 0; i < this.banner.length; i++) {
+                _loop_1(i);
+                i = out_i_1;
+            }
+        };
+        QQModule.prototype.preloadBanner = function (idIndex) {
+            if (idIndex === void 0) { idIndex = -1; }
+            return -1;
+        };
+        QQModule.prototype.clearStatus = function (banner) {
+            banner.status = BANNER_STATUS.NONE;
+            return banner;
+        };
+        QQModule.prototype.addStatus = function (banner, ad) {
+            banner.status |= ad;
+            return banner;
+        };
+        QQModule.prototype.removeStatus = function (banner, ad) {
+            if (this.hasStatus(banner, ad))
+                banner.status ^= ad;
+            return banner;
+        };
+        QQModule.prototype.hasStatus = function (banner, ad) {
+            return (banner.status & ad) == ad;
+        };
         Object.defineProperty(QQModule.prototype, "bannerWidth", {
             get: function () {
                 var wxsys = this.getSystemInfoSync();
@@ -5578,6 +5668,18 @@ var mx = (function () {
                 return;
             if (!window[this.platformName].createBannerAd)
                 return;
+            this.daemonTask();
+            var hasShow = false;
+            for (var i = 0; i < this.banner.length; i++) {
+                if (this.hasStatus(this.banner[i], BANNER_STATUS.SHOW) && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                    hasShow = true;
+                    break;
+                }
+            }
+            if (hasShow) {
+                console.log('当前有banner显示  取消创建');
+                return;
+            }
             var bannerId = this.getBannerId(adIndex);
             if (Common.isEmpty(bannerId)) {
                 console.warn(MSG.BANNER_KEY_IS_NULL);
@@ -5591,40 +5693,42 @@ var mx = (function () {
                 width: 320,
                 height: height
             };
-            console.log(" 显示前先关闭 banner ");
-            this.hideBanner();
             console.log(" QQModule ~ _createBannerAd ~ style", style, bannerId);
-            this.banner[bannerId] = window[this.platformName].createBannerAd({
+            var banner = window[this.platformName].createBannerAd({
                 adUnitId: bannerId,
                 style: style
             });
-            if (this.banner[bannerId]) {
-                this.banner[bannerId].onResize(this._onBannerResize);
-                this.banner[bannerId].onError(this._onBannerError);
-                this.banner[bannerId].onLoad(this._onBannerLoad.bind(this));
+            this.clearStatus(banner);
+            this.addStatus(banner, BANNER_STATUS.CREATE);
+            this.addStatus(banner, BANNER_STATUS.WAIT_SHOW);
+            banner.bannerShowCount = 0;
+            banner.bannerShowTime = Date.now();
+            banner.bannerIndex = this.bannerIndex;
+            if (banner) {
+                banner.onResize(this._onBannerResize.bind(this, banner.bannerIndex));
+                banner.onError(this._onBannerError.bind(this, banner.bannerIndex));
+                banner.onLoad(this._onBannerLoad.bind(this, banner.bannerIndex));
             }
-            return bannerId;
+            this.bannerIndex++;
+            this.banner.push(banner);
         };
-        QQModule.prototype._onBannerLoad = function () {
-            console.log("banner 加载结束 bannerId");
-            for (var k in this.banner) {
-                if (k != this.currentBannerId) {
-                    this.banner[k].hide();
-                    this.banner[k].destroy();
-                    this.banner[k] = null;
-                    delete this.banner[k];
+        QQModule.prototype._onBannerLoad = function (bannerIndex) {
+            console.log("QQModule ~ _onBannerLoad ~ this.banner", this.banner);
+            for (var i = 0; i < this.banner.length; i++) {
+                if (this.banner[i].bannerIndex == bannerIndex) {
+                    this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.LOADED);
                 }
             }
-            var banner = this.banner[this.currentBannerId];
-            if (banner) {
-                banner.show();
-            }
-            else {
-                console.log('banner 不存在');
-            }
+            this.daemonTask();
         };
-        QQModule.prototype._onBannerError = function (bannerId, err) {
-            console.warn('banner___error:', err, ' bannerId ', bannerId);
+        QQModule.prototype._onBannerError = function (bannerIndex, err) {
+            console.warn('banner___error:', err, ' bannerIndex ', bannerIndex);
+            for (var i = 0; i < this.banner.length; i++) {
+                if (this.banner[i].bannerIndex == bannerIndex) {
+                    this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.ERROR);
+                }
+            }
+            this.daemonTask();
         };
         /**
           * 显示平台的banner广告
@@ -5648,6 +5752,7 @@ var mx = (function () {
             this.bannerHorizontal = horizontal;
             this.bannerVertical = vertical;
             this.bannerStyle = style;
+            this.daemonTask();
             if (remoteOn)
                 moosnow.http.getAllConfig(function (res) {
                     if (res.mistouchNum == 0) {
@@ -5656,29 +5761,36 @@ var mx = (function () {
                     }
                     else {
                         console.log('后台开启了banner，执行显示');
-                        _this.currentBannerId = _this._createBannerAd(idIndex);
+                        _this._createBannerAd(idIndex);
                         _this._showBanner();
                     }
                 });
             else {
-                this.currentBannerId = this._createBannerAd(idIndex);
+                this._createBannerAd(idIndex);
                 this._showBanner();
             }
         };
         QQModule.prototype._showBanner = function () {
-            var banner = this.banner[this.currentBannerId];
-            if (banner) {
-                banner.show();
-            }
-            else {
-                console.log('banner 不存在');
+            for (var i = 0; i < this.banner.length; i++) {
+                if (!this.hasStatus(this.banner[i], BANNER_STATUS.HIDE)
+                    && !this.hasStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE)) {
+                    this.banner[i] = this.addStatus(this.banner[i], BANNER_STATUS.WAIT_SHOW);
+                }
             }
         };
-        QQModule.prototype._onBannerResize = function (size) {
+        QQModule.prototype._onBannerResize = function (bannerIndex, size) {
             // 尺寸调整时会触发回调         
             // 注意：如果在回调里再次调整尺寸，要确保不要触发死循环！！！  
             console.log('Resize后正式宽高:', size);
-            // this._resetBanenrStyle(size);
+            var bannerStyle = this._getBannerPosition();
+            for (var i = 0; i < this.banner.length; i++) {
+                if (this.banner[i].bannerIndex == bannerIndex) {
+                    this.banner[i].style.top = bannerStyle.top;
+                    this.banner[i].style.left = bannerStyle.left;
+                    this.banner[i].style.width = size.width;
+                    this.banner[i].style.height = size.height;
+                }
+            }
         };
         /**
          * 盒子广告
@@ -5741,14 +5853,12 @@ var mx = (function () {
          * 隐藏banner
          */
         QQModule.prototype.hideBanner = function () {
-            console.log(" hideBanner ~ this.banner", this.banner);
-            if (this.banner)
-                for (var k in this.banner) {
-                    this.banner[k].hide();
-                    this.banner[k].destroy();
-                    this.banner[k] = null;
-                    delete this.banner[k];
-                }
+            console.log(" QQModule ~ hideBanner ~ this.banner 1", this.banner);
+            for (var i = 0; i < this.banner.length; i++) {
+                this.addStatus(this.banner[i], BANNER_STATUS.WAIT_HIDE);
+            }
+            this.daemonTask();
+            console.log(" QQModule ~ hideBanner ~ this.banner 2", this.banner);
         };
         QQModule.prototype.hideAppBox = function (callback) {
             var _this = this;

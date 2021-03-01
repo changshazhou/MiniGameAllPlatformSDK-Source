@@ -830,6 +830,10 @@ export default class OPPOModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createGameBannerAd) return;
         if (this.getSystemInfoSync().platformVersionCode >= 1076) {
+            if (this.gameBannerId) {
+                console.warn('createGameBannerAd adUnitId 为空')
+                return;
+            }
             if (!this.gameBannerAd) {
                 this.gameBannerAd = window[this.platformName].createGameBannerAd({
                     adUnitId: this.gameBannerId
@@ -852,11 +856,23 @@ export default class OPPOModule extends PlatformModule {
     private onCloseGamePortalAd: Function;
     private onShowGamePortalAd: Function;
     public showGamePortalAd(onClose?: () => void, onShow?: (success) => void) {
-        if (!window[this.platformName]) return;
-        if (!window[this.platformName].createGamePortalAd) return;
+        if (!window[this.platformName]) {
+            if (onShow)
+                onShow(false);
+            return;
+        };
+        if (!window[this.platformName].createGamePortalAd) {
+            if (onShow)
+                onShow(false);
+            return;
+        };
         this.onCloseGamePortalAd = onClose;
         this.onShowGamePortalAd = onShow;
         let self = this;
+        if (this.gamePortalId) {
+            console.warn('showGamePortalAd adUnitId 为空')
+            return;
+        }
         if (this.getSystemInfoSync().platformVersionCode >= 1076) {
             if (!this.gamePortalAd) {
                 this.gamePortalAd = window[this.platformName].createGamePortalAd({
