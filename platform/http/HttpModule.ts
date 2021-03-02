@@ -366,7 +366,10 @@ export class HttpModule extends BaseModule {
                                 isLimitArea: 1,
                                 ...res,
                                 ...this.getCfg(false),
-                                site01: []
+                                site01: [],
+                                site02: [],
+                                site03: [],
+                                site04: []
                             })
                         }
                         else {
