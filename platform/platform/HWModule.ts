@@ -9,14 +9,78 @@ export default class HWModule extends PlatformModule {
 
     public platformName = "hbs";
 
-    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1, style?: bannerStyle) {
 
+
+    public showBanner(remoteOn: boolean = true, callback?: (isOpend: boolean) => void, horizontal: BANNER_HORIZONTAL = BANNER_HORIZONTAL.CENTER, vertical: BANNER_VERTICAL = BANNER_VERTICAL.BOTTOM, idIndex: number = -1, style?: bannerStyle) {
+        return;
+        this.bannerCb = callback;
+        this.isBannerShow = true;
+
+        console.log("HWModule ~ showBanner ~ begin ----------------------------",)
+        if (!window[this.platformName]) {
+            return;
+        }
+        this.bannerHorizontal = horizontal;
+        this.bannerVertical = vertical;
+        this.bannerStyle = style;
+        let bannerStyle = this._getBannerPosition();
+        let bannerId = this.getBannerId(idIndex);
+        if (!style)
+            style = {
+                top: 20,
+                left: 20,
+                width: -1,
+                height: -2
+            }
+        this.banner[bannerId].isLoaded = false;
+        this.banner[bannerId].bannerShowCount = 0;
+        this.banner[bannerId].bannerShowTime = Date.now();
+        console.log("HWModule ~ showBanner ~ bannerId", bannerId, style)
+        this.banner[bannerId] = window[this.platformName].createBannerAd({
+            adUnitId: "testw6vs28auh3",
+            style: {
+                top: 20,
+                left: 20,
+                width: 360,
+                height: 57
+            }
+        });
+        console.log("HWModule ~ showBanner ~ bannerId 2", JSON.stringify(this.banner[bannerId]))
+        if (this.banner[bannerId]) {
+            this.banner[bannerId].onResize(this._onBannerResize);
+            this.banner[bannerId].onError(this._onBannerError);
+            this.banner[bannerId].onLoad(this._onBannerLoad);
+        }
+        moosnow.http.getAllConfig(res => {
+            if (res.BannerAll == 0) {
+                console.log('后台关闭所有banner BannerAll == 0 发送 ON_BANNER_ERROR 事件')
+                return;
+            }
+            if (remoteOn)
+                if (res.mistouchNum == 0) {
+                    console.log('后台关闭了banner 发送 ON_BANNER_ERROR 事件')
+                    return;
+                }
+                else {
+                    console.log('后台开启了banner，执行显示')
+                    this.banner[bannerId].show();
+                }
+            else
+                this.banner[bannerId].show();
+        })
+    }
+    public _onBannerLoad() {
+        console.log("HWModule ~ _onBannerLoad ~ ok")
+    }
+    public _onBannerError(res) {
+        console.log("HWModule ~ _onBannerLoad ~ err ", JSON.stringify(res))
     }
 
     public createRewardAD(show: boolean, idIndex: number = 0) {
         if (this.videoLoading) {
             return;
         }
+        console.log('HWModule createRewardAD platformName ', window[this.platformName])
         if (!window[this.platformName]) {
             if (moosnow.platform.videoCb)
                 moosnow.platform.videoCb(VIDEO_STATUS.END);

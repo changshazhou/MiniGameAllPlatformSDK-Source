@@ -439,6 +439,8 @@ var mx = (function () {
                     this.mPlatform = APP_PLATFORM.BAIDU;
                 else if (window['qq'])
                     this.mPlatform = APP_PLATFORM.QQ;
+                else if (window['hbs'])
+                    this.mPlatform = APP_PLATFORM.HW;
                 else if (window['qg']) {
                     if (window["qg"] && window["qg"].getSystemInfoSync) {
                         var sys = window["qg"].getSystemInfoSync();
@@ -460,8 +462,6 @@ var mx = (function () {
                 }
                 else if (window['uc'])
                     this.mPlatform = APP_PLATFORM.UC;
-                else if (window['hbs'])
-                    this.mPlatform = APP_PLATFORM.HW;
                 else if (window['kwaigame'])
                     this.mPlatform = APP_PLATFORM.KUAI;
                 else if (window['wx'])
@@ -3460,7 +3460,7 @@ var mx = (function () {
                                     exportAutoNavigate = 0;
                                 if (res.exportAutoNavigate == 2)
                                     exportAutoNavigate = 1;
-                                callback(__assign(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)), { site01: [] }));
+                                callback(__assign(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)), { site01: [], site02: [], site03: [], site04: [] }));
                             }
                             else {
                                 if (res.exportAutoNavigate == 1)
@@ -9716,10 +9716,71 @@ var mx = (function () {
             return _this;
         }
         HWModule.prototype.showBanner = function (remoteOn, callback, horizontal, vertical, idIndex, style) {
+            var _this = this;
             if (remoteOn === void 0) { remoteOn = true; }
             if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
             if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
             if (idIndex === void 0) { idIndex = -1; }
+            this.bannerCb = callback;
+            this.isBannerShow = true;
+            console.log("HWModule ~ showBanner ~ begin ----------------------------");
+            if (!window[this.platformName]) {
+                return;
+            }
+            this.bannerHorizontal = horizontal;
+            this.bannerVertical = vertical;
+            this.bannerStyle = style;
+            var bannerStyle = this._getBannerPosition();
+            var bannerId = this.getBannerId(idIndex);
+            if (!style)
+                style = {
+                    top: 20,
+                    left: 20,
+                    width: -1,
+                    height: -2
+                };
+            this.banner[bannerId].isLoaded = false;
+            this.banner[bannerId].bannerShowCount = 0;
+            this.banner[bannerId].bannerShowTime = Date.now();
+            console.log("HWModule ~ showBanner ~ bannerId", bannerId, style);
+            this.banner[bannerId] = window[this.platformName].createBannerAd({
+                adUnitId: "testw6vs28auh3",
+                style: {
+                    top: 20,
+                    left: 20,
+                    width: 360,
+                    height: 57
+                }
+            });
+            console.log("HWModule ~ showBanner ~ bannerId 2", JSON.stringify(this.banner[bannerId]));
+            if (this.banner[bannerId]) {
+                this.banner[bannerId].onResize(this._onBannerResize);
+                this.banner[bannerId].onError(this._onBannerError);
+                this.banner[bannerId].onLoad(this._onBannerLoad);
+            }
+            moosnow.http.getAllConfig(function (res) {
+                if (res.BannerAll == 0) {
+                    console.log('后台关闭所有banner BannerAll == 0 发送 ON_BANNER_ERROR 事件');
+                    return;
+                }
+                if (remoteOn)
+                    if (res.mistouchNum == 0) {
+                        console.log('后台关闭了banner 发送 ON_BANNER_ERROR 事件');
+                        return;
+                    }
+                    else {
+                        console.log('后台开启了banner，执行显示');
+                        _this.banner[bannerId].show();
+                    }
+                else
+                    _this.banner[bannerId].show();
+            });
+        };
+        HWModule.prototype._onBannerLoad = function () {
+            console.log("HWModule ~ _onBannerLoad ~ ok");
+        };
+        HWModule.prototype._onBannerError = function (res) {
+            console.log("HWModule ~ _onBannerLoad ~ err ", JSON.stringify(res));
         };
         HWModule.prototype.createRewardAD = function (show, idIndex) {
             var _this = this;
@@ -9727,6 +9788,7 @@ var mx = (function () {
             if (this.videoLoading) {
                 return;
             }
+            console.log('HWModule createRewardAD platformName ', window[this.platformName]);
             if (!window[this.platformName]) {
                 if (moosnow.platform.videoCb)
                     moosnow.platform.videoCb(VIDEO_STATUS.END);

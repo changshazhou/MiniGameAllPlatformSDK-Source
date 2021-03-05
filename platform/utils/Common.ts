@@ -140,6 +140,8 @@ export default class Common {
             this.mPlatform = APP_PLATFORM.BAIDU
         else if (window['qq'])
             this.mPlatform = APP_PLATFORM.QQ
+        else if (window['hbs'])
+            this.mPlatform = APP_PLATFORM.HW
         else if (window['qg']) {
             if (window["qg"] && window["qg"].getSystemInfoSync) {
                 let sys = window["qg"].getSystemInfoSync();
@@ -162,8 +164,6 @@ export default class Common {
         }
         else if (window['uc'])
             this.mPlatform = APP_PLATFORM.UC
-        else if (window['hbs'])
-            this.mPlatform = APP_PLATFORM.HW
         else if (window['kwaigame'])
             this.mPlatform = APP_PLATFORM.KUAI
         else if (window['wx'])
