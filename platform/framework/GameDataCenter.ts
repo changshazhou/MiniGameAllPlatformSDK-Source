@@ -6,6 +6,7 @@ export default class GameDataCenter extends BaseModule {
 
     private TOKEN: string = "MOOSNOW_SDK_TOKEN";
     private COIN: string = "MOOSNOW_SDK_COIN";
+    private SCENE: string = "MOOSNOW_SDK_SCENE";
     private NAVIGATE_TOKEN: string = "MOOSNOW_SDK_NAVIGATE_TOKEN";
 
     private mUserToken: string = "";
@@ -141,6 +142,14 @@ export default class GameDataCenter extends BaseModule {
     public clearPrizeKey() {
         this.mPrizeKey = null;
         moosnow.setting.setValue(this.USER_PRIZE_KEY, "")
+    }
+
+    public getScene() {
+        return moosnow.setting.getString(this.SCENE, "")
+    }
+
+    public setScene(value) {
+        moosnow.setting.setValue(this.SCENE, value)
     }
 
 }

@@ -2659,6 +2659,7 @@ var mx = (function () {
                 self.getUserToken("", userToken, callback);
             }
             else {
+                moosnow.data.setScene(this.getLaunchOption().scene);
                 if (window[this.platformName] && window[this.platformName].login)
                     window[this.platformName].login({
                         success: function (res) {
@@ -3700,14 +3701,15 @@ var mx = (function () {
                     }
                 }
             }
-            if (this.appLaunchOptions && res) {
+            var firstScene = moosnow.data.getScene();
+            if (!Common.isEmpty(firstScene)) {
                 console.log('后台禁止场景 1 ', res.seachEntryScene);
                 console.log('后台禁止场景 2 ', res.shareEntryScene);
-                console.log('进入时的场景 ', this.appLaunchOptions.scene);
-                if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
-                    || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
+                console.log('进入时的场景 ', firstScene);
+                if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(firstScene) != -1)
+                    || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(firstScene) != -1)) {
                     callback(true);
-                    console.log('后台禁止场景 ', this.appLaunchOptions.scene);
+                    console.log('后台禁止场景 ', firstScene);
                     return;
                 }
             }
@@ -4615,6 +4617,7 @@ var mx = (function () {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.TOKEN = "MOOSNOW_SDK_TOKEN";
             _this.COIN = "MOOSNOW_SDK_COIN";
+            _this.SCENE = "MOOSNOW_SDK_SCENE";
             _this.NAVIGATE_TOKEN = "MOOSNOW_SDK_NAVIGATE_TOKEN";
             _this.mUserToken = "";
             _this.VIBRATE_SWITCH = "MOOSNOW_VIBRATE_SWITCH";
@@ -4732,6 +4735,12 @@ var mx = (function () {
         GameDataCenter.prototype.clearPrizeKey = function () {
             this.mPrizeKey = null;
             moosnow.setting.setValue(this.USER_PRIZE_KEY, "");
+        };
+        GameDataCenter.prototype.getScene = function () {
+            return moosnow.setting.getString(this.SCENE, "");
+        };
+        GameDataCenter.prototype.setScene = function (value) {
+            moosnow.setting.setValue(this.SCENE, value);
         };
         return GameDataCenter;
     }(BaseModule));
@@ -9721,6 +9730,7 @@ var mx = (function () {
             if (horizontal === void 0) { horizontal = BANNER_HORIZONTAL.CENTER; }
             if (vertical === void 0) { vertical = BANNER_VERTICAL.BOTTOM; }
             if (idIndex === void 0) { idIndex = -1; }
+            return;
             this.bannerCb = callback;
             this.isBannerShow = true;
             console.log("HWModule ~ showBanner ~ begin ----------------------------");

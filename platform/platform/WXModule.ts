@@ -24,16 +24,14 @@ export default class WXModule extends PlatformModule {
      */
     public login(callback?: Function, fail?: Function) {
         moosnow.http.getAllConfig(res => {
-
         });
-
         let self = this;
-
         let userToken: any = moosnow.data.getToken();
         if (userToken && !isNaN(userToken)) {
             self.getUserToken("", userToken, callback)
         }
         else {
+            moosnow.data.setScene(this.getLaunchOption().scene)
             if (window[this.platformName] && window[this.platformName].login)
                 window[this.platformName].login({
                     success: (res) => {

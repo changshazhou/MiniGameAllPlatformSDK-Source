@@ -652,16 +652,17 @@ export class HttpModule extends BaseModule {
                 }
             }
         }
-        if (this.appLaunchOptions && res) {
+        let firstScene = moosnow.data.getScene();
+        if (!Common.isEmpty(firstScene)) {
 
             console.log('后台禁止场景 1 ', res.seachEntryScene);
             console.log('后台禁止场景 2 ', res.shareEntryScene);
-            console.log('进入时的场景 ', this.appLaunchOptions.scene);
+            console.log('进入时的场景 ', firstScene);
 
-            if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(this.appLaunchOptions.scene) != -1)
-                || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(this.appLaunchOptions.scene) != -1)) {
+            if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(firstScene) != -1)
+                || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(firstScene) != -1)) {
                 callback(true)
-                console.log('后台禁止场景 ', this.appLaunchOptions.scene);
+                console.log('后台禁止场景 ', firstScene);
                 return;
             }
         }

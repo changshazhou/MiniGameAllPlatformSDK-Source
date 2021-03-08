@@ -2,6 +2,7 @@ import BaseModule from "./BaseModule";
 export default class GameDataCenter extends BaseModule {
     private TOKEN;
     private COIN;
+    private SCENE;
     private NAVIGATE_TOKEN;
     private mUserToken;
     private VIBRATE_SWITCH;
@@ -41,4 +42,6 @@ export default class GameDataCenter extends BaseModule {
     getPrizeKey(): number;
     addPrizeKey(keyNum: any): void;
     clearPrizeKey(): void;
+    getScene(): string;
+    setScene(value: any): void;
 }
