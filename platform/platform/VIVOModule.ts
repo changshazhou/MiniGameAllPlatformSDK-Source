@@ -548,7 +548,7 @@ export default class VIVOModule extends PlatformModule {
         this.nativeLoading = false;
         if (err.code == 20003) {
             if (this.nativeIdIndex < this.nativeId.length - 1) {
-                console.log(MSG.NATIVE_ERROR, err,)
+                console.log(MSG.NATIVE_ERROR, err)
                 this.nativeIdIndex += 1;
                 this._destroyNative();
             }
