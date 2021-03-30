@@ -24,7 +24,14 @@ export default class VIVOModule extends PlatformModule {
     private initAdService() {
         // this.initBanner();
         // this.initInter();
-        this._prepareNative();
+        moosnow.http.getAllConfig(res => {
+            for (let k in Common.config) {
+                if (res && res.hasOwnProperty(k) && "version" != k) {
+                    Common.config[k] = res[k]
+                }
+            }
+            this._prepareNative();
+        })
         moosnow.event.addListener(EventType.ON_PLATFORM_SHOW, this, this.onAppShow)
     }
 
