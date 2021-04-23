@@ -395,6 +395,10 @@ export class HttpModule extends BaseModule {
     public areaData = null;
     public _cfgQuene = [];
 
+    public updateCache(key: string, value: any) {
+        this.cfgData[key] = value;
+    }
+
     private getCfg(open: boolean) {
         let cfg = {
             checkBoxMistouch: 0,

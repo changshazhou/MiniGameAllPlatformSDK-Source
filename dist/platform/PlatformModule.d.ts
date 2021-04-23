@@ -412,10 +412,6 @@ export default class PlatformModule extends BaseModule {
     showBlock(horizontal?: BLOCK_HORIZONTAL, vertical?: BLOCK_VERTICAL, orientation?: number, size?: number): void;
     hideBlock(): void;
     private isLoaded;
-    /**
-     * 屏蔽iphone关闭退出按钮
-     */
-    hideExitButton(): void;
     gameBannerAd: any;
     gamePortalAd: any;
     showGameBannerAd(): void;

@@ -79,6 +79,7 @@ export declare class HttpModule extends BaseModule {
     cfgData: any;
     areaData: any;
     _cfgQuene: any[];
+    updateCache(key: string, value: any): void;
     private getCfg;
     /**
      *

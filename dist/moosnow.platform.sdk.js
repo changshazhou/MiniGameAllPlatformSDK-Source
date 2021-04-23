@@ -2,25 +2,25 @@ var mx = (function () {
     'use strict';
 
     /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
+    Copyright (c) Microsoft Corporation.
 
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
     /* global Reflect, Promise */
 
     var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
 
@@ -106,8 +106,16 @@ var mx = (function () {
         }
     }
 
-    function __exportStar(m, exports) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    var __createBinding = Object.create ? (function(o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    }) : (function(o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+    });
+
+    function __exportStar(m, o) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
     }
 
     function __values(o) {
@@ -188,11 +196,17 @@ var mx = (function () {
         return cooked;
     };
 
+    var __setModuleDefault = Object.create ? (function(o, v) {
+        Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+        o["default"] = v;
+    };
+
     function __importStar(mod) {
         if (mod && mod.__esModule) return mod;
         var result = {};
-        if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-        result.default = mod;
+        if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+        __setModuleDefault(result, mod);
         return result;
     }
 
@@ -497,21 +511,21 @@ var mx = (function () {
                 }
                 return this.mPlatform;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Common, "isOnlyUI", {
             get: function () {
                 return window["onlyUI"] == true;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Common, "isPC", {
             get: function () {
                 return cc.sys.browserType === cc.sys.BROWSER_TYPE_CHROME;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Common, "config", {
@@ -538,7 +552,7 @@ var mx = (function () {
                     config = winCfg.wx;
                 return config;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Common.colorRGB2Hex = function (color) {
@@ -985,7 +999,7 @@ var mx = (function () {
             get: function () {
                 return this.getAdId(Common.config.interId, -1);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -993,7 +1007,7 @@ var mx = (function () {
             get: function () {
                 return this.getAdId(Common.config.boxId, -1);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -1001,7 +1015,7 @@ var mx = (function () {
             get: function () {
                 return this.getAdId(Common.config.nativeId, -1);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -1009,7 +1023,7 @@ var mx = (function () {
             get: function () {
                 return this.getAdId(Common.config.gameBannerId, -1);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -1017,7 +1031,7 @@ var mx = (function () {
             get: function () {
                 return this.getAdId(Common.config.gamePortalId, -1);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -1043,7 +1057,7 @@ var mx = (function () {
             set: function (value) {
                 this.mBannerWidth = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -2565,51 +2579,6 @@ var mx = (function () {
         };
         PlatformModule.prototype.hideBlock = function () {
         };
-        /**
-         * 屏蔽iphone关闭退出按钮
-         */
-        PlatformModule.prototype.hideExitButton = function () {
-            var _this = this;
-            if (!window[this.platformName])
-                return;
-            if (!window[this.platformName].createVideo)
-                return;
-            if (!this.isIphone())
-                return;
-            if (this.isLoaded) {
-                return;
-            }
-            this.isLoaded = true;
-            moosnow.http.getAllConfig(function (res) {
-                var isBlockClose = res && res.isBlockClose == 1;
-                if (isBlockClose) {
-                    var sysInfo = _this.getSystemInfoSync();
-                    var width = sysInfo.screenWidth;
-                    var height = sysInfo.screenHeight;
-                    var url = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/video/1.mp4";
-                    var video = window['wx'].createVideo({
-                        x: 0,
-                        y: 0,
-                        width: width,
-                        height: height,
-                        src: url,
-                        objectFit: "contain",
-                        controls: !1,
-                        autoplay: !0,
-                        showCenterPlayBtn: !1,
-                        enableProgressGesture: !1
-                    });
-                    if (sysInfo.model.indexOf("iPhone") != -1) {
-                        console.log("苹果手机 播放视频");
-                        video.requestFullScreen();
-                    }
-                    video.onEnded(function (e) {
-                        video.destroy();
-                        console.log("video.destroy");
-                    });
-                }
-            });
-        };
         PlatformModule.prototype.showGameBannerAd = function () {
         };
         PlatformModule.prototype.hideGameBannerAd = function () {
@@ -3122,13 +3091,13 @@ var mx = (function () {
         }
         Object.defineProperty(ROOT_CONFIG, "HTTP_ROOT", {
             get: function () {
-                var retValue = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com";
+                var retValue = "https://csg-1302185196.cos.ap-chengdu.myqcloud.com/";
                 if (window && window["HTTP_ROOT"]) {
                     retValue = window["HTTP_ROOT"];
                 }
                 return retValue;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return ROOT_CONFIG;
@@ -3194,7 +3163,7 @@ var mx = (function () {
                 }
                 return this.mLaunchOptions;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         /**
@@ -3474,6 +3443,9 @@ var mx = (function () {
                     });
                 }
             });
+        };
+        HttpModule.prototype.updateCache = function (key, value) {
+            this.cfgData[key] = value;
         };
         HttpModule.prototype.getCfg = function (open) {
             var cfg = {
@@ -3787,7 +3759,7 @@ var mx = (function () {
             set: function (value) {
                 this.mBannerWidth = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -4959,7 +4931,7 @@ var mx = (function () {
             set: function (value) {
                 this.mBannerWidth = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         TTModule.prototype._registerTTCallback = function () {
@@ -5667,7 +5639,7 @@ var mx = (function () {
             set: function (value) {
                 this.mBannerWidth = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -7525,7 +7497,7 @@ var mx = (function () {
             set: function (value) {
                 this.mBtnSound = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         AudioModule.prototype.playClickEffect = function () {
@@ -7547,7 +7519,7 @@ var mx = (function () {
                 //Laya.SoundManager.soundMuted = value;
                 this.save();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(AudioModule.prototype, "isMute", {
@@ -7561,7 +7533,7 @@ var mx = (function () {
                 this._isMute = value;
                 this.save();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(AudioModule.prototype, "isMuteMusic", {
@@ -7576,7 +7548,7 @@ var mx = (function () {
                 //Laya.SoundManager.musicMuted = value;
                 this.save();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(AudioModule.prototype, "volumeSound", {
@@ -7591,7 +7563,7 @@ var mx = (function () {
                 //Laya.SoundManager.setSoundVolume(value);
                 this.save();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         /**
@@ -7945,7 +7917,7 @@ var mx = (function () {
                 // debugger
                 this.mQuene = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return LayoutFormQuene;
@@ -7967,7 +7939,7 @@ var mx = (function () {
             set: function (value) {
                 this.mFormQuene = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ;
@@ -7978,7 +7950,7 @@ var mx = (function () {
             set: function (value) {
                 this.mCachedLayoutQuene = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         FormFactory.prototype.destory = function () {
@@ -8252,7 +8224,7 @@ var mx = (function () {
             get: function () {
                 return cc.Canvas.instance.node;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         NodeHelper.getNodeName = function () {
@@ -8292,7 +8264,7 @@ var mx = (function () {
             set: function (value) {
                 this.mOwner = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         BaseForm.prototype.start = function () {
@@ -8304,7 +8276,7 @@ var mx = (function () {
             get: function () {
                 return this.mFormData;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         /**
@@ -8383,14 +8355,14 @@ var mx = (function () {
             get: function () {
                 return "";
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(NodeEvent, "TOUCH_END", {
             get: function () {
                 return "";
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return NodeEvent;
@@ -8405,21 +8377,21 @@ var mx = (function () {
             get: function () {
                 return cc.Node.EventType.TOUCH_START;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(CocosNodeEvent, "TOUCH_END", {
             get: function () {
                 return cc.Node.EventType.TOUCH_END;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(CocosNodeEvent, "TOUCH_CANCEL", {
             get: function () {
                 return cc.Node.EventType.TOUCH_CANCEL;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return CocosNodeEvent;
@@ -8506,7 +8478,7 @@ var mx = (function () {
             set: function (value) {
                 this.mRootNode = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CocosNodeHelper.createNode = function (name, nodeCfg) {
@@ -9305,7 +9277,7 @@ var mx = (function () {
             set: function (value) {
                 this._hideForm = value;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return showOptions;
@@ -9403,7 +9375,7 @@ var mx = (function () {
             get: function () {
                 return this.mFormData;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         CocosNativeForm.prototype.onShow = function (data) {
@@ -10208,7 +10180,7 @@ var mx = (function () {
                 }
                 return this.mPlatform;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(moosnow, "ad", {
@@ -10227,7 +10199,7 @@ var mx = (function () {
                 }
                 return moosnow.mAd;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(moosnow, "http", {
@@ -10243,7 +10215,7 @@ var mx = (function () {
                 }
                 return this.mHttp;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         moosnow.VIDEO_STATUS = VIDEO_STATUS;

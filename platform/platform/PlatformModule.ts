@@ -1744,49 +1744,7 @@ export default class PlatformModule extends BaseModule {
 
     }
     private isLoaded: boolean = false;
-    /**
-     * 屏蔽iphone关闭退出按钮
-     */
-    public hideExitButton() {
-        if (!window[this.platformName]) return;
-        if (!window[this.platformName].createVideo) return;
-        if (!this.isIphone()) return;
 
-        if (this.isLoaded) {
-            return;
-        }
-        this.isLoaded = true;
-        moosnow.http.getAllConfig(res => {
-            let isBlockClose = res && res.isBlockClose == 1;
-            if (isBlockClose) {
-                let sysInfo = this.getSystemInfoSync();
-                var width: number = sysInfo.screenWidth;
-                var height: number = sysInfo.screenHeight;
-                var url: String = "https://liteplay-1253992229.cos.ap-guangzhou.myqcloud.com/video/1.mp4";
-
-                var video: any = (window['wx'] as any).createVideo({
-                    x: 0,
-                    y: 0,
-                    width: width,
-                    height: height,
-                    src: url,
-                    objectFit: "contain",
-                    controls: !1,
-                    autoplay: !0,
-                    showCenterPlayBtn: !1,
-                    enableProgressGesture: !1
-                });
-                if (sysInfo.model.indexOf("iPhone") != -1) {
-                    console.log("苹果手机 播放视频");
-                    video.requestFullScreen();
-                }
-                video.onEnded(function (e): void {
-                    video.destroy();
-                    console.log("video.destroy");
-                });
-            }
-        })
-    }
 
     public gameBannerAd: any;
     public gamePortalAd: any;
