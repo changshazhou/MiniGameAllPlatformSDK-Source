@@ -869,7 +869,7 @@ export default class OPPOModule extends PlatformModule {
         this.onCloseGamePortalAd = onClose;
         this.onShowGamePortalAd = onShow;
         let self = this;
-        if (this.gamePortalId) {
+        if (!this.gamePortalId) {
             console.warn('showGamePortalAd adUnitId 为空')
             return;
         }
