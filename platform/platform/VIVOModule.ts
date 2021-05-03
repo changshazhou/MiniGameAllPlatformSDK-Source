@@ -511,6 +511,7 @@ export default class VIVOModule extends PlatformModule {
         if (!window[this.platformName]) return;
         if (!window[this.platformName].createNativeAd) return;
         this._destroyNative();
+        console.log("初始化_prepareNative ", this.nativeId)
         this.native = window[this.platformName].createNativeAd({
             posId: this.nativeId
         })

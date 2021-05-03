@@ -4527,7 +4527,7 @@ var mx = (function () {
             this.onCloseGamePortalAd = onClose;
             this.onShowGamePortalAd = onShow;
             var self = this;
-            if (this.gamePortalId) {
+            if (!this.gamePortalId) {
                 console.warn('showGamePortalAd adUnitId 为空');
                 return;
             }
