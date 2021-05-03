@@ -3122,7 +3122,6 @@ var mx = (function () {
             _this.secret = "";
             _this.versionNumber = "";
             _this.version = "2.1.0";
-            _this.baseUrl = "https://api.liteplay.com.cn/";
             _this.instanceTime = 0;
             _this.mLaunchOptions = {};
             _this.cfgData = null;
@@ -3292,31 +3291,31 @@ var mx = (function () {
                 tag: tag
             };
             console.log('navigate navigateData', navigateData);
-            var url = this.baseUrl + "api/jump/record";
-            if (Common.platform == APP_PLATFORM.OPPO) {
-                url = this.baseUrl + "api/jump_oppo/record";
-            }
-            this.request(url, navigateData, "POST", function (respone) {
-                console.log('navigate success ', respone);
-                if (callback)
-                    callback(respone.data);
-            });
+            // let url = `${this.baseUrl}api/jump/record`;
+            // if (Common.platform == APP_PLATFORM.OPPO) {
+            //     url = `${this.baseUrl}api/jump_oppo/record`;
+            // }
+            // this.request(url, navigateData, "POST", (respone) => {
+            //     console.log('navigate success ', respone)
+            //     if (callback)
+            //         callback(respone.data)
+            // });
         };
         /**
          * 跳转完成
          * @param code
          */
         HttpModule.prototype.navigateEnd = function (code) {
-            var url = this.baseUrl + "api/jump/success";
-            if (Common.platform == APP_PLATFORM.OPPO) {
-                url = this.baseUrl + "api/jump_oppo/success";
-            }
-            console.log('navigateEnd code ', code);
-            this.request(url, {
-                tag: code
-            }, "POST", function (respone) {
-                console.log('navigateEnd code ', code, respone);
-            });
+            // let url = `${this.baseUrl}api/jump/success`
+            // if (Common.platform == APP_PLATFORM.OPPO) {
+            //     url = `${this.baseUrl}api/jump_oppo/success`;
+            // }
+            // console.log('navigateEnd code ', code)
+            // this.request(url, {
+            //     tag: code
+            // }, "POST", (respone) => {
+            //     console.log('navigateEnd code ', code, respone)
+            // });
         };
         /**
          * 数据打点
@@ -3421,25 +3420,23 @@ var mx = (function () {
                     callback(__assign(__assign({}, res), { exportAutoNavigate: 1, isLimitArea: 0 }));
                 }
                 else {
-                    _this.loadArea(function (res2) {
-                        _this.disableAd(res, res2, function (disable) {
-                            var exportAutoNavigate = 0;
-                            if (disable) {
-                                //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
-                                if (res.exportAutoNavigate == 1)
-                                    exportAutoNavigate = 0;
-                                if (res.exportAutoNavigate == 2)
-                                    exportAutoNavigate = 1;
-                                callback(__assign(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)), { site01: [], site02: [], site03: [], site04: [] }));
-                            }
-                            else {
-                                if (res.exportAutoNavigate == 1)
-                                    exportAutoNavigate = 1;
-                                if (res.exportAutoNavigate == 2)
-                                    exportAutoNavigate = 1;
-                                callback(__assign(__assign({}, res), { exportAutoNavigate: exportAutoNavigate, isLimitArea: 0 }));
-                            }
-                        });
+                    _this.disableAd(res, null, function (disable) {
+                        var exportAutoNavigate = 0;
+                        if (disable) {
+                            //exportAutoNavigate 是否自动唤起跳转（强导） 0 关闭 1 开启(受屏蔽地区影响) 2开启（不受屏蔽地区影响）
+                            if (res.exportAutoNavigate == 1)
+                                exportAutoNavigate = 0;
+                            if (res.exportAutoNavigate == 2)
+                                exportAutoNavigate = 1;
+                            callback(__assign(__assign(__assign({ isLimitArea: 1 }, res), _this.getCfg(false)), { site01: [], site02: [], site03: [], site04: [] }));
+                        }
+                        else {
+                            if (res.exportAutoNavigate == 1)
+                                exportAutoNavigate = 1;
+                            if (res.exportAutoNavigate == 2)
+                                exportAutoNavigate = 1;
+                            callback(__assign(__assign({}, res), { exportAutoNavigate: exportAutoNavigate, isLimitArea: 0 }));
+                        }
                     });
                 }
             });
@@ -3587,69 +3584,68 @@ var mx = (function () {
             }
         };
         HttpModule.prototype.loadArea = function (callback) {
-            var _this = this;
-            if (this.areaData) {
-                callback(this.areaData);
-            }
-            else {
-                this._localQuene.push(callback);
-                if (this._localQuene.length > 1)
-                    return;
-                var ipUrl = this.baseUrl + "admin/wx_config/getLocation";
-                this.request(ipUrl, {}, 'GET', function (res2) {
-                    _this.areaData = res2;
-                    _this._localQuene.forEach(function (item) {
-                        item(_this.areaData);
-                    });
-                    _this._localQuene = [];
-                }, function () {
-                    _this._localQuene.forEach(function (item) {
-                        item(_this.areaData);
-                    });
-                    _this._localQuene = [];
-                });
-            }
+            // if (this.areaData) {
+            //     callback(this.areaData)
+            // }
+            // else {
+            //     this._localQuene.push(callback);
+            //     if (this._localQuene.length > 1)
+            //         return;
+            //     let ipUrl = `${this.baseUrl}admin/wx_config/getLocation`;
+            //     this.request(ipUrl, {}, 'GET', (res2) => {
+            //         this.areaData = res2;
+            //         this._localQuene.forEach(item => {
+            //             item(this.areaData)
+            //         })
+            //         this._localQuene = [];
+            //     }, () => {
+            //         this._localQuene.forEach(item => {
+            //             item(this.areaData)
+            //         })
+            //         this._localQuene = [];
+            //     })
+            // }
         };
-        HttpModule.prototype.getForceExport = function (callback) {
-            var _this = this;
-            this.loadCfg(function (res) {
-                _this.loadArea(function (res2) {
-                    _this.disabledForceExport(res, res2, function (disable) {
-                        callback(disable);
-                    });
-                });
-            });
-        };
+        // public getForceExport(callback) {
+        //     this.loadCfg(res => {
+        //         this.loadArea(res2 => {
+        //             this.disabledForceExport(res, res2, (disable) => {
+        //                 callback(disable)
+        //             })
+        //         })
+        //     })
+        // }
         HttpModule.prototype.disabledForceExport = function (res, res2, callback) {
-            var curTime = Common.formatTime(new Date());
-            var inDisabledRegion = false;
-            if (res.disabledForceExport) {
-                for (var i = 0; i < res.disabledForceExport.length; i++) {
-                    var region = res.disabledForceExport[i];
-                    if (res2.data.city.indexOf(region) != -1
-                        || res2.data.province.indexOf(region) != -1
-                        || res2.data.area.indexOf(region) != -1) {
-                        inDisabledRegion = true;
-                        break;
-                    }
-                }
-            }
-            if (inDisabledRegion) {
-                if (res.forceExportTime && res.forceExportTime.length == 2) {
-                    if (curTime > res.forceExportTime[0] && curTime < res.forceExportTime[1]) {
-                        callback(true);
-                    }
-                    else {
-                        callback(false);
-                    }
-                }
-                else {
-                    callback(true);
-                }
-            }
-            else {
-                callback(false);
-            }
+            callback(false);
+            // let curTime = Common.formatTime(new Date())
+            // let inDisabledRegion = false;
+            // if (res.disabledForceExport) {
+            //     for (let i = 0; i < res.disabledForceExport.length; i++) {
+            //         let region = res.disabledForceExport[i];
+            //         if (res2.data.city.indexOf(region) != -1
+            //             || res2.data.province.indexOf(region) != -1
+            //             || res2.data.area.indexOf(region) != -1) {
+            //             inDisabledRegion = true;
+            //             break;
+            //         }
+            //     }
+            // }
+            // if (inDisabledRegion) {
+            //     if (res.forceExportTime && res.forceExportTime.length == 2) {
+            //         if (curTime > res.forceExportTime[0] && curTime < res.forceExportTime[1]) {
+            //             callback(true)
+            //         }
+            //         else {
+            //             callback(false)
+            //         }
+            //     }
+            //     else {
+            //         callback(true)
+            //     }
+            // }
+            // else {
+            //     callback(false)
+            // }
         };
         HttpModule.prototype.getBannerShowCountLimit = function (callback) {
             this.loadCfg(function (res) {
@@ -3660,63 +3656,56 @@ var mx = (function () {
             });
         };
         HttpModule.prototype.disableAd = function (res, res2, callback) {
-            var curTime = Common.formatTime(new Date());
-            var inDisabledRegion = false;
-            if (res && res.disabledRegion) {
-                for (var i = 0; i < res.disabledRegion.length; i++) {
-                    var region = res.disabledRegion[i];
-                    if (res2 && res2.data && (res2.data.city.indexOf(region) != -1
-                        || res2.data.province.indexOf(region) != -1
-                        || res2.data.area.indexOf(region) != -1)) {
-                        inDisabledRegion = true;
-                        break;
-                    }
-                }
-            }
-            var firstScene = moosnow.data.getScene();
-            if (!Common.isEmpty(firstScene)) {
-                console.log('后台禁止场景 1 ', res.seachEntryScene);
-                console.log('后台禁止场景 2 ', res.shareEntryScene);
-                console.log('进入时的场景 ', firstScene);
-                if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(firstScene) != -1)
-                    || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(firstScene) != -1)) {
-                    callback(true);
-                    console.log('后台禁止场景 ', firstScene);
-                    return;
-                }
-            }
-            if (inDisabledRegion) {
-                if (res.disabledTime && res.disabledTime.length == 2) {
-                    if (curTime > res.disabledTime[0] && curTime < res.disabledTime[1]) {
-                        callback(true);
-                    }
-                    else {
-                        callback(false);
-                    }
-                }
-                else {
-                    callback(true);
-                }
-            }
-            else {
-                callback(false);
-            }
+            callback(false);
+            // let curTime = Common.formatTime(new Date())
+            // let inDisabledRegion = false;
+            // if (res && res.disabledRegion) {
+            //     for (let i = 0; i < res.disabledRegion.length; i++) {
+            //         let region = res.disabledRegion[i];
+            //         if (res2 && res2.data && (res2.data.city.indexOf(region) != -1
+            //             || res2.data.province.indexOf(region) != -1
+            //             || res2.data.area.indexOf(region) != -1)) {
+            //             inDisabledRegion = true;
+            //             break;
+            //         }
+            //     }
+            // }
+            // let firstScene = moosnow.data.getScene();
+            // if (!Common.isEmpty(firstScene)) {
+            //     console.log('后台禁止场景 1 ', res.seachEntryScene);
+            //     console.log('后台禁止场景 2 ', res.shareEntryScene);
+            //     console.log('进入时的场景 ', firstScene);
+            //     if ((res.seachEntryOn == 1 && res.seachEntryScene && res.seachEntryScene.indexOf(firstScene) != -1)
+            //         || (res.shareEntryOn == 1 && res.shareEntryScene && res.shareEntryScene.indexOf(firstScene) != -1)) {
+            //         callback(true)
+            //         console.log('后台禁止场景 ', firstScene);
+            //         return;
+            //     }
+            // }
+            // if (inDisabledRegion) {
+            //     if (res.disabledTime && res.disabledTime.length == 2) {
+            //         if (curTime > res.disabledTime[0] && curTime < res.disabledTime[1]) {
+            //             callback(true)
+            //         }
+            //         else {
+            //             callback(false)
+            //         }
+            //     }
+            //     else {
+            //         callback(true)
+            //     }
+            // }
+            // else {
+            //     callback(false)
+            // }
         };
         HttpModule.prototype.getShareInfo = function (cb) {
-            var _this = this;
             this.request(ROOT_CONFIG.HTTP_ROOT + "/share/" + Common.config.moosnowAppId + ".json", {
                 appid: Common.config.moosnowAppId
             }, "GET", function (res) {
                 cb(res);
                 moosnow.platform.initShare(res);
             }, function () {
-                _this.request(_this.baseUrl + "admin/wx_share/getShare", {
-                    appid: Common.config.moosnowAppId
-                }, "POST", function (res) {
-                    console.log('分享数据', res.data);
-                    cb(res.data);
-                    moosnow.platform.initShare(res.data);
-                });
             });
         };
         return HttpModule;
@@ -7098,6 +7087,7 @@ var mx = (function () {
             if (!window[this.platformName].createNativeAd)
                 return;
             this._destroyNative();
+            console.log("初始化_prepareNative ", this.nativeId);
             this.native = window[this.platformName].createNativeAd({
                 posId: this.nativeId
             });

@@ -4,7 +4,6 @@ export declare class HttpModule extends BaseModule {
     private secret;
     private versionNumber;
     version: string;
-    baseUrl: string;
     private instanceTime;
     constructor();
     private mLaunchOptions;
@@ -90,7 +89,6 @@ export declare class HttpModule extends BaseModule {
     loadCfg(callback: any): void;
     private _localQuene;
     loadArea(callback: any): void;
-    getForceExport(callback: any): void;
     disabledForceExport(res: any, res2: any, callback: any): void;
     getBannerShowCountLimit(callback: any): void;
     private disableAd;
