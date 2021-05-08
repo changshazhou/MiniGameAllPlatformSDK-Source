@@ -2610,90 +2610,7 @@ var mx = (function () {
             _this.initBanner();
             _this.initInter();
             return _this;
-            // setTimeout(() => {
-            //     this.initVideo();
-            // }, 1)
         }
-        /**
-         * 游戏登录
-         * @param callback
-         * @param fail
-         */
-        WXModule.prototype.login = function (callback, fail) {
-            moosnow.http.getAllConfig(function (res) {
-            });
-            var self = this;
-            var userToken = moosnow.data.getToken();
-            if (userToken && !isNaN(userToken)) {
-                self.getUserToken("", userToken, callback);
-            }
-            else {
-                moosnow.data.setScene(this.getLaunchOption().scene);
-                if (window[this.platformName] && window[this.platformName].login)
-                    window[this.platformName].login({
-                        success: function (res) {
-                            if (res.code) {
-                                //发起网络请求
-                                self.getUserToken(res.code, "", callback);
-                            }
-                            else {
-                                if (Common.isFunction(callback))
-                                    callback();
-                            }
-                        },
-                        fail: function () {
-                        }
-                    });
-                else {
-                    _super.prototype.login.call(this, callback, fail);
-                }
-            }
-        };
-        /**
-         *
-         * @param code
-         * @param user_id
-         * @param callback
-         */
-        WXModule.prototype.getUserToken = function (code, user_id, callback) {
-            var options = this.getLaunchOption();
-            var scene = options.scene;
-            var channel_id = options.query && options.query.channel_id ? options.query.channel_id : "0";
-            var channel_appid = options.referrerInfo && options.referrerInfo.appId ? options.referrerInfo.appId : "0";
-            var fromAppId = options.referrerInfo ? options.referrerInfo.appId : '未知';
-            var wxgamecid = "";
-            if (options && options.query)
-                wxgamecid = options.query.wxgamecid;
-            moosnow.data.setChannelAppId(channel_appid);
-            moosnow.data.setChannelId(channel_id);
-            if (window[this.platformName] && window[this.platformName].aldSendEvent) {
-                window[this.platformName].aldSendEvent("来源", {
-                    origin: fromAppId,
-                    path: options.query.from || 0
-                });
-            }
-            moosnow.http.request(this.baseUrl + "api/channel/login.html", {
-                appid: Common.config.moosnowAppId,
-                code: code,
-                user_id: user_id,
-                channel_id: channel_id,
-                channel_appid: channel_appid,
-                wxgamecid: wxgamecid,
-                scene: scene,
-                fromApp: fromAppId
-            }, "POST", function (respone) {
-                console.log("WXModule -> getUserToken -> respone", respone);
-                if (respone.code == 0 && respone.data && respone.data.user_id) {
-                    moosnow.data.setToken(respone.data.user_id);
-                }
-                if (Common.isFunction(callback))
-                    callback(respone);
-            }, function () {
-                //如果出错，不影响游戏
-                if (Common.isFunction(callback))
-                    callback({});
-            });
-        };
         WXModule.prototype.initRecord = function () {
             if (!window[this.platformName])
                 return;
@@ -4311,7 +4228,7 @@ var mx = (function () {
             this.nativeLoading = false;
             console.log(MSG.NATIVE_LOAD_COMPLETED, res);
             if (res && res.adList && res.adList.length > 0) {
-                this.nativeAdResult = res.adList[0];
+                this.nativeAdResult = res.adList[res.adList.length - 1];
                 if (!Common.isEmpty(this.nativeAdResult.adId)) {
                     console.log(MSG.NATIVE_REPORT);
                     this.native.reportAdShow({

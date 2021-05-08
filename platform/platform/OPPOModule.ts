@@ -661,7 +661,7 @@ export default class OPPOModule extends PlatformModule {
         this.nativeLoading = false;
         console.log(MSG.NATIVE_LOAD_COMPLETED, res)
         if (res && res.adList && res.adList.length > 0) {
-            this.nativeAdResult = res.adList[0];
+            this.nativeAdResult = res.adList[res.adList.length - 1];
             if (!Common.isEmpty(this.nativeAdResult.adId)) {
                 console.log(MSG.NATIVE_REPORT)
                 this.native.reportAdShow({
